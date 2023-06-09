@@ -9,11 +9,17 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
 set(benchmark_DIR "libs/benchmark/build")
 find_package(benchmark REQUIRED)
 
+link_directories(/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/libs/papi/src/install/lib)
+
 add_executable(${PROJECT_NAME}
         src/data_generation/data_generator.cpp
         src/library/select.cpp
         src/benchmarking/selectTests.cpp
         src/main.cpp
-        src/utils/dataHelpers.cpp)
+        src/utils/dataHelpers.cpp
+        src/perf_counters/hpcTests.cpp)
 
 target_link_libraries(${PROJECT_NAME} benchmark::benchmark)
+
+target_link_libraries(${PROJECT_NAME} papi)
+

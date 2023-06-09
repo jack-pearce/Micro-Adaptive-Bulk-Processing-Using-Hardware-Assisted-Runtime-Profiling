@@ -1,9 +1,8 @@
 #include <iostream>
 
-#include "libs/papi/papi-7.0.1/src/install/include/papi.h"
+#include "../../libs/papi/src/install/include/papi.h"
 
-int main()
-{
+void hpcTest() {
     int retval, EventSet = PAPI_NULL;
     unsigned int native = 0x0;
     PAPI_event_info_t info;

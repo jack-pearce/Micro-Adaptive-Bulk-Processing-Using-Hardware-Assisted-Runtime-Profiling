@@ -6,6 +6,7 @@
 #include "data_generation/data_generator.h"
 #include "utils/dataHelpers.h"
 #include "library/select.h"
+#include "perf_counters/hpcTests.h"
 #include "benchmark/benchmark.h"
 
 void runBenchmark(int argc, char** argv) {
@@ -53,6 +54,6 @@ void selectFunctionalityTest() {
 
 
 int main(int argc, char** argv) {
-    selectTest1(argc, argv);
+    hpcTest();
     return 0;
 }
