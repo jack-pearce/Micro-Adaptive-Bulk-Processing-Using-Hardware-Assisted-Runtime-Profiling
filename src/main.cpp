@@ -54,6 +54,6 @@ void selectFunctionalityTest() {
 
 
 int main(int argc, char** argv) {
-    hpcTest();
+    hpcTest_3();
     return 0;
 }
