@@ -13,7 +13,7 @@ add_executable(${PROJECT_NAME}
         src/data_generation/data_generator.cpp
         src/library/select.cpp
         src/benchmarking/selectTests.cpp
-        src/benchmarking/main.cpp
+        src/main.cpp
         src/utils/dataHelpers.cpp)
 
 target_link_libraries(${PROJECT_NAME} benchmark::benchmark)

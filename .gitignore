@@ -1,3 +1,4 @@
 /libs/
 /data/
 .log
+/cmake-build-debug/

@@ -2,11 +2,11 @@
 #include <vector>
 #include <iostream>
 
-#include "selectTests.h"
-#include "../data_generation/data_generator.h"
-#include "../utils/dataHelpers.h"
-#include "../library/select.h"
-#include "../../libs/benchmark/include/benchmark/benchmark.h"
+#include "benchmarking/selectTests.h"
+#include "data_generation/data_generator.h"
+#include "utils/dataHelpers.h"
+#include "library/select.h"
+#include "benchmark/benchmark.h"
 
 void runBenchmark(int argc, char** argv) {
     benchmark::Initialize(&argc, argv);
