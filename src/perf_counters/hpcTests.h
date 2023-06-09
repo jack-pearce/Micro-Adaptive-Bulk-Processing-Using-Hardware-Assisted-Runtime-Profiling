@@ -3,6 +3,6 @@
 
 void hpcTest_1();
 void hpcTest_2();
-void hpcTest_3();
+void hpcSelectTester();
 
 #endif //MABPL_HPCTESTS_H

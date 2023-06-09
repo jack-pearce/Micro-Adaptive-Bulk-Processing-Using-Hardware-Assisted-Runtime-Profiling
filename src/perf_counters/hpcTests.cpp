@@ -157,7 +157,7 @@ void hpcTest_2() {
         printf("Wall clock time in microseconds: %lld\n", end_usec - start_usec);
 }
 
-void hpcTest_3() {
+void hpcSelectTester() {
     std::string filePath = "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/input/uniformIntDistribution.csv";
     int numElements = 4000000 / sizeof(int);
     int sensitivityStride = 5;
