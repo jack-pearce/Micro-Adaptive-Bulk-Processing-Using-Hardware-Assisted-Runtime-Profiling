@@ -45,8 +45,13 @@ int initialisePAPIandCreateEventSet(std::vector<std::string>& hpcs) {
     return EventSet;
 }
 
-void teardownPAPI(int eventSet) {
-    PAPI_destroy_eventset(&eventSet);
+void teardownPAPI(int EventSet, long_long hpcValues[]) {
+    if (PAPI_stop(EventSet, hpcValues) != PAPI_OK) {
+        std::cerr << "PAPI could not stop counting events!" << std::endl;
+        exit(1);
+    }
+
+    PAPI_destroy_eventset(&EventSet);
     PAPI_shutdown();
 }
 
@@ -155,6 +160,8 @@ void hpcTest_2() {
 void hpcTest_3() {
     std::string filePath = "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/uniformIntDistribution.csv";
     int numElements = 4000000 / sizeof(int);
+    int sensitivityStride = 5;
+    int numTests = 1 + (100 / sensitivityStride);
     generateUniformDistributionCSV(filePath, numElements);
 
     std::vector<int> inputData;
@@ -163,7 +170,9 @@ void hpcTest_3() {
 
     std::vector<std::string> hpcs = {"INSTRUCTION_RETIRED",
                                      "BRANCH_INSTRUCTIONS_RETIRED",
-                                     "MISPREDICTED_BRANCH_RETIRED"};
+                                     "MISPREDICTED_BRANCH_RETIRED",
+                                     "LLC_MISSES",
+                                     "PERF_COUNT_HW_CACHE_MISSES"};
     long_long hpcValues[hpcs.size()];
     int EventSet = initialisePAPIandCreateEventSet(hpcs);
 
@@ -172,30 +181,31 @@ void hpcTest_3() {
         exit(1);
     }
 
-    selectBranch(elements, inputData, selection, 50);
+    std::vector<std::vector<long_long>> results(numTests, std::vector<long_long>(hpcs.size() + 1, 0));
+    int count = 0;
 
-    if (PAPI_stop(EventSet, hpcValues) != PAPI_OK) {
-        std::cerr << "PAPI could not stop counting events!" << std::endl;
-        exit(1);
+    for (int i = 0; i <= 100; i += sensitivityStride) {
+        if (PAPI_reset(EventSet) != PAPI_OK)
+            exit(1);
+
+        selectBranch(elements, inputData, selection, i);
+
+        if (PAPI_read(EventSet, hpcValues) != PAPI_OK)
+            exit(1);
+
+        results[count][0] = static_cast<long_long>(i);
+        for (int j = 0; j < hpcs.size(); ++j) {
+            results[count][j + 1] = hpcValues[j];
+        }
+        count++;
     }
 
-    printHpcValues(hpcs, hpcValues);
+    std::vector<std::string> headers(hpcs);
+    headers.insert(headers.begin(), "Sensitivity");
+    std::string outputFilePath = "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/output/";
+    std::string outputFileName = "Sensitivity_Output";
+    std::string outputFullFilePath = outputFilePath + outputFileName + ".csv";
+    writeHeadersAndTableToCSV(headers, results, outputFullFilePath);
 
-    teardownPAPI(EventSet);
-
-
-
-
-    /* Read the counting events in the Event Set */
-//    if (PAPI_read(EventSet, values) != PAPI_OK)
-//        exit(1);
-//
-//    printf("After reading the counters: %lld\n",values[0]);
-
-/* Reset the counting events in the Event Set */
-//    if (PAPI_reset(EventSet) != PAPI_OK)
-//        exit(1);
-
-
-
+    teardownPAPI(EventSet, hpcValues);
 }
