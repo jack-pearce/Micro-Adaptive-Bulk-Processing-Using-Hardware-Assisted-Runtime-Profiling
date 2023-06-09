@@ -22,7 +22,7 @@ void selectTest1(int argc, char** argv) {
 }
 
 void dataDistributionTest() {
-    std::string filePath = "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/uniformIntDistribution.csv";
+    std::string filePath = "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/input/uniformIntDistribution.csv";
     int numElements = 4000000 / sizeof(int);
 
     generateUniformDistributionCSV(filePath, numElements);
@@ -32,7 +32,7 @@ void dataDistributionTest() {
 }
 
 void selectFunctionalityTest() {
-    std::string filePath = "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/uniformIntDistribution.csv";
+    std::string filePath = "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/input/uniformIntDistribution.csv";
     int numElements = 4000000 / sizeof(int);
 
     generateUniformDistributionCSV(filePath, numElements);

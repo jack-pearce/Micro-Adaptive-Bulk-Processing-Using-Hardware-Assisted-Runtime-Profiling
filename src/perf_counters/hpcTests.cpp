@@ -158,7 +158,7 @@ void hpcTest_2() {
 }
 
 void hpcTest_3() {
-    std::string filePath = "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/uniformIntDistribution.csv";
+    std::string filePath = "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/input/uniformIntDistribution.csv";
     int numElements = 4000000 / sizeof(int);
     int sensitivityStride = 5;
     int numTests = 1 + (100 / sensitivityStride);

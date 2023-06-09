@@ -22,7 +22,7 @@ static void BM_select(benchmark::State& state) {
         for (auto _: state) {
             state.PauseTiming();
 
-            std::string filePath = "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/uniformIntDistribution.csv";
+            std::string filePath = "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/input/uniformIntDistribution.csv";
             std::vector<int> inputData;
             std::vector<int> selection;
             int elements = BM_selectSetup(filePath, inputData, selection);
@@ -35,7 +35,7 @@ static void BM_select(benchmark::State& state) {
         for (auto _: state) {
             state.PauseTiming();
 
-            std::string filePath = "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/uniformIntDistribution.csv";
+            std::string filePath = "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/input/uniformIntDistribution.csv";
             std::vector<int> inputData;
             std::vector<int> selection;
             int elements = BM_selectSetup(filePath, inputData, selection);
@@ -48,7 +48,7 @@ static void BM_select(benchmark::State& state) {
 }
 
 void selectBranchTest_1() {
-    std::string filePath = "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/uniformIntDistribution.csv";
+    std::string filePath = "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/input/uniformIntDistribution.csv";
     int numElements = 4000000 / sizeof(int);
 
     generateUniformDistributionCSV(filePath, numElements);
@@ -57,7 +57,7 @@ void selectBranchTest_1() {
 }
 
 void selectPredicationTest_1() {
-    std::string filePath = "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/uniformIntDistribution.csv";
+    std::string filePath = "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/input/uniformIntDistribution.csv";
     int numElements = 4000000 / sizeof(int);
 
     generateUniformDistributionCSV(filePath, numElements);
