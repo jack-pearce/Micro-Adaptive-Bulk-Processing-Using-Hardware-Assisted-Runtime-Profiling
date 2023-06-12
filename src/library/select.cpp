@@ -49,8 +49,10 @@ int selectAdaptive(int n, const int *inputData, int *selection, int threshold) {
 
     std::vector<std::string> counters = {"UNHALTED_CORE_CYCLES",
                                          "L1-DCACHE-LOAD-MISSES"};
+
+    int eventSet;
     long_long counterValues[counters.size()];
-    int eventSet = initialisePAPIandCreateEventSet(counters);
+    eventSet = initialisePAPIandCreateEventSet(counters);
 
     while (n > 0) {
         tuplesToProcess = std::min(n, tuplesPerAdaption);

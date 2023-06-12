@@ -66,16 +66,16 @@ void selectAdaptiveTimeBM_1() {
 }
 
 void selectBranchTimeBM_2() {
-    BENCHMARK(timeBM_select)->Name("SelectBranch")->Iterations(1)->ArgsProduct({
-        benchmark::CreateDenseRange(0,50,10), {SelectImplementation::Branch}});
+    BENCHMARK(timeBM_select)->Name("SelectBranch")->Iterations(10)->ArgsProduct({
+        benchmark::CreateDenseRange(0,100,10), {SelectImplementation::Branch}});
 }
 
 void selectPredicationTimeBM_2() {
-    BENCHMARK(timeBM_select)->Name("SelectPredication")->Iterations(1)->ArgsProduct({
-        benchmark::CreateDenseRange(0,50,10), {SelectImplementation::Predication}});
+    BENCHMARK(timeBM_select)->Name("SelectPredication")->Iterations(10)->ArgsProduct({
+        benchmark::CreateDenseRange(0,100,10), {SelectImplementation::Predication}});
 }
 
 void selectAdaptiveTimeBM_2() {
-    BENCHMARK(timeBM_select)->Name("SelectAdaptive")->Iterations(1)->ArgsProduct({
-        benchmark::CreateDenseRange(0,50,10), {SelectImplementation::Adaptive}});
+    BENCHMARK(timeBM_select)->Name("SelectAdaptive")->Iterations(10)->ArgsProduct({
+        benchmark::CreateDenseRange(0,100,10), {SelectImplementation::Adaptive}});
 }

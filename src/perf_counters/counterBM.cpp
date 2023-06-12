@@ -79,3 +79,50 @@ void selectCounterBM_2(SelectImplementation selectImplementation, int numElement
         printf("Wall clock time in microseconds: %lld\n", end_usec - start_usec);
     }
 }
+
+void selectCyclesCounterBM(SelectImplementation selectImplementation, int numElements,
+                           int sensitivityStride, const std::string& fileName, int iterations) {
+    std::string filePath = uniformInstDistribution250mValues;
+    int numTests = 1 + (100 / sensitivityStride);
+
+    // Try adding in other CPU cycle counter
+    std::vector<std::string> benchmarkCounters = {"PERF_COUNT_HW_CPU_CYCLES"};
+
+    std::unique_ptr<int[]> inputData(new int[numElements]);
+    std::unique_ptr<int[]> selection(new int[numElements]);
+    loadDataToArray(filePath, inputData.get());
+
+    long_long benchmarkCounterValues[benchmarkCounters.size()];
+    int benchmarkEventSet = initialisePAPIandCreateEventSet(benchmarkCounters);
+
+    std::vector<std::vector<long_long>> results(numTests, std::vector<long_long>(benchmarkCounters.size() + 1, 0));
+    int count = 0;
+
+    SelectFunctionPtr selectFunctionPtr;
+    setSelectFuncPtr(selectFunctionPtr, selectImplementation);
+
+    for (int i = 0; i <= 100; i += sensitivityStride) {
+        if (PAPI_reset(benchmarkEventSet) != PAPI_OK)
+            exit(1);
+
+        selectFunctionPtr(numElements, inputData.get(), selection.get(), i);
+
+        if (PAPI_read(benchmarkEventSet, benchmarkCounterValues) != PAPI_OK)
+            exit(1);
+
+        results[count][0] = static_cast<long_long>(i);
+        for (int j = 0; j < static_cast<int>(benchmarkCounters.size()); ++j) {
+            results[count][j + 1] = benchmarkCounterValues[j];
+        }
+        count++;
+    }
+
+    std::vector<std::string> headers(benchmarkCounters);
+    headers.insert(headers.begin(), "Sensitivity");
+    std::string outputFilePath = "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/output/";
+    std::string outputFileName = "select_cycles_benchmark";
+    std::string outputFullFilePath = outputFilePath + outputFileName + fileName + ".csv";
+    writeHeadersAndTableToCSV(headers, results, outputFullFilePath);
+
+    teardownPAPI(benchmarkEventSet, benchmarkCounterValues);
+}

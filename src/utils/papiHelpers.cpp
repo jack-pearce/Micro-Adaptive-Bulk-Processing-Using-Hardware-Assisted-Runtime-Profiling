@@ -14,15 +14,19 @@ int initialisePAPIandCreateEventSet(std::vector<std::string>& counters) {
     int returnValue, eventCode, eventSet=PAPI_NULL;
 
 /* Initialize the PAPI library */
-    returnValue = PAPI_library_init(PAPI_VER_CURRENT);
-    if (returnValue != PAPI_VER_CURRENT) {
-        std::cerr << "PAPI library init error!" << std::endl;
-        exit(1);
+    if (PAPI_is_initialized() == PAPI_NOT_INITED) {
+        returnValue = PAPI_library_init(PAPI_VER_CURRENT);
+        if (returnValue != PAPI_VER_CURRENT) {
+            std::cerr << "PAPI library init error!" << std::endl;
+            exit(1);
+        }
     }
 
 /* Create the Event Set */
-    if (PAPI_create_eventset(&eventSet) != PAPI_OK) {
+    returnValue = PAPI_create_eventset(&eventSet);
+    if (returnValue != PAPI_OK) {
         std::cerr << "PAPI could not create event set!" << std::endl;
+        std::cerr << "Error code: " << returnValue << std::endl;
         exit(1);
     }
 
@@ -47,6 +51,8 @@ int initialisePAPIandCreateEventSet(std::vector<std::string>& counters) {
         std::cerr << "PAPI could not start event set!" << std::endl;
         exit(1);
     }
+
+    std::cout << "Event set created" << std::endl;
 
     return eventSet;
 }

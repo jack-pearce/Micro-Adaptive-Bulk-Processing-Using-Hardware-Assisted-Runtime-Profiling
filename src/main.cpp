@@ -20,14 +20,14 @@ void runTimeBM(int argc, char** argv) {
     benchmark::Shutdown();
 }
 
-void selectTest1() {
+void selectTimeBM_1() {
     selectBranchTimeBM_1();
     selectPredicationTimeBM_1();
     selectAdaptiveTimeBM_1();
     runTimeBM(0, nullptr);
 }
 
-void selectTest2() {
+void selectTimeBM_2() {
     selectPredicationTimeBM_2();
     selectAdaptiveTimeBM_2();
     selectBranchTimeBM_2();
@@ -86,6 +86,13 @@ void selectCounterBM_2(SelectImplementation selectImplementation) {
     selectCounterBM_2(selectImplementation, numElements, sensitivityStride);
 }
 
+void selectCounterBM_3(SelectImplementation selectImplementation, int iterations) {
+    std::string fileName = "select_predication_cycles_test";
+    int numElements = 1000000000 / sizeof(int);
+    int sensitivityStride = 5;
+    selectCyclesCounterBM(selectImplementation, numElements, sensitivityStride, fileName, iterations);
+}
+
 int main(int argc, char** argv) {
 //    selectCounterBM_1(SelectImplementation::Predication, "Predication");
 //    selectCounterBM_1(SelectImplementation::Branch, "Branch");
@@ -94,10 +101,7 @@ int main(int argc, char** argv) {
 //    selectCounterBM_2(SelectImplementation::Predication);
 //    selectCounterBM_2(SelectImplementation::Branch);
 
-//    selectCounterCyclesTest();
-
-    selectTest1();
-    // Do valgrind check too
+    selectCounterBM_3(SelectImplementation::Branch, 1);
 
     return 0;
 }
