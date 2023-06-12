@@ -1,8 +1,6 @@
-#include <vector>
-
 #include "select.h"
 
-int selectBranch(int n, std::vector<int>& inputData, std::vector<int>& selection, int threshold) {
+int selectBranch(int n, const int *inputData, int *selection, int threshold) {
     int k = 0;
     for (int i = 0; i < n; ++i) {
         if (inputData[i] <= threshold) {
@@ -12,11 +10,20 @@ int selectBranch(int n, std::vector<int>& inputData, std::vector<int>& selection
     return k;
 }
 
-int selectPredication(int n, std::vector<int>& inputData, std::vector<int>& selection, int threshold) {
+int selectPredication(int n, const int *inputData, int *selection, int threshold) {
     int k = 0;
     for (int i = 0; i < n; ++i) {
         selection[k] = i;
         k += (inputData[i] <= threshold);
     }
     return k;
+}
+
+typedef int (*SelectFunctionPtr)(int n, const int *inputData, int *selection, int threshold);
+
+int selectAdaptive(int n, const int *inputData, int *selection, int threshold) {
+    SelectFunctionPtr selectFunctionPtr = selectBranch;
+
+
+    return 0;
 }

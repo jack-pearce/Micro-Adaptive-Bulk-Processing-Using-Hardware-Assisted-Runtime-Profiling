@@ -6,7 +6,34 @@
 #include <cassert>
 
 #include "dataHelpers.h"
-#include "../../libs/papi/src/install/include/papi.h"
+
+int countElements(const std::string& filePath) {
+    std::ifstream inputFile(filePath);
+
+    if (!inputFile) {
+        std::cerr << "Failed to open the file." << std::endl;
+        exit(1);
+    }
+
+    std::string line;
+    int index = 0;
+    while (std::getline(inputFile, line)) {
+        std::istringstream iss(line);
+        std::string value;
+
+        while (std::getline(iss, value, ',')) {
+            try {
+                int intValue = std::stoi(value);
+                index++;
+            } catch (const std::exception& e) {
+                std::cerr << "Failed to convert value to int: " << value << std::endl;
+            }
+        }
+    }
+
+    inputFile.close();
+    return index;
+}
 
 void loadDataToVector(const std::string& filePath, std::vector<int>& data) {
     std::ifstream inputFile(filePath);
@@ -32,6 +59,35 @@ void loadDataToVector(const std::string& filePath, std::vector<int>& data) {
     }
 
     inputFile.close();
+}
+
+int loadDataToArray(const std::string& filePath, int *data) {
+    std::ifstream inputFile(filePath);
+
+    if (!inputFile) {
+        std::cerr << "Failed to open the file." << std::endl;
+        exit(1);
+    }
+
+    std::string line;
+    int index = 0;
+    while (std::getline(inputFile, line)) {
+        std::istringstream iss(line);
+        std::string value;
+
+        while (std::getline(iss, value, ',')) {
+            try {
+                int intValue = std::stoi(value);
+                data[index] = intValue;
+                index++;
+            } catch (const std::exception& e) {
+                std::cerr << "Failed to convert value to int: " << value << std::endl;
+            }
+        }
+    }
+
+    inputFile.close();
+    return index;
 }
 
 void displayDistribution(const std::vector<int>& data) {

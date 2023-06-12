@@ -3,7 +3,9 @@
 
 #include "../../libs/papi/src/install/include/papi.h"
 
+int countElements(const std::string& filePath);
 void loadDataToVector(const std::string& filePath, std::vector<int>& data);
+int loadDataToArray(const std::string& filePath, int *data);
 void displayDistribution(const std::vector<int>& data);
 void writeHeadersAndTableToCSV(std::vector<std::string>& headers,
                                std::vector<std::vector<long_long>>  values,

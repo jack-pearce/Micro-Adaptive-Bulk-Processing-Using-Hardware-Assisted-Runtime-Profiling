@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <memory>
 
 #include "../data_generation/data_generator.h"
 #include "../library/select.h"
@@ -164,9 +165,10 @@ void hpcSelectTester() {
     int numTests = 1 + (100 / sensitivityStride);
     generateUniformDistributionCSV(filePath, numElements);
 
-    std::vector<int> inputData;
-    std::vector<int> selection;
-    int elements = BM_selectSetup(filePath, inputData, selection);
+    generateUniformDistributionCSV(filePath, numElements);
+    std::unique_ptr<int[]> inputData(new int[numElements]);
+    std::unique_ptr<int[]> selection(new int[numElements]);
+    loadDataToArray(filePath, inputData.get());
 
     std::vector<std::string> hpcs = {"INSTRUCTION_RETIRED",
                                      "BRANCH_INSTRUCTIONS_RETIRED",
@@ -188,7 +190,7 @@ void hpcSelectTester() {
         if (PAPI_reset(EventSet) != PAPI_OK)
             exit(1);
 
-        selectBranch(elements, inputData, selection, i);
+        selectBranch(numElements, inputData.get(), selection.get(), i);
 
         if (PAPI_read(EventSet, hpcValues) != PAPI_OK)
             exit(1);
