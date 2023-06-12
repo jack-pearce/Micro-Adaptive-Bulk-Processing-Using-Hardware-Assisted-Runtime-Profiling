@@ -5,8 +5,12 @@ int selectBranch(int n, const int *inputData, int *selection, int threshold);
 int selectPredication(int n, const int *inputData, int *selection, int threshold);
 int selectAdaptive(int n, const int *inputData, int *selection, int threshold);
 
-enum selectImplementation {
-    Branch, Predication
+enum SelectImplementation {
+    Branch, Predication, Adaptive
 };
+
+typedef int (*SelectFunctionPtr)(int n, const int *inputData, int *selection, int threshold);
+
+void setSelectFuncPtr(SelectFunctionPtr &selectFunctionPtr, SelectImplementation selectImplementation);
 
 #endif //MICRO_ADAPTIVE_BULK_PROCESSING_LIBRARY_SELECT_H

@@ -3,7 +3,7 @@
 #include <random>
 #include <string>
 
-#include "data_generator.h"
+#include "dataGenerators.h"
 
 void generateUniformDistributionCSV(const std::string& filePath, int numValues) {
     unsigned int seed = 1;
