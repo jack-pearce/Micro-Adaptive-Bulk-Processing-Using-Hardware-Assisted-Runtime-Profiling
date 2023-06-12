@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "select.h"
+#include "../utils/papiHelpers.h"
 
 
 int selectBranch(int n, const int *inputData, int *selection, int threshold) {
@@ -23,35 +24,39 @@ int selectPredication(int n, const int *inputData, int *selection, int threshold
     return k;
 }
 
-/*void selectPredication_2(int n, int *&inputData, int *&selection, int threshold, int &k) {
-    for (int i = 0; i < n; ++i) {
-        *selection = *inputData;
-        selection += (*inputData) <= threshold;
-        k += (*inputData)++ <= threshold;
-    }
-}*/
-
-void performAdaption(SelectFunctionPtr &selectFunctionPtr) {
-    // stop counters and read counters
+inline void performAdaption(SelectFunctionPtr &selectFunctionPtr, int eventSet, long_long counterValues[]) {
+    if (PAPI_read(eventSet, counterValues) != PAPI_OK)
+        exit(1);
 
     // do analysis
 
     // update selectFunctionPtr if necessary
 
-    // reset counters
+    if (PAPI_reset(eventSet) != PAPI_OK)
+        exit(1);
 }
 
 int selectAdaptive(int n, const int *inputData, int *selection, int threshold) {
-    int tuplesPerAdaption = 2500;
+    int tuplesPerAdaption = 10000;
     int k = 0;
     int tuplesToProcess;
     int selected;
-
-    // initialise performance counters
-
-    // start counters
-
     SelectFunctionPtr selectFunctionPtr = selectPredication;
+
+    std::vector<std::string> counters = {"PERF_COUNT_HW_CPU_CYCLES",
+                                         "INSTRUCTION_RETIRED",
+                                         "BRANCH_INSTRUCTIONS_RETIRED",
+                                         "MISPREDICTED_BRANCH_RETIRED",
+                                         "LLC_MISSES",
+                                         "PERF_COUNT_HW_CACHE_MISSES"};
+    long_long counterValues[counters.size()];
+    int eventSet = initialisePAPIandCreateEventSet(counters);
+    int returnValue = PAPI_start(eventSet);
+    if (returnValue != PAPI_OK) {
+        std::cerr << "PAPI could not start counting events!" << std::endl;
+        std::cerr << "Error code: " << returnValue << std::endl;
+        exit(1);
+    }
 
     while (n > 0) {
         tuplesToProcess = std::min(n, tuplesPerAdaption);
@@ -60,10 +65,10 @@ int selectAdaptive(int n, const int *inputData, int *selection, int threshold) {
         inputData += tuplesToProcess;
         selection += selected;
         k += selected;
-        performAdaption(selectFunctionPtr);
+        performAdaption(selectFunctionPtr, eventSet, counterValues);
     }
 
-    // counter teardown
+    teardownPAPI(eventSet, counterValues);
 
     return k;
 }

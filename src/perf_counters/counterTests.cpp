@@ -97,23 +97,18 @@ void selectCounterTest() {
                                          "LLC_MISSES",
                                          "PERF_COUNT_HW_CACHE_MISSES"};
     long_long counterValues[counters.size()];
-    int EventSet = initialisePAPIandCreateEventSet(counters);
-
-    if (PAPI_start(EventSet) != PAPI_OK) {
-        std::cerr << "PAPI could not start counting events!" << std::endl;
-        exit(1);
-    }
+    int eventSet = initialisePAPIandCreateEventSet(counters);
 
     std::vector<std::vector<long_long>> results(numTests, std::vector<long_long>(counters.size() + 1, 0));
     int count = 0;
 
     for (int i = 0; i <= 100; i += sensitivityStride) {
-        if (PAPI_reset(EventSet) != PAPI_OK)
+        if (PAPI_reset(eventSet) != PAPI_OK)
             exit(1);
 
         selectBranch(numElements, inputData.get(), selection.get(), i);
 
-        if (PAPI_read(EventSet, counterValues) != PAPI_OK)
+        if (PAPI_read(eventSet, counterValues) != PAPI_OK)
             exit(1);
 
         results[count][0] = static_cast<long_long>(i);
@@ -130,5 +125,5 @@ void selectCounterTest() {
     std::string outputFullFilePath = outputFilePath + outputFileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, outputFullFilePath);
 
-    teardownPAPI(EventSet, counterValues);
+    teardownPAPI(eventSet, counterValues);
 }

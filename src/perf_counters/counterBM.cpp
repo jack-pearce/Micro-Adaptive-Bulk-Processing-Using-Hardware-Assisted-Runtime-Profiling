@@ -21,11 +21,6 @@ void selectCounterBM(SelectImplementation selectImplementation, int numElements,
     long_long counterValues[counters.size()];
     int EventSet = initialisePAPIandCreateEventSet(counters);
 
-    if (PAPI_start(EventSet) != PAPI_OK) {
-        std::cerr << "PAPI could not start counting events!" << std::endl;
-        exit(1);
-    }
-
     std::vector<std::vector<long_long>> results(numTests, std::vector<long_long>(counters.size() + 1, 0));
     int count = 0;
 

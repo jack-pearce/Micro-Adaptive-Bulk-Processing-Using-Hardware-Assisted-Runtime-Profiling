@@ -38,7 +38,7 @@ void selectTest2() {
 
 void dataDistributionTest() {
     std::string filePath = "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/input/uniformIntDistribution.csv";
-    int numElements = 1000000000 / sizeof(int);
+//    int numElements = 1000000000 / sizeof(int);
 
 //    generateUniformDistributionCSV(filePath, numElements);
     std::vector<int> data;
@@ -83,13 +83,13 @@ void selectCounterBM_2(SelectImplementation selectImplementation) {
 }
 
 int main(int argc, char** argv) {
+//    selectCounterBM_1(SelectImplementation::Adaptive, "Adaptive");
 //    selectCounterBM_1(SelectImplementation::Predication, "Predication");
 //    selectCounterBM_1(SelectImplementation::Branch, "Branch");
-//    selectCounterBM_1(SelectImplementation::Adaptive, "Adaptive");
 
-    selectCounterBM_2(SelectImplementation::Predication);
-    selectCounterBM_2(SelectImplementation::Branch);
     selectCounterBM_2(SelectImplementation::Adaptive);
+    selectCounterBM_2(SelectImplementation::Predication);
+//    selectCounterBM_2(SelectImplementation::Branch);
 
     return 0;
 }

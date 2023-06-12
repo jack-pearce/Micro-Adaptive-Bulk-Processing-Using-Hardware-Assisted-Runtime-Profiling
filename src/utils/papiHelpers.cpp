@@ -11,7 +11,7 @@
 #include "papiHelpers.h"
 
 int initialisePAPIandCreateEventSet(std::vector<std::string>& counters) {
-    int returnValue, EventCode, EventSet=PAPI_NULL;
+    int returnValue, eventCode, eventSet=PAPI_NULL;
 
 /* Initialize the PAPI library */
     returnValue = PAPI_library_init(PAPI_VER_CURRENT);
@@ -21,21 +21,21 @@ int initialisePAPIandCreateEventSet(std::vector<std::string>& counters) {
     }
 
 /* Create the Event Set */
-    if (PAPI_create_eventset(&EventSet) != PAPI_OK) {
+    if (PAPI_create_eventset(&eventSet) != PAPI_OK) {
         std::cerr << "PAPI could not create event set!" << std::endl;
         exit(1);
     }
 
     for (const std::string& counter : counters) {
         /* Get event code */
-        returnValue = PAPI_event_name_to_code(counter.c_str(), &EventCode);
+        returnValue = PAPI_event_name_to_code(counter.c_str(), &eventCode);
         if (returnValue != PAPI_OK) {
             std::cerr << "PAPI could not create event code!" << std::endl;
             exit(1);
         }
 
         /* Add Events to our Event Set */
-        returnValue = PAPI_add_event(EventSet, EventCode);
+        returnValue = PAPI_add_event(eventSet, eventCode);
         if (returnValue != PAPI_OK) {
             std::cerr << "Could not add '" << counter << "' to event set!" << std::endl;
             std::cerr << "Error code: " << returnValue << std::endl;
@@ -43,16 +43,16 @@ int initialisePAPIandCreateEventSet(std::vector<std::string>& counters) {
         }
     }
 
-    return EventSet;
+    return eventSet;
 }
 
-void teardownPAPI(int EventSet, long_long counterValues[]) {
-    if (PAPI_stop(EventSet, counterValues) != PAPI_OK) {
+void teardownPAPI(int eventSet, long_long counterValues[]) {
+    if (PAPI_stop(eventSet, counterValues) != PAPI_OK) {
         std::cerr << "PAPI could not stop counting events!" << std::endl;
         exit(1);
     }
 
-    PAPI_destroy_eventset(&EventSet);
+    PAPI_destroy_eventset(&eventSet);
     PAPI_shutdown();
 }
 
