@@ -5,13 +5,13 @@
 
 #include "../data_generation/dataGenerators.h"
 #include "../library/select.h"
-#include "../benchmarking/selectBenchmarks.h"
+#include "../time_benchmarking//timeBM_select.h"
 #include "../utils/dataHelpers.h"
 #include "../utils/papiHelpers.h"
 #include "../../libs/papi/src/install/include/papi.h"
 
 
-void hpcTest_1() {
+void counterTest_1() {
     int retval, EventSet=PAPI_NULL;
     long_long values[1];
 
@@ -80,33 +80,7 @@ void hpcTest_1() {
     PAPI_shutdown();
 }
 
-void hpcTest_2() {
-        long_long start_cycles, end_cycles, start_usec, end_usec;
-        int EventSet = PAPI_NULL;
-
-        if (PAPI_library_init(PAPI_VER_CURRENT) != PAPI_VER_CURRENT)
-        exit(1);
-
-/* Gets the starting time in clock cycles */
-        start_cycles = PAPI_get_real_cyc();
-
-/* Gets the starting time in microseconds */
-        start_usec = PAPI_get_real_usec();
-
-/*Create an EventSet */
-        if (PAPI_create_eventset(&EventSet) != PAPI_OK)
-        exit(1);
-/* Gets the ending time in clock cycles */
-        end_cycles = PAPI_get_real_cyc();
-
-/* Gets the ending time in microseconds */
-        end_usec = PAPI_get_real_usec();
-
-        printf("Wall clock cycles: %lld\n", end_cycles - start_cycles);
-        printf("Wall clock time in microseconds: %lld\n", end_usec - start_usec);
-}
-
-void hpcSelectTester() {
+void selectCounterTest() {
     std::string filePath = "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/input/uniformIntDistribution.csv";
     int numElements = 4000000 / sizeof(int);
     int sensitivityStride = 5;
@@ -117,20 +91,20 @@ void hpcSelectTester() {
     std::unique_ptr<int[]> selection(new int[numElements]);
     loadDataToArray(filePath, inputData.get());
 
-    std::vector<std::string> hpcs = {"INSTRUCTION_RETIRED",
-                                     "BRANCH_INSTRUCTIONS_RETIRED",
-                                     "MISPREDICTED_BRANCH_RETIRED",
-                                     "LLC_MISSES",
-                                     "PERF_COUNT_HW_CACHE_MISSES"};
-    long_long hpcValues[hpcs.size()];
-    int EventSet = initialisePAPIandCreateEventSet(hpcs);
+    std::vector<std::string> counters = {"INSTRUCTION_RETIRED",
+                                         "BRANCH_INSTRUCTIONS_RETIRED",
+                                         "MISPREDICTED_BRANCH_RETIRED",
+                                         "LLC_MISSES",
+                                         "PERF_COUNT_HW_CACHE_MISSES"};
+    long_long counterValues[counters.size()];
+    int EventSet = initialisePAPIandCreateEventSet(counters);
 
     if (PAPI_start(EventSet) != PAPI_OK) {
         std::cerr << "PAPI could not start counting events!" << std::endl;
         exit(1);
     }
 
-    std::vector<std::vector<long_long>> results(numTests, std::vector<long_long>(hpcs.size() + 1, 0));
+    std::vector<std::vector<long_long>> results(numTests, std::vector<long_long>(counters.size() + 1, 0));
     int count = 0;
 
     for (int i = 0; i <= 100; i += sensitivityStride) {
@@ -139,22 +113,22 @@ void hpcSelectTester() {
 
         selectBranch(numElements, inputData.get(), selection.get(), i);
 
-        if (PAPI_read(EventSet, hpcValues) != PAPI_OK)
+        if (PAPI_read(EventSet, counterValues) != PAPI_OK)
             exit(1);
 
         results[count][0] = static_cast<long_long>(i);
-        for (int j = 0; j < static_cast<int>(hpcs.size()); ++j) {
-            results[count][j + 1] = hpcValues[j];
+        for (int j = 0; j < static_cast<int>(counters.size()); ++j) {
+            results[count][j + 1] = counterValues[j];
         }
         count++;
     }
 
-    std::vector<std::string> headers(hpcs);
+    std::vector<std::string> headers(counters);
     headers.insert(headers.begin(), "Sensitivity");
     std::string outputFilePath = "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/output/";
     std::string outputFileName = "Sensitivity_Output";
     std::string outputFullFilePath = outputFilePath + outputFileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, outputFullFilePath);
 
-    teardownPAPI(EventSet, hpcValues);
+    teardownPAPI(EventSet, counterValues);
 }

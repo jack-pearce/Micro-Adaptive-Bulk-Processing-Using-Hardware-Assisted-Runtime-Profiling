@@ -5,7 +5,7 @@
 
 #include "dataGenerators.h"
 
-void generateUniformDistributionCSV(const std::string& filePath, int numValues) {
+void generateUniformDistributionCSV(const std::string& filePath, int n) {
     unsigned int seed = 1;
     std::mt19937 gen(seed);
 
@@ -21,7 +21,7 @@ void generateUniformDistributionCSV(const std::string& filePath, int numValues) 
         exit(1);
     }
 
-    for (int i = 0; i < numValues; ++i) {
+    for (int i = 0; i < n; ++i) {
         outputFile << distribution(gen) << std::endl;
     }
 

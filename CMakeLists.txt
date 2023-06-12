@@ -17,12 +17,12 @@ link_directories(/home/jack/CLionProjects/micro-adaptive-bulk-processing-library
 add_executable(${PROJECT_NAME}
         src/data_generation/dataGenerators.cpp
         src/library/select.cpp
-        src/benchmarking/selectBenchmarks.cpp
+        src/time_benchmarking/timeBM_select.cpp
         src/main.cpp
         src/utils/dataHelpers.cpp
-        src/perf_counters/hpcTests.cpp
+        src/perf_counters/counterTests.cpp
         src/utils/papiHelpers.cpp
-        src/perf_counters/benchmarking.cpp)
+        src/perf_counters/counterBM.cpp)
 
 target_link_libraries(${PROJECT_NAME} benchmark::benchmark)
 

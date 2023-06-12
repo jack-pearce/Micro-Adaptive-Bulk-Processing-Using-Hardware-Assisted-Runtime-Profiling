@@ -5,17 +5,17 @@
 
 #include "../data_generation/dataGenerators.h"
 #include "../library/select.h"
-#include "../benchmarking/selectBenchmarks.h"
+#include "../time_benchmarking//timeBM_select.h"
 #include "../utils/dataHelpers.h"
 #include "../../libs/papi/src/install/include/papi.h"
 #include "papiHelpers.h"
 
-int initialisePAPIandCreateEventSet(std::vector<std::string>& hpcs) {
-    int retval, EventCode, EventSet=PAPI_NULL;
+int initialisePAPIandCreateEventSet(std::vector<std::string>& counters) {
+    int returnValue, EventCode, EventSet=PAPI_NULL;
 
 /* Initialize the PAPI library */
-    retval = PAPI_library_init(PAPI_VER_CURRENT);
-    if (retval != PAPI_VER_CURRENT) {
+    returnValue = PAPI_library_init(PAPI_VER_CURRENT);
+    if (returnValue != PAPI_VER_CURRENT) {
         std::cerr << "PAPI library init error!" << std::endl;
         exit(1);
     }
@@ -26,19 +26,19 @@ int initialisePAPIandCreateEventSet(std::vector<std::string>& hpcs) {
         exit(1);
     }
 
-    for (const std::string& hpc : hpcs) {
+    for (const std::string& counter : counters) {
         /* Get event code */
-        retval = PAPI_event_name_to_code(hpc.c_str(), &EventCode);
-        if (retval != PAPI_OK) {
+        returnValue = PAPI_event_name_to_code(counter.c_str(), &EventCode);
+        if (returnValue != PAPI_OK) {
             std::cerr << "PAPI could not create event code!" << std::endl;
             exit(1);
         }
 
         /* Add Events to our Event Set */
-        retval = PAPI_add_event(EventSet, EventCode);
-        if (retval != PAPI_OK) {
-            std::cerr << "Could not add '" << hpc << "' to event set!" << std::endl;
-            std::cerr << "Error code: " << retval << std::endl;
+        returnValue = PAPI_add_event(EventSet, EventCode);
+        if (returnValue != PAPI_OK) {
+            std::cerr << "Could not add '" << counter << "' to event set!" << std::endl;
+            std::cerr << "Error code: " << returnValue << std::endl;
             exit(1);
         }
     }
@@ -46,8 +46,8 @@ int initialisePAPIandCreateEventSet(std::vector<std::string>& hpcs) {
     return EventSet;
 }
 
-void teardownPAPI(int EventSet, long_long hpcValues[]) {
-    if (PAPI_stop(EventSet, hpcValues) != PAPI_OK) {
+void teardownPAPI(int EventSet, long_long counterValues[]) {
+    if (PAPI_stop(EventSet, counterValues) != PAPI_OK) {
         std::cerr << "PAPI could not stop counting events!" << std::endl;
         exit(1);
     }
@@ -56,9 +56,9 @@ void teardownPAPI(int EventSet, long_long hpcValues[]) {
     PAPI_shutdown();
 }
 
-void printHpcValues(std::vector<std::string>& hpcs, long_long hpcValues[]) {
-    int n = hpcs.size();
+void printHpcValues(std::vector<std::string>& counters, long_long counterValues[]) {
+    int n = static_cast<int>(counters.size());
     for (int i = 0; i < n; ++i) {
-        std::cout << hpcs[i] << ": " << hpcValues[i] << std::endl;
+        std::cout << counters[i] << ": " << counterValues[i] << std::endl;
     }
 }

@@ -1,6 +1,6 @@
 #ifndef MICRO_ADAPTIVE_BULK_PROCESSING_LIBRARY_DATA_GENERATOR_H
 #define MICRO_ADAPTIVE_BULK_PROCESSING_LIBRARY_DATA_GENERATOR_H
 
-void generateUniformDistributionCSV(const std::string& filePath, int numValues);
+void generateUniformDistributionCSV(const std::string& filePath, int n);
 
 #endif //MICRO_ADAPTIVE_BULK_PROCESSING_LIBRARY_DATA_GENERATOR_H
