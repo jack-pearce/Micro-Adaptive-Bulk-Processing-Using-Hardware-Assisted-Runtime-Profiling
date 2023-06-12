@@ -3,5 +3,6 @@
 
 void counterTest_1();
 void selectCounterTest();
+void selectCounterCyclesTest();
 
 #endif //MABPL_COUNTERTESTS_H

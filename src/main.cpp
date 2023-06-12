@@ -21,19 +21,16 @@ void runTimeBM(int argc, char** argv) {
 }
 
 void selectTest1() {
-    std::string filePath = uniformInstDistribution250mValues;
-    int numElements = 1000000000 / sizeof(int);
-    selectBranchTimeBM_1(filePath, numElements);
-    selectPredicationTimeBM_1(filePath, numElements);
+    selectBranchTimeBM_1();
+    selectPredicationTimeBM_1();
+    selectAdaptiveTimeBM_1();
     runTimeBM(0, nullptr);
 }
 
 void selectTest2() {
-    std::string filePath = uniformInstDistribution250mValues;
-    int numElements = 1000000000 / sizeof(int);
-    selectPredicationTimeBM_2(filePath, numElements);
-    selectAdaptiveTimeBM_2(filePath, numElements);
-    selectBranchTimeBM_2(filePath, numElements);
+    selectPredicationTimeBM_2();
+    selectAdaptiveTimeBM_2();
+    selectBranchTimeBM_2();
     runTimeBM(0, nullptr);
 }
 
@@ -97,7 +94,10 @@ int main(int argc, char** argv) {
 //    selectCounterBM_2(SelectImplementation::Predication);
 //    selectCounterBM_2(SelectImplementation::Branch);
 
-//    selectCounterTest();
-    dataDistributionTest();
+//    selectCounterCyclesTest();
+
+    selectTest1();
+    // Do valgrind check too
+
     return 0;
 }

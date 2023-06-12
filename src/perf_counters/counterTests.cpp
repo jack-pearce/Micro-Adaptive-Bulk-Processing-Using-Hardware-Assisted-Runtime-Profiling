@@ -84,7 +84,7 @@ void counterTest_1() {
 void selectCounterTest() {
     std::string filePath = uniformInstDistribution250mValues;
     int numElements = 1000000000 / sizeof(int);
-    int sensitivityStride = 5;
+    int sensitivityStride = 1;
     int numTests = 1 + (100 / sensitivityStride);
 
 //    generateUniformDistributionCSV(filePath, numElements);
@@ -92,11 +92,15 @@ void selectCounterTest() {
     std::unique_ptr<int[]> selection(new int[numElements]);
     loadDataToArray(filePath, inputData.get());
 
-    std::vector<std::string> counters = {"INSTRUCTION_RETIRED",
+    std::vector<std::string> counters = {"UNHALTED_CORE_CYCLES",
+                                         "INSTRUCTION_RETIRED",
                                          "BRANCH_INSTRUCTIONS_RETIRED",
                                          "MISPREDICTED_BRANCH_RETIRED",
+                                         "PERF_COUNT_HW_BRANCH_INSTRUCTIONS",
+                                         "PERF_COUNT_HW_BRANCH_MISSES",
                                          "LLC_MISSES",
-                                         "PERF_COUNT_HW_CACHE_MISSES"};
+                                         "L1-DCACHE-LOADS",
+                                         "L1-DCACHE-LOAD-MISSES"};
     long_long counterValues[counters.size()];
     int eventSet = initialisePAPIandCreateEventSet(counters);
 
@@ -107,7 +111,7 @@ void selectCounterTest() {
         if (PAPI_reset(eventSet) != PAPI_OK)
             exit(1);
 
-        selectBranch(numElements, inputData.get(), selection.get(), i);
+        selectPredication(numElements, inputData.get(), selection.get(), i);
 
         if (PAPI_read(eventSet, counterValues) != PAPI_OK)
             exit(1);
@@ -117,12 +121,71 @@ void selectCounterTest() {
             results[count][j + 1] = counterValues[j];
         }
         count++;
+        std::cout << "Progress: " << static_cast<float>(count) / static_cast<float>(numTests) << std::endl;
     }
 
     std::vector<std::string> headers(counters);
     headers.insert(headers.begin(), "Sensitivity");
     std::string outputFilePath = "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/output/";
-    std::string outputFileName = "Sensitivity_Output";
+    std::string outputFileName = "select_branch_250m_values_counter_values";
+    std::string outputFullFilePath = outputFilePath + outputFileName + ".csv";
+    writeHeadersAndTableToCSV(headers, results, outputFullFilePath);
+
+    teardownPAPI(eventSet, counterValues);
+}
+
+
+void selectCounterCyclesTest() {
+    std::string filePath = uniformInstDistribution250mValues;
+    int numElements = 1000000000 / sizeof(int);
+    int sensitivityStride = 1;
+    int numTests = 1 + (100 / sensitivityStride);
+
+//    generateUniformDistributionCSV(filePath, numElements);
+    std::unique_ptr<int[]> inputData(new int[numElements]);
+    std::unique_ptr<int[]> selection(new int[numElements]);
+    loadDataToArray(filePath, inputData.get());
+
+    std::vector<std::string> counters = {"UNHALTED_CORE_CYCLES"};
+    long_long counterValues[counters.size()];
+    int eventSet = initialisePAPIandCreateEventSet(counters);
+
+    long_long start_cycles, end_cycles, start_usec, end_usec;
+
+    std::vector<std::vector<long_long>> results(numTests, std::vector<long_long>(counters.size() + 3, 0));
+    int count = 0;
+
+    for (int i = 0; i <= 100; i += sensitivityStride) {
+        start_cycles = PAPI_get_real_cyc();
+        start_usec = PAPI_get_real_usec();
+
+        if (PAPI_reset(eventSet) != PAPI_OK)
+            exit(1);
+
+        selectPredication(numElements, inputData.get(), selection.get(), i);
+
+        if (PAPI_read(eventSet, counterValues) != PAPI_OK)
+            exit(1);
+
+        end_cycles = PAPI_get_real_cyc();
+        end_usec = PAPI_get_real_usec();
+
+        results[count][0] = static_cast<long_long>(i);
+        for (int j = 0; j < static_cast<int>(counters.size()); ++j) {
+            results[count][j + 1] = counterValues[j];
+        }
+        results[count][counters.size() + 1] = static_cast<long_long>(end_cycles - start_cycles);
+        results[count][counters.size() + 2] = static_cast<long_long>(end_usec - start_usec);
+        count++;
+        std::cout << "Progress: " << static_cast<float>(count) / static_cast<float>(numTests) << std::endl;
+    }
+
+    std::vector<std::string> headers(counters);
+    headers.insert(headers.begin(), "Sensitivity");
+    headers.emplace_back("PAPI clock cycles");
+    headers.emplace_back("PAPI wall time");
+    std::string outputFilePath = "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/output/";
+    std::string outputFileName = "select_branch_250m_values_counter_values";
     std::string outputFullFilePath = outputFilePath + outputFileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, outputFullFilePath);
 

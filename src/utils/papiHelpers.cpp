@@ -43,12 +43,19 @@ int initialisePAPIandCreateEventSet(std::vector<std::string>& counters) {
         }
     }
 
+    if (PAPI_start(eventSet) != PAPI_OK) {
+        std::cerr << "PAPI could not start event set!" << std::endl;
+        exit(1);
+    }
+
     return eventSet;
 }
 
 void teardownPAPI(int eventSet, long_long counterValues[]) {
-    if (PAPI_stop(eventSet, counterValues) != PAPI_OK) {
+    int returnValue = PAPI_stop(eventSet, counterValues);
+    if (returnValue != PAPI_OK) {
         std::cerr << "PAPI could not stop counting events!" << std::endl;
+        std::cerr << "Error code: " << returnValue << std::endl;
         exit(1);
     }
 

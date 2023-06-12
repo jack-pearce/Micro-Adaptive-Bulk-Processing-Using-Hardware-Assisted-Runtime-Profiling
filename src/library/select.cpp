@@ -24,15 +24,19 @@ int selectPredication(int n, const int *inputData, int *selection, int threshold
     return k;
 }
 
-inline void performAdaption(SelectFunctionPtr &selectFunctionPtr, int eventSet, long_long counterValues[]) {
-    if (PAPI_read(eventSet, counterValues) != PAPI_OK)
+inline void performAdaption(SelectFunctionPtr &selectFunctionPtr,
+                            int eventSet, long_long counterValues[], int tuplesPerAdaption) {
+    if (__builtin_expect(PAPI_read(eventSet, counterValues) != PAPI_OK, false))
         exit(1);
 
-    // do analysis
+    if (__builtin_expect(counterValues[0] / tuplesPerAdaption > 8 && selectFunctionPtr == selectBranch, false))
+        selectFunctionPtr = selectPredication;
 
-    // update selectFunctionPtr if necessary
+    if (__builtin_expect(static_cast<float>(tuplesPerAdaption) / static_cast<float>(counterValues[1]) < 8.3
+                         && selectFunctionPtr == selectPredication, false))
+        selectFunctionPtr = selectBranch;
 
-    if (PAPI_reset(eventSet) != PAPI_OK)
+    if (__builtin_expect(PAPI_reset(eventSet) != PAPI_OK, false))
         exit(1);
 }
 
@@ -43,20 +47,10 @@ int selectAdaptive(int n, const int *inputData, int *selection, int threshold) {
     int selected;
     SelectFunctionPtr selectFunctionPtr = selectPredication;
 
-    std::vector<std::string> counters = {"PERF_COUNT_HW_CPU_CYCLES",
-                                         "INSTRUCTION_RETIRED",
-                                         "BRANCH_INSTRUCTIONS_RETIRED",
-                                         "MISPREDICTED_BRANCH_RETIRED",
-                                         "LLC_MISSES",
-                                         "PERF_COUNT_HW_CACHE_MISSES"};
+    std::vector<std::string> counters = {"UNHALTED_CORE_CYCLES",
+                                         "L1-DCACHE-LOAD-MISSES"};
     long_long counterValues[counters.size()];
     int eventSet = initialisePAPIandCreateEventSet(counters);
-    int returnValue = PAPI_start(eventSet);
-    if (returnValue != PAPI_OK) {
-        std::cerr << "PAPI could not start counting events!" << std::endl;
-        std::cerr << "Error code: " << returnValue << std::endl;
-        exit(1);
-    }
 
     while (n > 0) {
         tuplesToProcess = std::min(n, tuplesPerAdaption);
@@ -65,7 +59,7 @@ int selectAdaptive(int n, const int *inputData, int *selection, int threshold) {
         inputData += tuplesToProcess;
         selection += selected;
         k += selected;
-        performAdaption(selectFunctionPtr, eventSet, counterValues);
+        performAdaption(selectFunctionPtr, eventSet, counterValues, tuplesPerAdaption);
     }
 
     teardownPAPI(eventSet, counterValues);
