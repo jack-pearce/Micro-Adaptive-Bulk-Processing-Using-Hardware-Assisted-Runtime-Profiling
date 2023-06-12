@@ -22,12 +22,7 @@ int countElements(const std::string& filePath) {
         std::string value;
 
         while (std::getline(iss, value, ',')) {
-            try {
-                int intValue = std::stoi(value);
-                index++;
-            } catch (const std::exception& e) {
-                std::cerr << "Failed to convert value to int: " << value << std::endl;
-            }
+            index++;
         }
     }
 

@@ -1,10 +1,13 @@
 cmake_minimum_required(VERSION 3.21)
 
 project(MABPL)
+enable_testing()
+add_test(NAME MemoryCheck COMMAND valgrind --tool=memcheck --leak-check=yes ./out/build/MABPL)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "out/build")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -g -O0")
+
 
 set(benchmark_DIR "libs/benchmark/build")
 find_package(benchmark REQUIRED)
