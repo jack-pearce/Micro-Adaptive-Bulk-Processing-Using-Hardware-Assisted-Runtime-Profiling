@@ -7,13 +7,14 @@
 #include "../library/select.h"
 #include "../utils/dataHelpers.h"
 #include "../../libs/benchmark/include/benchmark/benchmark.h"
+#include "../data_generation/dataFiles.h"
 
 
 static void timeBM_select(benchmark::State& state) {
     int selectivity = static_cast<int>(state.range(0));
     auto selectImplementation = static_cast<SelectImplementation>(state.range(1));
 
-    std::string filePath = "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/input/uniformIntDistribution.csv";
+    std::string filePath = uniformInstDistribution250mValues;
 //    int numElements = countElements(filePath);
     int numElements = 1000000000;
     std::unique_ptr<int[]> inputData(new int[numElements]);

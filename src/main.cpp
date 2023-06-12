@@ -11,6 +11,7 @@
 #include "perf_counters/counterBM.h"
 #include "benchmark/benchmark.h"
 #include "utils/papiHelpers.h"
+#include "data_generation/dataFiles.h"
 
 
 void runTimeBM(int argc, char** argv) {
@@ -20,7 +21,7 @@ void runTimeBM(int argc, char** argv) {
 }
 
 void selectTest1() {
-    std::string filePath = "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/input/uniformIntDistribution.csv";
+    std::string filePath = uniformInstDistribution250mValues;
     int numElements = 1000000000 / sizeof(int);
     selectBranchTimeBM_1(filePath, numElements);
     selectPredicationTimeBM_1(filePath, numElements);
@@ -28,7 +29,7 @@ void selectTest1() {
 }
 
 void selectTest2() {
-    std::string filePath = "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/input/uniformIntDistribution.csv";
+    std::string filePath = uniformInstDistribution250mValues;
     int numElements = 1000000000 / sizeof(int);
     selectPredicationTimeBM_2(filePath, numElements);
     selectAdaptiveTimeBM_2(filePath, numElements);
@@ -37,17 +38,18 @@ void selectTest2() {
 }
 
 void dataDistributionTest() {
-    std::string filePath = "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/input/uniformIntDistribution.csv";
+    std::string filePath = uniformInstDistribution250mValues;
 //    int numElements = 1000000000 / sizeof(int);
 
 //    generateUniformDistributionCSV(filePath, numElements);
     std::vector<int> data;
     loadDataToVector(filePath, data);
+    std::cout << data.size() << std::endl;
     displayDistribution(data);
 }
 
 void selectFunctionalityTest() {
-    std::string filePath = "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/input/uniformIntDistribution.csv";
+    std::string filePath = uniformInstDistribution250mValues;
     int numElements = 1000000000 / sizeof(int);
 
 //    generateUniformDistributionCSV(filePath, numElements);
@@ -70,6 +72,11 @@ void selectCounterBM_1(SelectImplementation selectImplementation, const std::str
     int numElements = 1000000000 / sizeof(int);
     int sensitivityStride = 5;
 
+    if (selectImplementation == SelectImplementation::Adaptive) {
+        std::cout << "Can't benchmark adaptive select using counters since it is already using counters" << std::endl;
+        exit(1);
+    }
+
     std::vector<std::string> counters = {"INSTRUCTION_RETIRED",
                                          "PERF_COUNT_HW_CPU_CYCLES",
                                          "UNHALTED_CORE_CYCLES"};
@@ -83,13 +90,14 @@ void selectCounterBM_2(SelectImplementation selectImplementation) {
 }
 
 int main(int argc, char** argv) {
-//    selectCounterBM_1(SelectImplementation::Adaptive, "Adaptive");
 //    selectCounterBM_1(SelectImplementation::Predication, "Predication");
 //    selectCounterBM_1(SelectImplementation::Branch, "Branch");
 
-    selectCounterBM_2(SelectImplementation::Adaptive);
-    selectCounterBM_2(SelectImplementation::Predication);
+//    selectCounterBM_2(SelectImplementation::Adaptive);
+//    selectCounterBM_2(SelectImplementation::Predication);
 //    selectCounterBM_2(SelectImplementation::Branch);
 
+//    selectCounterTest();
+    dataDistributionTest();
     return 0;
 }

@@ -7,11 +7,12 @@
 #include "../utils/dataHelpers.h"
 #include "../utils/papiHelpers.h"
 #include "counterBM.h"
+#include "../data_generation/dataFiles.h"
 
 
 void selectCounterBM(SelectImplementation selectImplementation, int numElements, int sensitivityStride,
                      std::vector<std::string> counters, const std::string& fileName) {
-    std::string filePath = "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/input/uniformIntDistribution.csv";
+    std::string filePath = uniformInstDistribution250mValues;
     int numTests = 1 + (100 / sensitivityStride);
 
     std::unique_ptr<int[]> inputData(new int[numElements]);
@@ -54,7 +55,7 @@ void selectCounterBM(SelectImplementation selectImplementation, int numElements,
 }
 
 void selectCounterBM_2(SelectImplementation selectImplementation, int numElements, int sensitivityStride) {
-    std::string filePath = "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/input/uniformIntDistribution.csv";
+    std::string filePath = uniformInstDistribution250mValues;
 
     std::unique_ptr<int[]> inputData(new int[numElements]);
     std::unique_ptr<int[]> selection(new int[numElements]);

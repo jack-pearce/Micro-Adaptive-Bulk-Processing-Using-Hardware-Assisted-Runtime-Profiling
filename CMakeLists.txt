@@ -22,7 +22,8 @@ add_executable(${PROJECT_NAME}
         src/utils/dataHelpers.cpp
         src/perf_counters/counterTests.cpp
         src/utils/papiHelpers.cpp
-        src/perf_counters/counterBM.cpp)
+        src/perf_counters/counterBM.cpp
+        src/data_generation/dataFiles.cpp)
 
 target_link_libraries(${PROJECT_NAME} benchmark::benchmark)
 

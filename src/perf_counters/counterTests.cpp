@@ -9,6 +9,7 @@
 #include "../utils/dataHelpers.h"
 #include "../utils/papiHelpers.h"
 #include "../../libs/papi/src/install/include/papi.h"
+#include "../data_generation/dataFiles.h"
 
 
 void counterTest_1() {
@@ -81,8 +82,8 @@ void counterTest_1() {
 }
 
 void selectCounterTest() {
-    std::string filePath = "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/input/uniformIntDistribution.csv";
-    int numElements = 4000000 / sizeof(int);
+    std::string filePath = uniformInstDistribution250mValues;
+    int numElements = 1000000000 / sizeof(int);
     int sensitivityStride = 5;
     int numTests = 1 + (100 / sensitivityStride);
 
