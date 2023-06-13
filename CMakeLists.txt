@@ -16,14 +16,14 @@ link_directories(/home/jack/CLionProjects/micro-adaptive-bulk-processing-library
 
 add_executable(${PROJECT_NAME}
         src/data_generation/dataGenerators.cpp
+        src/data_generation/dataFiles.cpp
         src/library/select.cpp
-        src/time_benchmarking/timeBM_select.cpp
+        src/time_benchmarking/timeBenchmarkSelect.cpp
+        src/time_benchmarking/timeBenchmarkHelpers.cpp
         src/main.cpp
         src/utils/dataHelpers.cpp
-        src/perf_counters/counterTests.cpp
         src/utils/papiHelpers.cpp
-        src/perf_counters/counterBM.cpp
-        src/data_generation/dataFiles.cpp)
+        src/perf_counters/counterBenchmark.cpp)
 
 target_link_libraries(${PROJECT_NAME} benchmark::benchmark)
 

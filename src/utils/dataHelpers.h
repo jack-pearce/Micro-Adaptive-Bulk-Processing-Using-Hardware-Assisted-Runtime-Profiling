@@ -1,7 +1,10 @@
 #ifndef MICRO_ADAPTIVE_BULK_PROCESSING_LIBRARY_DATAHELPERS_H
 #define MICRO_ADAPTIVE_BULK_PROCESSING_LIBRARY_DATAHELPERS_H
 
+#include <memory>
+
 #include "../../libs/papi/src/install/include/papi.h"
+#include "../data_generation/dataFiles.h"
 
 class LoadedData {
 private:
@@ -20,10 +23,8 @@ public:
     void operator=(const LoadedData&) = delete;
 };
 
-int countElements(const std::string& filePath);
-void loadDataToVector(const std::string& filePath, std::vector<int>& data);
 int loadDataToArray(const std::string& filePath, int *data);
-void displayDistribution(const std::vector<int>& data);
+void displayDistribution(const DataFile& dataFile);
 void writeHeadersAndTableToCSV(std::vector<std::string>& headers,
                                std::vector<std::vector<long_long>>  values,
                                std::string& filePath);

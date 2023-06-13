@@ -85,3 +85,17 @@ void setSelectFuncPtr(SelectFunctionPtr &selectFunctionPtr, SelectImplementation
             exit(1);
     }
 }
+
+std::string getName(SelectImplementation selectImplementation) {
+    switch(selectImplementation) {
+        case SelectImplementation::Branch:
+            return "Select_Branch";
+        case SelectImplementation::Predication:
+            return "Select_Predication";
+        case SelectImplementation::Adaptive:
+            return "Select_Adaptive";
+        default:
+            std::cout << "Invalid selection of 'Select' implementation!" << std::endl;
+            exit(1);
+    }
+}
