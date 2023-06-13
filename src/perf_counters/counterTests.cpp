@@ -82,7 +82,7 @@ void counterTest_1() {
 }
 
 void selectCounterTest() {
-    std::string filePath = uniformInstDistribution250mValues;
+    std::string filePath = uniformIntDistribution250mValues;
     int numElements = 1000000000 / sizeof(int);
     int sensitivityStride = 1;
     int numTests = 1 + (100 / sensitivityStride);
@@ -131,12 +131,12 @@ void selectCounterTest() {
     std::string outputFullFilePath = outputFilePath + outputFileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, outputFullFilePath);
 
-    teardownPAPI(eventSet, counterValues);
+    shutdownPAPI(eventSet);
 }
 
 
 void selectCounterCyclesTest() {
-    std::string filePath = uniformInstDistribution250mValues;
+    std::string filePath = uniformIntDistribution250mValues;
     int numElements = 1000000000 / sizeof(int);
     int sensitivityStride = 1;
     int numTests = 1 + (100 / sensitivityStride);
@@ -189,5 +189,5 @@ void selectCounterCyclesTest() {
     std::string outputFullFilePath = outputFilePath + outputFileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, outputFullFilePath);
 
-    teardownPAPI(eventSet, counterValues);
+    shutdownPAPI(eventSet);
 }

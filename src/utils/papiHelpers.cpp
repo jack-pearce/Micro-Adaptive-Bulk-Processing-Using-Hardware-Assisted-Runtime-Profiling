@@ -11,7 +11,7 @@
 #include "papiHelpers.h"
 
 int initialisePAPIandCreateEventSet(std::vector<std::string>& counters) {
-    int returnValue, eventCode, eventSet=PAPI_NULL;
+    int returnValue, eventCode, status, eventSet=PAPI_NULL;
 
 /* Initialize the PAPI library */
     if (PAPI_is_initialized() == PAPI_NOT_INITED) {
@@ -20,6 +20,7 @@ int initialisePAPIandCreateEventSet(std::vector<std::string>& counters) {
             std::cerr << "PAPI library init error!" << std::endl;
             exit(1);
         }
+        std::cout << "PAPI initialised" << std::endl;
     }
 
 /* Create the Event Set */
@@ -47,26 +48,29 @@ int initialisePAPIandCreateEventSet(std::vector<std::string>& counters) {
         }
     }
 
-    if (PAPI_start(eventSet) != PAPI_OK) {
-        std::cerr << "PAPI could not start event set!" << std::endl;
-        exit(1);
+    PAPI_state(eventSet, &status);
+    if (status != 1) {
+        returnValue = PAPI_start(eventSet);
+        if (returnValue != PAPI_OK) {
+            std::cerr << "PAPI could not start event set!" << std::endl;
+            std::cerr << "Error code: " << returnValue << std::endl;
+            exit(1);
+        }
     }
-
-    std::cout << "Event set created" << std::endl;
 
     return eventSet;
 }
 
-void teardownPAPI(int eventSet, long_long counterValues[]) {
-    int returnValue = PAPI_stop(eventSet, counterValues);
-    if (returnValue != PAPI_OK) {
-        std::cerr << "PAPI could not stop counting events!" << std::endl;
-        std::cerr << "Error code: " << returnValue << std::endl;
-        exit(1);
-    }
-
+void shutdownPAPI(int eventSet) {
     PAPI_destroy_eventset(&eventSet);
-    PAPI_shutdown();
+
+    if (PAPI_is_initialized() != PAPI_NOT_INITED)
+        PAPI_shutdown();
+}
+
+void shutdownPAPI() {
+    if (PAPI_is_initialized() != PAPI_NOT_INITED)
+        PAPI_shutdown();
 }
 
 void printHpcValues(std::vector<std::string>& counters, long_long counterValues[]) {

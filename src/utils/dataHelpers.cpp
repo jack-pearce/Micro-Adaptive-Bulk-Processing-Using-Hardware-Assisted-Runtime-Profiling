@@ -4,8 +4,28 @@
 #include <string>
 #include <vector>
 #include <cassert>
+#include <memory>
 
 #include "dataHelpers.h"
+
+LoadedData::LoadedData(const std::string& filePath, int numElements) {
+    size = numElements;
+    data = std::make_unique<int[]>(numElements);
+    loadDataToArray(filePath, data.get());
+}
+
+LoadedData& LoadedData::getInstance(const std::string& filePath, int numElements) {
+    static LoadedData instance(filePath, numElements);
+    return instance;
+}
+
+int* LoadedData::getData() {
+    return data.get();
+}
+
+int LoadedData::getSize() const {
+    return size;
+}
 
 int countElements(const std::string& filePath) {
     std::ifstream inputFile(filePath);
@@ -64,6 +84,9 @@ int loadDataToArray(const std::string& filePath, int *data) {
         exit(1);
     }
 
+    std::cout << "Loading data from file... ";
+    std::cout.flush();
+
     std::string line;
     int index = 0;
     while (std::getline(inputFile, line)) {
@@ -82,6 +105,7 @@ int loadDataToArray(const std::string& filePath, int *data) {
     }
 
     inputFile.close();
+    std::cout << "Complete" << std::endl;
     return index;
 }
 

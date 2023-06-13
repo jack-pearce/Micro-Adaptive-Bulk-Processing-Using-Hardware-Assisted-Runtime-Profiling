@@ -3,6 +3,7 @@
 
 #include <string>
 
-extern const std::string uniformInstDistribution250mValues;
+extern const std::string uniformIntDistribution25kValues;
+extern const std::string uniformIntDistribution250mValues;
 
 #endif //MABPL_DATAFILES_H

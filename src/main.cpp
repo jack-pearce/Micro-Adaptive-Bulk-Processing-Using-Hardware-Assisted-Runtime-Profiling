@@ -34,11 +34,7 @@ void selectTimeBM_2() {
     runTimeBM(0, nullptr);
 }
 
-void dataDistributionTest() {
-    std::string filePath = uniformInstDistribution250mValues;
-//    int numElements = 1000000000 / sizeof(int);
-
-//    generateUniformDistributionCSV(filePath, numElements);
+void dataDistributionTest(const std::string& filePath) {
     std::vector<int> data;
     loadDataToVector(filePath, data);
     std::cout << data.size() << std::endl;
@@ -46,7 +42,7 @@ void dataDistributionTest() {
 }
 
 void selectFunctionalityTest() {
-    std::string filePath = uniformInstDistribution250mValues;
+    std::string filePath = uniformIntDistribution250mValues;
     int numElements = 1000000000 / sizeof(int);
 
 //    generateUniformDistributionCSV(filePath, numElements);
@@ -86,22 +82,17 @@ void selectCounterBM_2(SelectImplementation selectImplementation) {
     selectCounterBM_2(selectImplementation, numElements, sensitivityStride);
 }
 
-void selectCounterBM_3(SelectImplementation selectImplementation, int iterations) {
-    std::string fileName = "select_predication_cycles_test";
-    int numElements = 1000000000 / sizeof(int);
-    int sensitivityStride = 5;
+void selectCounterBM_3(SelectImplementation selectImplementation, int iterations, const std::string& fileName) {
+    int numElements = 100000 / sizeof(int);
+    int sensitivityStride = 25;
     selectCyclesCounterBM(selectImplementation, numElements, sensitivityStride, fileName, iterations);
 }
 
 int main(int argc, char** argv) {
-//    selectCounterBM_1(SelectImplementation::Predication, "Predication");
-//    selectCounterBM_1(SelectImplementation::Branch, "Branch");
 
-//    selectCounterBM_2(SelectImplementation::Adaptive);
-//    selectCounterBM_2(SelectImplementation::Predication);
-//    selectCounterBM_2(SelectImplementation::Branch);
-
-    selectCounterBM_3(SelectImplementation::Branch, 1);
+//    selectCounterBM_3(SelectImplementation::Branch, 1, "select_branch_cpu_cycles");
+//    selectCounterBM_3(SelectImplementation::Predication, 1, "select_branch_cpu_cycles");
+    selectCounterBM_3(SelectImplementation::Adaptive, 1, "select_branch_cpu_cycles");
 
     return 0;
 }

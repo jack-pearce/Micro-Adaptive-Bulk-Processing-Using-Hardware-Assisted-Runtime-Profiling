@@ -12,7 +12,7 @@
 
 void selectCounterBM(SelectImplementation selectImplementation, int numElements, int sensitivityStride,
                      std::vector<std::string> counters, const std::string& fileName) {
-    std::string filePath = uniformInstDistribution250mValues;
+    std::string filePath = uniformIntDistribution250mValues;
     int numTests = 1 + (100 / sensitivityStride);
 
     std::unique_ptr<int[]> inputData(new int[numElements]);
@@ -51,11 +51,11 @@ void selectCounterBM(SelectImplementation selectImplementation, int numElements,
     std::string outputFullFilePath = outputFilePath + outputFileName + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, outputFullFilePath);
 
-    teardownPAPI(EventSet, counterValues);
+    shutdownPAPI(EventSet);
 }
 
 void selectCounterBM_2(SelectImplementation selectImplementation, int numElements, int sensitivityStride) {
-    std::string filePath = uniformInstDistribution250mValues;
+    std::string filePath = uniformIntDistribution250mValues;
 
     std::unique_ptr<int[]> inputData(new int[numElements]);
     std::unique_ptr<int[]> selection(new int[numElements]);
@@ -82,47 +82,57 @@ void selectCounterBM_2(SelectImplementation selectImplementation, int numElement
 
 void selectCyclesCounterBM(SelectImplementation selectImplementation, int numElements,
                            int sensitivityStride, const std::string& fileName, int iterations) {
-    std::string filePath = uniformInstDistribution250mValues;
+    std::string filePath = uniformIntDistribution25kValues;
     int numTests = 1 + (100 / sensitivityStride);
 
     // Try adding in other CPU cycle counter
     std::vector<std::string> benchmarkCounters = {"PERF_COUNT_HW_CPU_CYCLES"};
 
-    std::unique_ptr<int[]> inputData(new int[numElements]);
     std::unique_ptr<int[]> selection(new int[numElements]);
-    loadDataToArray(filePath, inputData.get());
+    int* inputData = LoadedData::getInstance(filePath, numElements).getData();
 
     long_long benchmarkCounterValues[benchmarkCounters.size()];
     int benchmarkEventSet = initialisePAPIandCreateEventSet(benchmarkCounters);
 
-    std::vector<std::vector<long_long>> results(numTests, std::vector<long_long>(benchmarkCounters.size() + 1, 0));
+    std::vector<std::vector<long_long>> results(numTests, std::vector<long_long>((iterations * benchmarkCounters.size()) + 1, 0));
     int count = 0;
 
     SelectFunctionPtr selectFunctionPtr;
     setSelectFuncPtr(selectFunctionPtr, selectImplementation);
 
     for (int i = 0; i <= 100; i += sensitivityStride) {
-        if (PAPI_reset(benchmarkEventSet) != PAPI_OK)
-            exit(1);
-
-        selectFunctionPtr(numElements, inputData.get(), selection.get(), i);
-
-        if (PAPI_read(benchmarkEventSet, benchmarkCounterValues) != PAPI_OK)
-            exit(1);
-
         results[count][0] = static_cast<long_long>(i);
-        for (int j = 0; j < static_cast<int>(benchmarkCounters.size()); ++j) {
-            results[count][j + 1] = benchmarkCounterValues[j];
+
+        for (int j = 0; j < iterations; ++j) {
+            std::cout << "Running sensitivity " << i << ", iteration " << j + 1 << "... ";
+
+            if (PAPI_reset(benchmarkEventSet) != PAPI_OK)
+                exit(1);
+
+            selectFunctionPtr(numElements, inputData, selection.get(), i);
+
+            if (PAPI_read(benchmarkEventSet, benchmarkCounterValues) != PAPI_OK)
+                exit(1);
+
+            for (int k = 0; k < static_cast<int>(benchmarkCounters.size()); ++k) {
+                results[count][1 + (j * benchmarkCounters.size()) + k] = benchmarkCounterValues[k];
+            }
+
+            std::cout << "Completed" << std::endl;
         }
+
         count++;
     }
 
-    std::vector<std::string> headers(benchmarkCounters);
+    std::vector<std::string> headers(benchmarkCounters.size() * iterations);
+    for (int i = 0; i < iterations; ++i) {
+        std::copy(benchmarkCounters.begin(), benchmarkCounters.end(), headers.begin() + i * benchmarkCounters.size());
+    }
     headers.insert(headers.begin(), "Sensitivity");
     std::string outputFilePath = "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/output/";
     std::string outputFileName = "select_cycles_benchmark";
     std::string outputFullFilePath = outputFilePath + outputFileName + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, outputFullFilePath);
 
-    teardownPAPI(benchmarkEventSet, benchmarkCounterValues);
+    shutdownPAPI(benchmarkEventSet);
 }

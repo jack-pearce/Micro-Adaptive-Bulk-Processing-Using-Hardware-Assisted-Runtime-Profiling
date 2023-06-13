@@ -26,6 +26,7 @@ int selectPredication(int n, const int *inputData, int *selection, int threshold
 
 inline void performAdaption(SelectFunctionPtr &selectFunctionPtr,
                             int eventSet, long_long counterValues[], int tuplesPerAdaption) {
+
     if (__builtin_expect(PAPI_read(eventSet, counterValues) != PAPI_OK, false))
         exit(1);
 
@@ -64,8 +65,7 @@ int selectAdaptive(int n, const int *inputData, int *selection, int threshold) {
         performAdaption(selectFunctionPtr, eventSet, counterValues, tuplesPerAdaption);
     }
 
-    teardownPAPI(eventSet, counterValues);
-
+    PAPI_destroy_eventset(&eventSet);
     return k;
 }
 
