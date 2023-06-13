@@ -39,27 +39,7 @@ int initialisePAPIandCreateEventSet(std::vector<std::string>& counters) {
         }
     }
 
-    PAPI_state(eventSet, &status);
-    if (status != 1) {
-        returnValue = PAPI_start(eventSet);
-        if (returnValue != PAPI_OK) {
-            std::cerr << "PAPI could not start event set!" << std::endl;
-            std::cerr << "Error code: " << returnValue << std::endl;
-            exit(1);
-        }
-        std::cout << "event set started" << std::endl;
-    }
-
-/*    std::cout << status << std::endl;
-
-    long_long results[counters.size()];
-    results[0] = -1;
-    if (PAPI_read(eventSet, results) != PAPI_OK)
-        exit(1);
-
-    for (long long result : results) {
-        std::cout << result << std::endl;
-    }*/
+    PAPI_start(eventSet);
 
     return eventSet;
 }

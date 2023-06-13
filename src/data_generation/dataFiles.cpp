@@ -3,7 +3,7 @@
 #include "dataFiles.h"
 
 const std::string outputFilePath = "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/output/";
-const std::string selectCyclesFolder = "select_cycles_BM/";
+const std::string selectCyclesFolder = "select_cycles_benchmark/";
 
 const DataFile DataFiles::uniformIntDistribution25kValues{
     "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/input/uniformIntDistribution25kValues.csv",

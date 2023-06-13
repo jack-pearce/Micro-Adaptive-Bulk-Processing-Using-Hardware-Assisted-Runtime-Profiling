@@ -66,8 +66,8 @@ void selectCyclesBenchmarkConfiguration_2(const DataFile &dataFile, SelectImplem
 
 int main(int argc, char** argv) {
 
-    selectCyclesBenchmarkConfiguration_1(DataFiles::uniformIntDistribution25kValues,
-                                         SelectImplementation::Predication,
+    selectCyclesBenchmarkConfiguration_2(DataFiles::uniformIntDistribution25kValues,
+                                         SelectImplementation::Adaptive,
                                          25,
                                          1);
 
