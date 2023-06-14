@@ -3,6 +3,7 @@
 
 #include <string>
 
+extern const std::string inputFilePath;
 extern const std::string outputFilePath;
 extern const std::string selectCyclesFolder;
 
@@ -25,6 +26,8 @@ class DataFiles {
 public:
     static const DataFile uniformIntDistribution25kValues;
     static const DataFile uniformIntDistribution250mValues;
+    static const DataFile varyingIntDistribution25kValues;
+    static const DataFile varyingIntDistribution250mValues;
 };
 
 #endif //MABPL_DATAFILES_H

@@ -17,4 +17,8 @@ void selectCpuCyclesBenchmark(const DataFile& dataFile,
                               int sensitivityStride,
                               int iterations);
 
+void selectCpuCyclesBenchmark(const DataFile& dataFile,
+                              SelectImplementation selectImplementation,
+                              int iterations);
+
 #endif //MICRO_ADAPTIVE_BULK_PROCESSING_COUNTERBENCHMARK_H

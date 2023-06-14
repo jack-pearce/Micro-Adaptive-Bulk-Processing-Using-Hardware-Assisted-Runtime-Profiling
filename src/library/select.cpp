@@ -31,7 +31,8 @@ inline void performAdaption(int (*&selectFunctionPtr)(int, const int *, int *, i
 //    std::cout << static_cast<float>(counterValues[0]) / static_cast<float>(tuplesPerAdaption) << " cycles per tuple" << std::endl;
 //    std::cout << static_cast<float>(tuplesPerAdaption) / static_cast<float>(counterValues[1]) << " tuples per L1 dcache load miss" << std::endl;
 
-    if (__builtin_expect(static_cast<float>(counterValues[0]) / static_cast<float>(tuplesPerAdaption) > 8.8 && selectFunctionPtr == selectBranch, false))
+    if (__builtin_expect(static_cast<float>(counterValues[0]) / static_cast<float>(tuplesPerAdaption) > 8.8
+                         && selectFunctionPtr == selectBranch, false))
         selectFunctionPtr = selectPredication;
 
     if (__builtin_expect(static_cast<float>(tuplesPerAdaption) / static_cast<float>(counterValues[1]) < 8.0
@@ -44,7 +45,7 @@ int selectAdaptive(int n, const int *inputData, int *selection, int threshold) {
     int k = 0;
     int tuplesToProcess;
     int selected;
-    SelectFunctionPtr selectFunctionPtr = selectPredication;
+    SelectFunctionPtr selectFunctionPtr = selectBranch;
 
     std::vector<std::string> counters = {"UNHALTED_CORE_CYCLES",
                                          "L1-DCACHE-LOAD-MISSES"};

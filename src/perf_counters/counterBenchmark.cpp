@@ -122,3 +122,52 @@ void selectCpuCyclesBenchmark(const DataFile& dataFile,
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }
 
+
+void selectCpuCyclesBenchmark(const DataFile& dataFile,
+                              SelectImplementation selectImplementation,
+                              int iterations) {
+    int threshold = 50;
+    int numTests = 1;
+
+    std::unique_ptr<int[]> selection(new int[dataFile.getNumElements()]);
+    int* inputData = LoadedData::getInstance(dataFile.getFilepath(), dataFile.getNumElements()).getData();
+
+    long_long cycles;
+
+    std::vector<std::vector<long_long>> results(numTests, std::vector<long_long>(iterations + 1, 0));
+    int count = 0;
+
+    SelectFunctionPtr selectFunctionPtr;
+    setSelectFuncPtr(selectFunctionPtr, selectImplementation);
+
+    results[count][0] = static_cast<long_long>(threshold);
+
+    for (int j = 0; j < iterations; ++j) {
+        std::cout << "Running sensitivity " << threshold << ", iteration " << j + 1 << "... ";
+
+        cycles = *Counters::getInstance().readEventSet();
+
+        selectFunctionPtr(dataFile.getNumElements(), inputData, selection.get(), threshold);
+
+        results[count][1 + j] = *Counters::getInstance().readEventSet() - cycles;
+
+        std::cout << "Completed" << std::endl;
+    }
+
+    count++;
+
+    std::vector<std::string> headers(1 + iterations, "PERF_COUNT_HW_CPU_CYCLES");
+    headers [0] = "Sensitivity";
+
+    std::string fileName =
+            getName(selectImplementation) +
+            "_cyclesBM_usingCounterSingleton_" +
+            dataFile.getFileName() +
+            "_threshold_" +
+            std::to_string(threshold);
+    std::string fullFilePath = outputFilePath + selectCyclesFolder + fileName + ".csv";
+    writeHeadersAndTableToCSV(headers, results, fullFilePath);
+}
+
+
+
