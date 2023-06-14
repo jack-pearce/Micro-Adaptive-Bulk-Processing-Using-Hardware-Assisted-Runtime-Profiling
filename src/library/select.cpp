@@ -34,7 +34,7 @@ inline void performAdaption(int (*&selectFunctionPtr)(int, const int *, int *, i
     if (__builtin_expect(static_cast<float>(counterValues[0]) / static_cast<float>(tuplesPerAdaption) > 8.8 && selectFunctionPtr == selectBranch, false))
         selectFunctionPtr = selectPredication;
 
-    if (__builtin_expect(static_cast<float>(tuplesPerAdaption) / static_cast<float>(counterValues[1]) < 8.3
+    if (__builtin_expect(static_cast<float>(tuplesPerAdaption) / static_cast<float>(counterValues[1]) < 8.0
                          && selectFunctionPtr == selectPredication, false))
         selectFunctionPtr = selectBranch;
 }

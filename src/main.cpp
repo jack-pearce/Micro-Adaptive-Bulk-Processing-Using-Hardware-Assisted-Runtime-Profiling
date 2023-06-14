@@ -80,53 +80,8 @@ void selectCpuCyclesBenchmarkConfiguration_1(const DataFile &dataFile, SelectImp
 int main(int argc, char** argv) {
 
     selectCpuCyclesBenchmarkConfiguration_1(DataFiles::uniformIntDistribution250mValues,
-                                            SelectImplementation::Adaptive,
+                                            SelectImplementation::Branch,
                                             1,
                                             10);
-
-//    selectCountersBenchmarkConfiguration_1(DataFiles::uniformIntDistribution250mValues,
-//                                         SelectImplementation::Branch,
-//                                         1,
-//                                         10);
-//    selectCountersBenchmarkConfiguration_1(DataFiles::uniformIntDistribution250mValues,
-//                                         SelectImplementation::Predication,
-//                                         1,
-//                                         10);
-//    selectCountersBenchmarkConfiguration_1(DataFiles::uniformIntDistribution25kValues,
-//                                         SelectImplementation::Adaptive,
-//                                         25,
-//                                         1);
-
-/*    long_long *values;
-    values = Counters::getInstance().readEventSet();
-    std::cout << values[0] << ", " << values[1] << std::endl;
-
-    std::vector<std::string> extraCounters = {"UNHALTED_CORE_CYCLES",
-                                              "INSTRUCTION_RETIRED",
-                                              "L1-DCACHE-LOAD-MISSES"};
-
-    long_long *extraValues = Counters::getInstance().getEvents(extraCounters);
-    std::cout << extraValues[0] << ", " << extraValues[1] << ", " << extraValues[2] << std::endl;
-
-    Counters::getInstance().readEventSet();
-    std::cout << values[0] << ", " << values[1] << std::endl;
-    std::cout << extraValues[0] << ", " << extraValues[1] << ", " << extraValues[2] << std::endl;
-
-
-    Counters::getInstance().readEventSet();
-    std::cout << values[0] << ", " << values[1] << std::endl;
-    std::cout << extraValues[0] << ", " << extraValues[1] << ", " << extraValues[2] << std::endl;
-
-    Counters::getInstance().removeEvents(extraCounters);
-
-    std::cout << "Extra counters removed" << std::endl;
-
-    Counters::getInstance().readEventSet();
-    std::cout << values[0] << ", " << values[1] << std::endl;
-    std::cout << extraValues[0] << ", " << extraValues[1] << ", " << extraValues[2] << std::endl;
-
-    Counters::getInstance().readEventSet();
-    std::cout << values[0] << ", " << values[1] << std::endl;
-    std::cout << extraValues[0] << ", " << extraValues[1] << ", " << extraValues[2] << std::endl;*/
 
 }
