@@ -9,11 +9,11 @@
 #include "counterBenchmark.h"
 
 
-void selectCyclesBenchmark(const DataFile& dataFile,
-                           SelectImplementation selectImplementation,
-                           int sensitivityStride,
-                           int iterations,
-                           std::vector<std::string>& benchmarkCounters) {
+void selectCountersBenchmark(const DataFile& dataFile,
+                             SelectImplementation selectImplementation,
+                             int sensitivityStride,
+                             int iterations,
+                             std::vector<std::string>& benchmarkCounters) {
     if (selectImplementation == SelectImplementation::Adaptive)
         std::cout << "Cannot benchmark adaptive select using counters as adaptive select is already using these counters" << std::endl;
 
@@ -72,3 +72,53 @@ void selectCyclesBenchmark(const DataFile& dataFile,
 
     shutdownPAPI(benchmarkEventSet, benchmarkCounterValues);
 }
+
+
+void selectCpuCyclesBenchmark(const DataFile& dataFile,
+                              SelectImplementation selectImplementation,
+                              int sensitivityStride,
+                              int iterations) {
+    int numTests = 1 + (100 / sensitivityStride);
+
+    std::unique_ptr<int[]> selection(new int[dataFile.getNumElements()]);
+    int* inputData = LoadedData::getInstance(dataFile.getFilepath(), dataFile.getNumElements()).getData();
+
+    long_long cycles;
+
+    std::vector<std::vector<long_long>> results(numTests, std::vector<long_long>(iterations + 1, 0));
+    int count = 0;
+
+    SelectFunctionPtr selectFunctionPtr;
+    setSelectFuncPtr(selectFunctionPtr, selectImplementation);
+
+    for (int i = 0; i <= 100; i += sensitivityStride) {
+        results[count][0] = static_cast<long_long>(i);
+
+        for (int j = 0; j < iterations; ++j) {
+            std::cout << "Running sensitivity " << i << ", iteration " << j + 1 << "... ";
+
+            cycles = *Counters::getInstance().readEventSet();
+
+            selectFunctionPtr(dataFile.getNumElements(), inputData, selection.get(), i);
+
+            results[count][1 + j] = *Counters::getInstance().readEventSet() - cycles;
+
+            std::cout << "Completed" << std::endl;
+        }
+
+        count++;
+    }
+
+    std::vector<std::string> headers(1 + iterations, "PERF_COUNT_HW_CPU_CYCLES");
+    headers [0] = "Sensitivity";
+
+    std::string fileName =
+            getName(selectImplementation) +
+            "_cyclesBM_usingCounterSingleton_" +
+            dataFile.getFileName() +
+            "_sensitivity_stride_" +
+            std::to_string(sensitivityStride);
+    std::string fullFilePath = outputFilePath + selectCyclesFolder + fileName + ".csv";
+    writeHeadersAndTableToCSV(headers, results, fullFilePath);
+}
+

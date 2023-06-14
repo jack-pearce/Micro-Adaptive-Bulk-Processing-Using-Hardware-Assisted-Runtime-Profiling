@@ -3,6 +3,7 @@
 
 #include "select.h"
 #include "../utils/papiHelpers.h"
+#include "papi.h"
 
 
 int selectBranch(int n, const int *inputData, int *selection, int threshold) {
@@ -24,23 +25,18 @@ int selectPredication(int n, const int *inputData, int *selection, int threshold
     return k;
 }
 
-inline void performAdaption(SelectFunctionPtr &selectFunctionPtr,
-                            int eventSet, long_long counterValues[], int tuplesPerAdaption) {
+inline void performAdaption(int (*&selectFunctionPtr)(int, const int *, int *, int), const long_long *counterValues,
+                            int tuplesPerAdaption) {
 
-    if (__builtin_expect(PAPI_read(eventSet, counterValues) != PAPI_OK, false))
-        exit(1);
-
-    std::cout << "Cycles: " << counterValues[0] << ", tuples per adaption: " << tuplesPerAdaption << std::endl;
+//    std::cout << static_cast<float>(counterValues[0]) / static_cast<float>(tuplesPerAdaption) << " cycles per tuple" << std::endl;
+//    std::cout << static_cast<float>(tuplesPerAdaption) / static_cast<float>(counterValues[1]) << " tuples per L1 dcache load miss" << std::endl;
 
     if (__builtin_expect(static_cast<float>(counterValues[0]) / static_cast<float>(tuplesPerAdaption) > 8.8 && selectFunctionPtr == selectBranch, false))
         selectFunctionPtr = selectPredication;
 
-//    if (__builtin_expect(static_cast<float>(tuplesPerAdaption) / static_cast<float>(counterValues[1]) < 8.3
-//                         && selectFunctionPtr == selectPredication, false))
-//        selectFunctionPtr = selectBranch;
-
-    if (__builtin_expect(PAPI_reset(eventSet) != PAPI_OK, false))
-        exit(1);
+    if (__builtin_expect(static_cast<float>(tuplesPerAdaption) / static_cast<float>(counterValues[1]) < 8.3
+                         && selectFunctionPtr == selectPredication, false))
+        selectFunctionPtr = selectBranch;
 }
 
 int selectAdaptive(int n, const int *inputData, int *selection, int threshold) {
@@ -48,25 +44,23 @@ int selectAdaptive(int n, const int *inputData, int *selection, int threshold) {
     int k = 0;
     int tuplesToProcess;
     int selected;
-    SelectFunctionPtr selectFunctionPtr = selectBranch;
+    SelectFunctionPtr selectFunctionPtr = selectPredication;
 
     std::vector<std::string> counters = {"UNHALTED_CORE_CYCLES",
                                          "L1-DCACHE-LOAD-MISSES"};
-
-    long_long counterValues[counters.size()];
-    int eventSet = initialisePAPIandCreateEventSet(counters);
+    long_long *counterValues = Counters::getInstance().getEvents(counters);
 
     while (n > 0) {
         tuplesToProcess = std::min(n, tuplesPerAdaption);
+        Counters::getInstance().readEventSet();
         selected = selectFunctionPtr(tuplesToProcess, inputData, selection, threshold);
+        Counters::getInstance().readEventSet();
         n -= tuplesToProcess;
         inputData += tuplesToProcess;
         selection += selected;
         k += selected;
-        performAdaption(selectFunctionPtr, eventSet, counterValues, tuplesPerAdaption);
+        performAdaption(selectFunctionPtr, counterValues, tuplesPerAdaption);
     }
-
-    shutdownPAPI(eventSet, counterValues);
 
     return k;
 }

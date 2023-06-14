@@ -16,7 +16,7 @@
 
 
 void dataDistributionTest(const DataFile& dataFile) {
-    int* inputData = LoadedData::getInstance(dataFile.getFilepath(), dataFile.getNumElements()).getData();
+    LoadedData::getInstance(dataFile.getFilepath(), dataFile.getNumElements()).getData();
     std::cout << dataFile.getNumElements() << " elements" << std::endl;
     displayDistribution(dataFile);
 }
@@ -44,47 +44,60 @@ void runSelectTimeBenchmarkSetIterations(const DataFile& dataFile, SelectImpleme
     runTimeBenchmark(0, nullptr);
 }
 
-void selectCyclesBenchmarkConfiguration_1(const DataFile &dataFile, SelectImplementation selectImplementation,
-                                          int sensitivityStride, int iterations) {
+void selectCountersBenchmarkConfiguration_1(const DataFile &dataFile, SelectImplementation selectImplementation,
+                                            int sensitivityStride, int iterations) {
 //    std::vector<std::string> benchmarkCounters = {"PERF_COUNT_HW_CPU_CYCLES"}; // Try adding in other CPU cycle counter
     std::vector<std::string> benchmarkCounters = {"INSTRUCTION_RETIRED"}; // Try adding in other CPU cycle counter
 
-    selectCyclesBenchmark(dataFile,
-                   selectImplementation,
-                   sensitivityStride,
-                   iterations,
-                   benchmarkCounters);
+    selectCountersBenchmark(dataFile,
+                            selectImplementation,
+                            sensitivityStride,
+                            iterations,
+                            benchmarkCounters);
 }
 
-void selectCyclesBenchmarkConfiguration_2(const DataFile &dataFile, SelectImplementation selectImplementation,
-                                          int sensitivityStride, int iterations) {
+void selectCountersBenchmarkConfiguration_2(const DataFile &dataFile, SelectImplementation selectImplementation,
+                                            int sensitivityStride, int iterations) {
     std::vector<std::string> benchmarkCounters = {"PERF_COUNT_HW_CPU_CYCLES",
                                                   "INSTRUCTION_RETIRED",
                                                   "UNHALTED_CORE_CYCLES"};
-    selectCyclesBenchmark(dataFile,
-                          selectImplementation,
-                          sensitivityStride,
-                          iterations,
-                          benchmarkCounters);
+    selectCountersBenchmark(dataFile,
+                            selectImplementation,
+                            sensitivityStride,
+                            iterations,
+                            benchmarkCounters);
+}
+
+void selectCpuCyclesBenchmarkConfiguration_1(const DataFile &dataFile, SelectImplementation selectImplementation,
+                                             int sensitivityStride, int iterations) {
+    selectCpuCyclesBenchmark(dataFile,
+                             selectImplementation,
+                             sensitivityStride,
+                             iterations);
 }
 
 
 int main(int argc, char** argv) {
 
-//    selectCyclesBenchmarkConfiguration_1(DataFiles::uniformIntDistribution250mValues,
+    selectCpuCyclesBenchmarkConfiguration_1(DataFiles::uniformIntDistribution250mValues,
+                                            SelectImplementation::Adaptive,
+                                            1,
+                                            10);
+
+//    selectCountersBenchmarkConfiguration_1(DataFiles::uniformIntDistribution250mValues,
 //                                         SelectImplementation::Branch,
 //                                         1,
 //                                         10);
-//    selectCyclesBenchmarkConfiguration_1(DataFiles::uniformIntDistribution250mValues,
+//    selectCountersBenchmarkConfiguration_1(DataFiles::uniformIntDistribution250mValues,
 //                                         SelectImplementation::Predication,
 //                                         1,
 //                                         10);
-//    selectCyclesBenchmarkConfiguration_1(DataFiles::uniformIntDistribution25kValues,
+//    selectCountersBenchmarkConfiguration_1(DataFiles::uniformIntDistribution25kValues,
 //                                         SelectImplementation::Adaptive,
 //                                         25,
 //                                         1);
 
-    long_long *values;
+/*    long_long *values;
     values = Counters::getInstance().readEventSet();
     std::cout << values[0] << ", " << values[1] << std::endl;
 
@@ -92,7 +105,7 @@ int main(int argc, char** argv) {
                                               "INSTRUCTION_RETIRED",
                                               "L1-DCACHE-LOAD-MISSES"};
 
-    long_long *extraValues = Counters::getInstance().addEvents(extraCounters);
+    long_long *extraValues = Counters::getInstance().getEvents(extraCounters);
     std::cout << extraValues[0] << ", " << extraValues[1] << ", " << extraValues[2] << std::endl;
 
     Counters::getInstance().readEventSet();
@@ -104,8 +117,16 @@ int main(int argc, char** argv) {
     std::cout << values[0] << ", " << values[1] << std::endl;
     std::cout << extraValues[0] << ", " << extraValues[1] << ", " << extraValues[2] << std::endl;
 
+    Counters::getInstance().removeEvents(extraCounters);
+
+    std::cout << "Extra counters removed" << std::endl;
+
     Counters::getInstance().readEventSet();
     std::cout << values[0] << ", " << values[1] << std::endl;
     std::cout << extraValues[0] << ", " << extraValues[1] << ", " << extraValues[2] << std::endl;
+
+    Counters::getInstance().readEventSet();
+    std::cout << values[0] << ", " << values[1] << std::endl;
+    std::cout << extraValues[0] << ", " << extraValues[1] << ", " << extraValues[2] << std::endl;*/
 
 }
