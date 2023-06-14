@@ -79,7 +79,7 @@ void selectCpuCyclesBenchmarkConfiguration_1(const DataFile &dataFile, SelectImp
 
 int main(int argc, char** argv) {
 
-    selectCpuCyclesBenchmark(DataFiles::step50IntDistribution250mValues,
+/*    selectCpuCyclesBenchmark(DataFiles::step50IntDistribution250mValues,
                              SelectImplementation::Adaptive,
                              10);
 
@@ -88,6 +88,18 @@ int main(int argc, char** argv) {
                              10);
 
     selectCpuCyclesBenchmark(DataFiles::step50IntDistribution250mValues,
+                             SelectImplementation::Branch,
+                             10);*/
+
+    selectCpuCyclesBenchmark(DataFiles::varyingIntDistribution250mValues,
+                             SelectImplementation::Adaptive,
+                             10);
+
+    selectCpuCyclesBenchmark(DataFiles::varyingIntDistribution250mValues,
+                             SelectImplementation::Predication,
+                             10);
+
+    selectCpuCyclesBenchmark(DataFiles::varyingIntDistribution250mValues,
                              SelectImplementation::Branch,
                              10);
 

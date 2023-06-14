@@ -96,14 +96,14 @@ void generateStepSelectivityCSV(const std::string& fileName, int n, int step) {
     std::mt19937 gen(seed);
 
     bool onStep = false;
-    int lowerBound;
-    int upperBound = 100;
+    int lowerBound = 1;
+    int upperBound;
 
     for (int i = 0; i < numberOfDiscreteSections; ++i) {
         if (onStep) {
-            lowerBound = step;
+            upperBound = step;
         } else {
-            lowerBound = 1;
+            upperBound = 100;
         }
 
         std::uniform_int_distribution<int> distribution(lowerBound, upperBound);

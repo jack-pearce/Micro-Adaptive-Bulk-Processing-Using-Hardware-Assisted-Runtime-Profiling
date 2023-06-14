@@ -32,12 +32,16 @@ inline void performAdaption(int (*&selectFunctionPtr)(int, const int *, int *, i
 //    std::cout << static_cast<float>(tuplesPerAdaption) / static_cast<float>(counterValues[1]) << " tuples per L1 dcache load miss" << std::endl;
 
     if (__builtin_expect(static_cast<float>(counterValues[0]) / static_cast<float>(tuplesPerAdaption) > 8.8
-                         && selectFunctionPtr == selectBranch, false))
+                         && selectFunctionPtr == selectBranch, false)) {
         selectFunctionPtr = selectPredication;
+//        std::cout << "Switch made to predication" << std::endl;
+    }
 
     if (__builtin_expect(static_cast<float>(tuplesPerAdaption) / static_cast<float>(counterValues[1]) < 8.0
-                         && selectFunctionPtr == selectPredication, false))
+                         && selectFunctionPtr == selectPredication, false)) {
         selectFunctionPtr = selectBranch;
+//        std::cout << "Switch made to branch" << std::endl;
+    }
 }
 
 int selectAdaptive(int n, const int *inputData, int *selection, int threshold) {
