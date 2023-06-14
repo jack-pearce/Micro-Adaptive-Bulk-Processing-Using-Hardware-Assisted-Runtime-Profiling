@@ -18,6 +18,7 @@ add_executable(${PROJECT_NAME}
         src/data_generation/dataGenerators.cpp
         src/data_generation/dataFiles.cpp
         src/library/select.cpp
+        src/library/papi.cpp
         src/time_benchmarking/timeBenchmarkSelect.cpp
         src/time_benchmarking/timeBenchmarkHelpers.cpp
         src/main.cpp

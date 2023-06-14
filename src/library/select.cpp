@@ -30,12 +30,14 @@ inline void performAdaption(SelectFunctionPtr &selectFunctionPtr,
     if (__builtin_expect(PAPI_read(eventSet, counterValues) != PAPI_OK, false))
         exit(1);
 
-    if (__builtin_expect(counterValues[0] / tuplesPerAdaption > 8 && selectFunctionPtr == selectBranch, false))
+    std::cout << "Cycles: " << counterValues[0] << ", tuples per adaption: " << tuplesPerAdaption << std::endl;
+
+    if (__builtin_expect(static_cast<float>(counterValues[0]) / static_cast<float>(tuplesPerAdaption) > 8.8 && selectFunctionPtr == selectBranch, false))
         selectFunctionPtr = selectPredication;
 
-    if (__builtin_expect(static_cast<float>(tuplesPerAdaption) / static_cast<float>(counterValues[1]) < 8.3
-                         && selectFunctionPtr == selectPredication, false))
-        selectFunctionPtr = selectBranch;
+//    if (__builtin_expect(static_cast<float>(tuplesPerAdaption) / static_cast<float>(counterValues[1]) < 8.3
+//                         && selectFunctionPtr == selectPredication, false))
+//        selectFunctionPtr = selectBranch;
 
     if (__builtin_expect(PAPI_reset(eventSet) != PAPI_OK, false))
         exit(1);
@@ -46,14 +48,13 @@ int selectAdaptive(int n, const int *inputData, int *selection, int threshold) {
     int k = 0;
     int tuplesToProcess;
     int selected;
-    SelectFunctionPtr selectFunctionPtr = selectPredication;
+    SelectFunctionPtr selectFunctionPtr = selectBranch;
 
     std::vector<std::string> counters = {"UNHALTED_CORE_CYCLES",
                                          "L1-DCACHE-LOAD-MISSES"};
 
-    int eventSet;
     long_long counterValues[counters.size()];
-    eventSet = initialisePAPIandCreateEventSet(counters);
+    int eventSet = initialisePAPIandCreateEventSet(counters);
 
     while (n > 0) {
         tuplesToProcess = std::min(n, tuplesPerAdaption);
@@ -65,7 +66,8 @@ int selectAdaptive(int n, const int *inputData, int *selection, int threshold) {
         performAdaption(selectFunctionPtr, eventSet, counterValues, tuplesPerAdaption);
     }
 
-    PAPI_destroy_eventset(&eventSet);
+    shutdownPAPI(eventSet, counterValues);
+
     return k;
 }
 

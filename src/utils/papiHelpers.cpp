@@ -6,7 +6,7 @@
 #include "papiHelpers.h"
 
 int initialisePAPIandCreateEventSet(std::vector<std::string>& counters) {
-    int returnValue, eventCode, status, eventSet=PAPI_NULL;
+    int returnValue, eventCode, eventSet=PAPI_NULL;
 
     if (PAPI_is_initialized() == PAPI_NOT_INITED) {
         returnValue = PAPI_library_init(PAPI_VER_CURRENT);
@@ -44,9 +44,14 @@ int initialisePAPIandCreateEventSet(std::vector<std::string>& counters) {
     return eventSet;
 }
 
-void shutdownPAPI(int eventSet) {
-    PAPI_destroy_eventset(&eventSet);
+void shutdownPAPI(int eventSet, long_long counterValues[]) {
+    std::cout << "Stop eventset: " << eventSet << ", return value: " << PAPI_stop(eventSet, counterValues) << std::endl;
+    std::cout << "Cleanup eventset: " << eventSet << ", return value: " << PAPI_cleanup_eventset(eventSet) << std::endl;
+    std::cout << "Destroy eventset: " << eventSet << ", return value: " << PAPI_destroy_eventset(&eventSet) << std::endl;
 
     if (PAPI_is_initialized() != PAPI_NOT_INITED)
         PAPI_shutdown();
+
+    std::cout << "PAPI shutdown" << std::endl;
+
 }

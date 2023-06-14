@@ -8,8 +8,11 @@
 #include "data_generation/dataGenerators.h"
 #include "utils/dataHelpers.h"
 #include "library/select.h"
+#include "library/papi.h"
 #include "perf_counters/counterBenchmark.h"
 #include "data_generation/dataFiles.h"
+#include "utils/papiHelpers.h"
+
 
 
 void dataDistributionTest(const DataFile& dataFile) {
@@ -43,7 +46,9 @@ void runSelectTimeBenchmarkSetIterations(const DataFile& dataFile, SelectImpleme
 
 void selectCyclesBenchmarkConfiguration_1(const DataFile &dataFile, SelectImplementation selectImplementation,
                                           int sensitivityStride, int iterations) {
-    std::vector<std::string> benchmarkCounters = {"PERF_COUNT_HW_CPU_CYCLES"}; // Try adding in other CPU cycle counter
+//    std::vector<std::string> benchmarkCounters = {"PERF_COUNT_HW_CPU_CYCLES"}; // Try adding in other CPU cycle counter
+    std::vector<std::string> benchmarkCounters = {"INSTRUCTION_RETIRED"}; // Try adding in other CPU cycle counter
+
     selectCyclesBenchmark(dataFile,
                    selectImplementation,
                    sensitivityStride,
@@ -66,10 +71,41 @@ void selectCyclesBenchmarkConfiguration_2(const DataFile &dataFile, SelectImplem
 
 int main(int argc, char** argv) {
 
-    selectCyclesBenchmarkConfiguration_2(DataFiles::uniformIntDistribution25kValues,
-                                         SelectImplementation::Adaptive,
-                                         25,
-                                         1);
+//    selectCyclesBenchmarkConfiguration_1(DataFiles::uniformIntDistribution250mValues,
+//                                         SelectImplementation::Branch,
+//                                         1,
+//                                         10);
+//    selectCyclesBenchmarkConfiguration_1(DataFiles::uniformIntDistribution250mValues,
+//                                         SelectImplementation::Predication,
+//                                         1,
+//                                         10);
+//    selectCyclesBenchmarkConfiguration_1(DataFiles::uniformIntDistribution25kValues,
+//                                         SelectImplementation::Adaptive,
+//                                         25,
+//                                         1);
 
-    return 0;
+    long_long *values;
+    values = Counters::getInstance().readEventSet();
+    std::cout << values[0] << ", " << values[1] << std::endl;
+
+    std::vector<std::string> extraCounters = {"UNHALTED_CORE_CYCLES",
+                                              "INSTRUCTION_RETIRED",
+                                              "L1-DCACHE-LOAD-MISSES"};
+
+    long_long *extraValues = Counters::getInstance().addEvents(extraCounters);
+    std::cout << extraValues[0] << ", " << extraValues[1] << ", " << extraValues[2] << std::endl;
+
+    Counters::getInstance().readEventSet();
+    std::cout << values[0] << ", " << values[1] << std::endl;
+    std::cout << extraValues[0] << ", " << extraValues[1] << ", " << extraValues[2] << std::endl;
+
+
+    Counters::getInstance().readEventSet();
+    std::cout << values[0] << ", " << values[1] << std::endl;
+    std::cout << extraValues[0] << ", " << extraValues[1] << ", " << extraValues[2] << std::endl;
+
+    Counters::getInstance().readEventSet();
+    std::cout << values[0] << ", " << values[1] << std::endl;
+    std::cout << extraValues[0] << ", " << extraValues[1] << ", " << extraValues[2] << std::endl;
+
 }

@@ -14,6 +14,9 @@ void selectCyclesBenchmark(const DataFile& dataFile,
                            int sensitivityStride,
                            int iterations,
                            std::vector<std::string>& benchmarkCounters) {
+    if (selectImplementation == SelectImplementation::Adaptive)
+        std::cout << "Cannot benchmark adaptive select using counters as adaptive select is already using these counters" << std::endl;
+
     int numTests = 1 + (100 / sensitivityStride);
 
     std::unique_ptr<int[]> selection(new int[dataFile.getNumElements()]);
@@ -67,5 +70,5 @@ void selectCyclesBenchmark(const DataFile& dataFile,
     std::string fullFilePath = outputFilePath + selectCyclesFolder + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 
-    shutdownPAPI(benchmarkEventSet);
+    shutdownPAPI(benchmarkEventSet, benchmarkCounterValues);
 }
