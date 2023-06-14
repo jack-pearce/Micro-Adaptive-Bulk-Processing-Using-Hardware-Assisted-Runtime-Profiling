@@ -26,6 +26,16 @@ const DataFile DataFiles::varyingIntDistribution250mValues{
         250*1000*1000,
         "varyingIntDistribution250mValues"};
 
+const DataFile DataFiles::step50IntDistribution25kValues{
+        "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/input/step50IntDistribution25kValues.csv",
+        25*1000,
+        "step50IntDistribution25kValues"};
+
+const DataFile DataFiles::step50IntDistribution250mValues{
+        "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/input/step50IntDistribution250mValues.csv",
+        250*1000*1000,
+        "step50IntDistribution250mValues"};
+
 
 DataFile::DataFile(std::string _filePath, int _numElements, std::string _fileName)
         : filePath(std::move(_filePath)), numElements(_numElements), fileName(std::move(_fileName)) {}

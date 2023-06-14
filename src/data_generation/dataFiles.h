@@ -28,6 +28,8 @@ public:
     static const DataFile uniformIntDistribution250mValues;
     static const DataFile varyingIntDistribution25kValues;
     static const DataFile varyingIntDistribution250mValues;
+    static const DataFile step50IntDistribution25kValues;
+    static const DataFile step50IntDistribution250mValues;
 };
 
 #endif //MABPL_DATAFILES_H

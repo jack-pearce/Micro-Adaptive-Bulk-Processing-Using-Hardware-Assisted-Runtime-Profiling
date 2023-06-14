@@ -45,7 +45,7 @@ int selectAdaptive(int n, const int *inputData, int *selection, int threshold) {
     int k = 0;
     int tuplesToProcess;
     int selected;
-    SelectFunctionPtr selectFunctionPtr = selectBranch;
+    SelectFunctionPtr selectFunctionPtr = selectPredication;
 
     std::vector<std::string> counters = {"UNHALTED_CORE_CYCLES",
                                          "L1-DCACHE-LOAD-MISSES"};

@@ -76,3 +76,44 @@ void generateVaryingSelectivityCSV(const std::string& fileName, int n, int minim
     outputFile.close();
     std::cout << "Complete" << std::endl;
 }
+
+
+void generateStepSelectivityCSV(const std::string& fileName, int n, int step) {
+    std::cout << "Generating csv datafile... ";
+    std::cout.flush();
+
+    std::ofstream outputFile(inputFilePath + fileName);
+
+    if (!outputFile) {
+        std::cerr << "Failed to open the file." << std::endl;
+        exit(1);
+    }
+
+    int numberOfDiscreteSections = 10;
+    int elementsPerSection = n / numberOfDiscreteSections;
+
+    unsigned int seed = 1;
+    std::mt19937 gen(seed);
+
+    bool onStep = false;
+    int lowerBound;
+    int upperBound = 100;
+
+    for (int i = 0; i < numberOfDiscreteSections; ++i) {
+        if (onStep) {
+            lowerBound = step;
+        } else {
+            lowerBound = 1;
+        }
+
+        std::uniform_int_distribution<int> distribution(lowerBound, upperBound);
+        for (int k = 0; k < elementsPerSection; ++k) {
+            outputFile << distribution(gen) << std::endl;
+        }
+
+        onStep = !onStep;
+    }
+
+    outputFile.close();
+    std::cout << "Complete" << std::endl;
+}
