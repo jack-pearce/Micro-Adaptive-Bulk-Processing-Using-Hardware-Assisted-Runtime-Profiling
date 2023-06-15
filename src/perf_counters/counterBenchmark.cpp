@@ -7,19 +7,14 @@
 #include "../utils/papiHelpers.h"
 #include "counterBenchmark.h"
 
-void copyArray(const int* source, int* destination, int size) {
-    for (int i = 0; i < size; i++) {
-        destination[i] = source[i];
-    }
-}
 
-void selectCountersBenchmark(const DataFile& dataFile,
-                             SelectImplementation selectImplementation,
-                             int sensitivityStride,
-                             int iterations,
-                             std::vector<std::string>& benchmarkCounters) {
-    if (selectImplementation == SelectImplementation::Adaptive)
-        std::cout << "Cannot benchmark adaptive select using counters as adaptive select is already using these counters" << std::endl;
+void selectBenchmarkWithExtraCounters(const DataFile& dataFile,
+                                      SelectImplementation selectImplementation,
+                                      int sensitivityStride,
+                                      int iterations,
+                                      std::vector<std::string>& benchmarkCounters) {
+//    if (selectImplementation == SelectImplementation::Adaptive)
+//        std::cout << "Cannot benchmark adaptive select using counters as adaptive select is already using these counters" << std::endl;
 
     int numTests = 1 + (100 / sensitivityStride);
 
@@ -81,10 +76,10 @@ void selectCountersBenchmark(const DataFile& dataFile,
     shutdownPAPI(benchmarkEventSet, benchmarkCounterValues);
 }
 
-void selectCpuCyclesBenchmark(const DataFile& dataFile,
-                              SelectImplementation selectImplementation,
-                              int sensitivityStride,
-                              int iterations) {
+void selectCpuCyclesMultipleBenchmarks(const DataFile& dataFile,
+                                       SelectImplementation selectImplementation,
+                                       int sensitivityStride,
+                                       int iterations) {
     int numTests = 1 + (100 / sensitivityStride);
 
     long_long cycles;
@@ -133,7 +128,7 @@ void selectCpuCyclesBenchmark(const DataFile& dataFile,
 }
 
 
-void selectCpuCyclesBenchmarkSingle(const DataFile &dataFile, SelectImplementation selectImplementation, int iterations,
+void selectCpuCyclesSingleBenchmark(const DataFile &dataFile, SelectImplementation selectImplementation, int iterations,
                                     int threshold) {
     int numTests = 1;
 

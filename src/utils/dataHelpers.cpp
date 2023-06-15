@@ -69,3 +69,9 @@ void writeHeadersAndTableToCSV(std::vector<std::string>& headers,
     }
 }
 
+void copyArray(const int* source, int* destination, int size) {
+    for (int i = 0; i < size; i++) {
+        destination[i] = source[i];
+    }
+}
+

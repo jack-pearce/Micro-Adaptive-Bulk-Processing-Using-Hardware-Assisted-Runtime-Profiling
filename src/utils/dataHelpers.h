@@ -24,5 +24,6 @@ void displayDistribution(const DataFile& dataFile);
 void writeHeadersAndTableToCSV(std::vector<std::string>& headers,
                                std::vector<std::vector<long_long>>  values,
                                std::string& filePath);
+void copyArray(const int* source, int* destination, int size);
 
 #endif //MICRO_ADAPTIVE_BULK_PROCESSING_LIBRARY_DATAHELPERS_H

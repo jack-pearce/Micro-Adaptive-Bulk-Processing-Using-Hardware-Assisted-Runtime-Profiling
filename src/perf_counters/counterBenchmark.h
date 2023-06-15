@@ -6,18 +6,18 @@
 #include "../data_generation/dataFiles.h"
 
 
-void selectCountersBenchmark(const DataFile& dataFile,
-                             SelectImplementation selectImplementation,
-                             int sensitivityStride,
-                             int iterations,
-                             std::vector<std::string>& benchmarkCounters);
+void selectBenchmarkWithExtraCounters(const DataFile& dataFile,
+                                      SelectImplementation selectImplementation,
+                                      int sensitivityStride,
+                                      int iterations,
+                                      std::vector<std::string>& benchmarkCounters);
 
-void selectCpuCyclesBenchmark(const DataFile& dataFile,
-                              SelectImplementation selectImplementation,
-                              int sensitivityStride,
-                              int iterations);
+void selectCpuCyclesMultipleBenchmarks(const DataFile& dataFile,
+                                       SelectImplementation selectImplementation,
+                                       int sensitivityStride,
+                                       int iterations);
 
-void selectCpuCyclesBenchmarkSingle(const DataFile &dataFile, SelectImplementation selectImplementation, int iterations,
+void selectCpuCyclesSingleBenchmark(const DataFile &dataFile, SelectImplementation selectImplementation, int iterations,
                                     int threshold);
 
 #endif //MICRO_ADAPTIVE_BULK_PROCESSING_COUNTERBENCHMARK_H
