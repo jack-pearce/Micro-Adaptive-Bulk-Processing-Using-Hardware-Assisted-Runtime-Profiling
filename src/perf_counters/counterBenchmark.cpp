@@ -2,12 +2,16 @@
 #include <functional>
 #include <vector>
 #include <string>
-#include <memory>
 
 #include "../utils/dataHelpers.h"
 #include "../utils/papiHelpers.h"
 #include "counterBenchmark.h"
 
+void copyArray(const int* source, int* destination, int size) {
+    for (int i = 0; i < size; i++) {
+        destination[i] = source[i];
+    }
+}
 
 void selectCountersBenchmark(const DataFile& dataFile,
                              SelectImplementation selectImplementation,
@@ -18,9 +22,6 @@ void selectCountersBenchmark(const DataFile& dataFile,
         std::cout << "Cannot benchmark adaptive select using counters as adaptive select is already using these counters" << std::endl;
 
     int numTests = 1 + (100 / sensitivityStride);
-
-    std::unique_ptr<int[]> selection(new int[dataFile.getNumElements()]);
-    int* inputData = LoadedData::getInstance(dataFile).getData();
 
     long_long benchmarkCounterValues[benchmarkCounters.size()];
     int benchmarkEventSet = initialisePAPIandCreateEventSet(benchmarkCounters);
@@ -35,15 +36,22 @@ void selectCountersBenchmark(const DataFile& dataFile,
         results[count][0] = static_cast<long_long>(i);
 
         for (int j = 0; j < iterations; ++j) {
+            int* inputData = new int[dataFile.getNumElements()];
+            int* selection = new int[dataFile.getNumElements()];
+            copyArray(LoadedData::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
+
             std::cout << "Running sensitivity " << i << ", iteration " << j + 1 << "... ";
 
             if (PAPI_reset(benchmarkEventSet) != PAPI_OK)
                 exit(1);
 
-            selectFunctionPtr(dataFile.getNumElements(), inputData, selection.get(), i);
+            selectFunctionPtr(dataFile.getNumElements(), inputData, selection, i);
 
             if (PAPI_read(benchmarkEventSet, benchmarkCounterValues) != PAPI_OK)
                 exit(1);
+
+            delete[] inputData;
+            delete[] selection;
 
             for (int k = 0; k < static_cast<int>(benchmarkCounters.size()); ++k) {
                 results[count][1 + (j * benchmarkCounters.size()) + k] = benchmarkCounterValues[k];
@@ -73,17 +81,13 @@ void selectCountersBenchmark(const DataFile& dataFile,
     shutdownPAPI(benchmarkEventSet, benchmarkCounterValues);
 }
 
-
 void selectCpuCyclesBenchmark(const DataFile& dataFile,
                               SelectImplementation selectImplementation,
                               int sensitivityStride,
                               int iterations) {
     int numTests = 1 + (100 / sensitivityStride);
 
-    std::unique_ptr<int[]> selection(new int[dataFile.getNumElements()]);
-    int* inputData = LoadedData::getInstance(dataFile).getData();
     long_long cycles;
-
     std::vector<std::vector<long_long>> results(numTests, std::vector<long_long>(iterations + 1, 0));
     int count = 0;
 
@@ -94,13 +98,20 @@ void selectCpuCyclesBenchmark(const DataFile& dataFile,
         results[count][0] = static_cast<long_long>(i);
 
         for (int j = 0; j < iterations; ++j) {
+            int* inputData = new int[dataFile.getNumElements()];
+            int* selection = new int[dataFile.getNumElements()];
+            copyArray(LoadedData::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
+
             std::cout << "Running sensitivity " << i << ", iteration " << j + 1 << "... ";
 
             cycles = *Counters::getInstance().readEventSet();
 
-            selectFunctionPtr(dataFile.getNumElements(), inputData, selection.get(), i);
+            selectFunctionPtr(dataFile.getNumElements(), inputData, selection, i);
 
             results[count][1 + j] = *Counters::getInstance().readEventSet() - cycles;
+
+            delete[] inputData;
+            delete[] selection;
 
             std::cout << "Completed" << std::endl;
         }
@@ -122,16 +133,12 @@ void selectCpuCyclesBenchmark(const DataFile& dataFile,
 }
 
 
-void selectCpuCyclesBenchmark(const DataFile& dataFile,
-                              SelectImplementation selectImplementation,
-                              int iterations) {
-    int threshold = 50;
+void selectCpuCyclesBenchmarkSingle(const DataFile &dataFile, SelectImplementation selectImplementation, int iterations,
+                                    int threshold) {
     int numTests = 1;
 
-    std::unique_ptr<int[]> selection(new int[dataFile.getNumElements()]);
-    int* inputData = LoadedData::getInstance(dataFile).getData();
-    long_long cycles;
 
+    long_long cycles;
     std::vector<std::vector<long_long>> results(numTests, std::vector<long_long>(iterations + 1, 0));
     int count = 0;
 
@@ -141,13 +148,20 @@ void selectCpuCyclesBenchmark(const DataFile& dataFile,
     results[count][0] = static_cast<long_long>(threshold);
 
     for (int j = 0; j < iterations; ++j) {
+        int* inputData = new int[dataFile.getNumElements()];
+        int* selection = new int[dataFile.getNumElements()];
+        copyArray(LoadedData::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
+
         std::cout << "Running sensitivity " << threshold << ", iteration " << j + 1 << "... ";
 
         cycles = *Counters::getInstance().readEventSet();
 
-        selectFunctionPtr(dataFile.getNumElements(), inputData, selection.get(), threshold);
+        selectFunctionPtr(dataFile.getNumElements(), inputData, selection, threshold);
 
         results[count][1 + j] = *Counters::getInstance().readEventSet() - cycles;
+
+        delete[] inputData;
+        delete[] selection;
 
         std::cout << "Completed" << std::endl;
     }

@@ -60,7 +60,19 @@ void selectCountersBenchmarkConfiguration_2(const DataFile &dataFile, SelectImpl
                                             int sensitivityStride, int iterations) {
     std::vector<std::string> benchmarkCounters = {"PERF_COUNT_HW_CPU_CYCLES",
                                                   "INSTRUCTION_RETIRED",
-                                                  "UNHALTED_CORE_CYCLES"};
+                                                  "LLC_REFERENCES",
+                                                  "LLC_MISSES",
+                                                  "MISPREDICTED_BRANCH_RETIRED",
+                                                  "PERF_COUNT_HW_CACHE_REFERENCES",
+                                                  "PERF_COUNT_HW_CACHE_MISSES",
+                                                  "PERF_COUNT_HW_BRANCH_MISSES",
+                                                  "PERF_COUNT_HW_CACHE_L1D"};
+//    std::vector<std::string> benchmarkCounters = {"PERF_COUNT_HW_CPU_CYCLES",
+//                                                  "INSTRUCTION_RETIRED",
+//                                                  "PERF_COUNT_HW_CACHE_L1D",
+//                                                  "L1-DCACHE-LOADS",
+//                                                  "L1-DCACHE-LOAD-MISSES",
+//                                                  "L1-DCACHE-STORES"};
     selectCountersBenchmark(dataFile,
                             selectImplementation,
                             sensitivityStride,
@@ -79,28 +91,24 @@ void selectCpuCyclesBenchmarkConfiguration_1(const DataFile &dataFile, SelectImp
 
 int main(int argc, char** argv) {
 
-    selectCpuCyclesBenchmark(DataFiles::step50IntDistribution250mValues,
+    selectCountersBenchmarkConfiguration_2(DataFiles::uniformIntDistribution250mValues,
+                                           SelectImplementation::Predication,
+                                           1,
+                                           1);
+
+/*    selectCountersBenchmarkConfiguration_2(DataFiles::uniformIntDistribution250mValues,
+                                           SelectImplementation::Branch,
+                                           1,
+                                           1);*/
+
+/*    selectCpuCyclesBenchmark(DataFiles::uniformIntDistribution250mValues,
                              SelectImplementation::Adaptive,
-                             3);
+                             1,
+                             1);*/
 
-/*    selectCpuCyclesBenchmark(DataFiles::step50IntDistribution250mValues,
-                             SelectImplementation::Predication,
-                             10);
+//    selectCpuCyclesBenchmarkSingle(DataFiles::uniformIntDistribution250mValues,
+//                                   SelectImplementation::Adaptive, 1, 70);
 
-    selectCpuCyclesBenchmark(DataFiles::step50IntDistribution250mValues,
-                             SelectImplementation::Branch,
-                             10);*/
-
-/*    selectCpuCyclesBenchmark(DataFiles::varyingIntDistribution250mValues,
-                             SelectImplementation::Adaptive,
-                             10);
-
-    selectCpuCyclesBenchmark(DataFiles::varyingIntDistribution250mValues,
-                             SelectImplementation::Predication,
-                             10);
-
-    selectCpuCyclesBenchmark(DataFiles::varyingIntDistribution250mValues,
-                             SelectImplementation::Branch,
-                             10);*/
+    return 0;
 
 }

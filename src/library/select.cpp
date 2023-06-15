@@ -2,11 +2,13 @@
 #include <iostream>
 
 #include "select.h"
+#include "hardwareTuning.h"
 #include "../utils/papiHelpers.h"
 #include "papi.h"
 
 
 int selectBranch(int n, const int *inputData, int *selection, int threshold) {
+//    std::cout << "Select branch called" << std::endl;
     int k = 0;
     for (int i = 0; i < n; ++i) {
         if (inputData[i] <= threshold) {
@@ -17,6 +19,7 @@ int selectBranch(int n, const int *inputData, int *selection, int threshold) {
 }
 
 int selectPredication(int n, const int *inputData, int *selection, int threshold) {
+//    std::cout << "Select predication called" << std::endl;
     int k = 0;
     for (int i = 0; i < n; ++i) {
         selection[k] = i;
@@ -25,34 +28,58 @@ int selectPredication(int n, const int *inputData, int *selection, int threshold
     return k;
 }
 
-inline void performAdaption(int (*&selectFunctionPtr)(int, const int *, int *, int), const long_long *counterValues,
-                            int tuplesPerAdaption) {
+inline void performAdaption(int (*&selectFunctionPtr)(int, const int *, int *, int),
+                            const long_long *counterValues,
+                            int tuplesPerAdaption,
+                            float lowerPredicateCrossoverL1dMisses,
+                            float upperPredicateCrossoverL1dMisses,
+                            float lowerBranchCrossoverRetiredInstructions,
+                            float upperBranchCrossoverRetiredInstructions,
+                            int iteration) {
 
-//    std::cout << static_cast<float>(counterValues[0]) / static_cast<float>(tuplesPerAdaption) << " cycles per tuple" << std::endl;
-//    std::cout << static_cast<float>(tuplesPerAdaption) / static_cast<float>(counterValues[1]) << " tuples per L1 dcache load miss" << std::endl;
-
-    if (__builtin_expect(static_cast<float>(counterValues[0]) / static_cast<float>(tuplesPerAdaption) > 8.8
+/*    if (__builtin_expect(static_cast<float>(counterValues[0]) > lowerBranchCrossoverRetiredInstructions
+                         && static_cast<float>(counterValues[0]) < upperBranchCrossoverRetiredInstructions
                          && selectFunctionPtr == selectBranch, false)) {
         selectFunctionPtr = selectPredication;
 //        std::cout << "Switch made to predication" << std::endl;
-    }
-
-    if (__builtin_expect(static_cast<float>(tuplesPerAdaption) / static_cast<float>(counterValues[1]) < 8.0
+    }*/
+    if (__builtin_expect((static_cast<float>(counterValues[1]) < lowerPredicateCrossoverL1dMisses
+                          || static_cast<float>(counterValues[1]) > upperPredicateCrossoverL1dMisses)
                          && selectFunctionPtr == selectPredication, false)) {
         selectFunctionPtr = selectBranch;
-//        std::cout << "Switch made to branch" << std::endl;
+        std::cout << "Switch made to branch on chunk " << iteration << std::endl;
+        std::cout << counterValues[1] << std::endl;
     }
 }
 
 int selectAdaptive(int n, const int *inputData, int *selection, int threshold) {
-    int tuplesPerAdaption = 10000;
+    int tuplesPerAdaption = 50000;
+    float lowerPredicateCrossoverSelectivity = 0.04;
+    float upperPredicateCrossoverSelectivity = 0.99;
+    float lowerBranchCrossoverSelectivity = 0.04;
+    float upperBranchCrossoverSelectivity = 0.98;
+
+    int elementsPerL1dCacheLine = getL1cacheLineSize() / sizeof (int);
+    float lowerPredicateCrossoverL1dMisses =
+            (tuplesPerAdaption + (tuplesPerAdaption * lowerPredicateCrossoverSelectivity)) / elementsPerL1dCacheLine;
+    float upperPredicateCrossoverL1dMisses =
+            (tuplesPerAdaption + (tuplesPerAdaption * upperPredicateCrossoverSelectivity)) / elementsPerL1dCacheLine;
+    float lowerBranchCrossoverRetiredInstructions =
+            (tuplesPerAdaption * 5) + (tuplesPerAdaption * 3 * lowerBranchCrossoverSelectivity);
+    float upperBranchCrossoverRetiredInstructions =
+            (tuplesPerAdaption * 5) + (tuplesPerAdaption * 3 * upperBranchCrossoverSelectivity);
+
+    std::cout << lowerPredicateCrossoverL1dMisses << std::endl;
+    std::cout << upperPredicateCrossoverL1dMisses << std::endl;
+
+
     int k = 0;
     int tuplesToProcess;
     int selected;
     SelectFunctionPtr selectFunctionPtr = selectPredication;
 
-    std::vector<std::string> counters = {"UNHALTED_CORE_CYCLES",
-                                         "L1-DCACHE-LOAD-MISSES"};
+    std::vector<std::string> counters = {"INSTRUCTION_RETIRED",
+                                         "PERF_COUNT_HW_CACHE_L1D"};
     long_long *counterValues = Counters::getInstance().getEvents(counters);
 
     while (n > 0) {
@@ -64,7 +91,10 @@ int selectAdaptive(int n, const int *inputData, int *selection, int threshold) {
         inputData += tuplesToProcess;
         selection += selected;
         k += selected;
-        performAdaption(selectFunctionPtr, counterValues, tuplesPerAdaption);
+        performAdaption(selectFunctionPtr, counterValues, tuplesPerAdaption, lowerPredicateCrossoverL1dMisses,
+                        upperPredicateCrossoverL1dMisses, lowerBranchCrossoverRetiredInstructions,
+                        upperBranchCrossoverRetiredInstructions,
+                        5000 - (n / tuplesPerAdaption));
     }
 
     return k;
