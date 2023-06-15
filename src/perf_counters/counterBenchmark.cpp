@@ -20,7 +20,7 @@ void selectCountersBenchmark(const DataFile& dataFile,
     int numTests = 1 + (100 / sensitivityStride);
 
     std::unique_ptr<int[]> selection(new int[dataFile.getNumElements()]);
-    int* inputData = LoadedData::getInstance(dataFile.getFilepath(), dataFile.getNumElements()).getData();
+    int* inputData = LoadedData::getInstance(dataFile).getData();
 
     long_long benchmarkCounterValues[benchmarkCounters.size()];
     int benchmarkEventSet = initialisePAPIandCreateEventSet(benchmarkCounters);
@@ -81,8 +81,7 @@ void selectCpuCyclesBenchmark(const DataFile& dataFile,
     int numTests = 1 + (100 / sensitivityStride);
 
     std::unique_ptr<int[]> selection(new int[dataFile.getNumElements()]);
-    int* inputData = LoadedData::getInstance(dataFile.getFilepath(), dataFile.getNumElements()).getData();
-
+    int* inputData = LoadedData::getInstance(dataFile).getData();
     long_long cycles;
 
     std::vector<std::vector<long_long>> results(numTests, std::vector<long_long>(iterations + 1, 0));
@@ -130,8 +129,7 @@ void selectCpuCyclesBenchmark(const DataFile& dataFile,
     int numTests = 1;
 
     std::unique_ptr<int[]> selection(new int[dataFile.getNumElements()]);
-    int* inputData = LoadedData::getInstance(dataFile.getFilepath(), dataFile.getNumElements()).getData();
-
+    int* inputData = LoadedData::getInstance(dataFile).getData();
     long_long cycles;
 
     std::vector<std::vector<long_long>> results(numTests, std::vector<long_long>(iterations + 1, 0));

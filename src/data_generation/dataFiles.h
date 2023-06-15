@@ -10,24 +10,27 @@ extern const std::string selectCyclesFolder;
 
 class DataFile {
 public:
-    DataFile(std::string _filePath, int _numElements, std::string _fileName);
+    DataFile(int _numElements, std::string _fileName, std::string _longDescription);
 
-    [[nodiscard]] const std::string& getFilepath() const;
     [[nodiscard]] int getNumElements() const;
     [[nodiscard]] const std::string& getFileName() const;
+    [[nodiscard]] const std::string& getLongDescription() const;
+    void loadDataIntoMemory(int *data) const;
 
 private:
-    std::string filePath;
     int numElements;
     std::string fileName;
+    std::string longDescription;
 };
 
 class DataFiles {
 public:
     static const DataFile uniformIntDistribution25kValues;
     static const DataFile uniformIntDistribution250mValues;
+
     static const DataFile varyingIntDistribution25kValues;
     static const DataFile varyingIntDistribution250mValues;
+
     static const DataFile step50IntDistribution25kValues;
     static const DataFile step50IntDistribution250mValues;
 };

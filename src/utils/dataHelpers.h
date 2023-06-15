@@ -9,21 +9,17 @@
 class LoadedData {
 private:
     std::unique_ptr<int[]> data;
-    int size;
-
-    LoadedData(const std::string& filePath, int numElements);
+    const DataFile &dataFile;
+    explicit LoadedData(const DataFile &dataFile);
 
 public:
-    static LoadedData& getInstance(const std::string& filePath, int numElements);
-
-    int* getData();
-    int getSize() const;
-
+    static LoadedData &getInstance(const DataFile &dataFile);
+    [[nodiscard]] int* getData() const;
+    [[nodiscard]] const DataFile& getDataFile() const;
     LoadedData(const LoadedData&) = delete;
     void operator=(const LoadedData&) = delete;
 };
 
-int loadDataToArray(const std::string& filePath, int *data);
 void displayDistribution(const DataFile& dataFile);
 void writeHeadersAndTableToCSV(std::vector<std::string>& headers,
                                std::vector<std::vector<long_long>>  values,

@@ -8,63 +8,28 @@
 
 #include "dataHelpers.h"
 
-LoadedData::LoadedData(const std::string& filePath, int numElements) {
-    size = numElements;
-    data = std::make_unique<int[]>(numElements);
-    loadDataToArray(filePath, data.get());
+LoadedData::LoadedData(const DataFile &_dataFile) : dataFile(_dataFile) {
+    data = std::make_unique<int[]>(dataFile.getNumElements());
+    dataFile.loadDataIntoMemory(data.get());
 }
 
-LoadedData& LoadedData::getInstance(const std::string& filePath, int numElements) {
-    static LoadedData instance(filePath, numElements);
+LoadedData &LoadedData::getInstance(const DataFile &dataFile) {
+    static LoadedData instance(dataFile);
     return instance;
 }
 
-int* LoadedData::getData() {
+int* LoadedData::getData() const {
     return data.get();
 }
 
-int LoadedData::getSize() const {
-    return size;
-}
-
-
-int loadDataToArray(const std::string& filePath, int *data) {
-    std::ifstream inputFile(filePath);
-
-    if (!inputFile) {
-        std::cerr << "Failed to open the file." << std::endl;
-        exit(1);
-    }
-
-    std::cout << "Loading data from file... ";
-    std::cout.flush();
-
-    std::string line;
-    int index = 0;
-    while (std::getline(inputFile, line)) {
-        std::istringstream iss(line);
-        std::string value;
-
-        while (std::getline(iss, value, ',')) {
-            try {
-                int intValue = std::stoi(value);
-                data[index] = intValue;
-                index++;
-            } catch (const std::exception& e) {
-                std::cerr << "Failed to convert value to int: " << value << std::endl;
-            }
-        }
-    }
-
-    inputFile.close();
-    std::cout << "Complete" << std::endl;
-    return index;
+const DataFile& LoadedData::getDataFile() const {
+    return dataFile;
 }
 
 void displayDistribution(const DataFile& dataFile) {
     std::vector<int> counts(101, 0);
     int numElements = dataFile.getNumElements();
-    int* inputData = LoadedData::getInstance(dataFile.getFilepath(), dataFile.getNumElements()).getData();
+    int* inputData = LoadedData::getInstance(dataFile).getData();
     for (int i = 0; i < numElements; ++i) {
         counts[inputData[i]]++;
     }

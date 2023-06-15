@@ -16,14 +16,14 @@
 
 
 void dataDistributionTest(const DataFile& dataFile) {
-    LoadedData::getInstance(dataFile.getFilepath(), dataFile.getNumElements()).getData();
+    LoadedData::getInstance(dataFile);
     std::cout << dataFile.getNumElements() << " elements" << std::endl;
     displayDistribution(dataFile);
 }
 
 void selectFunctionalityTest(const DataFile& dataFile, SelectImplementation selectImplementation) {
     std::unique_ptr<int[]> selection(new int[dataFile.getNumElements()]);
-    int* inputData = LoadedData::getInstance(dataFile.getFilepath(), dataFile.getNumElements()).getData();
+    int* inputData = LoadedData::getInstance(dataFile).getData();
 
     SelectFunctionPtr selectFunctionPtr;
     setSelectFuncPtr(selectFunctionPtr, selectImplementation);
@@ -79,11 +79,11 @@ void selectCpuCyclesBenchmarkConfiguration_1(const DataFile &dataFile, SelectImp
 
 int main(int argc, char** argv) {
 
-/*    selectCpuCyclesBenchmark(DataFiles::step50IntDistribution250mValues,
-                             SelectImplementation::Adaptive,
-                             10);
-
     selectCpuCyclesBenchmark(DataFiles::step50IntDistribution250mValues,
+                             SelectImplementation::Adaptive,
+                             3);
+
+/*    selectCpuCyclesBenchmark(DataFiles::step50IntDistribution250mValues,
                              SelectImplementation::Predication,
                              10);
 
@@ -91,7 +91,7 @@ int main(int argc, char** argv) {
                              SelectImplementation::Branch,
                              10);*/
 
-    selectCpuCyclesBenchmark(DataFiles::varyingIntDistribution250mValues,
+/*    selectCpuCyclesBenchmark(DataFiles::varyingIntDistribution250mValues,
                              SelectImplementation::Adaptive,
                              10);
 
@@ -101,6 +101,6 @@ int main(int argc, char** argv) {
 
     selectCpuCyclesBenchmark(DataFiles::varyingIntDistribution250mValues,
                              SelectImplementation::Branch,
-                             10);
+                             10);*/
 
 }
