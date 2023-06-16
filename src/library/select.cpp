@@ -46,13 +46,15 @@ inline void performAdaption(int (*&selectFunctionPtr)(int, const int *, int *, i
 
 int selectAdaptive(int n, const int *inputData, int *selection, int threshold) {
     int tuplesPerAdaption = 50000; // down to 10 000
-    float lowerCrossoverSelectivity = 0.03;
-    float upperCrossoverSelectivity = 0.98;
+    float lowerCrossoverSelectivity = 0.03; // Could use a tuning function to identify these cross-over points
+    float upperCrossoverSelectivity = 0.98; // Could use a tuning function to identify these cross-over points
 
     // Equations below are only valid at the extreme ends of selectivity
+    // Y intercept of number of branch misses (at lower cross-over selectivity)
     float lowerBranchCrossoverBranchMisses = lowerCrossoverSelectivity * static_cast<float>(tuplesPerAdaption);
     float upperBranchCrossoverBranchMisses = (1 - upperCrossoverSelectivity) * static_cast<float>(tuplesPerAdaption);
 
+    // Gradient of number of branch misses between lower cross-over selectivity and upper cross-over selectivity
     float m = (upperBranchCrossoverBranchMisses - lowerBranchCrossoverBranchMisses) /
             (upperCrossoverSelectivity - lowerCrossoverSelectivity);
 
