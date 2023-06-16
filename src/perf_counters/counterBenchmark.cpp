@@ -176,5 +176,26 @@ void selectCpuCyclesSingleBenchmark(const DataFile &dataFile, SelectImplementati
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }
 
+void selectSingleRunNoCounters(const DataFile &dataFile, SelectImplementation selectImplementation, int iterations,
+                                    int threshold) {
+    SelectFunctionPtr selectFunctionPtr;
+    setSelectFuncPtr(selectFunctionPtr, selectImplementation);
+
+    for (int j = 0; j < iterations; ++j) {
+        int* inputData = new int[dataFile.getNumElements()];
+        int* selection = new int[dataFile.getNumElements()];
+        copyArray(LoadedData::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
+
+        std::cout << "Running sensitivity " << threshold << ", iteration " << j + 1 << "... ";
+
+        selectFunctionPtr(dataFile.getNumElements(), inputData, selection, threshold);
+
+        delete[] inputData;
+        delete[] selection;
+
+        std::cout << "Completed" << std::endl;
+    }
+}
+
 
 

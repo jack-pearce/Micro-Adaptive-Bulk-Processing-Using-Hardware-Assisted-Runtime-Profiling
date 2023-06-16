@@ -111,14 +111,17 @@ int main(int argc, char** argv) {
                                            1,
                                            1);*/
 
-    selectCpuCyclesMultipleBenchmarks(DataFiles::uniformIntDistribution250mValues,
+/*    selectCpuCyclesMultipleBenchmarks(DataFiles::uniformIntDistribution250mValues,
                              SelectImplementation::Adaptive,
                              1,
-                             1);
+                             1);*/
 
 //    selectCpuCyclesSingleBenchmark(DataFiles::uniformIntDistribution250mValues,
-//                                   SelectImplementation::Adaptive, 1, 70);
+//                                   SelectImplementation::Predication, 1, 50);
 
+
+    selectSingleRunNoCounters(DataFiles::uniformIntDistribution250mValues,
+                                   SelectImplementation::Predication, 1, 50);
     return 0;
 
 }

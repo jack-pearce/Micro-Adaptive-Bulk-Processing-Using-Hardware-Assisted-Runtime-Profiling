@@ -45,7 +45,7 @@ inline void performAdaption(int (*&selectFunctionPtr)(int, const int *, int *, i
 }
 
 int selectAdaptive(int n, const int *inputData, int *selection, int threshold) {
-    int tuplesPerAdaption = 50000; // down to 10 000
+    int tuplesPerAdaption = 50000;
     float lowerCrossoverSelectivity = 0.03; // Could use a tuning function to identify these cross-over points
     float upperCrossoverSelectivity = 0.98; // Could use a tuning function to identify these cross-over points
 
@@ -61,7 +61,7 @@ int selectAdaptive(int n, const int *inputData, int *selection, int threshold) {
     int k = 0;
     int tuplesToProcess;
     int selected;
-    SelectFunctionPtr selectFunctionPtr = selectBranch;
+    SelectFunctionPtr selectFunctionPtr = selectPredication;
 
     std::vector<std::string> counters = {"PERF_COUNT_HW_BRANCH_MISSES"};
     long_long *counterValues = Counters::getInstance().getEvents(counters);

@@ -14,6 +14,10 @@ find_package(benchmark REQUIRED)
 
 link_directories(/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/libs/papi/src/install/lib)
 
+#set(TBB_ROOT "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/libs/tbb/oneTBB")
+#find_package(TBB REQUIRED)
+#link_directories(/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/libs/tbb/oneTBB/build/installationFolder/lib)
+
 add_executable(${PROJECT_NAME}
         src/data_generation/dataGenerators.cpp
         src/data_generation/dataFiles.cpp
@@ -30,4 +34,8 @@ add_executable(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME} benchmark::benchmark)
 
 target_link_libraries(${PROJECT_NAME} papi)
+
+#target_link_libraries(${PROJECT_NAME} tbb)
+#target_link_libraries(${PROJECT_NAME} TBB::tbb)
+
 
