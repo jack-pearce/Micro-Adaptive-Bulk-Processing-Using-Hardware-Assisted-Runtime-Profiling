@@ -91,19 +91,9 @@ void selectCpuCyclesBenchmarkConfiguration_1(const DataFile &dataFile, SelectImp
 
 int main(int argc, char** argv) {
 
-    selectCountersBenchmarkConfiguration_2(DataFiles::uniformIntDistribution250mValues,
+/*    selectCountersBenchmarkConfiguration_2(DataFiles::uniformIntDistribution250mValues,
                                            SelectImplementation::Adaptive,
                                            1,
-                                           1);
-
-/*    selectCountersBenchmarkConfiguration_2(DataFiles::uniformIntDistribution250mValues,
-                                           SelectImplementation::Branch,
-                                           1,
-                                           1);*/
-
-/*    selectCountersBenchmarkConfiguration_2(DataFiles::uniformIntDistribution250mValues,
-                                           SelectImplementation::Predication,
-                                           1,
                                            1);*/
 
 /*    selectCountersBenchmarkConfiguration_2(DataFiles::uniformIntDistribution250mValues,
@@ -111,10 +101,20 @@ int main(int argc, char** argv) {
                                            1,
                                            1);*/
 
-/*    selectCpuCyclesMultipleBenchmarks(DataFiles::uniformIntDistribution250mValues,
+//    selectCountersBenchmarkConfiguration_2(DataFiles::uniformIntDistribution250mValues,
+//                                           SelectImplementation::Predication,
+//                                           1,
+//                                           10);
+
+/*    selectCountersBenchmarkConfiguration_2(DataFiles::uniformIntDistribution250mValues,
+                                           SelectImplementation::Branch,
+                                           1,
+                                           1);*/
+
+    selectCpuCyclesMultipleBenchmarks(DataFiles::uniformIntDistribution250mValues,
                              SelectImplementation::Adaptive,
                              1,
-                             1);*/
+                             1);
 
 //    selectCpuCyclesSingleBenchmark(DataFiles::uniformIntDistribution250mValues,
 //                                   SelectImplementation::Adaptive, 1, 70);

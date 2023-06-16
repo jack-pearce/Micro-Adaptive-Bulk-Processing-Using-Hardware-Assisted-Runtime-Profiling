@@ -2,7 +2,6 @@
 #include <iostream>
 
 #include "select.h"
-#include "hardwareTuning.h"
 #include "../utils/papiHelpers.h"
 #include "papi.h"
 
@@ -26,34 +25,57 @@ int selectPredication(int n, const int *inputData, int *selection, int threshold
     return k;
 }
 
+inline void performAdaption(int (*&selectFunctionPtr)(int, const int *, int *, int),
+                            const long_long *counterValues,
+                            float lowerCrossoverSelectivity,
+                            float upperCrossoverSelectivity,
+                            float lowerBranchCrossoverBranchMisses,
+                            float m,
+                            float selectivity) {
+
+    if (__builtin_expect(static_cast<float>(counterValues[0]) >
+                         (((selectivity - lowerCrossoverSelectivity) * m) + lowerBranchCrossoverBranchMisses)
+                         && selectFunctionPtr == selectBranch, false))
+        selectFunctionPtr = selectPredication;
+
+    if (__builtin_expect((selectivity < lowerCrossoverSelectivity
+                         || selectivity > upperCrossoverSelectivity)
+                         && selectFunctionPtr == selectPredication, false))
+        selectFunctionPtr = selectBranch;
+}
+
 int selectAdaptive(int n, const int *inputData, int *selection, int threshold) {
-    int tuplesPerAdaption = 10000;
-    double lowerPredicateCrossoverSelectivity = 0.04 * tuplesPerAdaption;
-    double upperPredicateCrossoverSelectivity = 0.98 * tuplesPerAdaption;
-    double lowerBranchCrossoverSelectivity = 0.04 * tuplesPerAdaption;
-    double upperBranchCrossoverSelectivity = 0.98 * tuplesPerAdaption;
+    int tuplesPerAdaption = 50000; // down to 10 000
+    float lowerCrossoverSelectivity = 0.03;
+    float upperCrossoverSelectivity = 0.98;
+
+    // Equations below are only valid at the extreme ends of selectivity
+    float lowerBranchCrossoverBranchMisses = lowerCrossoverSelectivity * static_cast<float>(tuplesPerAdaption);
+    float upperBranchCrossoverBranchMisses = (1 - upperCrossoverSelectivity) * static_cast<float>(tuplesPerAdaption);
+
+    float m = (upperBranchCrossoverBranchMisses - lowerBranchCrossoverBranchMisses) /
+            (upperCrossoverSelectivity - lowerCrossoverSelectivity);
 
     int k = 0;
     int tuplesToProcess;
     int selected;
-    SelectFunctionPtr selectFunctionPtr = selectPredication;
+    SelectFunctionPtr selectFunctionPtr = selectBranch;
+
+    std::vector<std::string> counters = {"PERF_COUNT_HW_BRANCH_MISSES"};
+    long_long *counterValues = Counters::getInstance().getEvents(counters);
 
     while (n > 0) {
         tuplesToProcess = std::min(n, tuplesPerAdaption);
+        Counters::getInstance().readEventSet();
         selected = selectFunctionPtr(tuplesToProcess, inputData, selection, threshold);
+        Counters::getInstance().readEventSet();
         n -= tuplesToProcess;
         inputData += tuplesToProcess;
         selection += selected;
         k += selected;
-
-        if (__builtin_expect(selected > lowerBranchCrossoverSelectivity
-                             && selected < upperBranchCrossoverSelectivity
-                             && selectFunctionPtr == selectBranch, false))
-            selectFunctionPtr = selectPredication;
-        if (__builtin_expect((selected < lowerPredicateCrossoverSelectivity
-                             || selected > upperPredicateCrossoverSelectivity)
-                             && selectFunctionPtr == selectPredication, false))
-            selectFunctionPtr = selectBranch;
+        performAdaption(selectFunctionPtr, counterValues, lowerCrossoverSelectivity, upperCrossoverSelectivity,
+                        lowerBranchCrossoverBranchMisses, m,
+                        static_cast<float>(selected) / static_cast<float>(tuplesPerAdaption));
     }
 
     return k;
