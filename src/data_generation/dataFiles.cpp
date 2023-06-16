@@ -37,6 +37,37 @@ const DataFile DataFiles::step50IntDistribution250mValues{
     "step50IntDistribution250mValues",
     "250m values where max value is 100 and min value is in blocks of either 0 or 50"};
 
+const DataFile DataFiles::unequalStep50IntDistribution250mValues{
+        250 * 1000 * 1000,
+        "unequalStep50IntDistribution250mValues",
+        "250m values where max value is 100 and min value is in blocks of either 0 or 50. Blocks of 0 are 10 times larger than blocks of 0."};
+
+const DataFile DataFiles::fullySortedIntDistribution250mValues{
+        250 * 1000 * 1000,
+        "fullySortedIntDistribution250mValues",
+        ""};
+
+const DataFile DataFiles::veryNearlyFullySortedIntDistribution250mValues{
+        250 * 1000 * 1000,
+        "veryNearlyFullySortedIntDistribution250mValues",
+        ""};
+
+const DataFile DataFiles::nearlyFullySortedIntDistribution250mValues{
+        250 * 1000 * 1000,
+        "nearlyFullySortedIntDistribution250mValues",
+        ""};
+
+const DataFile DataFiles::partiallySortedIntDistribution250mValues{
+        250 * 1000 * 1000,
+        "partiallySortedIntDistribution250mValues",
+        ""};
+
+const DataFile DataFiles::slightlySortedIntDistribution250mValues{
+        250 * 1000 * 1000,
+        "slightlySortedIntDistribution250mValues",
+        ""};
+
+
 DataFile::DataFile(int _numElements, std::string _fileName, std::string _longDescription)
         : numElements(_numElements), fileName(std::move(_fileName)), longDescription(std::move(_longDescription)) {}
 
@@ -53,6 +84,18 @@ void DataFile::loadDataIntoMemory(int *data) const {
         generateStepSelectivityInMemory(data, getNumElements(), 50, 10);
     } else if (getFileName() == "step50IntDistribution250mValues") {
         generateStepSelectivityInMemory(data, getNumElements(), 50, 10);
+    } else if (getFileName() == "unequalStep50IntDistribution250mValues") {
+        generateUnequalStepSelectivityInMemory(data, getNumElements(), 50, 10, 10);
+    } else if (getFileName() == "fullySortedIntDistribution250mValues") {
+        generatePartiallySortedInMemory(data, getNumElements(), 100, 0);
+    } else if (getFileName() == "veryNearlyFullySortedIntDistribution250mValues") {
+        generatePartiallySortedInMemory(data, getNumElements(), 100, 0.01);
+    } else if (getFileName() == "nearlyFullySortedIntDistribution250mValues") {
+        generatePartiallySortedInMemory(data, getNumElements(), 100, 1);
+    } else if (getFileName() == "partiallySortedIntDistribution250mValues") {
+        generatePartiallySortedInMemory(data, getNumElements(), 100, 5);
+    } else if (getFileName() == "slightlySortedIntDistribution250mValues") {
+        generatePartiallySortedInMemory(data, getNumElements(), 100, 25);
     }
 };
 

@@ -23,4 +23,6 @@ void selectCpuCyclesSingleBenchmark(const DataFile &dataFile, SelectImplementati
 void selectSingleRunNoCounters(const DataFile &dataFile, SelectImplementation selectImplementation, int iterations,
                                int threshold);
 
+void selectCpuCyclesBenchmarkAllFuncs(const DataFile &dataFile, int iterations, int threshold);
+
 #endif //MICRO_ADAPTIVE_BULK_PROCESSING_COUNTERBENCHMARK_H

@@ -176,6 +176,57 @@ void selectCpuCyclesSingleBenchmark(const DataFile &dataFile, SelectImplementati
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }
 
+
+void selectCpuCyclesBenchmarkAllFuncs(const DataFile &dataFile, int iterations, int threshold) {
+    long_long cycles;
+    std::vector<std::vector<long_long>> results(iterations, std::vector<long_long>(4, 0));
+    int count = 0;
+
+    SelectFunctionPtr selectFunctionPtr;
+
+    for (int i = 0; i < iterations; ++i) {
+
+        results[i][0] = static_cast<long_long>(threshold);
+
+        for (int j = 0; j < 3; ++j) {
+            auto selectImplementation = static_cast<SelectImplementation>(j);
+            setSelectFuncPtr(selectFunctionPtr, selectImplementation);
+
+            int *inputData = new int[dataFile.getNumElements()];
+            int *selection = new int[dataFile.getNumElements()];
+            copyArray(LoadedData::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
+
+            std::cout << "Running function '" << getName(selectImplementation) <<"' threshold " << threshold << ", iteration " << i + 1 << "... ";
+
+            cycles = *Counters::getInstance().readEventSet();
+
+            selectFunctionPtr(dataFile.getNumElements(), inputData, selection, threshold);
+
+            results[i][1 + j] = *Counters::getInstance().readEventSet() - cycles;
+
+            delete[] inputData;
+            delete[] selection;
+
+            std::cout << "Completed" << std::endl;
+        }
+
+    }
+
+    std::vector<std::string> headers(4, "Threshold");
+    for (int j = 0; j < 3; ++j) {
+        auto selectImplementation = static_cast<SelectImplementation>(j);
+        headers[j + 1] = getName(selectImplementation);
+    }
+
+    std::string fileName =
+            "allSelect_cyclesBM_" +
+            dataFile.getFileName() +
+            "_threshold_" +
+            std::to_string(threshold);
+    std::string fullFilePath = outputFilePath + selectCyclesFolder + fileName + ".csv";
+    writeHeadersAndTableToCSV(headers, results, fullFilePath);
+}
+
 void selectSingleRunNoCounters(const DataFile &dataFile, SelectImplementation selectImplementation, int iterations,
                                     int threshold) {
     SelectFunctionPtr selectFunctionPtr;
@@ -196,6 +247,8 @@ void selectSingleRunNoCounters(const DataFile &dataFile, SelectImplementation se
         std::cout << "Completed" << std::endl;
     }
 }
+
+
 
 
 

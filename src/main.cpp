@@ -91,37 +91,14 @@ void selectCpuCyclesBenchmarkConfiguration_1(const DataFile &dataFile, SelectImp
 
 int main(int argc, char** argv) {
 
-/*    selectCountersBenchmarkConfiguration_2(DataFiles::uniformIntDistribution250mValues,
-                                           SelectImplementation::Adaptive,
-                                           1,
-                                           1);*/
+    selectCpuCyclesBenchmarkAllFuncs(DataFiles::slightlySortedIntDistribution250mValues,
+                                     5,
+                                     50);
 
-/*    selectCountersBenchmarkConfiguration_2(DataFiles::uniformIntDistribution250mValues,
-                                           SelectImplementation::Branch,
-                                           1,
-                                           1);*/
+//    selectCountersBenchmarkConfiguration_2(DataFiles::fullySortedIntDistribution250mValues,
+//                                           SelectImplementation::Branch,
+//                                           50, 1);
 
-//    selectCountersBenchmarkConfiguration_2(DataFiles::uniformIntDistribution250mValues,
-//                                           SelectImplementation::Predication,
-//                                           1,
-//                                           10);
-
-/*    selectCountersBenchmarkConfiguration_2(DataFiles::uniformIntDistribution250mValues,
-                                           SelectImplementation::Branch,
-                                           1,
-                                           1);*/
-
-/*    selectCpuCyclesMultipleBenchmarks(DataFiles::uniformIntDistribution250mValues,
-                             SelectImplementation::Adaptive,
-                             1,
-                             1);*/
-
-//    selectCpuCyclesSingleBenchmark(DataFiles::uniformIntDistribution250mValues,
-//                                   SelectImplementation::Predication, 1, 50);
-
-
-    selectSingleRunNoCounters(DataFiles::uniformIntDistribution250mValues,
-                                   SelectImplementation::Predication, 1, 50);
     return 0;
 
 }

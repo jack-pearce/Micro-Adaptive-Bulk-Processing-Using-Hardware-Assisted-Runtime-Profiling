@@ -35,13 +35,17 @@ inline void performAdaption(int (*&selectFunctionPtr)(int, const int *, int *, i
 
     if (__builtin_expect(static_cast<float>(counterValues[0]) >
                          (((selectivity - lowerCrossoverSelectivity) * m) + lowerBranchCrossoverBranchMisses)
-                         && selectFunctionPtr == selectBranch, false))
+                         && selectFunctionPtr == selectBranch, false)) {
+//        std::cout << "Switched to select predication" << std::endl;
         selectFunctionPtr = selectPredication;
+    }
 
     if (__builtin_expect((selectivity < lowerCrossoverSelectivity
                          || selectivity > upperCrossoverSelectivity)
-                         && selectFunctionPtr == selectPredication, false))
+                         && selectFunctionPtr == selectPredication, false)) {
+//        std::cout << "Switched to select branch" << std::endl;
         selectFunctionPtr = selectBranch;
+    }
 }
 
 int selectAdaptive(int n, const int *inputData, int *selection, int threshold) {
@@ -61,7 +65,7 @@ int selectAdaptive(int n, const int *inputData, int *selection, int threshold) {
     int k = 0;
     int tuplesToProcess;
     int selected;
-    SelectFunctionPtr selectFunctionPtr = selectPredication;
+    SelectFunctionPtr selectFunctionPtr = selectBranch;
 
     std::vector<std::string> counters = {"PERF_COUNT_HW_BRANCH_MISSES"};
     long_long *counterValues = Counters::getInstance().getEvents(counters);

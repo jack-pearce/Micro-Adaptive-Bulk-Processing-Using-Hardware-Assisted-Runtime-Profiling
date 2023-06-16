@@ -33,6 +33,14 @@ public:
 
     static const DataFile step50IntDistribution25kValues;
     static const DataFile step50IntDistribution250mValues;
+
+    static const DataFile unequalStep50IntDistribution250mValues;
+
+    static const DataFile fullySortedIntDistribution250mValues;
+    static const DataFile veryNearlyFullySortedIntDistribution250mValues;
+    static const DataFile nearlyFullySortedIntDistribution250mValues;
+    static const DataFile partiallySortedIntDistribution250mValues;
+    static const DataFile slightlySortedIntDistribution250mValues;
 };
 
 #endif //MABPL_DATAFILES_H
