@@ -142,7 +142,7 @@ void selectBenchmarkWithExtraCounters(const DataFile& dataFile,
                                       int selectivityStride,
                                       int iterations,
                                       std::vector<std::string>& benchmarkCounters) {
-    if (selectImplementation == SelectImplementation::Adaptive)
+    if (selectImplementation == SelectImplementation::IndexesAdaptive)
         std::cout << "Cannot benchmark adaptive select using counters as adaptive select is already using these counters" << std::endl;
 
     int numTests = 1 + (100 / selectivityStride);

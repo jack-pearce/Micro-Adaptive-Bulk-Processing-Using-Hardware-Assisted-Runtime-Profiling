@@ -9,7 +9,7 @@ void generateUniformDistributionInMemory(int *data, int n) {
     std::cout << "Generating data in memory... ";
     std::cout.flush();
 
-    unsigned int seed = 9999;
+    unsigned int seed = 1;
     std::mt19937 gen(seed);
 
     int lowerBound = 1;

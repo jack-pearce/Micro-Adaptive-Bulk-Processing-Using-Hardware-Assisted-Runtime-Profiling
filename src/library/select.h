@@ -3,12 +3,18 @@
 
 #include <string>
 
-int selectBranch(int n, const int *inputData, int *selection, int threshold);
-int selectPredication(int n, const int *inputData, int *selection, int threshold);
-int selectAdaptive(int n, const int *inputData, int *selection, int threshold);
+int selectIndexesBranch(int n, const int *inputData, int *selection, int threshold);
+int selectIndexesPredication(int n, const int *inputData, int *selection, int threshold);
+int selectIndexesAdaptive(int n, const int *inputData, int *selection, int threshold);
+
+int selectValuesBranch(int n, const int *inputData, int *selection, int threshold);
+int selectValuesPredication(int n, const int *inputData, int *selection, int threshold);
+int selectValuesVectorized(int n, const int *inputData, int *selection, int threshold);
+int selectValuesAdaptive(int n, const int *inputData, int *selection, int threshold);
 
 enum SelectImplementation {
-    Branch, Predication, Adaptive
+    IndexesBranch, IndexesPredication, IndexesAdaptive,
+    ValuesBranch, ValuesPredication, ValuesVectorized, ValuesAdaptive
 };
 
 typedef int (*SelectFunctionPtr)(int n, const int *inputData, int *selection, int threshold);

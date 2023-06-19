@@ -70,42 +70,42 @@ void selectBenchmarkWithExtraCountersConfigurations(const DataFile &dataFile, Se
 void allSelectTests() {
     // Graph 1: Selectivity range on uniform data
     selectCpuCyclesMultipleInputBenchmark(DataFiles::uniformIntDistribution250mValues,
-                                          {SelectImplementation::Branch,
-                                           SelectImplementation::Predication,
-                                           SelectImplementation::Adaptive},
+                                          {SelectImplementation::IndexesBranch,
+                                           SelectImplementation::IndexesPredication,
+                                           SelectImplementation::IndexesAdaptive},
                                           1, 3);
 
     // Graph 2: Randomness range on sorted data
     selectCpuCyclesSweepBenchmark(DataSweeps::logSortedIntDistribution250mValuesRandomnessSweep,
-                                  {SelectImplementation::Branch,
-                                   SelectImplementation::Predication,
-                                   SelectImplementation::Adaptive}, 50, 5);
+                                  {SelectImplementation::IndexesBranch,
+                                   SelectImplementation::IndexesPredication,
+                                   SelectImplementation::IndexesAdaptive}, 50, 5);
 
     // Graph 3: Period range on linearly varying selectivity
     selectCpuCyclesSweepBenchmark(DataSweeps::varyingIntDistribution250mValuesSweep,
-                                  {SelectImplementation::Branch,
-                                   SelectImplementation::Predication,
-                                   SelectImplementation::Adaptive}, 50, 5);
+                                  {SelectImplementation::IndexesBranch,
+                                   SelectImplementation::IndexesPredication,
+                                   SelectImplementation::IndexesAdaptive}, 50, 5);
 
     // Graph 4: Period range on step varying selectivity
     selectCpuCyclesSweepBenchmark(DataSweeps::step50IntDistribution250mValuesSweep,
-                                  {SelectImplementation::Branch,
-                                   SelectImplementation::Predication,
-                                   SelectImplementation::Adaptive}, 50, 5);
+                                  {SelectImplementation::IndexesBranch,
+                                   SelectImplementation::IndexesPredication,
+                                   SelectImplementation::IndexesAdaptive}, 50, 5);
 
     // Graph 5: Best case - tuned unequal step varying selectivity
     selectCpuCyclesSingleInputBenchmark(DataFiles::bestCaseTunedUnequalStep50IntDistribution250mValues,
-                                        {SelectImplementation::Branch,
-                                         SelectImplementation::Predication,
-                                         SelectImplementation::Adaptive},
+                                        {SelectImplementation::IndexesBranch,
+                                         SelectImplementation::IndexesPredication,
+                                         SelectImplementation::IndexesAdaptive},
                                          50,
                                          5);
 
     // Graph 6: Worst case - tuned period range on step varying selectivity
     selectCpuCyclesSingleInputBenchmark(DataFiles::worstCaseTunedStep50IntDistribution250mValues,
-                                        {SelectImplementation::Branch,
-                                         SelectImplementation::Predication,
-                                         SelectImplementation::Adaptive},
+                                        {SelectImplementation::IndexesBranch,
+                                         SelectImplementation::IndexesPredication,
+                                         SelectImplementation::IndexesAdaptive},
                                         50,
                                         5);
 }
@@ -113,6 +113,11 @@ void allSelectTests() {
 
 int main(int argc, char** argv) {
 
+    selectCpuCyclesMultipleInputBenchmark(DataFiles::uniformIntDistribution250mValues,
+                                          {SelectImplementation::IndexesBranch,
+                                           SelectImplementation::IndexesPredication,
+                                           SelectImplementation::IndexesAdaptive},
+                                          1, 3);
 
     return 0;
 
