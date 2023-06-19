@@ -4,8 +4,8 @@
 #include "../library/select.h"
 #include "../data_generation/dataFiles.h"
 
-void selectTimeBenchmark(const DataFile &dataFile, SelectImplementation selectImplementation, int sensitivityStride);
+void selectTimeBenchmark(const DataFile &dataFile, SelectImplementation selectImplementation, int selectivityStride);
 void selectTimeBenchmarkSetIterations(const DataFile &dataFile, SelectImplementation selectImplementation,
-                                      int sensitivityStride, int iterations);
+                                      int selectivityStride, int iterations);
 
 #endif //MICRO_ADAPTIVE_BULK_PROCESSING_LIBRARY_TIMEBENCHMARKSELECT_H

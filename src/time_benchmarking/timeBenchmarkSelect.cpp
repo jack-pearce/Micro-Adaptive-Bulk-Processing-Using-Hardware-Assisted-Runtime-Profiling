@@ -23,17 +23,17 @@ static void selectTimeBenchmarker(benchmark::State& state) {
     }
 }
 
-void selectTimeBenchmark(const DataFile &dataFile, SelectImplementation selectImplementation, int sensitivityStride) {
+void selectTimeBenchmark(const DataFile &dataFile, SelectImplementation selectImplementation, int selectivityStride) {
     loadedDataFile = &LoadedData::getInstance(dataFile);
     BENCHMARK(selectTimeBenchmarker)->Name(getName(selectImplementation))->ArgsProduct({
-        benchmark::CreateDenseRange(0,100,sensitivityStride), {selectImplementation}});
+                                                                                               benchmark::CreateDenseRange(0, 100, selectivityStride), {selectImplementation}});
 }
 
 void
 selectTimeBenchmarkSetIterations(const DataFile &dataFile, SelectImplementation selectImplementation,
-                                 int sensitivityStride, int iterations) {
+                                 int selectivityStride, int iterations) {
     loadedDataFile = &LoadedData::getInstance(dataFile);
     BENCHMARK(selectTimeBenchmarker)->Name(getName(selectImplementation))->Iterations(iterations)->ArgsProduct({
-        benchmark::CreateDenseRange(0,100,sensitivityStride), {selectImplementation}});
+                                                                                                                       benchmark::CreateDenseRange(0, 100, selectivityStride), {selectImplementation}});
 }
 

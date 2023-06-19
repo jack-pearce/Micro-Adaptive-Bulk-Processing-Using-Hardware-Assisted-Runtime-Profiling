@@ -20,9 +20,15 @@ public:
     void operator=(const LoadedData&) = delete;
 };
 
+void generateLogDistribution(int numPoints, double minValue, double maxValue, std::vector<float> &points);
+void generateLinearDistribution(int numPoints, double minValue, double maxValue, std::vector<float> &points);
 void displayDistribution(const DataFile& dataFile);
+void writeDataFileToCSV(const DataFile& dataFile);
 void writeHeadersAndTableToCSV(std::vector<std::string>& headers,
                                std::vector<std::vector<long_long>>  values,
+                               std::string& filePath);
+void writeHeadersAndTableToCSV(std::vector<std::string>& headers,
+                               std::vector<std::vector<double>>  values,
                                std::string& filePath);
 void copyArray(const int* source, int* destination, int size);
 

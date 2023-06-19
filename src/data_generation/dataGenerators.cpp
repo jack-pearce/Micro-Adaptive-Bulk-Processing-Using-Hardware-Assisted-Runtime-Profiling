@@ -1,5 +1,6 @@
 #include <iostream>
 #include <random>
+#include <set>
 
 #include "dataGenerators.h"
 
@@ -144,7 +145,7 @@ void generatePartiallySortedInMemory(int *data, int n, int numRepeats, float per
 
 //    std::cout << sectionSize << " section size" << std::endl;
 //    std::cout << sections << " sections" << std::endl;
-//    std::cout << elementsToShufflePerSection << " elements to shuffle per section" << std::endl;
+//    std::cout << elementsToShufflePerSection << " pairs to shuffle per section" << std::endl;
 
     unsigned int seed = 1;
     std::mt19937 gen(seed);
@@ -165,21 +166,32 @@ void generatePartiallySortedInMemory(int *data, int n, int numRepeats, float per
         }
         increasing = !increasing;
 
+        std::set<int> selectedIndexes = {};
+        int index1, index2;
         for (int swapCount = 0; swapCount < elementsToShufflePerSection; ++swapCount) {
             std::uniform_int_distribution<int> dis(1, sectionSize);
-            std::swap(data[index - dis(gen)], data[index - dis(gen)]);
 
-//            int index1 = dis(gen);
-//            int index2 = dis(gen);
-//            std::swap(data[index - index1], data[index - index2]);
+            index1 = dis(gen);
+            while (selectedIndexes.count(index1) > 0) {
+                index1 = dis(gen);
+            }
+
+            index2 = dis(gen);
+            while (selectedIndexes.count(index2) > 0) {
+                index2 = dis(gen);
+            }
+
+            selectedIndexes.insert(index1);
+            selectedIndexes.insert(index2);
+            std::swap(data[index - index1], data[index - index2]);
+
 //            std::cout << "Swapped indexes: " << index1 << ", " << index2 << std::endl;
         }
 
 /*        for (int x = 0; x < 100; ++x) {
             for (int y = 0; y < numRepeats; ++y) {
-                std::cout << data[index - sectionSize + (x * numRepeats) + y] << ", ";
+                std::cout << data[index - sectionSize + (x * numRepeats) + y] << std::endl;
             }
-            std::cout << std::endl;
         }*/
     }
 
