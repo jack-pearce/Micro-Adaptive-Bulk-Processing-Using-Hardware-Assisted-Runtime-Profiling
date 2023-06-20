@@ -33,4 +33,13 @@ void selectCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<Selec
                                    int threshold, int iterations);
 
 
+
+
+
+void selectCpuCyclesMultipleInputBenchmark2(const DataFile& dataFile,
+                                            const std::vector<SelectImplementation>& selectImplementations,
+                                            int selectivityStride,
+                                            int iterations);
+
+
 #endif //MICRO_ADAPTIVE_BULK_PROCESSING_COUNTERBENCHMARK_H

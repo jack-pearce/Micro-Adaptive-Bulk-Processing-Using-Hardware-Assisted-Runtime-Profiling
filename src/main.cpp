@@ -67,7 +67,7 @@ void selectBenchmarkWithExtraCountersConfigurations(const DataFile &dataFile, Se
                                      benchmarkCounters);
 }
 
-void allSelectTests() {
+void allSelectIndexesTests() {
     // Graph 1: Selectivity range on uniform data
     selectCpuCyclesMultipleInputBenchmark(DataFiles::uniformIntDistribution250mValues,
                                           {SelectImplementation::IndexesBranch,
@@ -113,11 +113,13 @@ void allSelectTests() {
 
 int main(int argc, char** argv) {
 
-    selectCpuCyclesMultipleInputBenchmark(DataFiles::uniformIntDistribution250mValues,
-                                          {SelectImplementation::IndexesBranch,
-                                           SelectImplementation::IndexesPredication,
-                                           SelectImplementation::IndexesAdaptive},
-                                          1, 3);
+//    selectCpuCyclesMultipleInputBenchmark2(DataFiles::uniformIntDistribution250mValues,
+//                                          {SelectImplementation::ValuesBranch,
+//                                           SelectImplementation::ValuesPredication,
+//                                           SelectImplementation::ValuesVectorized},
+//                                          1, 1);
+
+    // Check correctness of vectorise function. - Do they all give the same result?
 
     return 0;
 

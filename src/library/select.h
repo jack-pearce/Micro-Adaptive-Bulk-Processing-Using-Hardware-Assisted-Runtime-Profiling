@@ -8,8 +8,8 @@ int selectIndexesPredication(int n, const int *inputData, int *selection, int th
 int selectIndexesAdaptive(int n, const int *inputData, int *selection, int threshold);
 
 int selectValuesBranch(int n, const int *inputData, int *selection, int threshold);
-int selectValuesPredication(int n, const int *inputData, int *selection, int threshold);
-int selectValuesVectorized(int n, const int *inputData, int *selection, int threshold);
+int selectValuesPredication(int n, const int *inputData, const int *inputFilter, int *selection, int threshold);
+int selectValuesVectorized(int n, const int *inputData, const int *inputFilter, int *selection, int threshold);
 int selectValuesAdaptive(int n, const int *inputData, int *selection, int threshold);
 
 enum SelectImplementation {
@@ -18,6 +18,14 @@ enum SelectImplementation {
 };
 
 typedef int (*SelectFunctionPtr)(int n, const int *inputData, int *selection, int threshold);
+
+
+
+
+typedef int (*SelectFunctionPtrTest)(int n, const int *inputData, const int* inputFilter, int *selection, int threshold);
+
+
+
 
 void setSelectFuncPtr(SelectFunctionPtr &selectFunctionPtr, SelectImplementation selectImplementation);
 std::string getName(SelectImplementation selectImplementation);

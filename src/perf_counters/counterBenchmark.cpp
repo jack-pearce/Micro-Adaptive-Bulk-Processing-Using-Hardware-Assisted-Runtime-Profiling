@@ -257,3 +257,78 @@ void selectCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<Selec
 
 
 
+
+
+
+
+
+
+
+void selectCpuCyclesMultipleInputBenchmark2(const DataFile& dataFile,
+                                           const std::vector<SelectImplementation>& selectImplementations,
+                                           int selectivityStride,
+                                           int iterations) {
+    int numTests = 1 + (100 / selectivityStride);
+    int implementations = static_cast<int>(selectImplementations.size());
+    int dataCols = implementations * iterations;
+
+    long_long cycles;
+    std::vector<std::vector<long_long>> results(numTests, std::vector<long_long>(dataCols + 1, 0));
+
+    SelectFunctionPtrTest selectFunctionPtr;
+    for (int i = 0; i < 2; ++i) {
+        if (i == 0) {
+            selectFunctionPtr = selectValuesPredication;
+        } else {
+            selectFunctionPtr = selectValuesVectorized;
+        }
+        int count = 0;
+
+        for (int j = 0; j <= 100; j += selectivityStride) {
+            results[count][0] = static_cast<long_long>(j);
+
+            for (int k = 0; k < iterations; ++k) {
+                int *inputData = new int[dataFile.getNumElements()];
+                int *filterData = new int[dataFile.getNumElements()];
+                int *selection = new int[dataFile.getNumElements()];
+                copyArray(LoadedData::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
+                copyArray(LoadedData::getInstance(dataFile).getData(), filterData, dataFile.getNumElements());
+
+
+                std::cout << "Running " << getName(selectImplementations[i]) << ", threshold ";
+                std::cout << j << ", iteration " << k + 1 << "... ";
+
+                cycles = *Counters::getInstance().readEventSet();
+
+                selectFunctionPtr(dataFile.getNumElements(), inputData, filterData, selection, j);
+
+                results[count][1 + (i * iterations) + k] = *Counters::getInstance().readEventSet() - cycles;
+
+                delete[] inputData;
+                delete[] filterData;
+                delete[] selection;
+
+                std::cout << "Completed" << std::endl;
+            }
+
+            count++;
+        }
+    }
+
+    std::vector<std::string> headers(1 + dataCols);
+    headers[0] = "Threshold";
+    for (int i = 0; i < dataCols; ++i) {
+        headers[1 + i] = getName(selectImplementations[i / iterations]) + " iteration_" + std::to_string(i % iterations);
+    }
+
+    std::string fileName =
+            "TEST_MultiplesCyclesBM_" +
+            dataFile.getFileName() +
+            "_selectivityStride_" +
+            std::to_string(selectivityStride);
+    std::string fullFilePath = outputFilePath + selectCyclesFolder + fileName + ".csv";
+    writeHeadersAndTableToCSV(headers, results, fullFilePath);
+}
+
+
+

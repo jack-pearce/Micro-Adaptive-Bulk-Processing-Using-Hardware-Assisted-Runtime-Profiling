@@ -6,7 +6,7 @@ add_test(NAME MemoryCheck COMMAND valgrind --tool=memcheck --leak-check=yes ./ou
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "out/build")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -g -O3")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -g -O3 -march=native")
 
 
 set(benchmark_DIR "libs/benchmark/build")

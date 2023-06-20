@@ -1,8 +1,8 @@
 #include <algorithm>
 #include <iostream>
+#include <immintrin.h>
 
 #include "select.h"
-#include "../utils/papiHelpers.h"
 #include "papi.h"
 
 
@@ -134,36 +134,71 @@ int selectValuesBranch(int n, const int *inputData, int *selection, int threshol
     int k = 0;
     for (int i = 0; i < n; ++i) {
         if (inputData[i] <= threshold) {
-            selection[k++] = i;
+            selection[k++] = inputData[i];
         }
     }
     return k;
 }
 
-int selectValuesPredication(int n, const int *inputData, int *selection, int threshold) {
+int selectValuesPredication(int n, const int *inputData, const int *inputFilter, int *selection, int threshold) {
     int k = 0;
     for (int i = 0; i < n; ++i) {
-        selection[k] = i;
-        k += (inputData[i] <= threshold);
+        selection[k] = inputData[i];
+//        selection[k] = inputData[(inputFilter[i] <= threshold) * i] * (inputFilter[i] <= threshold);
+        k += (inputFilter[i] <= threshold);
     }
     return k;
 }
 
-int selectValuesVectorized(int n, const int *inputData, int *selection, int threshold) {
+bool isSimdAligned(const int* array) {
+    const size_t simdAlignment = sizeof(__m128i);
+    return reinterpret_cast<uintptr_t>(array) % simdAlignment == 0;
+}
+
+int selectValuesVectorized(int n, const int *inputData, const int *inputFilter, int *selection, int threshold) {
     int k = 0;
-    for (int i = 0; i < n; ++i) {
-        selection[k] = i;
-        k += (inputData[i] <= threshold);
+
+    // Process unaligned tuples
+    int unalignedCount = 0;
+    for (int i = 0; !isSimdAligned(inputData + i); ++i) {
+        selection[k] = inputData[i];
+        k += (inputFilter[i] <= threshold);
+        ++unalignedCount;
     }
+
+    // Vectorize the loop for aligned tuples
+    int simdWidth = sizeof(__m128i) / sizeof(int);
+    int simdIterations = (n - unalignedCount) / simdWidth;
+    __m128i thresholdVector = _mm_set1_epi32(threshold);
+
+    for (int i = unalignedCount; i < unalignedCount + (simdIterations * simdWidth); i += simdWidth) {
+        __m128i filterVector = _mm_load_si128((__m128i *)(inputFilter + i));
+
+        // Compare filterVector <= thresholdVector
+        __mmask8 mask = _mm_cmpgt_epi32_mask(filterVector, thresholdVector);
+        mask = ~mask; // Combine with line above
+
+        if(__builtin_popcount(mask)) {   // Does this help?
+            for (int j = 0; j < simdWidth; ++j) {
+                if (mask & (1 << j)) {
+                    selection[k++] = inputData[i + j];    // Try branch and branch free versions
+                }
+            }
+        }
+    }
+
+    // Process the remaining elements (if any)
+    for (int i = unalignedCount + simdIterations * simdWidth; i < n; ++i) {
+        selection[k] = inputData[i];
+        k += (inputFilter[i] <= threshold);
+    }
+
     return k;
 }
 
 int selectValuesAdaptive(int n, const int *inputData, int *selection, int threshold) {
     int k = 0;
-    for (int i = 0; i < n; ++i) {
-        selection[k] = i;
-        k += (inputData[i] <= threshold);
-    }
+    // to implement
     return k;
 }
 
@@ -181,12 +216,12 @@ void setSelectFuncPtr(SelectFunctionPtr &selectFunctionPtr, SelectImplementation
         case SelectImplementation::ValuesBranch:
             selectFunctionPtr = selectValuesBranch;
             break;
-        case SelectImplementation::ValuesPredication:
-            selectFunctionPtr = selectValuesPredication;
-            break;
-        case SelectImplementation::ValuesVectorized:
-            selectFunctionPtr = selectValuesVectorized;
-            break;
+//        case SelectImplementation::ValuesPredication:
+//            selectFunctionPtr = selectValuesPredication;
+//            break;
+//        case SelectImplementation::ValuesVectorized:
+//            selectFunctionPtr = selectValuesVectorized;
+//            break;
         case SelectImplementation::ValuesAdaptive:
             selectFunctionPtr = selectValuesAdaptive;
             break;
