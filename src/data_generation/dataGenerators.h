@@ -1,7 +1,7 @@
 #ifndef MICRO_ADAPTIVE_BULK_PROCESSING_LIBRARY_DATA_GENERATOR_H
 #define MICRO_ADAPTIVE_BULK_PROCESSING_LIBRARY_DATA_GENERATOR_H
 
-void generateUniformDistributionInMemory(int *data, int n);
+void generateUniformDistributionInMemory(int *data, int n, int upperBound);
 void generateVaryingSelectivityInMemory(int *data, int n, int minimum, int numberOfDiscreteSections);
 void generateStepSelectivityInMemory(int *data, int n, int step, int numberOfDiscreteSections);
 void generateUnequalStepSelectivityInMemory(int *data, int n, int step, int numberOfDiscreteSections, int sectionRatio);

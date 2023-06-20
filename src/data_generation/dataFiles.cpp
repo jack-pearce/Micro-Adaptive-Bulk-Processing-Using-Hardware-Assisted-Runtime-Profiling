@@ -9,15 +9,20 @@ const std::string outputFilePath = "/home/jack/CLionProjects/micro-adaptive-bulk
 const std::string selectCyclesFolder = "select_cycles_benchmark/";
 const std::string dataFilesFolder = "dataFiles/";
 
-const DataFile DataFiles::uniformIntDistribution25kValues{
+const DataFile DataFiles::uniformIntDistribution25kValuesMax100{
     25 * 1000,
-    "uniformIntDistribution25kValues",
-    "Uniform distribution of 25k int values"};
+    "uniformIntDistribution25kValuesMax100",
+    "Uniform distribution of 25k int values 1-100"};
 
-const DataFile DataFiles::uniformIntDistribution250mValues{
+const DataFile DataFiles::uniformIntDistribution250mValuesMax100{
     250 * 1000 * 1000,
-    "uniformIntDistribution250mValues",
-    "uniform distribution of 250m int values"};
+    "uniformIntDistribution250mValuesMax100",
+    "uniform distribution of 250m int values 1-100"};
+
+const DataFile DataFiles::uniformIntDistribution250mValuesMax1000000{
+        250 * 1000 * 1000,
+        "uniformIntDistribution250mValuesMax1000000",
+        "uniform distribution of 250m int values 1-1000,000"};
 
 const DataFile DataFiles::varyingIntDistribution25kValues{
     25 * 1000,
@@ -79,10 +84,12 @@ DataFile::DataFile(int _numElements, std::string _fileName, std::string _longDes
         : numElements(_numElements), fileName(std::move(_fileName)), longDescription(std::move(_longDescription)) {}
 
 void DataFile::loadDataIntoMemory(int *data) const {
-    if (getFileName() == "uniformIntDistribution25kValues") {
-        generateUniformDistributionInMemory(data, getNumElements());
-    } else if (getFileName() == "uniformIntDistribution250mValues") {
-        generateUniformDistributionInMemory(data, getNumElements());
+    if (getFileName() == "uniformIntDistribution25kValuesMax100") {
+        generateUniformDistributionInMemory(data, getNumElements(), 100);
+    } else if (getFileName() == "uniformIntDistribution250mValuesMax100") {
+        generateUniformDistributionInMemory(data, getNumElements(), 100);
+    } else if (getFileName() == "uniformIntDistribution250mValuesMax1000000") {
+        generateUniformDistributionInMemory(data, getNumElements(), 1000*1000);
     } else if (getFileName() == "varyingIntDistribution25kValues") {
         generateVaryingSelectivityInMemory(data, getNumElements(), 50, 10);
     } else if (getFileName() == "varyingIntDistribution250mValues") {

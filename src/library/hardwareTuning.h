@@ -1,6 +1,0 @@
-#ifndef MABPL_HARDWARETUNING_H
-#define MABPL_HARDWARETUNING_H
-
-long getL1cacheLineSize();
-
-#endif //MABPL_HARDWARETUNING_H

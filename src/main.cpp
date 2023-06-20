@@ -24,8 +24,8 @@ void selectFunctionalityTest(const DataFile& dataFile, SelectImplementation sele
     std::unique_ptr<int[]> selection(new int[dataFile.getNumElements()]);
     int* inputData = LoadedData::getInstance(dataFile).getData();
 
-    SelectFunctionPtr selectFunctionPtr;
-    setSelectFuncPtr(selectFunctionPtr, selectImplementation);
+    SelectIndexesFunctionPtr selectFunctionPtr;
+    setSelectIndexesFuncPtr(selectFunctionPtr, selectImplementation);
 
     for (int i = 0; i <= 100; i += 10) {
         int selected = selectFunctionPtr(dataFile.getNumElements(), inputData, selection.get(), i);
@@ -69,11 +69,14 @@ void selectBenchmarkWithExtraCountersConfigurations(const DataFile &dataFile, Se
 
 void allSelectIndexesTests() {
     // Graph 1: Selectivity range on uniform data
-    selectCpuCyclesMultipleInputBenchmark(DataFiles::uniformIntDistribution250mValues,
-                                          {SelectImplementation::IndexesBranch,
-                                           SelectImplementation::IndexesPredication,
-                                           SelectImplementation::IndexesAdaptive},
-                                          1, 3);
+    std::vector<float> inputThresholdDistribution;
+    generateLogDistribution(30, 1, 1000*1000, inputThresholdDistribution);
+    selectCpuCyclesInputSweepBenchmark(DataFiles::uniformIntDistribution250mValuesMax1000000,
+                                       {SelectImplementation::IndexesBranch,
+                                        SelectImplementation::IndexesPredication,
+                                        SelectImplementation::IndexesAdaptive},
+                                       inputThresholdDistribution,
+                                       5);
 
     // Graph 2: Randomness range on sorted data
     selectCpuCyclesSweepBenchmark(DataSweeps::logSortedIntDistribution250mValuesRandomnessSweep,
@@ -113,13 +116,14 @@ void allSelectIndexesTests() {
 
 int main(int argc, char** argv) {
 
-//    selectCpuCyclesMultipleInputBenchmark2(DataFiles::uniformIntDistribution250mValues,
-//                                          {SelectImplementation::ValuesBranch,
-//                                           SelectImplementation::ValuesPredication,
-//                                           SelectImplementation::ValuesVectorized},
-//                                          1, 1);
-
-    // Check correctness of vectorise function. - Do they all give the same result?
+//    std::vector<float> inputThresholdDistribution;
+//    generateLogDistribution(30, 1, 10000, inputThresholdDistribution);
+//    selectCpuCyclesInputSweepBenchmark(DataFiles::uniformIntDistribution250mValuesMax10000,
+//                                       {SelectImplementation::ValuesBranch,
+//                                        SelectImplementation::ValuesPredication,
+//                                        SelectImplementation::ValuesVectorized},
+//                                       inputThresholdDistribution,
+//                                       5);
 
     return 0;
 

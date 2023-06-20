@@ -15,8 +15,8 @@ static void selectTimeBenchmarker(benchmark::State& state) {
     int* inputData = loadedDataFile->getData();
     std::unique_ptr<int[]> selection(new int[numElements]);
 
-    SelectFunctionPtr selectFunctionPtr;
-    setSelectFuncPtr(selectFunctionPtr, selectImplementation);
+    SelectIndexesFunctionPtr selectFunctionPtr;
+    setSelectIndexesFuncPtr(selectFunctionPtr, selectImplementation);
 
     for (auto _: state) {
         selectFunctionPtr(numElements, inputData, selection.get(), selectivity);
@@ -25,7 +25,7 @@ static void selectTimeBenchmarker(benchmark::State& state) {
 
 void selectTimeBenchmark(const DataFile &dataFile, SelectImplementation selectImplementation, int selectivityStride) {
     loadedDataFile = &LoadedData::getInstance(dataFile);
-    BENCHMARK(selectTimeBenchmarker)->Name(getName(selectImplementation))->ArgsProduct({
+    BENCHMARK(selectTimeBenchmarker)->Name(getSelectName(selectImplementation))->ArgsProduct({
                                                                                                benchmark::CreateDenseRange(0, 100, selectivityStride), {selectImplementation}});
 }
 
@@ -33,7 +33,7 @@ void
 selectTimeBenchmarkSetIterations(const DataFile &dataFile, SelectImplementation selectImplementation,
                                  int selectivityStride, int iterations) {
     loadedDataFile = &LoadedData::getInstance(dataFile);
-    BENCHMARK(selectTimeBenchmarker)->Name(getName(selectImplementation))->Iterations(iterations)->ArgsProduct({
+    BENCHMARK(selectTimeBenchmarker)->Name(getSelectName(selectImplementation))->Iterations(iterations)->ArgsProduct({
                                                                                                                        benchmark::CreateDenseRange(0, 100, selectivityStride), {selectImplementation}});
 }
 

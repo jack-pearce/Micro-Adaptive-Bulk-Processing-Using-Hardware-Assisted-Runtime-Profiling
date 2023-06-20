@@ -23,7 +23,7 @@ add_executable(${PROJECT_NAME}
         src/data_generation/dataFiles.cpp
         src/library/select.cpp
         src/library/papi.cpp
-        src/library/hardwareTuning.cpp
+        src/library/utils.cpp
         src/time_benchmarking/timeBenchmarkSelect.cpp
         src/time_benchmarking/timeBenchmarkHelpers.cpp
         src/main.cpp

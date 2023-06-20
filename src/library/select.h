@@ -3,31 +3,29 @@
 
 #include <string>
 
-int selectIndexesBranch(int n, const int *inputData, int *selection, int threshold);
-int selectIndexesPredication(int n, const int *inputData, int *selection, int threshold);
-int selectIndexesAdaptive(int n, const int *inputData, int *selection, int threshold);
-
-int selectValuesBranch(int n, const int *inputData, int *selection, int threshold);
-int selectValuesPredication(int n, const int *inputData, const int *inputFilter, int *selection, int threshold);
-int selectValuesVectorized(int n, const int *inputData, const int *inputFilter, int *selection, int threshold);
-int selectValuesAdaptive(int n, const int *inputData, int *selection, int threshold);
-
 enum SelectImplementation {
     IndexesBranch, IndexesPredication, IndexesAdaptive,
     ValuesBranch, ValuesPredication, ValuesVectorized, ValuesAdaptive
 };
 
-typedef int (*SelectFunctionPtr)(int n, const int *inputData, int *selection, int threshold);
+int selectIndexesBranch(int n, const int *inputFilter, int *selection, int threshold);
+int selectIndexesPredication(int n, const int *inputFilter, int *selection, int threshold);
+int selectIndexesAdaptive(int n, const int *inputFilter, int *selection, int threshold);
 
+int selectValuesBranch(int n, const int *inputData, const int *inputFilter, int *selection, int threshold);
+int selectValuesPredication(int n, const int *inputData, const int *inputFilter, int *selection, int threshold);
+int selectValuesVectorized(int n, const int *inputData, const int *inputFilter, int *selection, int threshold);
+int selectValuesAdaptive(int n, const int *inputData, const int *inputFilter, int *selection, int threshold);
 
+typedef int (*SelectIndexesFunctionPtr)(int n, const int *inputData, int *selection, int threshold);
+typedef int (*SelectValuesFunctionPtr)(int n, const int *inputData, const int* inputFilter, int *selection, int threshold);
 
+void setSelectValuesFuncPtr(SelectValuesFunctionPtr &selectValueFunctionPtr, SelectImplementation selectImplementation);
+void setSelectIndexesFuncPtr(SelectIndexesFunctionPtr &selectIndexesFunctionPtr, SelectImplementation selectImplementation);
 
-typedef int (*SelectFunctionPtrTest)(int n, const int *inputData, const int* inputFilter, int *selection, int threshold);
+int runSelectFunction(SelectImplementation selectImplementation,
+                      int n, const int *inputData, const int *inputFilter, int *selection, int threshold);
 
-
-
-
-void setSelectFuncPtr(SelectFunctionPtr &selectFunctionPtr, SelectImplementation selectImplementation);
-std::string getName(SelectImplementation selectImplementation);
+std::string getSelectName(SelectImplementation selectImplementation);
 
 #endif //MICRO_ADAPTIVE_BULK_PROCESSING_LIBRARY_SELECT_H

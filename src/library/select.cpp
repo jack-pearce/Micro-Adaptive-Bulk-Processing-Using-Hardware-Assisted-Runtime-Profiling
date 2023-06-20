@@ -4,23 +4,24 @@
 
 #include "select.h"
 #include "papi.h"
+#include "utils.h"
 
 
-int selectIndexesBranch(int n, const int *inputData, int *selection, int threshold) {
+int selectIndexesBranch(int n, const int *inputFilter, int *selection, int threshold) {
     int k = 0;
     for (int i = 0; i < n; ++i) {
-        if (inputData[i] <= threshold) {
+        if (inputFilter[i] <= threshold) {
             selection[k++] = i;
         }
     }
     return k;
 }
 
-int selectIndexesPredication(int n, const int *inputData, int *selection, int threshold) {
+int selectIndexesPredication(int n, const int *inputFilter, int *selection, int threshold) {
     int k = 0;
     for (int i = 0; i < n; ++i) {
         selection[k] = i;
-        k += (inputData[i] <= threshold);
+        k += (inputFilter[i] <= threshold);
     }
     return k;
 }
@@ -69,7 +70,7 @@ inline void performSelectIndexesAdaption(int (*&selectFunctionPtr)(int, const in
     }
 }
 
-int selectIndexesAdaptive(int n, const int *inputData, int *selection, int threshold) {
+int selectIndexesAdaptive(int n, const int *inputFilter, int *selection, int threshold) {
     int tuplesPerAdaption = 50000;
     int maxConsecutivePredications = 10;
     int tuplesInBranchBurst = 1000;
@@ -96,7 +97,7 @@ int selectIndexesAdaptive(int n, const int *inputData, int *selection, int thres
     int consecutivePredications = 0;
     int tuplesToProcess;
     int selected;
-    SelectFunctionPtr selectFunctionPtr = selectIndexesPredication;
+    SelectIndexesFunctionPtr selectFunctionPtr = selectIndexesPredication;
 
     std::vector<std::string> counters = {"PERF_COUNT_HW_BRANCH_MISSES"};
     long_long *counterValues = Counters::getInstance().getEvents(counters);
@@ -108,7 +109,7 @@ int selectIndexesAdaptive(int n, const int *inputData, int *selection, int thres
             consecutivePredications = 0;
 
             selected = runSelectIndexesChunk(selectFunctionPtr, tuplesInBranchBurst, n,
-                                             inputData, selection, threshold, k, consecutivePredications);
+                                             inputFilter, selection, threshold, k, consecutivePredications);
             performSelectIndexesAdaption(selectFunctionPtr, counterValues, lowerCrossoverSelectivity,
                                          upperCrossoverSelectivity,
                                          lowerBranchCrossoverBranchMisses_BranchBurst,
@@ -117,7 +118,7 @@ int selectIndexesAdaptive(int n, const int *inputData, int *selection, int thres
                                          consecutivePredications);
         } else {
             tuplesToProcess = std::min(n, tuplesPerAdaption);
-            selected = runSelectIndexesChunk(selectFunctionPtr, tuplesToProcess, n, inputData, selection,
+            selected = runSelectIndexesChunk(selectFunctionPtr, tuplesToProcess, n, inputFilter, selection,
                                              threshold, k, consecutivePredications);
             performSelectIndexesAdaption(selectFunctionPtr, counterValues, lowerCrossoverSelectivity,
                                          upperCrossoverSelectivity,
@@ -130,10 +131,10 @@ int selectIndexesAdaptive(int n, const int *inputData, int *selection, int thres
     return k;
 }
 
-int selectValuesBranch(int n, const int *inputData, int *selection, int threshold) {
+int selectValuesBranch(int n, const int *inputData, const int *inputFilter, int *selection, int threshold) {
     int k = 0;
     for (int i = 0; i < n; ++i) {
-        if (inputData[i] <= threshold) {
+        if (inputFilter[i] <= threshold) {
             selection[k++] = inputData[i];
         }
     }
@@ -150,44 +151,35 @@ int selectValuesPredication(int n, const int *inputData, const int *inputFilter,
     return k;
 }
 
-bool isSimdAligned(const int* array) {
-    const size_t simdAlignment = sizeof(__m128i);
-    return reinterpret_cast<uintptr_t>(array) % simdAlignment == 0;
-}
-
 int selectValuesVectorized(int n, const int *inputData, const int *inputFilter, int *selection, int threshold) {
     int k = 0;
 
     // Process unaligned tuples
     int unalignedCount = 0;
-    for (int i = 0; !isSimdAligned(inputData + i); ++i) {
+    for (int i = 0; !arrayIsSimd256Aligned(inputFilter + i); ++i) {
         selection[k] = inputData[i];
         k += (inputFilter[i] <= threshold);
         ++unalignedCount;
     }
 
     // Vectorize the loop for aligned tuples
-    int simdWidth = sizeof(__m128i) / sizeof(int);
+    int simdWidth = sizeof(__m256i) / sizeof(int);
     int simdIterations = (n - unalignedCount) / simdWidth;
-    __m128i thresholdVector = _mm_set1_epi32(threshold);
+    __m256i thresholdVector = _mm256_set1_epi32(threshold);
 
     for (int i = unalignedCount; i < unalignedCount + (simdIterations * simdWidth); i += simdWidth) {
-        __m128i filterVector = _mm_load_si128((__m128i *)(inputFilter + i));
+        __m256i filterVector = _mm256_load_si256((__m256i *)(inputFilter + i));
 
         // Compare filterVector <= thresholdVector
-        __mmask8 mask = _mm_cmpgt_epi32_mask(filterVector, thresholdVector);
-        mask = ~mask; // Combine with line above
+        __mmask8 mask = ~_mm256_cmpgt_epi32_mask(filterVector, thresholdVector);
 
-        if(__builtin_popcount(mask)) {   // Does this help?
-            for (int j = 0; j < simdWidth; ++j) {
-                if (mask & (1 << j)) {
-                    selection[k++] = inputData[i + j];    // Try branch and branch free versions
-                }
-            }
+        for (int j = 0; j < simdWidth; ++j) {
+            selection[k] = inputData[i + j];
+            k += (mask >> j) & 1;
         }
     }
 
-    // Process the remaining elements (if any)
+    // Process any remaining tuples
     for (int i = unalignedCount + simdIterations * simdWidth; i < n; ++i) {
         selection[k] = inputData[i];
         k += (inputFilter[i] <= threshold);
@@ -196,34 +188,22 @@ int selectValuesVectorized(int n, const int *inputData, const int *inputFilter, 
     return k;
 }
 
-int selectValuesAdaptive(int n, const int *inputData, int *selection, int threshold) {
+int selectValuesAdaptive(int n, const int *inputData, const int *inputFilter, int *selection, int threshold) {
     int k = 0;
     // to implement
     return k;
 }
 
-void setSelectFuncPtr(SelectFunctionPtr &selectFunctionPtr, SelectImplementation selectImplementation) {
+void setSelectIndexesFuncPtr(SelectIndexesFunctionPtr &selectIndexesFunctionPtr, SelectImplementation selectImplementation) {
     switch(selectImplementation) {
         case SelectImplementation::IndexesBranch:
-            selectFunctionPtr = selectIndexesBranch;
+            selectIndexesFunctionPtr = selectIndexesBranch;
             break;
         case SelectImplementation::IndexesPredication:
-            selectFunctionPtr = selectIndexesPredication;
+            selectIndexesFunctionPtr = selectIndexesPredication;
             break;
         case SelectImplementation::IndexesAdaptive:
-            selectFunctionPtr = selectIndexesAdaptive;
-            break;
-        case SelectImplementation::ValuesBranch:
-            selectFunctionPtr = selectValuesBranch;
-            break;
-//        case SelectImplementation::ValuesPredication:
-//            selectFunctionPtr = selectValuesPredication;
-//            break;
-//        case SelectImplementation::ValuesVectorized:
-//            selectFunctionPtr = selectValuesVectorized;
-//            break;
-        case SelectImplementation::ValuesAdaptive:
-            selectFunctionPtr = selectValuesAdaptive;
+            selectIndexesFunctionPtr = selectIndexesAdaptive;
             break;
         default:
             std::cout << "Invalid selection of 'Select' implementation!" << std::endl;
@@ -231,7 +211,42 @@ void setSelectFuncPtr(SelectFunctionPtr &selectFunctionPtr, SelectImplementation
     }
 }
 
-std::string getName(SelectImplementation selectImplementation) {
+void setSelectValuesFuncPtr(SelectValuesFunctionPtr &selectValueFunctionPtr, SelectImplementation selectImplementation) {
+    switch(selectImplementation) {
+        case SelectImplementation::ValuesBranch:
+            selectValueFunctionPtr = selectValuesBranch;
+            break;
+        case SelectImplementation::ValuesPredication:
+            selectValueFunctionPtr = selectValuesPredication;
+            break;
+        case SelectImplementation::ValuesVectorized:
+            selectValueFunctionPtr = selectValuesVectorized;
+            break;
+        case SelectImplementation::ValuesAdaptive:
+            selectValueFunctionPtr = selectValuesAdaptive;
+            break;
+        default:
+            std::cout << "Invalid selection of 'Select' implementation!" << std::endl;
+            exit(1);
+    }
+}
+
+int runSelectFunction(SelectImplementation selectImplementation,
+                      int n, const int *inputData, const int *inputFilter, int *selection, int threshold) {
+    if (selectImplementation == SelectImplementation::IndexesBranch ||
+        selectImplementation == SelectImplementation::IndexesPredication ||
+        selectImplementation == SelectImplementation::IndexesAdaptive) {
+        SelectIndexesFunctionPtr selectIndexesFunctionPtr;
+        setSelectIndexesFuncPtr(selectIndexesFunctionPtr, selectImplementation);
+        return selectIndexesFunctionPtr(n, inputData, selection, threshold);
+    } else {
+        SelectValuesFunctionPtr selectValuesFunctionPtr;
+        setSelectValuesFuncPtr(selectValuesFunctionPtr, selectImplementation);
+        return selectValuesFunctionPtr(n, inputData, inputFilter, selection, threshold);
+    }
+}
+
+std::string getSelectName(SelectImplementation selectImplementation) {
     switch(selectImplementation) {
         case SelectImplementation::IndexesBranch:
             return "Select_Indexes_Branch";

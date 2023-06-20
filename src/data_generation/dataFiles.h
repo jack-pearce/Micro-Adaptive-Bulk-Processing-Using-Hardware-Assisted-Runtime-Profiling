@@ -27,8 +27,9 @@ private:
 
 class DataFiles {
 public:
-    static const DataFile uniformIntDistribution25kValues;
-    static const DataFile uniformIntDistribution250mValues;
+    static const DataFile uniformIntDistribution25kValuesMax100;
+    static const DataFile uniformIntDistribution250mValuesMax100;
+    static const DataFile uniformIntDistribution250mValuesMax1000000;
 
     static const DataFile varyingIntDistribution25kValues;
     static const DataFile varyingIntDistribution250mValues;

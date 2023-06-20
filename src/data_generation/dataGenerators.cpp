@@ -5,7 +5,7 @@
 #include "dataGenerators.h"
 
 
-void generateUniformDistributionInMemory(int *data, int n) {
+void generateUniformDistributionInMemory(int *data, int n, int upperBound) {
     std::cout << "Generating data in memory... ";
     std::cout.flush();
 
@@ -13,7 +13,6 @@ void generateUniformDistributionInMemory(int *data, int n) {
     std::mt19937 gen(seed);
 
     int lowerBound = 1;
-    int upperBound = 100;
 
     std::uniform_int_distribution<int> distribution(lowerBound, upperBound);
 
