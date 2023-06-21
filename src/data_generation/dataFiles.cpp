@@ -37,25 +37,37 @@ const DataFile DataFiles::varyingIntDistribution250mValues{
     "varyingIntDistribution250mValues",
     "250m int values where max value is 100 and min value varies linearly from 0 to 50 a number of times"};
 
-const DataFile DataFiles::step50IntDistribution25kValues{
+const DataFile DataFiles::upperStep50IntDistribution25kValues{
     25 * 1000,
-    "step50IntDistribution25kValues",
+    "upperStep50IntDistribution25kValues",
     "25k values where max value is 100 and min value is in blocks of either 0 or 50"};
 
-const DataFile DataFiles::step50IntDistribution250mValues{
+const DataFile DataFiles::upperStep50IntDistribution250mValues{
     250 * 1000 * 1000,
-    "step50IntDistribution250mValues",
+    "upperStep50IntDistribution250mValues",
     "250m values where max value is 100 and min value is in blocks of either 0 or 50"};
 
-const DataFile DataFiles::worstCaseTunedStep50IntDistribution250mValues{
+const DataFile DataFiles::worstCaseIndexesTunedUpperStep50IntDistribution250mValues{
         250 * 1000 * 1000,
-        "worstCaseTunedStep50IntDistribution250mValues",
+        "worstCaseIndexesTunedUpperStep50IntDistribution250mValues",
         "250m values where max value is 100 and min value is in blocks of either 0 or 50 - size of blocks tuned to act as worst case"};
 
-const DataFile DataFiles::bestCaseTunedUnequalStep50IntDistribution250mValues{
+const DataFile DataFiles::worstCaseValuesTunedLowerStep50IntDistribution250mValues{
         250 * 1000 * 1000,
-        "bestCaseTunedUnequalStep50IntDistribution250mValues",
+        "worstCaseValuesTunedLowerStep50IntDistribution250mValues",
+        "250m values where min value is 1 and max value is in blocks of either 50 or 100 - size of blocks tuned to act as worst case"};
+
+
+const DataFile DataFiles::bestCaseIndexesTunedUnequalLowerStep50IntDistribution250mValues{
+        250 * 1000 * 1000,
+        "bestCaseIndexesTunedUnequalLowerStep50IntDistribution250mValues",
         "250m values where max value is 100 and min value is in blocks of either 0 or 50. Blocks of 0 are 10 times larger than blocks of 0."};
+
+const DataFile DataFiles::bestCaseValuesTunedUnequalLowerStep50IntDistribution250mValues{
+        250 * 1000 * 1000,
+        "bestCaseValuesTunedUnequalLowerStep50IntDistribution250mValues",
+        "250m values where max value is 100 and min value is in blocks of either 0 or 50. Blocks of 0 are XX times larger than blocks of 0."};
+
 
 const DataFile DataFiles::fullySortedIntDistribution250mValues{
         250 * 1000 * 1000,
@@ -96,17 +108,21 @@ void DataFile::loadDataIntoMemory(int *data) const {
     } else if (getFileName() == "uniformIntDistribution250mValuesMax1000000") {
         generateUniformDistributionInMemory(data, getNumElements(), 1000*1000);
     } else if (getFileName() == "varyingIntDistribution25kValues") {
-        generateVaryingSelectivityInMemory(data, getNumElements(), 50, 10);
+        generateVaryingSelectivityInMemory(data, getNumElements(), 51, 10);
     } else if (getFileName() == "varyingIntDistribution250mValues") {
-        generateVaryingSelectivityInMemory(data, getNumElements(), 50, 10);
-    } else if (getFileName() == "step50IntDistribution25kValues") {
-        generateStepSelectivityInMemory(data, getNumElements(), 50, 10);
-    } else if (getFileName() == "step50IntDistribution250mValues") {
-        generateStepSelectivityInMemory(data, getNumElements(), 50, 10);
-    } else if (getFileName() == "worstCaseTunedStep50IntDistribution250mValues") {
-        generateStepSelectivityInMemory(data, getNumElements(), 50, 5000);
-    } else if (getFileName() == "bestCaseTunedUnequalStep50IntDistribution250mValues") {
-        generateUnequalStepSelectivityInMemory(data, getNumElements(), 50, 10, 10);
+        generateVaryingSelectivityInMemory(data, getNumElements(), 51, 10);
+    } else if (getFileName() == "upperStep50IntDistribution25kValues") {
+        generateUpperStepSelectivityInMemory(data, getNumElements(), 51, 10);
+    } else if (getFileName() == "upperStep50IntDistribution250mValues") {
+        generateUpperStepSelectivityInMemory(data, getNumElements(), 51, 10);
+    } else if (getFileName() == "worstCaseIndexesTunedUpperStep50IntDistribution250mValues") {
+        generateUpperStepSelectivityInMemory(data, getNumElements(), 50, 5000);
+    } else if (getFileName() == "worstCaseValuesTunedLowerStep50IntDistribution250mValues") {
+        generateLowerStepSelectivityInMemory(data, getNumElements(), 51, 5000);
+    } else if (getFileName() == "bestCaseIndexesTunedUnequalLowerStep50IntDistribution250mValues") {
+        generateUnequalLowerStepSelectivityInMemory(data, getNumElements(), 51, 10, 10);
+    } else if (getFileName() == "bestCaseValuesTunedUnequalLowerStep50IntDistribution250mValues") {
+        generateUnequalLowerStepSelectivityInMemory(data, getNumElements(), 51, 10, 15);
     } else if (getFileName() == "fullySortedIntDistribution250mValues") {
         generatePartiallySortedInMemory(data, getNumElements(), 100, 0);
     } else if (getFileName() == "veryNearlyFullySortedIntDistribution250mValues") {
@@ -150,10 +166,10 @@ DataSweep DataSweeps::varyingIntDistribution250mValuesSweep {
         "varyingIntDistribution250mValuesSweep",
         ""};
 
-DataSweep DataSweeps::step50IntDistribution250mValuesSweep {
+DataSweep DataSweeps::lowerStep50IntDistribution250mValuesSweep {
         30,
         250*1000*1000,
-        "step50IntDistribution250mValuesSweep",
+        "lowerStep50IntDistribution250mValuesSweep",
         ""};
 
 
@@ -164,7 +180,7 @@ DataSweep::DataSweep(int _totalRuns, int _numElements, std::string _sweepName, s
         getSweepName() == "logSortedIntDistribution250mValuesRandomnessSweep") {
         generateLogDistribution(getTotalRuns(), 0.01, 100, inputs);
     } else if (getSweepName() == "varyingIntDistribution250mValuesSweep" ||
-               getSweepName() == "step50IntDistribution250mValuesSweep") {
+               getSweepName() == "lowerStep50IntDistribution250mValuesSweep") {
         generateLogDistribution(getTotalRuns(), 2, 10000, inputs);
     }
 }
@@ -181,10 +197,10 @@ bool DataSweep::loadNextDataSetIntoMemory(int *data) {
         generatePartiallySortedInMemory(data, getNumElements(), 10, inputs[runsCompleted++]);
         return true;
     } else if (getSweepName() == "varyingIntDistribution250mValuesSweep") {
-        generateVaryingSelectivityInMemory(data, getNumElements(), 50, static_cast<int>(inputs[runsCompleted++]));
+        generateVaryingSelectivityInMemory(data, getNumElements(), 51, static_cast<int>(inputs[runsCompleted++]));
         return true;
-    } else if (getSweepName() == "step50IntDistribution250mValuesSweep") {
-        generateStepSelectivityInMemory(data, getNumElements(), 50, static_cast<int>(inputs[runsCompleted++]));
+    } else if (getSweepName() == "lowerStep50IntDistribution250mValuesSweep") {
+        generateLowerStepSelectivityInMemory(data, getNumElements(), 51, static_cast<int>(inputs[runsCompleted++]));
         return true;
     }
     return false;

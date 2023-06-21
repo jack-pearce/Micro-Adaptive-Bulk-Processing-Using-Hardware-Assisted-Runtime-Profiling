@@ -107,8 +107,8 @@ int selectIndexesAdaptive(int n, const int *inputFilter, int *selection, int thr
 //            std::cout << "Running branch burst" << std::endl;
             selectIndexesFunctionPtr = selectIndexesBranch;
             consecutivePredications = 0;
-
-            selected = runSelectIndexesChunk(selectIndexesFunctionPtr, tuplesInBranchBurst, n,
+            tuplesToProcess = std::min(n, tuplesInBranchBurst);
+            selected = runSelectIndexesChunk(selectIndexesFunctionPtr, tuplesToProcess, n,
                                              inputFilter, selection, threshold, k, consecutivePredications);
             performSelectIndexesAdaption(selectIndexesFunctionPtr, counterValues, lowerCrossoverSelectivity,
                                          upperCrossoverSelectivity,
@@ -132,6 +132,7 @@ int selectIndexesAdaptive(int n, const int *inputFilter, int *selection, int thr
 }
 
 int selectValuesBranch(int n, const int *inputData, const int *inputFilter, int *selection, int threshold) {
+//    std::cout << "Running values branch" << std::endl;
     int k = 0;
     for (int i = 0; i < n; ++i) {
         if (inputFilter[i] <= threshold) {
@@ -152,6 +153,7 @@ int selectValuesPredication(int n, const int *inputData, const int *inputFilter,
 }
 
 int selectValuesVectorized(int n, const int *inputData, const int *inputFilter, int *selection, int threshold) {
+//    std::cout << "Running values vectorized" << std::endl;
     int k = 0;
 
     // Process unaligned tuples
@@ -202,9 +204,10 @@ inline int runSelectValuesChunk(int (*&selectValuesFunctionPtr)(int, const int *
     Counters::getInstance().readEventSet();
     n -= tuplesToProcess;
     inputData += tuplesToProcess;
+    inputFilter += tuplesToProcess;
     selection += selected;
     k += selected;
-    consecutivePredications += (selectValuesFunctionPtr == selectValuesPredication);
+    consecutivePredications += (selectValuesFunctionPtr == selectValuesVectorized);
     return selected;
 }
 
@@ -217,7 +220,7 @@ inline void performSelectValuesAdaption(int (*&selectValuesFunctionPtr)(int, con
 
     if (__builtin_expect(static_cast<float>(counterValues[0]) > branchCrossoverBranchMisses
                          && selectValuesFunctionPtr == selectValuesBranch, false)) {
-//        std::cout << "Switched to select predication" << std::endl;
+//        std::cout << "Switched to select vectorized" << std::endl;
         selectValuesFunctionPtr = selectValuesVectorized;
     }
 
@@ -246,18 +249,19 @@ int selectValuesAdaptive(int n, const int *inputData, const int *inputFilter, in
     int consecutiveVectorized = 0;
     int tuplesToProcess;
     int selected;
-    SelectValuesFunctionPtr selectValuesFunctionPtr = selectValuesVectorized;
+    SelectValuesFunctionPtr selectValuesFunctionPtr = selectValuesBranch;
 
     std::vector<std::string> counters = {"PERF_COUNT_HW_BRANCH_MISSES"};
     long_long *counterValues = Counters::getInstance().getEvents(counters);
 
     while (n > 0) {
+
         if (__builtin_expect(consecutiveVectorized == maxConsecutiveVectorized, false)) {
 //            std::cout << "Running branch burst" << std::endl;
             selectValuesFunctionPtr = selectValuesBranch;
             consecutiveVectorized = 0;
-
-            selected = runSelectValuesChunk(selectValuesFunctionPtr, tuplesInBranchBurst, n,
+            tuplesToProcess = std::min(n, tuplesInBranchBurst);
+            selected = runSelectValuesChunk(selectValuesFunctionPtr, tuplesToProcess, n,
                                              inputData, inputFilter, selection, threshold, k, consecutiveVectorized);
             performSelectValuesAdaption(selectValuesFunctionPtr, counterValues, crossoverSelectivity,
                                         branchCrossoverBranchMisses_BranchBurst,

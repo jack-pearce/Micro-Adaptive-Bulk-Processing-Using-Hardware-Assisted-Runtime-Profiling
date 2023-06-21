@@ -33,11 +33,13 @@ public:
     static const DataFile varyingIntDistribution25kValues;
     static const DataFile varyingIntDistribution250mValues;
 
-    static const DataFile step50IntDistribution25kValues;
-    static const DataFile step50IntDistribution250mValues;
-    static const DataFile worstCaseTunedStep50IntDistribution250mValues;
+    static const DataFile upperStep50IntDistribution25kValues;
+    static const DataFile upperStep50IntDistribution250mValues;
+    static const DataFile worstCaseIndexesTunedUpperStep50IntDistribution250mValues;
 
-    static const DataFile bestCaseTunedUnequalStep50IntDistribution250mValues;
+    static const DataFile worstCaseValuesTunedLowerStep50IntDistribution250mValues;
+    static const DataFile bestCaseIndexesTunedUnequalLowerStep50IntDistribution250mValues;
+    static const DataFile bestCaseValuesTunedUnequalLowerStep50IntDistribution250mValues;
 
     static const DataFile fullySortedIntDistribution250mValues;
     static const DataFile veryNearlyFullySortedIntDistribution250mValues;
@@ -74,7 +76,7 @@ public:
 
     static DataSweep varyingIntDistribution250mValuesSweep;
 
-    static DataSweep step50IntDistribution250mValuesSweep;
+    static DataSweep lowerStep50IntDistribution250mValuesSweep;
 };
 
 #endif //MABPL_DATAFILES_H

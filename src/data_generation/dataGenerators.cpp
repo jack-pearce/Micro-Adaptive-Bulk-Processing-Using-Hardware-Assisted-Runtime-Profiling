@@ -59,7 +59,7 @@ void generateVaryingSelectivityInMemory(int *data, int n, int minimum, int numbe
     std::cout << "Complete" << std::endl;
 }
 
-void generateStepSelectivityInMemory(int *data, int n, int step, int numberOfDiscreteSections) {
+void generateUpperStepSelectivityInMemory(int *data, int n, int step, int numberOfDiscreteSections) {
     std::cout << "Generating data in memory... ";
     std::cout.flush();
 
@@ -91,7 +91,41 @@ void generateStepSelectivityInMemory(int *data, int n, int step, int numberOfDis
     std::cout << "Complete" << std::endl;
 }
 
-void generateUnequalStepSelectivityInMemory(int *data, int n, int step, int numberOfDiscreteSections, int sectionRatio) {
+
+void generateLowerStepSelectivityInMemory(int *data, int n, int step, int numberOfDiscreteSections) {
+    std::cout << "Generating data in memory... ";
+    std::cout.flush();
+
+    int elementsPerSection = n / numberOfDiscreteSections;
+
+    unsigned int seed = 1;
+    std::mt19937 gen(seed);
+
+    bool onStep = false;
+    int lowerBound;
+    int upperBound = 100;
+
+    int index = 0;
+    for (int i = 0; i < numberOfDiscreteSections; ++i) {
+        if (onStep) {
+            lowerBound = step;
+        } else {
+            lowerBound = 1;
+        }
+
+        std::uniform_int_distribution<int> distribution(lowerBound, upperBound);
+        for (int k = 0; k < elementsPerSection; ++k) {
+            data[index++] = distribution(gen);
+        }
+
+        onStep = !onStep;
+    }
+
+    std::cout << "Complete" << std::endl;
+}
+
+
+void generateUnequalLowerStepSelectivityInMemory(int *data, int n, int step, int numberOfDiscreteSections, int sectionRatio) {
     std::cout << "Generating data in memory... ";
     std::cout.flush();
 
@@ -104,15 +138,15 @@ void generateUnequalStepSelectivityInMemory(int *data, int n, int step, int numb
     std::mt19937 gen(seed);
 
     bool onStep = false;
-    int lowerBound = 1;
-    int upperBound;
+    int lowerBound;
+    int upperBound = 100;
 
     int index = 0;
-    for (int i = 0; i < numberOfDiscreteSections; ++i) {
+    for (int i = 0; i < (2 * numberOfDiscreteSections); ++i) {
         if (onStep) {
-            upperBound = step;
+            lowerBound = step;
         } else {
-            upperBound = 100;
+            lowerBound = 1;
         }
 
         std::uniform_int_distribution<int> distribution(lowerBound, upperBound);
