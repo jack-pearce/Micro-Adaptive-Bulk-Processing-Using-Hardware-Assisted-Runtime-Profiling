@@ -142,14 +142,14 @@ void selectCpuCyclesMultipleInputBenchmark(const DataFile& dataFile,
 
 void selectBenchmarkWithExtraCounters(const DataFile& dataFile,
                                       SelectImplementation selectImplementation,
-                                      int selectivityStride,
+                                      std::vector<float> &thresholds,
                                       int iterations,
                                       std::vector<std::string>& benchmarkCounters) {
     if (selectImplementation == SelectImplementation::IndexesAdaptive ||
         selectImplementation == SelectImplementation::ValuesAdaptive)
         std::cout << "Cannot benchmark adaptive select using counters as adaptive select is already using these counters" << std::endl;
 
-    int numTests = 1 + (100 / selectivityStride);
+    int numTests = static_cast<int>(thresholds.size());
 
     long_long benchmarkCounterValues[benchmarkCounters.size()];
     int benchmarkEventSet = initialisePAPIandCreateEventSet(benchmarkCounters);
@@ -157,8 +157,8 @@ void selectBenchmarkWithExtraCounters(const DataFile& dataFile,
     std::vector<std::vector<long_long>> results(numTests, std::vector<long_long>((iterations * benchmarkCounters.size()) + 1, 0));
     int count = 0;
 
-    for (int i = 0; i <= 100; i += selectivityStride) {
-        results[count][0] = static_cast<long_long>(i);
+    for (int i = 0; i < numTests; ++i) {
+        results[count][0] = static_cast<long_long>(thresholds[i]);
 
         for (int j = 0; j < iterations; ++j) {
             int *inputData = new int[dataFile.getNumElements()];
@@ -167,14 +167,14 @@ void selectBenchmarkWithExtraCounters(const DataFile& dataFile,
             copyArray(LoadedData::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
             copyArray(LoadedData::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
 
-            std::cout << "Running threshold " << i << ", iteration " << j + 1 << "... ";
+            std::cout << "Running threshold " << static_cast<int>(thresholds[i]) << ", iteration " << j + 1 << "... ";
 
             if (PAPI_reset(benchmarkEventSet) != PAPI_OK)
                 exit(1);
 
             runSelectFunction(selectImplementation,
-                              dataFile.getNumElements(), inputData, inputFilter, selection, i);
-
+                              dataFile.getNumElements(), inputData, inputFilter, selection,
+                              static_cast<int>(thresholds[i]));
 
             if (PAPI_read(benchmarkEventSet, benchmarkCounterValues) != PAPI_OK)
                 exit(1);
@@ -202,9 +202,7 @@ void selectBenchmarkWithExtraCounters(const DataFile& dataFile,
     std::string fileName =
             "ExtraCountersCyclesBM_" +
                     getSelectName(selectImplementation) +
-            dataFile.getFileName() +
-            "_selectivityStride_" +
-            std::to_string(selectivityStride);
+            dataFile.getFileName();
     std::string fullFilePath = outputFilePath + selectCyclesFolder + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 

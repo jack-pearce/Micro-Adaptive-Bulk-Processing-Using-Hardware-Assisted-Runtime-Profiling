@@ -25,7 +25,7 @@ void selectCpuCyclesMultipleInputBenchmark(const DataFile& dataFile,
 
 void selectBenchmarkWithExtraCounters(const DataFile& dataFile,
                                       SelectImplementation selectImplementation,
-                                      int selectivityStride,
+                                      std::vector<float> &thresholds,
                                       int iterations,
                                       std::vector<std::string>& benchmarkCounters);
 
@@ -38,18 +38,6 @@ void selectCpuCyclesInputSweepBenchmark(const DataFile &dataFile,
                                         const std::vector<SelectImplementation> &selectImplementations,
                                         std::vector<float> &thresholds,
                                         int iterations);
-
-
-
-
-
-
-
-void selectBenchmarkWithExtraCountersLogScale(const DataFile& dataFile,
-                                              SelectImplementation selectImplementation,
-                                              int selectivityStride,
-                                              int iterations,
-                                              std::vector<std::string>& benchmarkCounters);
 
 
 #endif //MICRO_ADAPTIVE_BULK_PROCESSING_COUNTERBENCHMARK_H
