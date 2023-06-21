@@ -132,7 +132,6 @@ int selectIndexesAdaptive(int n, const int *inputFilter, int *selection, int thr
 }
 
 int selectValuesBranch(int n, const int *inputData, const int *inputFilter, int *selection, int threshold) {
-//    std::cout << "Running values branch" << std::endl;
     int k = 0;
     for (int i = 0; i < n; ++i) {
         if (inputFilter[i] <= threshold) {
@@ -153,7 +152,6 @@ int selectValuesPredication(int n, const int *inputData, const int *inputFilter,
 }
 
 int selectValuesVectorized(int n, const int *inputData, const int *inputFilter, int *selection, int threshold) {
-//    std::cout << "Running values vectorized" << std::endl;
     int k = 0;
 
     // Process unaligned tuples
@@ -220,13 +218,11 @@ inline void performSelectValuesAdaption(int (*&selectValuesFunctionPtr)(int, con
 
     if (__builtin_expect(static_cast<float>(counterValues[0]) > branchCrossoverBranchMisses
                          && selectValuesFunctionPtr == selectValuesBranch, false)) {
-//        std::cout << "Switched to select vectorized" << std::endl;
         selectValuesFunctionPtr = selectValuesVectorized;
     }
 
     if (__builtin_expect(selectivity < crossoverSelectivity
                          && selectValuesFunctionPtr == selectValuesVectorized, false)) {
-//        std::cout << "Switched to select branch" << std::endl;
         selectValuesFunctionPtr = selectValuesBranch;
         consecutiveVectorized = 0;
     }
@@ -257,7 +253,6 @@ int selectValuesAdaptive(int n, const int *inputData, const int *inputFilter, in
     while (n > 0) {
 
         if (__builtin_expect(consecutiveVectorized == maxConsecutiveVectorized, false)) {
-//            std::cout << "Running branch burst" << std::endl;
             selectValuesFunctionPtr = selectValuesBranch;
             consecutiveVectorized = 0;
             tuplesToProcess = std::min(n, tuplesInBranchBurst);
