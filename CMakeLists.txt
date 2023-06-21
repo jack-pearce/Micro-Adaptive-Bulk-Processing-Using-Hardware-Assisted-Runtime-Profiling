@@ -21,6 +21,7 @@ link_directories(/home/jack/CLionProjects/micro-adaptive-bulk-processing-library
 add_executable(${PROJECT_NAME}
         src/data_generation/dataGenerators.cpp
         src/data_generation/dataFiles.cpp
+        src/data_generation/config.cpp
         src/library/select.cpp
         src/library/papi.cpp
         src/library/utils.cpp

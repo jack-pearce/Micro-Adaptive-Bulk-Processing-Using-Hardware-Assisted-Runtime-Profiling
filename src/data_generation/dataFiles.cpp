@@ -4,8 +4,6 @@
 #include "dataGenerators.h"
 #include "../utils/dataHelpers.h"
 
-const std::string inputFilePath = "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/input/";
-const std::string outputFilePath = "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/data/output/";
 const std::string selectCyclesFolder = "select_cycles_benchmark/";
 const std::string dataFilesFolder = "dataFiles/";
 
@@ -18,6 +16,11 @@ const DataFile DataFiles::uniformIntDistribution250mValuesMax100{
     250 * 1000 * 1000,
     "uniformIntDistribution250mValuesMax100",
     "uniform distribution of 250m int values 1-100"};
+
+const DataFile DataFiles::uniformIntDistribution250mValuesMax10000{
+        250 * 1000 * 1000,
+        "uniformIntDistribution250mValuesMax10000",
+        "uniform distribution of 250m int values 1-10,000"};
 
 const DataFile DataFiles::uniformIntDistribution250mValuesMax1000000{
         250 * 1000 * 1000,
@@ -88,6 +91,8 @@ void DataFile::loadDataIntoMemory(int *data) const {
         generateUniformDistributionInMemory(data, getNumElements(), 100);
     } else if (getFileName() == "uniformIntDistribution250mValuesMax100") {
         generateUniformDistributionInMemory(data, getNumElements(), 100);
+    } else if (getFileName() == "uniformIntDistribution250mValuesMax10000") {
+        generateUniformDistributionInMemory(data, getNumElements(), 10*1000);
     } else if (getFileName() == "uniformIntDistribution250mValuesMax1000000") {
         generateUniformDistributionInMemory(data, getNumElements(), 1000*1000);
     } else if (getFileName() == "varyingIntDistribution25kValues") {

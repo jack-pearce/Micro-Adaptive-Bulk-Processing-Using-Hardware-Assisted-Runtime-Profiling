@@ -70,8 +70,8 @@ void selectBenchmarkWithExtraCountersConfigurations(const DataFile &dataFile, Se
 void allSelectIndexesTests() {
     // Graph 1: Selectivity range on uniform data
     std::vector<float> inputThresholdDistribution;
-    generateLogDistribution(30, 1, 1000*1000, inputThresholdDistribution);
-    selectCpuCyclesInputSweepBenchmark(DataFiles::uniformIntDistribution250mValuesMax1000000,
+    generateLogDistribution(30, 1, 10*1000, inputThresholdDistribution);
+    selectCpuCyclesInputSweepBenchmark(DataFiles::uniformIntDistribution250mValuesMax10000,
                                        {SelectImplementation::IndexesBranch,
                                         SelectImplementation::IndexesPredication,
                                         SelectImplementation::IndexesAdaptive},
@@ -113,17 +113,74 @@ void allSelectIndexesTests() {
                                         5);
 }
 
+void allSelectValuesTests() {
+    // Graph 1: Selectivity range on uniform data
+    std::vector<float> inputThresholdDistribution;
+    generateLogDistribution(30, 1, 10 * 1000, inputThresholdDistribution);
+    selectCpuCyclesInputSweepBenchmark(DataFiles::uniformIntDistribution250mValuesMax10000,
+                                       {SelectImplementation::ValuesBranch,
+                                        SelectImplementation::ValuesPredication,
+                                        SelectImplementation::ValuesVectorized},
+                                       inputThresholdDistribution,
+                                       5);
+
+    // Graph 2: Randomness range on sorted data
+
+    // Graph 3: Period range on linearly varying selectivity
+
+    // Graph 4: Period range on step varying selectivity
+
+    // Graph 5: Best case - tuned unequal step varying selectivity
+
+    // Graph 6: Worst case - tuned period range on step varying selectivity
+
+}
+
+
+
+
+
+
+
+void selectBenchmarkWithExtraCountersConfigurationsLogScale(const DataFile &dataFile, SelectImplementation selectImplementation,
+                                                    int selectivityStride, int iterations) {
+//    std::vector<std::string> benchmarkCounters = {"PERF_COUNT_HW_CPU_CYCLES",
+//                                                  "INSTRUCTION_RETIRED",
+//                                                  "LLC_REFERENCES",
+//                                                  "LLC_MISSES",
+//                                                  "MISPREDICTED_BRANCH_RETIRED",
+//                                                  "PERF_COUNT_HW_CACHE_REFERENCES",
+//                                                  "PERF_COUNT_HW_CACHE_MISSES",
+//                                                  "PERF_COUNT_HW_BRANCH_MISSES",
+//                                                  "PERF_COUNT_HW_CACHE_L1D"};
+    std::vector<std::string> benchmarkCounters = {"PERF_COUNT_HW_CPU_CYCLES",
+                                                  "INSTRUCTION_RETIRED",
+                                                  "PERF_COUNT_HW_CACHE_L1D",
+                                                  "L1-DCACHE-LOADS",
+                                                  "L1-DCACHE-LOAD-MISSES",
+                                                  "L1-DCACHE-STORES"};
+    selectBenchmarkWithExtraCountersLogScale(dataFile,
+                                     selectImplementation,
+                                     selectivityStride,
+                                     iterations,
+                                     benchmarkCounters);
+}
+
 
 int main(int argc, char** argv) {
 
-//    std::vector<float> inputThresholdDistribution;
-//    generateLogDistribution(30, 1, 10000, inputThresholdDistribution);
-//    selectCpuCyclesInputSweepBenchmark(DataFiles::uniformIntDistribution250mValuesMax10000,
-//                                       {SelectImplementation::ValuesBranch,
-//                                        SelectImplementation::ValuesPredication,
-//                                        SelectImplementation::ValuesVectorized},
-//                                       inputThresholdDistribution,
-//                                       5);
+    selectBenchmarkWithExtraCountersConfigurationsLogScale(DataFiles::uniformIntDistribution250mValuesMax10000,
+                                                   SelectImplementation::ValuesBranch,
+                                                   -1,3);
+
+    selectBenchmarkWithExtraCountersConfigurationsLogScale(DataFiles::uniformIntDistribution250mValuesMax10000,
+                                                   SelectImplementation::ValuesPredication,
+                                                   -1,3);
+
+
+    selectBenchmarkWithExtraCountersConfigurationsLogScale(DataFiles::uniformIntDistribution250mValuesMax10000,
+                                                   SelectImplementation::ValuesVectorized,
+                                                   -1,3);
 
     return 0;
 

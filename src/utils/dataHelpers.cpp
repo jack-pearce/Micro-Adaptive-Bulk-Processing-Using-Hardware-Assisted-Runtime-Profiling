@@ -8,6 +8,7 @@
 #include <cmath>
 
 #include "dataHelpers.h"
+#include "../data_generation/config.h"
 
 LoadedData::LoadedData(const DataFile &_dataFile) : dataFile(_dataFile) {
     data = std::make_unique<int[]>(dataFile.getNumElements());

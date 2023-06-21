@@ -7,6 +7,7 @@
 #include "../utils/dataHelpers.h"
 #include "../utils/papiHelpers.h"
 #include "counterBenchmark.h"
+#include "../data_generation/config.h"
 
 
 void selectSingleRunNoCounters(const DataFile &dataFile, SelectImplementation selectImplementation, int threshold,
@@ -271,7 +272,7 @@ void selectCpuCyclesInputSweepBenchmark(const DataFile &dataFile, const std::vec
 
     for (int i = 0; i < iterations; ++i) {
         for (int j = 0; j < static_cast<int>(selectImplementations.size()); ++j) {
-            for (int k = 0; k < thresholds.size(); ++k) {
+            for (int k = 0; k < static_cast<int>(thresholds.size()); ++k) {
                 results[k][0] = static_cast<int>(thresholds[k]);
                 int *inputData = new int[dataFile.getNumElements()];
                 int *inputFilter = new int[dataFile.getNumElements()];
@@ -309,4 +310,84 @@ void selectCpuCyclesInputSweepBenchmark(const DataFile &dataFile, const std::vec
     std::string fileName = "InputSweepCyclesBM_" + dataFile.getFileName();
     std::string fullFilePath = outputFilePath + selectCyclesFolder + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
+}
+
+
+
+
+
+
+
+void selectBenchmarkWithExtraCountersLogScale(const DataFile& dataFile,
+                                      SelectImplementation selectImplementation,
+                                      int selectivityStride,
+                                      int iterations,
+                                      std::vector<std::string>& benchmarkCounters) {
+    if (selectImplementation == SelectImplementation::IndexesAdaptive ||
+        selectImplementation == SelectImplementation::ValuesAdaptive)
+        std::cout << "Cannot benchmark adaptive select using counters as adaptive select is already using these counters" << std::endl;
+
+    int numTests = 30;
+    std::vector<float> inputThresholdDistribution;
+    generateLogDistribution(30, 1, 10 * 1000, inputThresholdDistribution);
+
+    long_long benchmarkCounterValues[benchmarkCounters.size()];
+    int benchmarkEventSet = initialisePAPIandCreateEventSet(benchmarkCounters);
+
+    std::vector<std::vector<long_long>> results(numTests, std::vector<long_long>((iterations * benchmarkCounters.size()) + 1, 0));
+    int count = 0;
+
+    for (int i = 0; i < 30; ++i) {
+        results[count][0] = static_cast<long_long>(inputThresholdDistribution[i]);
+
+        for (int j = 0; j < iterations; ++j) {
+            int *inputData = new int[dataFile.getNumElements()];
+            int *inputFilter = new int[dataFile.getNumElements()];
+            int *selection = new int[dataFile.getNumElements()];
+            copyArray(LoadedData::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
+            copyArray(LoadedData::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
+
+            std::cout << "Running threshold " << static_cast<int>(inputThresholdDistribution[i]) << ", iteration " << j + 1 << "... ";
+
+            if (PAPI_reset(benchmarkEventSet) != PAPI_OK)
+                exit(1);
+
+            runSelectFunction(selectImplementation,
+                              dataFile.getNumElements(), inputData, inputFilter, selection,
+                              static_cast<int>(inputThresholdDistribution[i]));
+
+
+            if (PAPI_read(benchmarkEventSet, benchmarkCounterValues) != PAPI_OK)
+                exit(1);
+
+            delete[] inputData;
+            delete[] inputFilter;
+            delete[] selection;
+
+            for (int k = 0; k < static_cast<int>(benchmarkCounters.size()); ++k) {
+                results[count][1 + (j * benchmarkCounters.size()) + k] = benchmarkCounterValues[k];
+            }
+
+            std::cout << "Completed" << std::endl;
+        }
+
+        count++;
+    }
+
+    std::vector<std::string> headers(benchmarkCounters.size() * iterations);
+    for (int i = 0; i < iterations; ++i) {
+        std::copy(benchmarkCounters.begin(), benchmarkCounters.end(), headers.begin() + i * benchmarkCounters.size());
+    }
+    headers.insert(headers.begin(), "Selectivity");
+
+    std::string fileName =
+            "ExtraCountersCyclesBM_" +
+            getSelectName(selectImplementation) +
+            dataFile.getFileName() +
+            "_selectivityStride_" +
+            std::to_string(selectivityStride);
+    std::string fullFilePath = outputFilePath + selectCyclesFolder + fileName + ".csv";
+    writeHeadersAndTableToCSV(headers, results, fullFilePath);
+
+    shutdownPAPI(benchmarkEventSet, benchmarkCounterValues);
 }

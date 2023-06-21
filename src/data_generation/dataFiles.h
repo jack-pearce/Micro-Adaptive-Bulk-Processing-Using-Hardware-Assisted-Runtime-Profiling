@@ -4,8 +4,6 @@
 #include <string>
 #include <vector>
 
-extern const std::string inputFilePath;
-extern const std::string outputFilePath;
 extern const std::string selectCyclesFolder;
 extern const std::string dataFilesFolder;
 
@@ -29,6 +27,7 @@ class DataFiles {
 public:
     static const DataFile uniformIntDistribution25kValuesMax100;
     static const DataFile uniformIntDistribution250mValuesMax100;
+    static const DataFile uniformIntDistribution250mValuesMax10000;
     static const DataFile uniformIntDistribution250mValuesMax1000000;
 
     static const DataFile varyingIntDistribution25kValues;
