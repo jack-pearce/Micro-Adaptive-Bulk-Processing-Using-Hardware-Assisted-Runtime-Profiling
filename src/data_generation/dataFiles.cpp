@@ -30,43 +30,42 @@ const DataFile DataFiles::uniformIntDistribution250mValuesMax1000000{
 const DataFile DataFiles::varyingIntDistribution25kValues{
     25 * 1000,
     "varyingIntDistribution25kValues",
-    "25k int values where max value is 100 and min value varies linearly from 0 to 50 a number of times"};
+    "25k int values where max value is 100 and min value varies linearly from 1 to 50 a number of times"};
 
 const DataFile DataFiles::varyingIntDistribution250mValues{
     250 * 1000 * 1000,
     "varyingIntDistribution250mValues",
-    "250m int values where max value is 100 and min value varies linearly from 0 to 50 a number of times"};
+    "250m int values where max value is 100 and min value varies linearly from 1 to 50 a number of times"};
 
 const DataFile DataFiles::upperStep50IntDistribution25kValues{
     25 * 1000,
     "upperStep50IntDistribution25kValues",
-    "25k values where max value is 100 and min value is in blocks of either 0 or 50"};
+    "25k values where min value is 1 and max value is in blocks of either 51 or 100"};
 
 const DataFile DataFiles::upperStep50IntDistribution250mValues{
     250 * 1000 * 1000,
     "upperStep50IntDistribution250mValues",
-    "250m values where max value is 100 and min value is in blocks of either 0 or 50"};
+    "250m values where min value is 1 and max value is in blocks of either 51 or 100"};
 
 const DataFile DataFiles::worstCaseIndexesTunedUpperStep50IntDistribution250mValues{
         250 * 1000 * 1000,
         "worstCaseIndexesTunedUpperStep50IntDistribution250mValues",
-        "250m values where max value is 100 and min value is in blocks of either 0 or 50 - size of blocks tuned to act as worst case"};
+        "250m values where min value is 1 and max value is in blocks of either 50 or 100 - size of blocks tuned to act as worst case"};
 
 const DataFile DataFiles::worstCaseValuesTunedLowerStep50IntDistribution250mValues{
         250 * 1000 * 1000,
         "worstCaseValuesTunedLowerStep50IntDistribution250mValues",
-        "250m values where min value is 1 and max value is in blocks of either 50 or 100 - size of blocks tuned to act as worst case"};
-
+        "250m values where max value is 100 and max value is in blocks of either 1 or 51 - size of blocks tuned to act as worst case"};
 
 const DataFile DataFiles::bestCaseIndexesTunedUnequalLowerStep50IntDistribution250mValues{
         250 * 1000 * 1000,
         "bestCaseIndexesTunedUnequalLowerStep50IntDistribution250mValues",
-        "250m values where max value is 100 and min value is in blocks of either 0 or 50. Blocks of 0 are 10 times larger than blocks of 0."};
+        "250m values where max value is 100 and min value is in blocks of either 1 or 51. Blocks of 0 are 10 times larger than blocks of 0."};
 
 const DataFile DataFiles::bestCaseValuesTunedUnequalLowerStep50IntDistribution250mValues{
         250 * 1000 * 1000,
         "bestCaseValuesTunedUnequalLowerStep50IntDistribution250mValues",
-        "250m values where max value is 100 and min value is in blocks of either 0 or 50. Blocks of 0 are XX times larger than blocks of 0."};
+        "250m values where max value is 100 and min value is in blocks of either 1 or 51. Blocks of 0 are 15 times larger than blocks of 0."};
 
 
 const DataFile DataFiles::fullySortedIntDistribution250mValues{
