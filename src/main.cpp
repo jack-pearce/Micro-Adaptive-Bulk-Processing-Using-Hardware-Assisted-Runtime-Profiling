@@ -130,12 +130,34 @@ void allSelectIndexesTests() {
 
 void allSelectValuesTests() {
     // Graph 1: Selectivity range on uniform data
+    std::vector<float> inputThresholdDistribution;
+    generateLogDistribution(30, 1, 10 * 1000, inputThresholdDistribution);
+    selectCpuCyclesInputSweepBenchmark(DataFiles::uniformIntDistribution250mValuesMax10000,
+                                       {SelectImplementation::ValuesBranch,
+                                        SelectImplementation::ValuesVectorized,
+                                        SelectImplementation::ValuesPredication,
+                                        SelectImplementation::ValuesAdaptive},
+                                       inputThresholdDistribution,
+                                       5);
 
     // Graph 2: Randomness range on sorted data
+    selectCpuCyclesSweepBenchmark(DataSweeps::logSortedIntDistribution250mValuesRandomnessSweep,
+                                  {SelectImplementation::ValuesBranch,
+                                   SelectImplementation::ValuesVectorized,
+                                   SelectImplementation::ValuesAdaptive}, 50, 5);
+
 
     // Graph 3: Period range on linearly varying selectivity
+    selectCpuCyclesSweepBenchmark(DataSweeps::varyingIntDistribution250mValuesSweep,
+                                  {SelectImplementation::ValuesBranch,
+                                   SelectImplementation::ValuesVectorized,
+                                   SelectImplementation::ValuesAdaptive}, 50, 5);
 
     // Graph 4: Period range on step varying selectivity
+    selectCpuCyclesSweepBenchmark(DataSweeps::lowerStep50IntDistribution250mValuesSweep,
+                                  {SelectImplementation::ValuesBranch,
+                                   SelectImplementation::ValuesVectorized,
+                                   SelectImplementation::ValuesAdaptive}, 50, 5);
 
     // Graph 5: Best case - tuned unequal step varying selectivity
     selectCpuCyclesSingleInputBenchmark(DataFiles::bestCaseValuesTunedUnequalLowerStep50IntDistribution250mValues,
@@ -157,37 +179,6 @@ void allSelectValuesTests() {
 
 
 int main(int argc, char** argv) {
-
-    // Graph 1: Selectivity range on uniform data
-    std::vector<float> inputThresholdDistribution;
-    generateLogDistribution(30, 1, 10 * 1000, inputThresholdDistribution);
-    selectCpuCyclesInputSweepBenchmark(DataFiles::uniformIntDistribution250mValuesMax10000,
-                                       {SelectImplementation::ValuesBranch,
-                                        SelectImplementation::ValuesVectorized,
-                                        SelectImplementation::ValuesPredication,
-                                        SelectImplementation::ValuesAdaptive},
-                                       inputThresholdDistribution,
-                                       5);
-
-    // Graph 2: Randomness range on sorted data
-    selectCpuCyclesSweepBenchmark(DataSweeps::logSortedIntDistribution250mValuesRandomnessSweep,
-                                  {SelectImplementation::ValuesBranch,
-                                   SelectImplementation::ValuesVectorized,
-                                   SelectImplementation::ValuesAdaptive}, 50, 5);
-
-    // Graph 3: Period range on linearly varying selectivity
-    selectCpuCyclesSweepBenchmark(DataSweeps::varyingIntDistribution250mValuesSweep,
-                                  {SelectImplementation::ValuesBranch,
-                                   SelectImplementation::ValuesVectorized,
-                                   SelectImplementation::ValuesAdaptive}, 50, 5);
-
-    // Graph 4: Period range on step varying selectivity
-    selectCpuCyclesSweepBenchmark(DataSweeps::lowerStep50IntDistribution250mValuesSweep,
-                                  {SelectImplementation::ValuesBranch,
-                                   SelectImplementation::ValuesVectorized,
-                                   SelectImplementation::ValuesAdaptive}, 50, 5);
-
-
 
 
     return 0;
