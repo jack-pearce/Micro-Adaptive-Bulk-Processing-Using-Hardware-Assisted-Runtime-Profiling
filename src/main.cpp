@@ -169,18 +169,19 @@ void selectBenchmarkWithExtraCountersConfigurationsLogScale(const DataFile &data
 
 int main(int argc, char** argv) {
 
-    selectBenchmarkWithExtraCountersConfigurationsLogScale(DataFiles::uniformIntDistribution250mValuesMax10000,
-                                                   SelectImplementation::ValuesBranch,
-                                                   -1,3);
+//    selectBenchmarkWithExtraCountersConfigurationsLogScale(DataFiles::uniformIntDistribution250mValuesMax10000,
+//                                                   SelectImplementation::ValuesBranch,
+//                                                   -1,3);
+//
+//    selectBenchmarkWithExtraCountersConfigurationsLogScale(DataFiles::uniformIntDistribution250mValuesMax10000,
+//                                                   SelectImplementation::ValuesPredication,
+//                                                   -1,3);
+//
+//
+//    selectBenchmarkWithExtraCountersConfigurationsLogScale(DataFiles::uniformIntDistribution250mValuesMax10000,
+//                                                   SelectImplementation::ValuesVectorized,
+//                                                   -1,3);
 
-    selectBenchmarkWithExtraCountersConfigurationsLogScale(DataFiles::uniformIntDistribution250mValuesMax10000,
-                                                   SelectImplementation::ValuesPredication,
-                                                   -1,3);
-
-
-    selectBenchmarkWithExtraCountersConfigurationsLogScale(DataFiles::uniformIntDistribution250mValuesMax10000,
-                                                   SelectImplementation::ValuesVectorized,
-                                                   -1,3);
 
     return 0;
 
