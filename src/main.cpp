@@ -79,7 +79,7 @@ void selectBenchmarkWithExtraCountersConfigurations(const DataFile &dataFile, Se
                                      selectImplementation,
                                      inputThresholdDistribution,
                                      iterations,
-                                     benchmarkCounters);
+                                     benchmarkCounters, "");
 }
 
 void allSelectIndexesTests() {
@@ -91,25 +91,28 @@ void allSelectIndexesTests() {
                                         SelectImplementation::IndexesPredication,
                                         SelectImplementation::IndexesAdaptive},
                                        inputThresholdDistribution,
-                                       5);
+                                       5, "Indexes");
 
     // Graph 2: Randomness range on sorted data
     selectCpuCyclesSweepBenchmark(DataSweeps::logSortedIntDistribution250mValuesRandomnessSweep,
                                   {SelectImplementation::IndexesBranch,
                                    SelectImplementation::IndexesPredication,
-                                   SelectImplementation::IndexesAdaptive}, 50, 5);
+                                   SelectImplementation::IndexesAdaptive},
+                                   50, 5, "Indexes");
 
     // Graph 3: Period range on linearly varying selectivity
     selectCpuCyclesSweepBenchmark(DataSweeps::varyingIntDistribution250mValuesSweep,
                                   {SelectImplementation::IndexesBranch,
                                    SelectImplementation::IndexesPredication,
-                                   SelectImplementation::IndexesAdaptive}, 50, 5);
+                                   SelectImplementation::IndexesAdaptive},
+                                   50, 5, "Indexes");
 
     // Graph 4: Period range on step varying selectivity
     selectCpuCyclesSweepBenchmark(DataSweeps::lowerStep50IntDistribution250mValuesSweep,
                                   {SelectImplementation::IndexesBranch,
                                    SelectImplementation::IndexesPredication,
-                                   SelectImplementation::IndexesAdaptive}, 50, 5);
+                                   SelectImplementation::IndexesAdaptive},
+                                   50, 5, "Indexes");
 
     // Graph 5: Best case - tuned unequal step varying selectivity
     selectCpuCyclesSingleInputBenchmark(DataFiles::bestCaseIndexesTunedUnequalLowerStep50IntDistribution250mValues,
@@ -117,7 +120,7 @@ void allSelectIndexesTests() {
                                          SelectImplementation::IndexesPredication,
                                          SelectImplementation::IndexesAdaptive},
                                         50,
-                                        5);
+                                        5, "Indexes");
 
     // Graph 6: Worst case - tuned period range on step varying selectivity
     selectCpuCyclesSingleInputBenchmark(DataFiles::worstCaseIndexesTunedUpperStep50IntDistribution250mValues,
@@ -125,7 +128,7 @@ void allSelectIndexesTests() {
                                          SelectImplementation::IndexesPredication,
                                          SelectImplementation::IndexesAdaptive},
                                         50,
-                                        5);
+                                        5, "Indexes");
 }
 
 void allSelectValuesTests() {
@@ -138,26 +141,29 @@ void allSelectValuesTests() {
                                         SelectImplementation::ValuesPredication,
                                         SelectImplementation::ValuesAdaptive},
                                        inputThresholdDistribution,
-                                       5);
+                                       5, "Values");
 
     // Graph 2: Randomness range on sorted data
     selectCpuCyclesSweepBenchmark(DataSweeps::logSortedIntDistribution250mValuesRandomnessSweep,
                                   {SelectImplementation::ValuesBranch,
                                    SelectImplementation::ValuesVectorized,
-                                   SelectImplementation::ValuesAdaptive}, 50, 5);
+                                   SelectImplementation::ValuesAdaptive},
+                                   50, 5, "Values");
 
 
     // Graph 3: Period range on linearly varying selectivity
     selectCpuCyclesSweepBenchmark(DataSweeps::varyingIntDistribution250mValuesSweep,
                                   {SelectImplementation::ValuesBranch,
                                    SelectImplementation::ValuesVectorized,
-                                   SelectImplementation::ValuesAdaptive}, 50, 5);
+                                   SelectImplementation::ValuesAdaptive},
+                                   50, 5, "Values");
 
     // Graph 4: Period range on step varying selectivity
     selectCpuCyclesSweepBenchmark(DataSweeps::lowerStep50IntDistribution250mValuesSweep,
                                   {SelectImplementation::ValuesBranch,
                                    SelectImplementation::ValuesVectorized,
-                                   SelectImplementation::ValuesAdaptive}, 50, 5);
+                                   SelectImplementation::ValuesAdaptive},
+                                   50, 5, "Values");
 
     // Graph 5: Best case - tuned unequal step varying selectivity
     selectCpuCyclesSingleInputBenchmark(DataFiles::bestCaseValuesTunedUnequalLowerStep50IntDistribution250mValues,
@@ -165,7 +171,7 @@ void allSelectValuesTests() {
                                          SelectImplementation::ValuesVectorized,
                                          SelectImplementation::ValuesAdaptive},
                                         50,
-                                        5);
+                                        5, "Values");
 
     // Graph 6: Worst case - tuned period range on step varying selectivity
     selectCpuCyclesSingleInputBenchmark(DataFiles::worstCaseValuesTunedLowerStep50IntDistribution250mValues,
@@ -173,20 +179,14 @@ void allSelectValuesTests() {
                                          SelectImplementation::ValuesVectorized,
                                          SelectImplementation::ValuesAdaptive},
                                         50,
-                                        5);
+                                        5, "Values");
 
 }
 
 
 int main(int argc, char** argv) {
-//    allSelectIndexesTests();
-
-    selectFunctionalityTest(DataFiles::upperStep50IntDistribution25kValues,
-                            SelectImplementation::ValuesVectorized);
-
-    selectFunctionalityTest(DataFiles::upperStep50IntDistribution25kValues,
-                            SelectImplementation::IndexesBranch);
-
+    allSelectIndexesTests();
+    allSelectValuesTests();
 
     return 0;
 

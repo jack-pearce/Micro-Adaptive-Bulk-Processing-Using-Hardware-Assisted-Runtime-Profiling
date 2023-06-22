@@ -32,8 +32,9 @@ void selectSingleRunNoCounters(const DataFile &dataFile, SelectImplementation se
     }
 }
 
-void selectCpuCyclesSingleInputBenchmark(const DataFile &dataFile, const std::vector<SelectImplementation> &selectImplementations,
-                                    int threshold, int iterations) {
+void selectCpuCyclesSingleInputBenchmark(const DataFile &dataFile,
+                                         const std::vector<SelectImplementation> &selectImplementations, int threshold,
+                                         int iterations, const std::string &fileNamePrefix) {
     int numTests = static_cast<int>(selectImplementations.size());
     long_long cycles;
     std::vector<std::vector<long_long>> results(iterations, std::vector<long_long>(numTests + 1, 0));
@@ -72,6 +73,7 @@ void selectCpuCyclesSingleInputBenchmark(const DataFile &dataFile, const std::ve
     }
 
     std::string fileName =
+            fileNamePrefix +
             "SingleCyclesBM_" +
             dataFile.getFileName() +
             "_threshold_" +
@@ -80,10 +82,9 @@ void selectCpuCyclesSingleInputBenchmark(const DataFile &dataFile, const std::ve
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }
 
-void selectCpuCyclesMultipleInputBenchmark(const DataFile& dataFile,
-                                           const std::vector<SelectImplementation>& selectImplementations,
-                                           int selectivityStride,
-                                           int iterations) {
+void selectCpuCyclesMultipleInputBenchmark(const DataFile &dataFile,
+                                           const std::vector<SelectImplementation> &selectImplementations,
+                                           int selectivityStride, int iterations, const std::string &fileNamePrefix) {
     int numTests = 1 + (100 / selectivityStride);
     int implementations = static_cast<int>(selectImplementations.size());
     int dataCols = implementations * iterations;
@@ -132,6 +133,7 @@ void selectCpuCyclesMultipleInputBenchmark(const DataFile& dataFile,
     }
 
     std::string fileName =
+            fileNamePrefix +
             "MultiplesCyclesBM_" +
             dataFile.getFileName() +
             "_selectivityStride_" +
@@ -140,11 +142,9 @@ void selectCpuCyclesMultipleInputBenchmark(const DataFile& dataFile,
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }
 
-void selectBenchmarkWithExtraCounters(const DataFile& dataFile,
-                                      SelectImplementation selectImplementation,
-                                      std::vector<float> &thresholds,
-                                      int iterations,
-                                      std::vector<std::string>& benchmarkCounters) {
+void selectBenchmarkWithExtraCounters(const DataFile &dataFile, SelectImplementation selectImplementation,
+                                      std::vector<float> &thresholds, int iterations,
+                                      std::vector<std::string> &benchmarkCounters, const std::string &fileNamePrefix) {
     if (selectImplementation == SelectImplementation::IndexesAdaptive ||
         selectImplementation == SelectImplementation::ValuesAdaptive)
         std::cout << "Cannot benchmark adaptive select using counters as adaptive select is already using these counters" << std::endl;
@@ -200,8 +200,9 @@ void selectBenchmarkWithExtraCounters(const DataFile& dataFile,
     headers.insert(headers.begin(), "Selectivity");
 
     std::string fileName =
+            fileNamePrefix +
             "ExtraCountersCyclesBM_" +
-                    getSelectName(selectImplementation) +
+            getSelectName(selectImplementation) +
             dataFile.getFileName();
     std::string fullFilePath = outputFilePath + selectCyclesFolder + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
@@ -210,7 +211,7 @@ void selectBenchmarkWithExtraCounters(const DataFile& dataFile,
 }
 
 void selectCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<SelectImplementation> &selectImplementations,
-                                   int threshold, int iterations) {
+                                   int threshold, int iterations, const std::string &fileNamePrefix) {
     assert(!selectImplementations.empty());
 
     int dataCols = iterations * static_cast<int>(selectImplementations.size());
@@ -256,13 +257,20 @@ void selectCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<Selec
         headers[1 + i] = getSelectName(selectImplementations[i % selectImplementations.size()]);
     }
 
-    std::string fileName = "SweepCyclesBM_" + dataSweep.getSweepName() + "_threshold_" + std::to_string(threshold);
+    std::string fileName =
+            fileNamePrefix +
+            "SweepCyclesBM_" +
+            dataSweep.getSweepName() +
+            "_threshold_" +
+            std::to_string(threshold);
     std::string fullFilePath = outputFilePath + selectCyclesFolder + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }
 
-void selectCpuCyclesInputSweepBenchmark(const DataFile &dataFile, const std::vector<SelectImplementation> &selectImplementations,
-                                        std::vector<float> &thresholds, int iterations) {
+void selectCpuCyclesInputSweepBenchmark(const DataFile &dataFile,
+                                        const std::vector<SelectImplementation> &selectImplementations,
+                                        std::vector<float> &thresholds, int iterations,
+                                        const std::string &fileNamePrefix) {
     assert(!selectImplementations.empty());
 
     int dataCols = iterations * static_cast<int>(selectImplementations.size());
@@ -307,7 +315,7 @@ void selectCpuCyclesInputSweepBenchmark(const DataFile &dataFile, const std::vec
         headers[1 + i] = getSelectName(selectImplementations[i % selectImplementations.size()]);
     }
 
-    std::string fileName = "InputSweepCyclesBM_" + dataFile.getFileName();
+    std::string fileName = fileNamePrefix + "InputSweepCyclesBM_" + dataFile.getFileName();
     std::string fullFilePath = outputFilePath + selectCyclesFolder + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }
