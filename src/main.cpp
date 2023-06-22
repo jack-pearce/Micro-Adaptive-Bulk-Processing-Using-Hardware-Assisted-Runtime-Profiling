@@ -179,7 +179,7 @@ void allSelectValuesTests() {
 
 
 int main(int argc, char** argv) {
-
+    allSelectIndexesTests();
 
     return 0;
 
