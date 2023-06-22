@@ -179,7 +179,14 @@ void allSelectValuesTests() {
 
 
 int main(int argc, char** argv) {
-    allSelectIndexesTests();
+//    allSelectIndexesTests();
+
+    selectFunctionalityTest(DataFiles::upperStep50IntDistribution25kValues,
+                            SelectImplementation::ValuesVectorized);
+
+    selectFunctionalityTest(DataFiles::upperStep50IntDistribution25kValues,
+                            SelectImplementation::IndexesBranch);
+
 
     return 0;
 
