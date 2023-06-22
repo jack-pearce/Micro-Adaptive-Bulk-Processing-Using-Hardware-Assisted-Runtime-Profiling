@@ -156,6 +156,43 @@ int selectValuesVectorized(int n, const int *inputData, const int *inputFilter, 
 
     // Process unaligned tuples
     int unalignedCount = 0;
+    for (int i = 0; !arrayIsSimd128Aligned(inputFilter + i); ++i) {
+        selection[k] = inputData[i];
+        k += (inputFilter[i] <= threshold);
+        ++unalignedCount;
+    }
+
+    // Vectorize the loop for aligned tuples
+    int simdWidth = sizeof(__m128i) / sizeof(int);
+    int simdIterations = (n - unalignedCount) / simdWidth;
+    __m128i thresholdVector = _mm_set1_epi32(threshold);
+
+    for (int i = unalignedCount; i < unalignedCount + (simdIterations * simdWidth); i += simdWidth) {
+        __m128i filterVector = _mm_load_si128((__m128i *)(inputFilter + i));
+
+        // Compare filterVector <= thresholdVector
+        __mmask8 mask = ~_mm_cmpgt_epi32_mask(filterVector, thresholdVector);
+
+        for (int j = 0; j < simdWidth; ++j) {
+            selection[k] = inputData[i + j];
+            k += (mask >> j) & 1;
+        }
+    }
+
+    // Process any remaining tuples
+    for (int i = unalignedCount + simdIterations * simdWidth; i < n; ++i) {
+        selection[k] = inputData[i];
+        k += (inputFilter[i] <= threshold);
+    }
+
+    return k;
+}
+
+/*int selectValuesVectorized(int n, const int *inputData, const int *inputFilter, int *selection, int threshold) {
+    int k = 0;
+
+    // Process unaligned tuples
+    int unalignedCount = 0;
     for (int i = 0; !arrayIsSimd256Aligned(inputFilter + i); ++i) {
         selection[k] = inputData[i];
         k += (inputFilter[i] <= threshold);
@@ -186,7 +223,7 @@ int selectValuesVectorized(int n, const int *inputData, const int *inputFilter, 
     }
 
     return k;
-}
+}*/
 
 inline int runSelectValuesChunk(int (*&selectValuesFunctionPtr)(int, const int *, const int *, int *, int),
                                  int tuplesToProcess,
