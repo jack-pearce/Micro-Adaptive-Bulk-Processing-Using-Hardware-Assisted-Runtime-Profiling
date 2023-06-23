@@ -185,8 +185,39 @@ void allSelectValuesTests() {
 
 
 int main(int argc, char** argv) {
-    allSelectIndexesTests();
-    allSelectValuesTests();
+
+
+    // Graph 5: Best case - tuned unequal step varying selectivity
+    selectCpuCyclesSingleInputBenchmark(DataFiles::bestCaseIndexesTunedUnequalLowerStep50IntDistribution250mValues,
+                                        {SelectImplementation::IndexesBranch,
+                                         SelectImplementation::IndexesPredication,
+                                         SelectImplementation::IndexesAdaptive},
+                                        50,
+                                        5, "Indexes");
+
+    // Graph 6: Worst case - tuned period range on step varying selectivity
+    selectCpuCyclesSingleInputBenchmark(DataFiles::worstCaseIndexesTunedUpperStep50IntDistribution250mValues,
+                                        {SelectImplementation::IndexesBranch,
+                                         SelectImplementation::IndexesPredication,
+                                         SelectImplementation::IndexesAdaptive},
+                                        50,
+                                        5, "Indexes");
+
+    // Graph 5: Best case - tuned unequal step varying selectivity
+    selectCpuCyclesSingleInputBenchmark(DataFiles::bestCaseValuesTunedUnequalLowerStep50IntDistribution250mValues,
+                                        {SelectImplementation::ValuesBranch,
+                                         SelectImplementation::ValuesVectorized,
+                                         SelectImplementation::ValuesAdaptive},
+                                        50,
+                                        5, "Values");
+
+    // Graph 6: Worst case - tuned period range on step varying selectivity
+    selectCpuCyclesSingleInputBenchmark(DataFiles::worstCaseValuesTunedLowerStep50IntDistribution250mValues,
+                                        {SelectImplementation::ValuesBranch,
+                                         SelectImplementation::ValuesVectorized,
+                                         SelectImplementation::ValuesAdaptive},
+                                        50,
+                                        5, "Values");
 
     return 0;
 

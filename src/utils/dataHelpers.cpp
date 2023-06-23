@@ -4,28 +4,38 @@
 #include <string>
 #include <vector>
 #include <cassert>
-#include <memory>
 #include <cmath>
 
 #include "dataHelpers.h"
 #include "../data_generation/config.h"
 
-LoadedData::LoadedData(const DataFile &_dataFile) : dataFile(_dataFile) {
-    data = std::make_unique<int[]>(dataFile.getNumElements());
-    dataFile.loadDataIntoMemory(data.get());
+LoadedData::LoadedData(const DataFile &dataFile) : data(nullptr), dataFile(&dataFile) {
+    loadData();
 }
 
-LoadedData &LoadedData::getInstance(const DataFile &dataFile) {
-    static LoadedData instance(dataFile);
+void LoadedData::loadData() {
+    data = new int[dataFile->getNumElements()];
+    dataFile->loadDataIntoMemory(data);
+}
+
+LoadedData &LoadedData::getInstance(const DataFile &requestedDataFile) {
+    static LoadedData instance(requestedDataFile);
+
+    if (requestedDataFile.getFileName() != instance.getDataFile().getFileName()) {
+        delete[] instance.data;
+        instance.dataFile = &requestedDataFile;
+        instance.loadData();
+    }
+
     return instance;
 }
 
 int* LoadedData::getData() const {
-    return data.get();
+    return data;
 }
 
 const DataFile& LoadedData::getDataFile() const {
-    return dataFile;
+    return *dataFile;
 }
 
 void generateLogDistribution(int numPoints, double minValue, double maxValue, std::vector<float> &points) {
@@ -44,7 +54,7 @@ void generateLinearDistribution(int numPoints, double minValue, double maxValue,
     }
 }
 
-void displayDistribution(const DataFile& dataFile) {
+void displayDistribution(const DataFile &dataFile) {
     std::vector<int> counts(101, 0);
     int numElements = dataFile.getNumElements();
     int* inputData = LoadedData::getInstance(dataFile).getData();
@@ -56,7 +66,7 @@ void displayDistribution(const DataFile& dataFile) {
     }
 }
 
-void writeDataFileToCSV(const DataFile& dataFile) {
+void writeDataFileToCSV(const DataFile &dataFile) {
     int* data = LoadedData::getInstance(dataFile).getData();
     int numElements = dataFile.getNumElements();
 

@@ -1,19 +1,18 @@
 #ifndef MICRO_ADAPTIVE_BULK_PROCESSING_LIBRARY_DATAHELPERS_H
 #define MICRO_ADAPTIVE_BULK_PROCESSING_LIBRARY_DATAHELPERS_H
 
-#include <memory>
-
 #include "../../libs/papi/src/install/include/papi.h"
 #include "../data_generation/dataFiles.h"
 
 class LoadedData {
 private:
-    std::unique_ptr<int[]> data;
-    const DataFile &dataFile;
+    int *data;
+    const DataFile *dataFile;
     explicit LoadedData(const DataFile &dataFile);
+    void loadData();
 
 public:
-    static LoadedData &getInstance(const DataFile &dataFile);
+    static LoadedData &getInstance(const DataFile &requestedDataFile);
     [[nodiscard]] int* getData() const;
     [[nodiscard]] const DataFile& getDataFile() const;
     LoadedData(const LoadedData&) = delete;
@@ -22,8 +21,8 @@ public:
 
 void generateLogDistribution(int numPoints, double minValue, double maxValue, std::vector<float> &points);
 void generateLinearDistribution(int numPoints, double minValue, double maxValue, std::vector<float> &points);
-void displayDistribution(const DataFile& dataFile);
-void writeDataFileToCSV(const DataFile& dataFile);
+void displayDistribution(const DataFile &dataFile);
+void writeDataFileToCSV(const DataFile &dataFile);
 void writeHeadersAndTableToCSV(std::vector<std::string>& headers,
                                std::vector<std::vector<long_long>>  values,
                                std::string& filePath);

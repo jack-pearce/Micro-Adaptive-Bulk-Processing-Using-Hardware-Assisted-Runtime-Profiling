@@ -150,7 +150,7 @@ int selectValuesPredication(int n, const int *inputData, const int *inputFilter,
     }
     return k;
 }
-
+/*
 int selectValuesVectorized(int n, const int *inputData, const int *inputFilter, int *selection, int threshold) {
     int k = 0;
 
@@ -187,9 +187,9 @@ int selectValuesVectorized(int n, const int *inputData, const int *inputFilter, 
     }
 
     return k;
-}
+}*/
 
-/*int selectValuesVectorized(int n, const int *inputData, const int *inputFilter, int *selection, int threshold) {
+int selectValuesVectorized(int n, const int *inputData, const int *inputFilter, int *selection, int threshold) {
     int k = 0;
 
     // Process unaligned tuples
@@ -224,7 +224,7 @@ int selectValuesVectorized(int n, const int *inputData, const int *inputFilter, 
     }
 
     return k;
-}*/
+}
 
 inline int runSelectValuesChunk(int (*&selectValuesFunctionPtr)(int, const int *, const int *, int *, int),
                                  int tuplesToProcess,
