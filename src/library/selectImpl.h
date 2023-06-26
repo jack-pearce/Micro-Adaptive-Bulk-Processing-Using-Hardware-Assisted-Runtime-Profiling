@@ -2,6 +2,7 @@
 #define MABPL_SELECT_IMPLEMENTATION_H
 
 #include <immintrin.h>
+#include <functional>
 
 #include "papi.h"
 #include "utils.h"
@@ -29,7 +30,7 @@ int selectIndexesPredication(int n, const T *inputFilter, int *selection, T thre
 }
 
 template<typename T>
-inline int runSelectIndexesChunk(SelectIndexesFunctionPtr<T> selectIndexesFunctionPtr,
+inline int runSelectIndexesChunk(SelectIndexesChoice selectIndexesChoice,
                                  int tuplesToProcess,
                                  int &n,
                                  const T *&inputData,
@@ -37,19 +38,25 @@ inline int runSelectIndexesChunk(SelectIndexesFunctionPtr<T> selectIndexesFuncti
                                  T threshold,
                                  int &k,
                                  int &consecutivePredications) {
-    Counters::getInstance().readEventSet();
-    int selected = selectIndexesFunctionPtr(tuplesToProcess, inputData, selection, threshold);
-    Counters::getInstance().readEventSet();
+    int selected;
+    if (selectIndexesChoice == SelectIndexesChoice::IndexesBranch) {
+        Counters::getInstance().readEventSet();
+        selected = selectIndexesBranch(tuplesToProcess, inputData, selection, threshold);
+        Counters::getInstance().readEventSet();
+    } else {
+        Counters::getInstance().readEventSet();
+        selected = selectIndexesPredication(tuplesToProcess, inputData, selection, threshold);
+        Counters::getInstance().readEventSet();
+    }
     n -= tuplesToProcess;
     inputData += tuplesToProcess;
     selection += selected;
     k += selected;
-    consecutivePredications += (selectIndexesFunctionPtr == selectIndexesPredication<T>);
+    consecutivePredications += (selectIndexesChoice == SelectIndexesChoice::IndexesPredication);
     return selected;
 }
 
-template<typename T>
-inline void performSelectIndexesAdaption(SelectIndexesFunctionPtr<T> &selectIndexesFunctionPtr,
+inline void performSelectIndexesAdaption(SelectIndexesChoice &selectIndexesChoice,
                                          const long_long *counterValues,
                                          float lowerCrossoverSelectivity,
                                          float upperCrossoverSelectivity,
@@ -60,16 +67,16 @@ inline void performSelectIndexesAdaption(SelectIndexesFunctionPtr<T> &selectInde
 
     if (__builtin_expect(static_cast<float>(counterValues[0]) >
                          (((selectivity - lowerCrossoverSelectivity) * m) + lowerBranchCrossoverBranchMisses)
-                         && selectIndexesFunctionPtr == selectIndexesBranch<T>, false)) {
+                         && selectIndexesChoice == SelectIndexesChoice::IndexesBranch, false)) {
 //        std::cout << "Switched to select predication" << std::endl;
-        selectIndexesFunctionPtr = selectIndexesPredication;
+        selectIndexesChoice = SelectIndexesChoice::IndexesPredication;
     }
 
     if (__builtin_expect((selectivity < lowerCrossoverSelectivity
                           || selectivity > upperCrossoverSelectivity)
-                         && selectIndexesFunctionPtr == selectIndexesPredication<T>, false)) {
+                         && selectIndexesChoice == SelectIndexesChoice::IndexesPredication, false)) {
 //        std::cout << "Switched to select branch" << std::endl;
-        selectIndexesFunctionPtr = selectIndexesBranch;
+        selectIndexesChoice = SelectIndexesChoice::IndexesBranch;
         consecutivePredications = 0;
     }
 }
@@ -102,7 +109,7 @@ int selectIndexesAdaptive(int n, const T *inputFilter, int *selection, T thresho
     int consecutivePredications = 0;
     int tuplesToProcess;
     int selected;
-    SelectIndexesFunctionPtr<T> selectIndexesFunctionPtr = selectIndexesPredication<T>;
+    SelectIndexesChoice selectIndexesChoice = SelectIndexesChoice::IndexesPredication;
 
     std::vector<std::string> counters = {"PERF_COUNT_HW_BRANCH_MISSES"};
     long_long *counterValues = Counters::getInstance().getEvents(counters);
@@ -110,12 +117,12 @@ int selectIndexesAdaptive(int n, const T *inputFilter, int *selection, T thresho
     while (n > 0) {
         if (__builtin_expect(consecutivePredications == maxConsecutivePredications, false)) {
 //            std::cout << "Running branch burst" << std::endl;
-            selectIndexesFunctionPtr = selectIndexesBranch;
+            selectIndexesChoice = SelectIndexesChoice::IndexesBranch;
             consecutivePredications = 0;
             tuplesToProcess = std::min(n, tuplesInBranchBurst);
-            selected = runSelectIndexesChunk<T>(selectIndexesFunctionPtr, tuplesToProcess, n,
+            selected = runSelectIndexesChunk<T>(selectIndexesChoice, tuplesToProcess, n,
                                                 inputFilter, selection, threshold, k, consecutivePredications);
-            performSelectIndexesAdaption(selectIndexesFunctionPtr, counterValues, lowerCrossoverSelectivity,
+            performSelectIndexesAdaption(selectIndexesChoice, counterValues, lowerCrossoverSelectivity,
                                          upperCrossoverSelectivity,
                                          lowerBranchCrossoverBranchMisses_BranchBurst,
                                          m_BranchBurst,
@@ -123,9 +130,9 @@ int selectIndexesAdaptive(int n, const T *inputFilter, int *selection, T thresho
                                          consecutivePredications);
         } else {
             tuplesToProcess = std::min(n, tuplesPerAdaption);
-            selected = runSelectIndexesChunk<T>(selectIndexesFunctionPtr, tuplesToProcess, n, inputFilter, selection,
+            selected = runSelectIndexesChunk<T>(selectIndexesChoice, tuplesToProcess, n, inputFilter, selection,
                                                 threshold, k, consecutivePredications);
-            performSelectIndexesAdaption(selectIndexesFunctionPtr, counterValues, lowerCrossoverSelectivity,
+            performSelectIndexesAdaption(selectIndexesChoice, counterValues, lowerCrossoverSelectivity,
                                          upperCrossoverSelectivity,
                                          lowerBranchCrossoverBranchMisses, m,
                                          static_cast<float>(selected) / static_cast<float>(tuplesPerAdaption),
@@ -247,29 +254,35 @@ int selectValuesVectorized(int n, const T2 *inputData, const T1 *inputFilter, T2
 }
 
 template<typename T1, typename T2>
-inline int runSelectValuesChunk(SelectValuesFunctionPtr<T1,T2> selectValuesFunctionPtr,
+inline int runSelectValuesChunk(SelectValuesChoice selectValuesChoice,
                                 int tuplesToProcess,
                                 int &n,
-                                const int *&inputData,
-                                const int *&inputFilter,
-                                int *&selection,
-                                int threshold,
+                                const T2 *&inputData,
+                                const T1 *&inputFilter,
+                                T2 *&selection,
+                                T1 threshold,
                                 int &k,
                                 int &consecutivePredications) {
-    Counters::getInstance().readEventSet();
-    int selected = selectValuesFunctionPtr(tuplesToProcess, inputData, inputFilter, selection, threshold);
-    Counters::getInstance().readEventSet();
+    int selected;
+    if (selectValuesChoice == SelectValuesChoice::ValuesBranch) {
+        Counters::getInstance().readEventSet();
+        selected = selectValuesBranch(tuplesToProcess, inputData, inputFilter, selection, threshold);
+        Counters::getInstance().readEventSet();
+    } else {
+        Counters::getInstance().readEventSet();
+        selected = selectValuesVectorized(tuplesToProcess, inputData, inputFilter, selection, threshold);
+        Counters::getInstance().readEventSet();
+    }
     n -= tuplesToProcess;
     inputData += tuplesToProcess;
     inputFilter += tuplesToProcess;
     selection += selected;
     k += selected;
-    consecutivePredications += (selectValuesFunctionPtr == selectValuesVectorized<T1,T2>);
+    consecutivePredications += (selectValuesChoice == SelectValuesChoice::ValuesVectorized);
     return selected;
 }
 
-template<typename T1, typename T2>
-inline void performSelectValuesAdaption(SelectValuesFunctionPtr<T1,T2> &selectValuesFunctionPtr,
+inline void performSelectValuesAdaption(SelectValuesChoice &selectValuesChoice,
                                         const long_long *counterValues,
                                         float crossoverSelectivity,
                                         float branchCrossoverBranchMisses,
@@ -277,13 +290,13 @@ inline void performSelectValuesAdaption(SelectValuesFunctionPtr<T1,T2> &selectVa
                                         int &consecutiveVectorized) {
 
     if (__builtin_expect(static_cast<float>(counterValues[0]) > branchCrossoverBranchMisses
-                         && selectValuesFunctionPtr == selectValuesBranch<T1,T2>, false)) {
-        selectValuesFunctionPtr = selectValuesVectorized;
+                         && selectValuesChoice == SelectValuesChoice::ValuesBranch, false)) {
+        selectValuesChoice = SelectValuesChoice::ValuesVectorized;
     }
 
     if (__builtin_expect(selectivity < crossoverSelectivity
-                         && selectValuesFunctionPtr == selectValuesVectorized<T1,T2>, false)) {
-        selectValuesFunctionPtr = selectValuesBranch;
+                         && selectValuesChoice == SelectValuesChoice::ValuesVectorized, false)) {
+        selectValuesChoice = SelectValuesChoice::ValuesBranch;
         consecutiveVectorized = 0;
     }
 }
@@ -306,7 +319,7 @@ int selectValuesAdaptive(int n, const T2 *inputData, const T1 *inputFilter, T2 *
     auto consecutiveVectorized = 0;
     int tuplesToProcess;
     int selected;
-    SelectValuesFunctionPtr<T1,T2> selectValuesFunctionPtr = selectValuesBranch<T1,T2>;
+    SelectValuesChoice selectValuesChoice = SelectValuesChoice::ValuesBranch;
 
     std::vector<std::string> counters = {"PERF_COUNT_HW_BRANCH_MISSES"};
     long_long *counterValues = Counters::getInstance().getEvents(counters);
@@ -314,20 +327,20 @@ int selectValuesAdaptive(int n, const T2 *inputData, const T1 *inputFilter, T2 *
     while (n > 0) {
 
         if (__builtin_expect(consecutiveVectorized == maxConsecutiveVectorized, false)) {
-            selectValuesFunctionPtr = selectValuesBranch;
+            selectValuesChoice = SelectValuesChoice::ValuesVectorized;
             consecutiveVectorized = 0;
             tuplesToProcess = std::min(n, tuplesInBranchBurst);
-            selected = runSelectValuesChunk<T1,T2>(selectValuesFunctionPtr, tuplesToProcess, n,
+            selected = runSelectValuesChunk<T1,T2>(selectValuesChoice, tuplesToProcess, n,
                                             inputData, inputFilter, selection, threshold, k, consecutiveVectorized);
-            performSelectValuesAdaption(selectValuesFunctionPtr, counterValues, crossoverSelectivity,
+            performSelectValuesAdaption(selectValuesChoice, counterValues, crossoverSelectivity,
                                         branchCrossoverBranchMisses_BranchBurst,
                                         static_cast<float>(selected) / static_cast<float>(tuplesInBranchBurst),
                                         consecutiveVectorized);
         } else {
             tuplesToProcess = std::min(n, tuplesPerAdaption);
-            selected = runSelectValuesChunk<T1,T2>(selectValuesFunctionPtr, tuplesToProcess, n,
+            selected = runSelectValuesChunk<T1,T2>(selectValuesChoice, tuplesToProcess, n,
                                             inputData, inputFilter, selection, threshold, k, consecutiveVectorized);
-            performSelectValuesAdaption(selectValuesFunctionPtr, counterValues, crossoverSelectivity,
+            performSelectValuesAdaption(selectValuesChoice, counterValues, crossoverSelectivity,
                                         branchCrossoverBranchMisses,
                                         static_cast<float>(selected) / static_cast<float>(tuplesPerAdaption),
                                         consecutiveVectorized);
@@ -339,22 +352,22 @@ int selectValuesAdaptive(int n, const T2 *inputData, const T1 *inputFilter, T2 *
 
 
 template<typename T1, typename T2>
-int runSelectFunction(SelectImplementation selectImplementation,
+int runSelectFunction(Select selectImplementation,
                       int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold) {
     switch(selectImplementation) {
-        case SelectImplementation::IndexesBranch:
+        case Select::ImplementationIndexesBranch:
             return selectIndexesBranch(n, inputFilter, selection, threshold);
-        case SelectImplementation::IndexesPredication:
+        case Select::ImplementationIndexesPredication:
             return selectIndexesPredication(n, inputFilter, selection, threshold);
-        case SelectImplementation::IndexesAdaptive:
+        case Select::ImplementationIndexesAdaptive:
             return selectIndexesAdaptive(n, inputFilter, selection, threshold);
-        case SelectImplementation::ValuesBranch:
+        case Select::ImplementationValuesBranch:
             return selectValuesBranch(n, inputData, inputFilter, selection, threshold);
-        case SelectImplementation::ValuesPredication:
+        case Select::ImplementationValuesPredication:
             return selectValuesPredication(n, inputData, inputFilter, selection, threshold);
-        case SelectImplementation::ValuesVectorized:
+        case Select::ImplementationValuesVectorized:
             return selectValuesVectorized(n, inputData, inputFilter, selection, threshold);
-        case SelectImplementation::ValuesAdaptive:
+        case Select::ImplementationValuesAdaptive:
             return selectValuesAdaptive(n, inputData, inputFilter, selection, threshold);
         default:
             std::cout << "Invalid selection of 'Select' implementation!" << std::endl;

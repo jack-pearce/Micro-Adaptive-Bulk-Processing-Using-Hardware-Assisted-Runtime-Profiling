@@ -3,21 +3,21 @@
 #include "select.h"
 
 
-std::string getSelectName(SelectImplementation selectImplementation) {
+std::string getSelectName(Select selectImplementation) {
     switch(selectImplementation) {
-        case SelectImplementation::IndexesBranch:
+        case Select::ImplementationIndexesBranch:
             return "Select_Indexes_Branch";
-        case SelectImplementation::IndexesPredication:
+        case Select::ImplementationIndexesPredication:
             return "Select_Indexes_Predication";
-        case SelectImplementation::IndexesAdaptive:
+        case Select::ImplementationIndexesAdaptive:
             return "Select_Indexes_Adaptive";
-        case SelectImplementation::ValuesBranch:
+        case Select::ImplementationValuesBranch:
             return "Select_Values_Branch";
-        case SelectImplementation::ValuesPredication:
+        case Select::ImplementationValuesPredication:
             return "Select_Values_Predication";
-        case SelectImplementation::ValuesVectorized:
+        case Select::ImplementationValuesVectorized:
             return "Select_Values_Vectorized";
-        case SelectImplementation::ValuesAdaptive:
+        case Select::ImplementationValuesAdaptive:
             return "Select_Values_Adaptive";
         default:
             std::cout << "Invalid selection of 'Select' implementation!" << std::endl;

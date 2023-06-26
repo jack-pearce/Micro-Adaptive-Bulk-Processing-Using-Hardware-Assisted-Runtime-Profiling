@@ -9,7 +9,7 @@ LoadedData* loadedDataFile;
 
 static void selectTimeBenchmarker(benchmark::State& state) {
     auto selectivity = static_cast<int>(state.range(0));
-    auto selectImplementation = static_cast<SelectImplementation>(state.range(1));
+    auto selectImplementation = static_cast<Select>(state.range(1));
 
     auto numElements = loadedDataFile->getDataFile().getNumElements();
     auto inputData = loadedDataFile->getData();
@@ -22,7 +22,7 @@ static void selectTimeBenchmarker(benchmark::State& state) {
     }
 }
 
-void selectTimeBenchmark(const DataFile &dataFile, SelectImplementation selectImplementation, int selectivityStride) {
+void selectTimeBenchmark(const DataFile &dataFile, Select selectImplementation, int selectivityStride) {
     loadedDataFile = &LoadedData::getInstance(dataFile);
     BENCHMARK(selectTimeBenchmarker)
     ->Name(getSelectName(selectImplementation))
@@ -30,8 +30,8 @@ void selectTimeBenchmark(const DataFile &dataFile, SelectImplementation selectIm
                    {selectImplementation}});
 }
 
-void selectTimeBenchmarkSetIterations(const DataFile &dataFile, SelectImplementation selectImplementation,
-                                 int selectivityStride, int iterations) {
+void selectTimeBenchmarkSetIterations(const DataFile &dataFile, Select selectImplementation,
+                                      int selectivityStride, int iterations) {
     loadedDataFile = &LoadedData::getInstance(dataFile);
     BENCHMARK(selectTimeBenchmarker)
     ->Name(getSelectName(selectImplementation))

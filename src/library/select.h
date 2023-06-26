@@ -5,19 +5,28 @@
 #include <iostream>
 
 
-enum SelectImplementation {
-    IndexesBranch, IndexesPredication, IndexesAdaptive,
-    ValuesBranch, ValuesPredication, ValuesVectorized, ValuesAdaptive
+enum SelectIndexesChoice {
+    IndexesBranch,
+    IndexesPredication
 };
 
-std::string getSelectName(SelectImplementation selectImplementation);
+enum SelectValuesChoice {
+    ValuesBranch,
+    ValuesPredication,
+    ValuesVectorized
+};
 
+enum Select {
+    ImplementationIndexesBranch,
+    ImplementationIndexesPredication,
+    ImplementationIndexesAdaptive,
+    ImplementationValuesBranch,
+    ImplementationValuesPredication,
+    ImplementationValuesVectorized,
+    ImplementationValuesAdaptive
+};
 
-template<typename T>
-using SelectIndexesFunctionPtr = int (*)(int, const T*, int*, T);
-
-template<typename T1, typename T2>
-using SelectValuesFunctionPtr = int (*)(int, const T2*, const T1*, int*, T1);
+std::string getSelectName(Select selectImplementation);
 
 
 template<typename T>
@@ -44,7 +53,7 @@ int selectValuesAdaptive(int n, const T2 *inputData, const T1 *inputFilter, T2 *
 
 
 template<typename T1, typename T2>
-int runSelectFunction(SelectImplementation selectImplementation,
+int runSelectFunction(Select selectImplementation,
                       int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold);
 
 

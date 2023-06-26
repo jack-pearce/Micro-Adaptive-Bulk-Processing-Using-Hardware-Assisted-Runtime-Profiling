@@ -9,27 +9,27 @@
 
 
 void selectSingleRunNoCounters(const DataFile &dataFile,
-                               SelectImplementation selectImplementation,
+                               Select selectImplementation,
                                int threshold,
                                int iterations);
 
 void selectCpuCyclesSingleInputBenchmark(const DataFile &dataFile,
-                                         const std::vector<SelectImplementation> &selectImplementations, int threshold,
+                                         const std::vector<Select> &selectImplementations, int threshold,
                                          int iterations, const std::string &fileNamePrefix);
 
 void selectCpuCyclesMultipleInputBenchmark(const DataFile &dataFile,
-                                           const std::vector<SelectImplementation> &selectImplementations,
+                                           const std::vector<Select> &selectImplementations,
                                            int selectivityStride, int iterations, const std::string &fileNamePrefix);
 
-void selectBenchmarkWithExtraCounters(const DataFile &dataFile, SelectImplementation selectImplementation,
+void selectBenchmarkWithExtraCounters(const DataFile &dataFile, Select selectImplementation,
                                       std::vector<float> &thresholds, int iterations,
                                       std::vector<std::string> &benchmarkCounters, const std::string &fileNamePrefix);
 
-void selectCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<SelectImplementation> &selectImplementations,
+void selectCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<Select> &selectImplementations,
                                    int threshold, int iterations, const std::string &fileNamePrefix);
 
 void selectCpuCyclesInputSweepBenchmark(const DataFile &dataFile,
-                                        const std::vector<SelectImplementation> &selectImplementations,
+                                        const std::vector<Select> &selectImplementations,
                                         std::vector<float> &thresholds, int iterations,
                                         const std::string &fileNamePrefix);
 

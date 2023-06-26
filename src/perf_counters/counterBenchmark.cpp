@@ -10,7 +10,7 @@
 #include "../data_generation/config.h"
 
 
-void selectSingleRunNoCounters(const DataFile &dataFile, SelectImplementation selectImplementation, int threshold,
+void selectSingleRunNoCounters(const DataFile &dataFile, Select selectImplementation, int threshold,
                                int iterations) {
     for (auto j = 0; j < iterations; ++j) {
         auto inputData = new int[dataFile.getNumElements()];
@@ -33,7 +33,7 @@ void selectSingleRunNoCounters(const DataFile &dataFile, SelectImplementation se
 }
 
 void selectCpuCyclesSingleInputBenchmark(const DataFile &dataFile,
-                                         const std::vector<SelectImplementation> &selectImplementations, int threshold,
+                                         const std::vector<Select> &selectImplementations, int threshold,
                                          int iterations, const std::string &fileNamePrefix) {
     int numTests = static_cast<int>(selectImplementations.size());
     long_long cycles;
@@ -83,7 +83,7 @@ void selectCpuCyclesSingleInputBenchmark(const DataFile &dataFile,
 }
 
 void selectCpuCyclesMultipleInputBenchmark(const DataFile &dataFile,
-                                           const std::vector<SelectImplementation> &selectImplementations,
+                                           const std::vector<Select> &selectImplementations,
                                            int selectivityStride, int iterations, const std::string &fileNamePrefix) {
     int numTests = 1 + (100 / selectivityStride);
     int implementations = static_cast<int>(selectImplementations.size());
@@ -142,11 +142,11 @@ void selectCpuCyclesMultipleInputBenchmark(const DataFile &dataFile,
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }
 
-void selectBenchmarkWithExtraCounters(const DataFile &dataFile, SelectImplementation selectImplementation,
+void selectBenchmarkWithExtraCounters(const DataFile &dataFile, Select selectImplementation,
                                       std::vector<float> &thresholds, int iterations,
                                       std::vector<std::string> &benchmarkCounters, const std::string &fileNamePrefix) {
-    if (selectImplementation == SelectImplementation::IndexesAdaptive ||
-        selectImplementation == SelectImplementation::ValuesAdaptive)
+    if (selectImplementation == Select::ImplementationIndexesAdaptive ||
+        selectImplementation == Select::ImplementationValuesAdaptive)
         std::cout << "Cannot benchmark adaptive select using counters as adaptive select is already using these counters" << std::endl;
 
     int numTests = static_cast<int>(thresholds.size());
@@ -210,7 +210,7 @@ void selectBenchmarkWithExtraCounters(const DataFile &dataFile, SelectImplementa
     shutdownPAPI(benchmarkEventSet, benchmarkCounterValues);
 }
 
-void selectCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<SelectImplementation> &selectImplementations,
+void selectCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<Select> &selectImplementations,
                                    int threshold, int iterations, const std::string &fileNamePrefix) {
     assert(!selectImplementations.empty());
 
@@ -268,7 +268,7 @@ void selectCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<Selec
 }
 
 void selectCpuCyclesInputSweepBenchmark(const DataFile &dataFile,
-                                        const std::vector<SelectImplementation> &selectImplementations,
+                                        const std::vector<Select> &selectImplementations,
                                         std::vector<float> &thresholds, int iterations,
                                         const std::string &fileNamePrefix) {
     assert(!selectImplementations.empty());
