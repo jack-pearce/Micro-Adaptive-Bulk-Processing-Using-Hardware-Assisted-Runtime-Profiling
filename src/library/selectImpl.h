@@ -165,8 +165,51 @@ int selectValuesPredication(int n, const T2 *inputData, const T1 *inputFilter, T
     return k;
 }
 
+
+#ifdef __AVX2__
+
 template<typename T1, typename T2>
-int selectValuesVectorized128(int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold) {
+int selectValuesVectorized(int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold) {
+    auto k = 0;
+
+    // Process unaligned tuples
+    auto unalignedCount = 0;
+    for (auto i = 0; !arrayIsSimd256Aligned(inputFilter + i); ++i) {
+        selection[k] = inputData[i];
+        k += (inputFilter[i] <= threshold);
+        ++unalignedCount;
+    }
+
+    // Vectorize the loop for aligned tuples
+    int simdWidth = sizeof(__m256i) / sizeof(int);
+    int simdIterations = (n - unalignedCount) / simdWidth;
+    __m256i thresholdVector = _mm256_set1_epi32(threshold);
+
+    for (auto i = unalignedCount; i < unalignedCount + (simdIterations * simdWidth); i += simdWidth) {
+        __m256i filterVector = _mm256_load_si256((__m256i *)(inputFilter + i));
+
+        // Compare filterVector <= thresholdVector
+        __mmask8 mask = ~_mm256_cmpgt_epi32_mask(filterVector, thresholdVector);
+
+        for (auto j = 0; j < simdWidth; ++j) {
+            selection[k] = inputData[i + j];
+            k += (mask >> j) & 1;
+        }
+    }
+
+    // Process any remaining tuples
+    for (auto i = unalignedCount + simdIterations * simdWidth; i < n; ++i) {
+        selection[k] = inputData[i];
+        k += (inputFilter[i] <= threshold);
+    }
+
+    return k;
+}
+
+#else
+
+template<typename T1, typename T2>
+int selectValuesVectorized(int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold) {
     auto k = 0;
 
     // Process unaligned tuples
@@ -204,54 +247,7 @@ int selectValuesVectorized128(int n, const T2 *inputData, const T1 *inputFilter,
     return k;
 }
 
-template<typename T1, typename T2>
-int selectValuesVectorized256(int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold) {
-    auto k = 0;
-
-    // Process unaligned tuples
-    auto unalignedCount = 0;
-    for (auto i = 0; !arrayIsSimd256Aligned(inputFilter + i); ++i) {
-        selection[k] = inputData[i];
-        k += (inputFilter[i] <= threshold);
-        ++unalignedCount;
-    }
-
-    // Vectorize the loop for aligned tuples
-    int simdWidth = sizeof(__m256i) / sizeof(int);
-    int simdIterations = (n - unalignedCount) / simdWidth;
-    __m256i thresholdVector = _mm256_set1_epi32(threshold);
-
-    for (auto i = unalignedCount; i < unalignedCount + (simdIterations * simdWidth); i += simdWidth) {
-        __m256i filterVector = _mm256_load_si256((__m256i *)(inputFilter + i));
-
-        // Compare filterVector <= thresholdVector
-        __mmask8 mask = ~_mm256_cmpgt_epi32_mask(filterVector, thresholdVector);
-
-        for (auto j = 0; j < simdWidth; ++j) {
-            selection[k] = inputData[i + j];
-            k += (mask >> j) & 1;
-        }
-    }
-
-    // Process any remaining tuples
-    for (auto i = unalignedCount + simdIterations * simdWidth; i < n; ++i) {
-        selection[k] = inputData[i];
-        k += (inputFilter[i] <= threshold);
-    }
-
-    return k;
-}
-
-template<typename T1, typename T2>
-int selectValuesVectorized(int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold) {
-    if (__builtin_cpu_supports("avx2")) {
-        std::cout << "Machine does support avx2" << std::endl;
-        return selectValuesVectorized256(n, inputData, inputFilter, selection ,threshold);
-    } else {
-        std::cout << "Machine does not support avx2" << std::endl;
-        return selectValuesVectorized128(n, inputData, inputFilter, selection ,threshold);
-    }
-}
+#endif
 
 template<typename T1, typename T2>
 inline int runSelectValuesChunk(SelectValuesChoice selectValuesChoice,

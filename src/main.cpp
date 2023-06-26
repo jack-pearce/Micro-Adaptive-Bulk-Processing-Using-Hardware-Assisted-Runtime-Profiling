@@ -185,9 +185,19 @@ void allSelectValuesTests() {
 
 
 int main(int argc, char** argv) {
+/*    // Graph 1: Selectivity range on uniform data
+    std::vector<float> inputThresholdDistribution;
+    generateLogDistribution(30, 1, 10 * 1000, inputThresholdDistribution);
+    selectCpuCyclesInputSweepBenchmark(DataFiles::uniformIntDistribution250mValuesMax10000,
+                                       {Select::ImplementationValuesBranch,
+                                        Select::ImplementationValuesVectorized,
+                                        Select::ImplementationValuesPredication,
+                                        Select::ImplementationValuesAdaptive},
+                                       inputThresholdDistribution,
+                                       1, "Values");*/
 
     selectSingleRunNoCounters(DataFiles::uniformIntDistribution250mValuesMax100,
-                              Select::ImplementationValuesVectorized, 50 , 1);
+                              Select::ImplementationValuesVectorized, 1,1);
 
     return 0;
 
