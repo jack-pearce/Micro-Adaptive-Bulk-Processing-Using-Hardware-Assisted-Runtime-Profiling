@@ -186,39 +186,18 @@ void allSelectValuesTests() {
 
 int main(int argc, char** argv) {
 
+//    selectSingleRunNoCounters(DataFiles::uniformIntDistribution250mValuesMax100,
+//                            SelectImplementation::IndexesAdaptive, 50 , 1);
 
-    // Graph 5: Best case - tuned unequal step varying selectivity
-    selectCpuCyclesSingleInputBenchmark(DataFiles::bestCaseIndexesTunedUnequalLowerStep50IntDistribution250mValues,
-                                        {SelectImplementation::IndexesBranch,
-                                         SelectImplementation::IndexesPredication,
-                                         SelectImplementation::IndexesAdaptive},
-                                        50,
-                                        5, "Indexes");
-
-    // Graph 6: Worst case - tuned period range on step varying selectivity
-    selectCpuCyclesSingleInputBenchmark(DataFiles::worstCaseIndexesTunedUpperStep50IntDistribution250mValues,
-                                        {SelectImplementation::IndexesBranch,
-                                         SelectImplementation::IndexesPredication,
-                                         SelectImplementation::IndexesAdaptive},
-                                        50,
-                                        5, "Indexes");
-
-    // Graph 5: Best case - tuned unequal step varying selectivity
-    selectCpuCyclesSingleInputBenchmark(DataFiles::bestCaseValuesTunedUnequalLowerStep50IntDistribution250mValues,
-                                        {SelectImplementation::ValuesBranch,
-                                         SelectImplementation::ValuesVectorized,
-                                         SelectImplementation::ValuesAdaptive},
-                                        50,
-                                        5, "Values");
-
-    // Graph 6: Worst case - tuned period range on step varying selectivity
-    selectCpuCyclesSingleInputBenchmark(DataFiles::worstCaseValuesTunedLowerStep50IntDistribution250mValues,
-                                        {SelectImplementation::ValuesBranch,
-                                         SelectImplementation::ValuesVectorized,
-                                         SelectImplementation::ValuesAdaptive},
-                                        50,
-                                        5, "Values");
-
+    std::vector<float> inputThresholdDistribution;
+    generateLogDistribution(30, 1, 10 * 1000, inputThresholdDistribution);
+    selectCpuCyclesInputSweepBenchmark(DataFiles::uniformIntDistribution250mValuesMax10000,
+                                       {SelectImplementation::ValuesBranch,
+                                        SelectImplementation::ValuesVectorized,
+                                        SelectImplementation::ValuesPredication,
+                                        SelectImplementation::ValuesAdaptive},
+                                       inputThresholdDistribution,
+                                       1, "Values");
     return 0;
 
 }
