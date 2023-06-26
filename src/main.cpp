@@ -196,9 +196,6 @@ int main(int argc, char** argv) {
                                        inputThresholdDistribution,
                                        1, "Values");*/
 
-    selectSingleRunNoCounters(DataFiles::uniformIntDistribution250mValuesMax100,
-                              Select::ImplementationValuesVectorized, 1,1);
-
     return 0;
 
 }

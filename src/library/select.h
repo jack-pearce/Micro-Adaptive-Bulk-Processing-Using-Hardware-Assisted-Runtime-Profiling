@@ -57,6 +57,6 @@ int runSelectFunction(Select selectImplementation,
                       int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold);
 
 
-#include "selectImpl.h"
+#include "selectImplementation.h"
 
 #endif //MICRO_ADAPTIVE_BULK_PROCESSING_LIBRARY_SELECT_H

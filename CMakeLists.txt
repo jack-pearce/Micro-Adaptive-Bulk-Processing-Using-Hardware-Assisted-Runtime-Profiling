@@ -17,7 +17,7 @@ add_executable(${PROJECT_NAME}
         src/data_generation/dataFiles.cpp
         src/data_generation/config.cpp
         src/library/select.cpp
-        src/library/selectImpl.h
+        src/library/selectImplementation.h
         src/library/papi.cpp
         src/library/utils.cpp
         src/time_benchmarking/timeBenchmarkSelect.cpp
