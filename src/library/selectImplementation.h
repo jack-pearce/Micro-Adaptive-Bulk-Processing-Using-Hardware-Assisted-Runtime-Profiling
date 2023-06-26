@@ -352,10 +352,13 @@ int runSelectFunction(Select selectImplementation,
                       int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold) {
     switch(selectImplementation) {
         case Select::ImplementationIndexesBranch:
+            static_assert(std::is_same_v<T2, int>, "selection array type must be int for select indexes function");
             return selectIndexesBranch(n, inputFilter, selection, threshold);
         case Select::ImplementationIndexesPredication:
+            static_assert(std::is_same_v<T2, int>, "selection array type must be int for select indexes function");
             return selectIndexesPredication(n, inputFilter, selection, threshold);
         case Select::ImplementationIndexesAdaptive:
+            static_assert(std::is_same_v<T2, int>, "selection array type must be int for select indexes function");
             return selectIndexesAdaptive(n, inputFilter, selection, threshold);
         case Select::ImplementationValuesBranch:
             return selectValuesBranch(n, inputData, inputFilter, selection, threshold);

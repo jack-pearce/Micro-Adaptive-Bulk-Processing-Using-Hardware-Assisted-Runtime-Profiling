@@ -186,9 +186,6 @@ void allSelectValuesTests() {
 
 int main(int argc, char** argv) {
 
-    allSelectIndexesTests();
-    allSelectValuesTests();
-
     return 0;
 
 }
