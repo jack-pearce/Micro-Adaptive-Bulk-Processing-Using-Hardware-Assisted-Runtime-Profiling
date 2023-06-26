@@ -159,7 +159,7 @@ int selectValuesPredication(int n, const T2 *inputData, const T1 *inputFilter, T
     auto k = 0;
     for (auto i = 0; i < n; ++i) {
         selection[k] = inputData[i];
-//        selection[k] = inputData[(inputFilter[i] <= threshold) * i] * (inputFilter[i] <= threshold);
+//        selection[k] = inputData[(0 - (inputFilter[i] <= threshold)) & i];
         k += (inputFilter[i] <= threshold);
     }
     return k;
