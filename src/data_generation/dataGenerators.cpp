@@ -12,12 +12,12 @@ void generateUniformDistributionInMemory(int *data, int n, int upperBound) {
     unsigned int seed = 1;
     std::mt19937 gen(seed);
 
-    int lowerBound = 1;
+    auto lowerBound = 1;
 
     std::uniform_int_distribution<int> distribution(lowerBound, upperBound);
 
-    int index = 0;
-    for (int i = 0; i < n; ++i) {
+    auto index = 0;
+    for (auto i = 0; i < n; ++i) {
         data[index++] = distribution(gen);
     }
 
@@ -34,12 +34,12 @@ void generateVaryingSelectivityInMemory(int *data, int n, int minimum, int numbe
     std::mt19937 gen(seed);
 
     bool increasing = true;
-    int lowerBound = 1;
-    int upperBound = 100;
+    auto lowerBound = 1;
+    auto upperBound = 100;
 
-    int index = 0;
-    for (int i = 0; i < numberOfDiscreteSections; ++i) {
-        for (int j = 0; j < (minimum); ++j) {
+    auto index = 0;
+    for (auto i = 0; i < numberOfDiscreteSections; ++i) {
+        for (auto j = 0; j < (minimum); ++j) {
             if (j > 0) {
                 if (increasing) {
                     lowerBound += 1;
@@ -49,7 +49,7 @@ void generateVaryingSelectivityInMemory(int *data, int n, int minimum, int numbe
             }
 
             std::uniform_int_distribution<int> distribution(lowerBound, upperBound);
-            for (int k = 0; k < elementsPerSection; ++k) {
+            for (auto k = 0; k < elementsPerSection; ++k) {
                 data[index++] = distribution(gen);
             }
         }
@@ -69,11 +69,11 @@ void generateUpperStepSelectivityInMemory(int *data, int n, int step, int number
     std::mt19937 gen(seed);
 
     bool onStep = false;
-    int lowerBound = 1;
+    auto lowerBound = 1;
     int upperBound;
 
-    int index = 0;
-    for (int i = 0; i < numberOfDiscreteSections; ++i) {
+    auto index = 0;
+    for (auto i = 0; i < numberOfDiscreteSections; ++i) {
         if (onStep) {
             upperBound = step;
         } else {
@@ -81,7 +81,7 @@ void generateUpperStepSelectivityInMemory(int *data, int n, int step, int number
         }
 
         std::uniform_int_distribution<int> distribution(lowerBound, upperBound);
-        for (int k = 0; k < elementsPerSection; ++k) {
+        for (auto k = 0; k < elementsPerSection; ++k) {
             data[index++] = distribution(gen);
         }
 
@@ -103,10 +103,10 @@ void generateLowerStepSelectivityInMemory(int *data, int n, int step, int number
 
     bool onStep = false;
     int lowerBound;
-    int upperBound = 100;
+    auto upperBound = 100;
 
-    int index = 0;
-    for (int i = 0; i < numberOfDiscreteSections; ++i) {
+    auto index = 0;
+    for (auto i = 0; i < numberOfDiscreteSections; ++i) {
         if (onStep) {
             lowerBound = step;
         } else {
@@ -114,7 +114,7 @@ void generateLowerStepSelectivityInMemory(int *data, int n, int step, int number
         }
 
         std::uniform_int_distribution<int> distribution(lowerBound, upperBound);
-        for (int k = 0; k < elementsPerSection; ++k) {
+        for (auto k = 0; k < elementsPerSection; ++k) {
             data[index++] = distribution(gen);
         }
 
@@ -131,18 +131,18 @@ void generateUnequalLowerStepSelectivityInMemory(int *data, int n, int step, int
 
     int elementsPerSection = n / numberOfDiscreteSections;
 
-    int elementsPerStepSection = elementsPerSection * sectionRatio / (1 + sectionRatio);
-    int elementsPerNoStepSection = elementsPerSection - elementsPerStepSection;
+    auto elementsPerStepSection = elementsPerSection * sectionRatio / (1 + sectionRatio);
+    auto elementsPerNoStepSection = elementsPerSection - elementsPerStepSection;
 
     unsigned int seed = 1;
     std::mt19937 gen(seed);
 
     bool onStep = false;
     int lowerBound;
-    int upperBound = 100;
+    auto upperBound = 100;
 
-    int index = 0;
-    for (int i = 0; i < (2 * numberOfDiscreteSections); ++i) {
+    auto index = 0;
+    for (auto i = 0; i < (2 * numberOfDiscreteSections); ++i) {
         if (onStep) {
             lowerBound = step;
         } else {
@@ -151,11 +151,11 @@ void generateUnequalLowerStepSelectivityInMemory(int *data, int n, int step, int
 
         std::uniform_int_distribution<int> distribution(lowerBound, upperBound);
         if (onStep) {
-            for (int k = 0; k < elementsPerStepSection; ++k) {
+            for (auto k = 0; k < elementsPerStepSection; ++k) {
                 data[index++] = distribution(gen);
             }
         } else {
-            for (int k = 0; k < elementsPerNoStepSection; ++k) {
+            for (auto k = 0; k < elementsPerNoStepSection; ++k) {
                 data[index++] = distribution(gen);
             }
 
@@ -184,15 +184,15 @@ void generatePartiallySortedInMemory(int *data, int n, int numRepeats, float per
     std::mt19937 gen(seed);
 
     bool increasing = true;
-    int lowerBound = 1;
-    int upperBound = 100;
+    auto lowerBound = 1;
+    auto upperBound = 100;
 
     int value;
-    int index = 0;
-    for (int i = 0; i < sections; ++i) {
+    auto index = 0;
+    for (auto i = 0; i < sections; ++i) {
         value = increasing ? lowerBound : upperBound;
-        for (int j = 0; j < 100; ++j) {
-            for (int k = 0; k < numRepeats; ++k) {
+        for (auto j = 0; j < 100; ++j) {
+            for (auto k = 0; k < numRepeats; ++k) {
                 data[index++] = value;
             }
             value = increasing ? value + 1 : value - 1;
@@ -201,7 +201,7 @@ void generatePartiallySortedInMemory(int *data, int n, int numRepeats, float per
 
         std::set<int> selectedIndexes = {};
         int index1, index2;
-        for (int swapCount = 0; swapCount < elementsToShufflePerSection; ++swapCount) {
+        for (auto swapCount = 0; swapCount < elementsToShufflePerSection; ++swapCount) {
             std::uniform_int_distribution<int> dis(1, sectionSize);
 
             index1 = dis(gen);

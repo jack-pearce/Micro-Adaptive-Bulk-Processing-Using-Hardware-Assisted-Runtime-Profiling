@@ -39,42 +39,42 @@ const DataFile& LoadedData::getDataFile() const {
 }
 
 void generateLogDistribution(int numPoints, double minValue, double maxValue, std::vector<float> &points) {
-    for (int i = 0; i < numPoints; ++i) {
-        double t = i / static_cast<double>(numPoints - 1); // Normalized parameter between 0 and 1
-        double value = std::pow(10.0, t * (std::log10(maxValue) - std::log10(minValue)) + std::log10(minValue));
+    for (auto i = 0; i < numPoints; ++i) {
+        auto t = i / static_cast<double>(numPoints - 1); // Normalized parameter between 0 and 1
+        auto value = std::pow(10.0, t * (std::log10(maxValue) - std::log10(minValue)) + std::log10(minValue));
         points.push_back(static_cast<float>(value));
     }
 }
 
 void generateLinearDistribution(int numPoints, double minValue, double maxValue, std::vector<float> &points) {
-    double step = (maxValue - minValue) / (numPoints - 1);
-    for (int i = 0; i < numPoints; i++) {
-        double value = minValue + i * step;
+    auto step = (maxValue - minValue) / (numPoints - 1);
+    for (auto i = 0; i < numPoints; i++) {
+        auto value = minValue + i * step;
         points.push_back(static_cast<float>(value));
     }
 }
 
 void displayDistribution(const DataFile &dataFile) {
     std::vector<int> counts(101, 0);
-    int numElements = dataFile.getNumElements();
-    int* inputData = LoadedData::getInstance(dataFile).getData();
-    for (int i = 0; i < numElements; ++i) {
+    auto numElements = dataFile.getNumElements();
+    auto inputData = LoadedData::getInstance(dataFile).getData();
+    for (auto i = 0; i < numElements; ++i) {
         counts[inputData[i]]++;
     }
-    for (int i = 0; i <= 100; ++i) {
+    for (auto i = 0; i <= 100; ++i) {
         std::cout << i << "%: " << static_cast<float>(counts[i]) / static_cast<float>(numElements) << std::endl;
     }
 }
 
 void writeDataFileToCSV(const DataFile &dataFile) {
-    int* data = LoadedData::getInstance(dataFile).getData();
-    int numElements = dataFile.getNumElements();
+    auto data = LoadedData::getInstance(dataFile).getData();
+    auto numElements = dataFile.getNumElements();
 
     std::string fileName = outputFilePath + dataFilesFolder + dataFile.getFileName() + ".csv";
     std::ofstream file(fileName);
 
     if (file.is_open()) {
-        for (int i = 0; i < numElements; ++i) {
+        for (auto i = 0; i < numElements; ++i) {
             file << data[i];
 
             // Add comma except for the last element
@@ -97,7 +97,7 @@ void writeHeadersAndTableToCSV(std::vector<std::string>& headers,
 
     std::ofstream file(filePath);
 
-    for (size_t i = 0; i < headers.size(); ++i) {
+    for (auto i = 0; i < headers.size(); ++i) {
         file << headers[i];
         if (i != headers.size() - 1) {
             file << ",";
@@ -107,7 +107,7 @@ void writeHeadersAndTableToCSV(std::vector<std::string>& headers,
 
     if (file.is_open()) {
         for (const auto& row : values) {
-            for (size_t i = 0; i < row.size(); ++i) {
+            for (auto i = 0; i < row.size(); ++i) {
                 file << row[i];
                 if (i != row.size() - 1) {
                     file << ",";
@@ -128,7 +128,7 @@ void writeHeadersAndTableToCSV(std::vector<std::string>& headers,
 
     std::ofstream file(filePath);
 
-    for (size_t i = 0; i < headers.size(); ++i) {
+    for (auto i = 0; i < headers.size(); ++i) {
         file << headers[i];
         if (i != headers.size() - 1) {
             file << ",";
@@ -138,7 +138,7 @@ void writeHeadersAndTableToCSV(std::vector<std::string>& headers,
 
     if (file.is_open()) {
         for (const auto& row : values) {
-            for (size_t i = 0; i < row.size(); ++i) {
+            for (auto i = 0; i < row.size(); ++i) {
                 file << row[i];
                 if (i != row.size() - 1) {
                     file << ",";
@@ -153,7 +153,7 @@ void writeHeadersAndTableToCSV(std::vector<std::string>& headers,
 }
 
 void copyArray(const int* source, int* destination, int size) {
-    for (int i = 0; i < size; i++) {
+    for (auto i = 0; i < size; i++) {
         destination[i] = source[i];
     }
 }

@@ -24,7 +24,7 @@ int initialisePAPIandCreateEventSet(std::vector<std::string>& counters) {
         exit(1);
     }
 
-    for (const std::string& counter : counters) {
+    for (const auto& counter : counters) {
         returnValue = PAPI_event_name_to_code(counter.c_str(), &eventCode);
         if (returnValue != PAPI_OK) {
             std::cerr << "PAPI could not create event code!" << std::endl;

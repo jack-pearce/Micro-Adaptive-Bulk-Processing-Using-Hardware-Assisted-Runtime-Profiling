@@ -22,14 +22,14 @@ void dataDistributionTest(const DataFile& dataFile) {
 
 void selectFunctionalityTest(const DataFile& dataFile, SelectImplementation selectImplementation) {
 
-    for (int i = 0; i <= 100; i += 10) {
-        int *inputData = new int[dataFile.getNumElements()];
-        int *inputFilter = new int[dataFile.getNumElements()];
-        int *selection = new int[dataFile.getNumElements()];
+    for (auto i = 0; i <= 100; i += 10) {
+        auto inputData = new int[dataFile.getNumElements()];
+        auto inputFilter = new int[dataFile.getNumElements()];
+        auto selection = new int[dataFile.getNumElements()];
         copyArray(LoadedData::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
         copyArray(LoadedData::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
 
-        int selected = runSelectFunction(selectImplementation,
+        auto selected = runSelectFunction(selectImplementation,
                                          dataFile.getNumElements(), inputData, inputFilter, selection, i);
         std::cout << i << "%: " << static_cast<float>(selected) / static_cast<float>(dataFile.getNumElements()) << std::endl;
 
@@ -189,15 +189,6 @@ int main(int argc, char** argv) {
 //    selectSingleRunNoCounters(DataFiles::uniformIntDistribution250mValuesMax100,
 //                            SelectImplementation::IndexesAdaptive, 50 , 1);
 
-    std::vector<float> inputThresholdDistribution;
-    generateLogDistribution(30, 1, 10 * 1000, inputThresholdDistribution);
-    selectCpuCyclesInputSweepBenchmark(DataFiles::uniformIntDistribution250mValuesMax10000,
-                                       {SelectImplementation::ValuesBranch,
-                                        SelectImplementation::ValuesVectorized,
-                                        SelectImplementation::ValuesPredication,
-                                        SelectImplementation::ValuesAdaptive},
-                                       inputThresholdDistribution,
-                                       1, "Values");
     return 0;
 
 }

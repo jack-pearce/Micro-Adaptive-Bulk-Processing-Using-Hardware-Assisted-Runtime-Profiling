@@ -8,19 +8,15 @@
 LoadedData* loadedDataFile;
 
 static void selectTimeBenchmarker(benchmark::State& state) {
-    int selectivity = static_cast<int>(state.range(0));
+    auto selectivity = static_cast<int>(state.range(0));
     auto selectImplementation = static_cast<SelectImplementation>(state.range(1));
 
-    int numElements = loadedDataFile->getDataFile().getNumElements();
-    int* inputData = loadedDataFile->getData();
-    int* inputFilter = loadedDataFile->getData();
-    std::unique_ptr<int[]> selection(new int[numElements]);
-
-//    SelectIndexesFunctionPtr<int> selectFunctionPtr;
-//    setSelectIndexesFuncPtr(selectFunctionPtr, selectImplementation);
+    auto numElements = loadedDataFile->getDataFile().getNumElements();
+    auto inputData = loadedDataFile->getData();
+    auto inputFilter = loadedDataFile->getData();
+    auto selection = std::make_unique<int[]>(numElements);
 
     for (auto _: state) {
-//        selectFunctionPtr(numElements, inputData, selection.get(), selectivity);
         runSelectFunction<int>(selectImplementation, numElements, inputData,
                           inputFilter, selection.get(), selectivity);
     }

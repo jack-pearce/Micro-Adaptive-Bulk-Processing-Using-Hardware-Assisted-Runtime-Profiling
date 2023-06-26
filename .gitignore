@@ -2,3 +2,4 @@
 /data/
 .log
 /cmake-build-debug/
+/.idea/inspectionProfiles/Project_Default.xml

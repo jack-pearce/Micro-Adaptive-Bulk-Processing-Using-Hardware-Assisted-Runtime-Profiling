@@ -12,10 +12,10 @@
 
 void selectSingleRunNoCounters(const DataFile &dataFile, SelectImplementation selectImplementation, int threshold,
                                int iterations) {
-    for (int j = 0; j < iterations; ++j) {
-        int *inputData = new int[dataFile.getNumElements()];
-        int *inputFilter = new int[dataFile.getNumElements()];
-        int *selection = new int[dataFile.getNumElements()];
+    for (auto j = 0; j < iterations; ++j) {
+        auto inputData = new int[dataFile.getNumElements()];
+        auto inputFilter = new int[dataFile.getNumElements()];
+        auto selection = new int[dataFile.getNumElements()];
         copyArray(LoadedData::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
         copyArray(LoadedData::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
 
@@ -39,13 +39,13 @@ void selectCpuCyclesSingleInputBenchmark(const DataFile &dataFile,
     long_long cycles;
     std::vector<std::vector<long_long>> results(iterations, std::vector<long_long>(numTests + 1, 0));
 
-    for (int i = 0; i < iterations; ++i) {
+    for (auto i = 0; i < iterations; ++i) {
         results[i][0] = static_cast<long_long>(threshold);
 
-        for (int j = 0; j < numTests; ++j) {
-            int *inputData = new int[dataFile.getNumElements()];
-            int *inputFilter = new int[dataFile.getNumElements()];
-            int *selection = new int[dataFile.getNumElements()];
+        for (auto j = 0; j < numTests; ++j) {
+            auto inputData = new int[dataFile.getNumElements()];
+            auto inputFilter = new int[dataFile.getNumElements()];
+            auto selection = new int[dataFile.getNumElements()];
             copyArray(LoadedData::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
             copyArray(LoadedData::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
 
@@ -68,7 +68,7 @@ void selectCpuCyclesSingleInputBenchmark(const DataFile &dataFile,
 
     std::vector<std::string> headers(1 + numTests);
     headers [0] = "Input";
-    for (int i = 0; i < numTests; ++i) {
+    for (auto i = 0; i < numTests; ++i) {
         headers[1 + i] = getSelectName(selectImplementations[i]);
     }
 
@@ -91,16 +91,16 @@ void selectCpuCyclesMultipleInputBenchmark(const DataFile &dataFile,
 
     long_long cycles;
     std::vector<std::vector<long_long>> results(numTests, std::vector<long_long>(dataCols + 1, 0));
-    for (int i = 0; i < implementations; ++i) {
-        int count = 0;
+    for (auto i = 0; i < implementations; ++i) {
+        auto count = 0;
 
-        for (int j = 0; j <= 100; j += selectivityStride) {
+        for (auto j = 0; j <= 100; j += selectivityStride) {
             results[count][0] = static_cast<long_long>(j);
 
-            for (int k = 0; k < iterations; ++k) {
-                int *inputData = new int[dataFile.getNumElements()];
-                int *inputFilter = new int[dataFile.getNumElements()];
-                int *selection = new int[dataFile.getNumElements()];
+            for (auto k = 0; k < iterations; ++k) {
+                auto inputData = new int[dataFile.getNumElements()];
+                auto inputFilter = new int[dataFile.getNumElements()];
+                auto selection = new int[dataFile.getNumElements()];
                 copyArray(LoadedData::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
                 copyArray(LoadedData::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
 
@@ -127,7 +127,7 @@ void selectCpuCyclesMultipleInputBenchmark(const DataFile &dataFile,
 
     std::vector<std::string> headers(1 + dataCols);
     headers[0] = "Threshold";
-    for (int i = 0; i < dataCols; ++i) {
+    for (auto i = 0; i < dataCols; ++i) {
         headers[1 + i] =
                 getSelectName(selectImplementations[i / iterations]) + " iteration_" + std::to_string(i % iterations);
     }
@@ -155,15 +155,15 @@ void selectBenchmarkWithExtraCounters(const DataFile &dataFile, SelectImplementa
     int benchmarkEventSet = initialisePAPIandCreateEventSet(benchmarkCounters);
 
     std::vector<std::vector<long_long>> results(numTests, std::vector<long_long>((iterations * benchmarkCounters.size()) + 1, 0));
-    int count = 0;
+    auto count = 0;
 
-    for (int i = 0; i < numTests; ++i) {
+    for (auto i = 0; i < numTests; ++i) {
         results[count][0] = static_cast<long_long>(thresholds[i]);
 
-        for (int j = 0; j < iterations; ++j) {
-            int *inputData = new int[dataFile.getNumElements()];
-            int *inputFilter = new int[dataFile.getNumElements()];
-            int *selection = new int[dataFile.getNumElements()];
+        for (auto j = 0; j < iterations; ++j) {
+            auto inputData = new int[dataFile.getNumElements()];
+            auto inputFilter = new int[dataFile.getNumElements()];
+            auto selection = new int[dataFile.getNumElements()];
             copyArray(LoadedData::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
             copyArray(LoadedData::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
 
@@ -194,7 +194,7 @@ void selectBenchmarkWithExtraCounters(const DataFile &dataFile, SelectImplementa
     }
 
     std::vector<std::string> headers(benchmarkCounters.size() * iterations);
-    for (int i = 0; i < iterations; ++i) {
+    for (auto i = 0; i < iterations; ++i) {
         std::copy(benchmarkCounters.begin(), benchmarkCounters.end(), headers.begin() + i * benchmarkCounters.size());
     }
     headers.insert(headers.begin(), "Selectivity");
@@ -219,13 +219,13 @@ void selectCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<Selec
     std::vector<std::vector<double>> results(dataSweep.getTotalRuns(),
                                              std::vector<double>(dataCols + 1, 0));
 
-    for (int i = 0; i < iterations; ++i) {
-        for (int j = 0; j < static_cast<int>(selectImplementations.size()); ++j) {
-            for (int k = 0; k < dataSweep.getTotalRuns(); ++k) {
+    for (auto i = 0; i < iterations; ++i) {
+        for (auto j = 0; j < static_cast<int>(selectImplementations.size()); ++j) {
+            for (auto k = 0; k < dataSweep.getTotalRuns(); ++k) {
                 results[k][0] = static_cast<double>(dataSweep.getRunInput());
-                int *inputData = new int[dataSweep.getNumElements()];
-                int *inputFilter = new int[dataSweep.getNumElements()];
-                int *selection = new int[dataSweep.getNumElements()];
+                auto inputData = new int[dataSweep.getNumElements()];
+                auto inputFilter = new int[dataSweep.getNumElements()];
+                auto selection = new int[dataSweep.getNumElements()];
 
                 std::cout << "Running " << getSelectName(selectImplementations[j]) << " for input ";
                 std::cout << dataSweep.getRunInput() << "... ";
@@ -253,7 +253,7 @@ void selectCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<Selec
 
     std::vector<std::string> headers(1 + dataCols);
     headers [0] = "Input";
-    for (int i = 0; i < dataCols; ++i) {
+    for (auto i = 0; i < dataCols; ++i) {
         headers[1 + i] = getSelectName(selectImplementations[i % selectImplementations.size()]);
     }
 
@@ -278,13 +278,13 @@ void selectCpuCyclesInputSweepBenchmark(const DataFile &dataFile,
     std::vector<std::vector<double>> results(thresholds.size(),
                                              std::vector<double>(dataCols + 1, 0));
 
-    for (int i = 0; i < iterations; ++i) {
-        for (int j = 0; j < static_cast<int>(selectImplementations.size()); ++j) {
-            for (int k = 0; k < static_cast<int>(thresholds.size()); ++k) {
+    for (auto i = 0; i < iterations; ++i) {
+        for (auto j = 0; j < static_cast<int>(selectImplementations.size()); ++j) {
+            for (auto k = 0; k < static_cast<int>(thresholds.size()); ++k) {
                 results[k][0] = static_cast<int>(thresholds[k]);
-                int *inputData = new int[dataFile.getNumElements()];
-                int *inputFilter = new int[dataFile.getNumElements()];
-                int *selection = new int[dataFile.getNumElements()];
+                auto inputData = new int[dataFile.getNumElements()];
+                auto inputFilter = new int[dataFile.getNumElements()];
+                auto selection = new int[dataFile.getNumElements()];
                 copyArray(LoadedData::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
                 copyArray(LoadedData::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
 
@@ -311,7 +311,7 @@ void selectCpuCyclesInputSweepBenchmark(const DataFile &dataFile,
 
     std::vector<std::string> headers(1 + dataCols);
     headers [0] = "Input";
-    for (int i = 0; i < dataCols; ++i) {
+    for (auto i = 0; i < dataCols; ++i) {
         headers[1 + i] = getSelectName(selectImplementations[i % selectImplementations.size()]);
     }
 
