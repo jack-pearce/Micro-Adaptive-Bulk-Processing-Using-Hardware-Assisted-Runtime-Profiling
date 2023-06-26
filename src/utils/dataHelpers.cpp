@@ -97,7 +97,7 @@ void writeHeadersAndTableToCSV(std::vector<std::string>& headers,
 
     std::ofstream file(filePath);
 
-    for (auto i = 0; i < headers.size(); ++i) {
+    for (size_t i = 0; i < headers.size(); ++i) {
         file << headers[i];
         if (i != headers.size() - 1) {
             file << ",";
@@ -107,7 +107,7 @@ void writeHeadersAndTableToCSV(std::vector<std::string>& headers,
 
     if (file.is_open()) {
         for (const auto& row : values) {
-            for (auto i = 0; i < row.size(); ++i) {
+            for (size_t i = 0; i < row.size(); ++i) {
                 file << row[i];
                 if (i != row.size() - 1) {
                     file << ",";
@@ -128,7 +128,7 @@ void writeHeadersAndTableToCSV(std::vector<std::string>& headers,
 
     std::ofstream file(filePath);
 
-    for (auto i = 0; i < headers.size(); ++i) {
+    for (size_t i = 0; i < headers.size(); ++i) {
         file << headers[i];
         if (i != headers.size() - 1) {
             file << ",";
@@ -138,7 +138,7 @@ void writeHeadersAndTableToCSV(std::vector<std::string>& headers,
 
     if (file.is_open()) {
         for (const auto& row : values) {
-            for (auto i = 0; i < row.size(); ++i) {
+            for (size_t i = 0; i < row.size(); ++i) {
                 file << row[i];
                 if (i != row.size() - 1) {
                     file << ",";

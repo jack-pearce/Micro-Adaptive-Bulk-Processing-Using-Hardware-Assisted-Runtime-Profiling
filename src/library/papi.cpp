@@ -55,11 +55,11 @@ long_long *Counters::addEvents(std::vector<std::string>& counterNames) {
 }
 
 long_long *Counters::eventsAlreadyInSet(std::vector<std::string>& newCounterNames) {
-    for (auto i = 0; i <= counters.size(); ++i) {
+    for (size_t i = 0; i <= counters.size(); ++i) {
         if (counters[i] == newCounterNames[0]) {
             bool found = true;
 
-            for (auto j = 1; j < newCounterNames.size(); ++j) {
+            for (size_t j = 1; j < newCounterNames.size(); ++j) {
                 if (counters[i + j] != newCounterNames[j]) {
                     found = false;
                     break;
@@ -83,7 +83,7 @@ long_long *Counters::getEvents(std::vector<std::string>& counterNames) {
 }
 
 long_long *Counters::readEventSet() {
-    for (auto i = 1; i < counters.size(); ++i) {
+    for (size_t i = 1; i < counters.size(); ++i) {
         counterValues[i] = 0;
     }
 

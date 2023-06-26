@@ -3,7 +3,6 @@
 
 #include <string>
 
-extern std::string inputFilePath;
 extern std::string outputFilePath;
 
 #endif //MABPL_CONFIG_H

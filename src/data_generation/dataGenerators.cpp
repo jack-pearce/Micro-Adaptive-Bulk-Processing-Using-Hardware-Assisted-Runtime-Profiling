@@ -39,7 +39,7 @@ void generateVaryingSelectivityInMemory(int *data, int n, int minimum, int numbe
 
     auto index = 0;
     for (auto i = 0; i < numberOfDiscreteSections; ++i) {
-        for (auto j = 0; j < (minimum); ++j) {
+        for (auto j = 0; j < minimum; ++j) {
             if (j > 0) {
                 if (increasing) {
                     lowerBound += 1;

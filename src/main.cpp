@@ -186,8 +186,8 @@ void allSelectValuesTests() {
 
 int main(int argc, char** argv) {
 
-//    selectSingleRunNoCounters(DataFiles::uniformIntDistribution250mValuesMax100,
-//                            SelectImplementation::IndexesAdaptive, 50 , 1);
+    selectSingleRunNoCounters(DataFiles::uniformIntDistribution250mValuesMax100,
+                             SelectImplementation::ValuesVectorized, 50 , 1);
 
     return 0;
 

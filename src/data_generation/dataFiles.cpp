@@ -30,68 +30,73 @@ const DataFile DataFiles::uniformIntDistribution250mValuesMax1000000{
 const DataFile DataFiles::varyingIntDistribution25kValues{
     25 * 1000,
     "varyingIntDistribution25kValues",
-    "25k int values where max value is 100 and min value varies linearly from 1 to 50 a number of times"};
+    "25k int values where max value is 100 and min value varies linearly from 1 to 51 ten times"};
 
 const DataFile DataFiles::varyingIntDistribution250mValues{
     250 * 1000 * 1000,
     "varyingIntDistribution250mValues",
-    "250m int values where max value is 100 and min value varies linearly from 1 to 50 a number of times"};
+    "250m int values where max value is 100 and min value varies linearly from 1 to 51 ten times"};
 
 const DataFile DataFiles::upperStep50IntDistribution25kValues{
     25 * 1000,
     "upperStep50IntDistribution25kValues",
-    "25k values where min value is 1 and max value is in blocks of either 51 or 100"};
+    "25k values where min value is 1 and max value is in ten blocks of either 51 or 100"};
 
 const DataFile DataFiles::upperStep50IntDistribution250mValues{
     250 * 1000 * 1000,
     "upperStep50IntDistribution250mValues",
-    "250m values where min value is 1 and max value is in blocks of either 51 or 100"};
+    "250m values where min value is 1 and max value is in ten blocks of either 51 or 100"};
 
 const DataFile DataFiles::worstCaseIndexesTunedUpperStep50IntDistribution250mValues{
         250 * 1000 * 1000,
         "worstCaseIndexesTunedUpperStep50IntDistribution250mValues",
-        "250m values where min value is 1 and max value is in blocks of either 50 or 100 - size of blocks tuned to act as worst case"};
+        "250m values where min value is 1 and max value is in 5000 blocks of either 50 or 100"};
 
 const DataFile DataFiles::worstCaseValuesTunedLowerStep50IntDistribution250mValues{
         250 * 1000 * 1000,
         "worstCaseValuesTunedLowerStep50IntDistribution250mValues",
-        "250m values where max value is 100 and max value is in blocks of either 1 or 51 - size of blocks tuned to act as worst case"};
+        "250m values where max value is 100 and min value is in 5000 blocks of either 1 or 51"};
 
 const DataFile DataFiles::bestCaseIndexesTunedUnequalLowerStep50IntDistribution250mValues{
         250 * 1000 * 1000,
         "bestCaseIndexesTunedUnequalLowerStep50IntDistribution250mValues",
-        "250m values where max value is 100 and min value is in blocks of either 1 or 51. Blocks of 0 are 10 times larger than blocks of 0."};
+        "250m values where max value is 100 and min value is in blocks of either 1 or 51. "
+        "Blocks of 51 are 10 times larger than blocks of 1."};
 
 const DataFile DataFiles::bestCaseValuesTunedUnequalLowerStep50IntDistribution250mValues{
         250 * 1000 * 1000,
         "bestCaseValuesTunedUnequalLowerStep50IntDistribution250mValues",
-        "250m values where max value is 100 and min value is in blocks of either 1 or 51. Blocks of 0 are 15 times larger than blocks of 0."};
-
+        "250m values where max value is 100 and min value is in blocks of either 1 or 51. "
+        "Blocks of 51 are 15 times larger than blocks of 1."};
 
 const DataFile DataFiles::fullySortedIntDistribution250mValues{
         250 * 1000 * 1000,
         "fullySortedIntDistribution250mValues",
-        ""};
+        "250m values between which are sorted. Each value is repeated 100 times before the next value."};
 
 const DataFile DataFiles::veryNearlyFullySortedIntDistribution250mValues{
         250 * 1000 * 1000,
         "veryNearlyFullySortedIntDistribution250mValues",
-        ""};
+        "250m values between which are sorted. Each value is repeated 100 times before the next value."
+        "0.01% of values are randomly swapped"};
 
 const DataFile DataFiles::nearlyFullySortedIntDistribution250mValues{
         250 * 1000 * 1000,
         "nearlyFullySortedIntDistribution250mValues",
-        ""};
+        "250m values between which are sorted. Each value is repeated 100 times before the next value."
+        "1% of values are randomly swapped"};
 
 const DataFile DataFiles::partiallySortedIntDistribution250mValues{
         250 * 1000 * 1000,
         "partiallySortedIntDistribution250mValues",
-        ""};
+        "250m values between which are sorted. Each value is repeated 100 times before the next value."
+        "5% of values are randomly swapped"};
 
 const DataFile DataFiles::slightlySortedIntDistribution250mValues{
         250 * 1000 * 1000,
         "slightlySortedIntDistribution250mValues",
-        ""};
+        "250m values between which are sorted. Each value is repeated 100 times before the next value."
+        "25% of values are randomly swapped"};
 
 
 DataFile::DataFile(int _numElements, std::string _fileName, std::string _longDescription)
@@ -151,25 +156,29 @@ DataSweep DataSweeps::logSortedIntDistribution25kValuesRandomnessSweep {
         30,
         25*1000,
         "logSortedIntDistribution25kValuesRandomnessSweep",
-        "Partially sorted distribution of 25k int values. Log input of percentage randomness"};
+        "Partially sorted distribution of 25k int values. "
+        "Log input of percentage randomness from 0.01% - 100%"};
 
 DataSweep DataSweeps::logSortedIntDistribution250mValuesRandomnessSweep {
         30,
         250*1000*1000,
         "logSortedIntDistribution250mValuesRandomnessSweep",
-        "Partially sorted distribution of 250m int values. Log input of percentage randomness"};
+        "Partially sorted distribution of 250m int values. "
+        "Log input of percentage randomness from 0.01% - 100%"};
 
 DataSweep DataSweeps::varyingIntDistribution250mValuesSweep {
         30,
         250*1000*1000,
         "varyingIntDistribution250mValuesSweep",
-        ""};
+        "250m int values where max value is 100 and min value varies linearly from 1 to 51. "
+        "Linear input of number of discrete sections from 2 to 10,000"};
 
 DataSweep DataSweeps::lowerStep50IntDistribution250mValuesSweep {
         30,
         250*1000*1000,
         "lowerStep50IntDistribution250mValuesSweep",
-        ""};
+        "250m int values where max value is 100 and min value is either 1 or 51"
+        "Linear input of number of discrete sections from 2 to 10,000"};
 
 
 DataSweep::DataSweep(int _totalRuns, int _numElements, std::string _sweepName, std::string _longDescription)

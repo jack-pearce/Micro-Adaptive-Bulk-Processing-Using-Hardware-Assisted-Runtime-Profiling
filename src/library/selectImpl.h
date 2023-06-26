@@ -157,9 +157,9 @@ int selectValuesPredication(int n, const T2 *inputData, const T1 *inputFilter, T
     }
     return k;
 }
-/*
+
 template<typename T1, typename T2>
-int selectValuesVectorized(int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold) {
+int selectValuesVectorized128(int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold) {
     auto k = 0;
 
     // Process unaligned tuples
@@ -195,10 +195,10 @@ int selectValuesVectorized(int n, const T2 *inputData, const T1 *inputFilter, T2
     }
 
     return k;
-}*/
+}
 
 template<typename T1, typename T2>
-int selectValuesVectorized(int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold){
+int selectValuesVectorized256(int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold) {
     auto k = 0;
 
     // Process unaligned tuples
@@ -233,6 +233,17 @@ int selectValuesVectorized(int n, const T2 *inputData, const T1 *inputFilter, T2
     }
 
     return k;
+}
+
+template<typename T1, typename T2>
+int selectValuesVectorized(int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold) {
+    if (__builtin_cpu_supports("avx2")) {
+        std::cout << "Machine does support avx2" << std::endl;
+        return selectValuesVectorized256(n, inputData, inputFilter, selection ,threshold);
+    } else {
+        std::cout << "Machine does not support avx2" << std::endl;
+        return selectValuesVectorized128(n, inputData, inputFilter, selection ,threshold);
+    }
 }
 
 template<typename T1, typename T2>
