@@ -5,6 +5,7 @@
 #include <vector>
 
 extern const std::string selectCyclesFolder;
+extern const std::string groupByCyclesFolder;
 extern const std::string dataFilesFolder;
 
 
@@ -77,6 +78,8 @@ public:
     static DataSweep varyingIntDistribution250mValuesSweep;
 
     static DataSweep lowerStep50IntDistribution250mValuesSweep;
+
+    static DataSweep logUniformIntDistribution200mValuesCardinalitySweep;
 };
 
 #endif //MABPL_DATAFILES_H

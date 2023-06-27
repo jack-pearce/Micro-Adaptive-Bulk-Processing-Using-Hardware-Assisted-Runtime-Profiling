@@ -2,14 +2,17 @@
 #include <vector>
 #include <iostream>
 #include <memory>
+#include <sparsehash/dense_hash_map>
 
 #include "time_benchmarking/timeBenchmarkSelect.h"
 #include "time_benchmarking/timeBenchmarkHelpers.h"
 #include "data_generation/dataGenerators.h"
 #include "utils/dataHelpers.h"
 #include "library/select.h"
+#include "library/groupBy.h"
 #include "library/papi.h"
-#include "perf_counters/counterBenchmark.h"
+#include "perf_counters/selectCounterBenchmark.h"
+#include "perf_counters/groupByCounterBenchmark.h"
 #include "data_generation/dataFiles.h"
 #include "utils/papiHelpers.h"
 
@@ -183,8 +186,16 @@ void allSelectValuesTests() {
 
 }
 
+void allGroupByTests() {
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweep,
+                                   {GroupBy::Hash},
+                                   1, "");
+}
+
 
 int main(int argc, char** argv) {
+
+    allGroupByTests();
 
     return 0;
 

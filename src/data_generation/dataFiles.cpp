@@ -5,6 +5,7 @@
 #include "../utils/dataHelpers.h"
 
 const std::string selectCyclesFolder = "select_cycles_benchmark/";
+const std::string groupByCyclesFolder = "groupBy_cycles_benchmark/";
 const std::string dataFilesFolder = "dataFiles/";
 
 const DataFile DataFiles::uniformIntDistribution25kValuesMax100{
@@ -180,6 +181,12 @@ DataSweep DataSweeps::lowerStep50IntDistribution250mValuesSweep {
         "250m int values where max value is 100 and min value is either 1 or 51"
         "Linear input of number of discrete sections from 2 to 10,000"};
 
+DataSweep DataSweeps::logUniformIntDistribution200mValuesCardinalitySweep {
+        30,
+        200*1000*1000,
+        "logUniformIntDistribution200mValuesCardinalitySweep",
+        ""};
+
 
 DataSweep::DataSweep(int _totalRuns, int _numElements, std::string _sweepName, std::string _longDescription)
         : totalRuns(_totalRuns), numElements(_numElements), runsCompleted(0), sweepName(std::move(_sweepName)),
@@ -190,6 +197,8 @@ DataSweep::DataSweep(int _totalRuns, int _numElements, std::string _sweepName, s
     } else if (getSweepName() == "varyingIntDistribution250mValuesSweep" ||
                getSweepName() == "lowerStep50IntDistribution250mValuesSweep") {
         generateLogDistribution(getTotalRuns(), 2, 10000, inputs);
+    } else if (getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweep") {
+        generateLogDistribution(getTotalRuns(), 1, getNumElements() / 2.0, inputs);
     }
 }
 
@@ -209,6 +218,9 @@ bool DataSweep::loadNextDataSetIntoMemory(int *data) {
         return true;
     } else if (getSweepName() == "lowerStep50IntDistribution250mValuesSweep") {
         generateLowerStepSelectivityInMemory(data, getNumElements(), 51, static_cast<int>(inputs[runsCompleted++]));
+        return true;
+    } else if (getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweep") {
+        generateUniformDistributionInMemory(data, getNumElements(), static_cast<int>(inputs[runsCompleted++]));
         return true;
     }
     return false;

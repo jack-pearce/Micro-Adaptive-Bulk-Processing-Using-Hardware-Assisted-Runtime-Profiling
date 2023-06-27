@@ -6,7 +6,7 @@
 
 #include "../utils/dataHelpers.h"
 #include "../utils/papiHelpers.h"
-#include "counterBenchmark.h"
+#include "selectCounterBenchmark.h"
 #include "../data_generation/config.h"
 
 

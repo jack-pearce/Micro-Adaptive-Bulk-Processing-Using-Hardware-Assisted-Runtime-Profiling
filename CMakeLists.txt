@@ -25,7 +25,11 @@ add_executable(${PROJECT_NAME}
         src/main.cpp
         src/utils/dataHelpers.cpp
         src/utils/papiHelpers.cpp
-        src/perf_counters/counterBenchmark.cpp)
+        src/perf_counters/selectCounterBenchmark.cpp
+        src/library/groupBy.cpp
+        src/library/groupBy.h
+        src/perf_counters/groupByCounterBenchmark.cpp
+        src/perf_counters/groupByCounterBenchmark.h)
 
 target_link_libraries(${PROJECT_NAME} benchmark::benchmark)
 
