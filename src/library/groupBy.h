@@ -3,9 +3,11 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 using Run = std::vector<std::pair<int, int>>;
-using Runs = std::vector<Run*>;
+//using Runs = std::vector<Run*>;
+using Runs = std::vector<std::unique_ptr<Run>>;
 
 enum GroupBy {
     Hash,

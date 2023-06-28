@@ -205,10 +205,10 @@ int main(int argc, char** argv) {
 //    copyArray(LoadedData::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
 //    int numElements = dataFile.getNumElements();
 
-    int numElements = 6000;
+    int numElements = 257;
     auto inputData = new int[numElements];
     for (auto i = 0; i < numElements; ++i) {
-        inputData[i] = (i + 1) / 20;
+        inputData[i] = (i + 1) / 1;
     }
 
     Run result = groupByHash(numElements, inputData);
