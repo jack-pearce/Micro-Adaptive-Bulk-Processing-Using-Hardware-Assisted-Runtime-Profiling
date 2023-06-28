@@ -3,6 +3,8 @@
 #include <iostream>
 #include <memory>
 #include <sparsehash/dense_hash_map>
+#include <functional>
+#include <algorithm>
 
 #include "time_benchmarking/timeBenchmarkSelect.h"
 #include "time_benchmarking/timeBenchmarkHelpers.h"
@@ -192,10 +194,51 @@ void allGroupByTests() {
                                    1, "");
 }
 
+bool comparePairs(const std::pair<int, int>& pair1, const std::pair<int, int>& pair2) {
+    return pair1.first < pair2.first;
+}
 
 int main(int argc, char** argv) {
 
-    allGroupByTests();
+//    DataFile dataFile = DataFiles::uniformIntDistribution25kValuesMax100;
+//    auto inputData = new int[dataFile.getNumElements()];
+//    copyArray(LoadedData::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
+//    int numElements = dataFile.getNumElements();
+
+    int numElements = 6000;
+    auto inputData = new int[numElements];
+    for (auto i = 0; i < numElements; ++i) {
+        inputData[i] = (i + 1) / 20;
+    }
+
+    Run result = groupByHash(numElements, inputData);
+    std::sort(result.begin(), result.end(), comparePairs);
+
+    std::cout << "Hash result:" << std::endl;
+    for (auto &pair : result) {
+        std::cout << pair.first << ", " << pair.second << std::endl;
+    }
+
+
+    result = groupByAdaptive(numElements, inputData);
+    std::sort(result.begin(), result.end(), comparePairs);
+
+    std::cout << "Adaptive result:" << std::endl;
+    for (auto &pair : result) {
+        std::cout << pair.first << ", " << pair.second << std::endl;
+    }
+
+    delete []inputData;
+
+
+
+
+
+
+
+
+
+
 
     return 0;
 
