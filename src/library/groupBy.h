@@ -6,7 +6,6 @@
 #include <memory>
 
 using Run = std::vector<std::pair<int, int>>;
-//using Runs = std::vector<Run*>;
 using Runs = std::vector<std::unique_ptr<Run>>;
 
 enum GroupBy {
@@ -17,7 +16,7 @@ enum GroupBy {
 
 std::vector<std::pair<int, int>> groupByHash(int n, const int *inputData);
 
-//std::vector<std::pair<int, int>> &groupBySort(int n, const int *inputData);
+std::vector<std::pair<int, int>> groupBySort(int n, const int *inputData);
 
 std::vector<std::pair<int, int>> groupByAdaptive(int n, const int *inputData);
 

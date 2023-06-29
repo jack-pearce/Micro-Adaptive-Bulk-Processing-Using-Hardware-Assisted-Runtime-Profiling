@@ -56,27 +56,28 @@ void runSelectTimeBenchmarkSetIterations(const DataFile& dataFile, Select select
 
 void selectBenchmarkWithExtraCountersConfigurations(const DataFile &dataFile, Select selectImplementation, int iterations) {
     // HPC set 1
-//    std::vector<std::string> benchmarkCounters = {"PERF_COUNT_HW_CPU_CYCLES",
-//                                                  "INSTRUCTION_RETIRED",
-//                                                  "LLC_REFERENCES",
-//                                                  "LLC_MISSES",
-//                                                  "MISPREDICTED_BRANCH_RETIRED",
-//                                                  "PERF_COUNT_HW_CACHE_REFERENCES",
-//                                                  "PERF_COUNT_HW_CACHE_MISSES",
-//                                                  "PERF_COUNT_HW_BRANCH_MISSES",
-//                                                  "PERF_COUNT_HW_CACHE_L1D"};
-    // HPC set 2
     std::vector<std::string> benchmarkCounters = {"PERF_COUNT_HW_CPU_CYCLES",
                                                   "INSTRUCTION_RETIRED",
-                                                  "PERF_COUNT_HW_CACHE_L1D",
-                                                  "L1-DCACHE-LOADS",
-                                                  "L1-DCACHE-LOAD-MISSES",
-                                                  "L1-DCACHE-STORES"};
+                                                  "LLC_REFERENCES",
+                                                  "LLC_MISSES",
+                                                  "MISPREDICTED_BRANCH_RETIRED",
+                                                  "PERF_COUNT_HW_CACHE_REFERENCES",
+                                                  "PERF_COUNT_HW_CACHE_MISSES",
+                                                  "PERF_COUNT_HW_BRANCH_MISSES",
+                                                  "PERF_COUNT_HW_CACHE_L1D"};
+//    // HPC set 2
+//    std::vector<std::string> benchmarkCounters = {"PERF_COUNT_HW_CPU_CYCLES",
+//                                                  "INSTRUCTION_RETIRED",
+//                                                  "PERF_COUNT_HW_CACHE_L1D",
+//                                                  "L1-DCACHE-LOADS",
+//                                                  "L1-DCACHE-LOAD-MISSES",
+//                                                  "L1-DCACHE-STORES"};
 
     std::vector<float> inputThresholdDistribution;
+    generateLinearDistribution(2, 0., 1, inputThresholdDistribution);
 
     // Update min & max to match dataFile
-    generateLinearDistribution(10, 0, 100, inputThresholdDistribution);
+//    generateLinearDistribution(10, 0, 100, inputThresholdDistribution);
     // Update min & max to match dataFile
 //    generateLogDistribution(30, 1, 10*1000, inputThresholdDistribution);
 
@@ -190,7 +191,7 @@ void allSelectValuesTests() {
 
 void allGroupByTests() {
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweep,
-                                   {GroupBy::Hash},
+                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                    1, "");
 }
 
@@ -205,32 +206,38 @@ int main(int argc, char** argv) {
 //    copyArray(LoadedData::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
 //    int numElements = dataFile.getNumElements();
 
-    int numElements = 257;
+//    int numElements = 200*1000*1000;
+//    int cardinality = 48939;
+//    auto inputData = new int[numElements];
+//    generateUniformDistributionInMemory(inputData, numElements, cardinality);
+
+/*    int numElements = 500000000;
     auto inputData = new int[numElements];
     for (auto i = 0; i < numElements; ++i) {
-        inputData[i] = (i + 1) / 1;
-    }
+        inputData[i] = 1;
+    }*/
 
-    Run result = groupByHash(numElements, inputData);
+    /*Run result = groupByHash(numElements, inputData);
     std::sort(result.begin(), result.end(), comparePairs);
 
     std::cout << "Hash result:" << std::endl;
     for (auto &pair : result) {
         std::cout << pair.first << ", " << pair.second << std::endl;
-    }
+    }*/
 
 
-    result = groupByAdaptive(numElements, inputData);
-    std::sort(result.begin(), result.end(), comparePairs);
+/*    Run result = groupByAdaptive(numElements, inputData);
+//    std::sort(result.begin(), result.end(), comparePairs);
 
     std::cout << "Adaptive result:" << std::endl;
-    for (auto &pair : result) {
-        std::cout << pair.first << ", " << pair.second << std::endl;
-    }
+//    for (auto &pair : result) {
+//        std::cout << pair.first << ", " << pair.second << std::endl;
+//    }
 
-    delete []inputData;
+    delete []inputData;*/
 
 
+//    allGroupByTests();
 
 
 

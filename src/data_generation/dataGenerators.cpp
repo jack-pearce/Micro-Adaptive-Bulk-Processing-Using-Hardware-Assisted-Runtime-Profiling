@@ -16,9 +16,8 @@ void generateUniformDistributionInMemory(int *data, int n, int upperBound) {
 
     std::uniform_int_distribution<int> distribution(lowerBound, upperBound);
 
-    auto index = 0;
     for (auto i = 0; i < n; ++i) {
-        data[index++] = distribution(gen);
+        data[i] = distribution(gen);
     }
 
     std::cout << "Complete" << std::endl;
