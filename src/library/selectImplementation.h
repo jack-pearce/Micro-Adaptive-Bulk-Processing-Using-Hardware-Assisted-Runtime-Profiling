@@ -157,9 +157,9 @@ int selectValuesBranch(int n, const T2 *inputData, const T1 *inputFilter, T2 *se
 template<typename T1, typename T2>
 int selectValuesPredication(int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold) {
     auto k = 0;
-    for (auto i = 0; i < n; ++i) {
+    for (auto i = 0L; i < n; ++i) {
 //        selection[k] = inputData[i];
-        selection[k] = inputData[(0 - (inputFilter[i] <= threshold)) & i];
+        selection[k] = inputData[(0L - (inputFilter[i] <= threshold)) & i];
         k += (inputFilter[i] <= threshold);
     }
     return k;

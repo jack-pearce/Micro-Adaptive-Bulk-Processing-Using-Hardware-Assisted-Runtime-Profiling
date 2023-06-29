@@ -199,7 +199,7 @@ bool comparePairs(const std::pair<int, int>& pair1, const std::pair<int, int>& p
     return pair1.first < pair2.first;
 }
 
-int main(int argc, char** argv) {
+//int main(int argc, char** argv) {
 
 //    DataFile dataFile = DataFiles::uniformIntDistribution25kValuesMax100;
 //    auto inputData = new int[dataFile.getNumElements()];
@@ -239,14 +239,46 @@ int main(int argc, char** argv) {
 
 //    allGroupByTests();
 
+//    return 0;
+//
+//}
 
 
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+void printArray(const int* arr, int n) {
+    for (int i = 0; i < n; ++i) {
+        std::cout << arr[i] << " ";
+    }
+    std::cout << "\n";
+}
 
+int main() {
 
+/*    int n = 90;
+    int cardinality = 250;
+    auto inputData = new int[n];
+    generateUniformDistributionInMemory(inputData, n, cardinality);
 
+    std::cout << "Original array: ";
+    printArray(inputData, n);
+
+    groupBySort(n, inputData);
+
+    std::cout << "Sorted array: ";
+    printArray(inputData, n);*/
+
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweep,
+                                   {GroupBy::Sort},
+                                   1, "SortTesting");
 
     return 0;
-
 }
+
+
+
+
+
+
+

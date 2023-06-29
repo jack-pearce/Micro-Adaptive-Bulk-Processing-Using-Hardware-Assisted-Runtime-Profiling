@@ -3,6 +3,8 @@
 #include <list>
 #include <memory>
 #include <algorithm>
+#include <cmath>
+#include <stdio.h>
 
 #include "groupBy.h"
 #include "utils.h"
@@ -32,23 +34,121 @@ Run groupByHash(int n, const int *inputData) {
     return result;
 }
 
-Run groupBySort(int n, const int *inputData) {
-    std::vector<int> input(inputData, inputData + n);
-    std::sort(input.begin(), input.end());
-
-    Run result;
-    result.emplace_back(input[0], 1);
-
-    for (auto it = std::next(std::begin(input)); it != std::end(input); ++it) {
-        if (*it == result.back().first) {
-            result.back().second += 1;
-        } else {
-            result.emplace_back(*it, 1);
+// Function to find the maximum element in the array
+int getMax(const int* arr, int n) {
+    int max = arr[0];
+    for (int i = 1; i < n; ++i) {
+        if (arr[i] > max) {
+            max = arr[i];
         }
     }
+    return max;
+}
 
+// Counting sort used as a subroutine in Radix Sort
+void countingSort(int* arr, int n, int exp) {
+    std::vector<int> output(n);
+    std::vector<int> count(10, 0);
+
+    // Store the count of occurrences in count[]
+    for (int i = 0; i < n; ++i) {
+        count[(arr[i] / exp) % 10]++;
+    }
+
+    // Change count[i] so that count[i] contains the actual
+    // position of this digit in the output[]
+    for (int i = 1; i < 10; ++i) {
+        count[i] += count[i - 1];
+    }
+
+    // Build the output array
+    for (int i = n - 1; i >= 0; --i) {
+        output[count[(arr[i] / exp) % 10] - 1] = arr[i];
+        count[(arr[i] / exp) % 10]--;
+    }
+
+    // Copy the output array to arr[] so that arr[] contains
+    // sorted numbers according to the current digit
+    for (int i = 0; i < n; ++i) {
+        arr[i] = output[i];
+    }
+}
+
+/*
+Run groupBySort(int n, int *inputData) {
+    // Find the maximum number to determine the number of digits
+    int max = getMax(inputData, n);
+
+    // Perform counting sort for every digit
+    for (int exp = 1; max / exp > 0; exp *= 10) {
+        countingSort(inputData, n, exp);
+    }
+
+    Run result;
     return result;
 }
+*/
+
+#define BITS_PER_PASS 10
+
+Run groupBySort(int n, int *inputData) {
+    int i;
+    int *output = new int[n];
+    int buckets = 1 << BITS_PER_PASS;
+    int mask = buckets - 1;
+    int* bucket = new int[buckets];
+    int largest = 0;
+
+    for (i = 0; i < n; i++) {
+        if (inputData[i] > largest) {
+            largest = inputData[i];
+        }
+    }
+    int msbPosition = 0;
+    while (largest != 0) {
+        largest >>= 1;
+        msbPosition++;
+    }
+
+    int passes = static_cast<int>(std::ceil(static_cast<double>(msbPosition) / BITS_PER_PASS)) - 1;
+    bool finalCopyRequired = (passes + 1) % 2;
+
+    while (passes >= 0) {
+        for (i = 0; i < buckets; i++) {
+            bucket[i] = 0;
+        }
+
+        for (i = 0; i < n; i++) {
+            bucket[(inputData[i] >> (passes * BITS_PER_PASS)) & mask]++;
+        }
+
+        for (i = 1; i < buckets; i++) {
+            bucket[i] += bucket[i - 1];
+        }
+
+        for (i = n - 1; i >= 0; i--) {
+            output[--bucket[(inputData[i] >> (passes * BITS_PER_PASS)) & mask]] = inputData[i];
+        }
+
+
+        std::swap(inputData, output);
+        --passes;
+    }
+
+    // Need to work individually in partitions
+    // Need to use insertion sort when partition gets small enough
+
+    if (finalCopyRequired) {
+        std::swap(inputData, output);
+        std::copy(output, output + n, inputData);
+    }
+
+    delete []output;
+
+    Run result;
+    return result;
+}
+
 
 inline void initialiseMap(google::dense_hash_map<int, int> &map) {
     map.set_empty_key(-1);
@@ -111,37 +211,11 @@ Runs groupByAdaptiveHash(Run& inputRun, int level) {
     return partitionedRuns;
 }
 
-void printRun(Run &run) {
-    for (auto pair : run) {
-        std::cout << pair.first << ", " << pair.second << std::endl;
-    }
-}
-
-void printRuns(Runs &runs) {
-    int count = 0;
-    for (auto &run : runs) {
-        if (run && !run->empty()) {
-            std::cout << "Run: " << count++ << std::endl;
-            printRun(*run);
-        }
-    }
-}
-
 Run groupByAdaptiveAux(Runs &inputRuns, int level) {
-
-//    std::cout << "Level " << level << std::endl;
 
     if (level != 0 && inputRuns.size() == 1 && inputRuns[0]->size() == 1) {
         return *inputRuns[0];
     }
-
-/*    if (level == 5) {
-//        printRuns(inputRuns);
-        exit(2);
-    }*/
-
-//    printRuns(inputRuns);
-//    std::cout << inputRuns.size() << std::endl;
 
     std::vector<Runs> producedGroupsOfRuns;
     producedGroupsOfRuns.reserve(inputRuns.size());
@@ -149,9 +223,6 @@ Run groupByAdaptiveAux(Runs &inputRuns, int level) {
     for (auto &run : inputRuns) {
         producedGroupsOfRuns.push_back(groupByAdaptiveHash(*run, level));
     }
-
-//    printRuns(producedGroupsOfRuns[0]);
-//    printRuns(producedGroupsOfRuns[1]);
 
     Run result;
 
@@ -161,12 +232,8 @@ Run groupByAdaptiveAux(Runs &inputRuns, int level) {
         Run& runInPartition = *runsInPartition.back();
 
         for (auto &producedGroupOfRuns : producedGroupsOfRuns) {
-//            printRuns(producedGroupOfRuns);
 
             if (!producedGroupOfRuns[partitionNumber]->empty()) {
-//                std::cout << "Here, partition number: " << partitionNumber << std::endl;
-//                printRun(*(producedGroupOfRuns[partitionNumber]));
-//                runsInPartition.push_back(producedGroupOfRuns[partitionNumber]);
                 runInPartition.insert(
                         runInPartition.end(),
                         std::make_move_iterator(producedGroupOfRuns[partitionNumber]->begin()),
@@ -175,18 +242,14 @@ Run groupByAdaptiveAux(Runs &inputRuns, int level) {
 
             }
         }
-//        printRuns(runsInPartition);
+
         if (!runsInPartition[0]->empty()) {
             Run aggregatedPartitionResult = groupByAdaptiveAux(runsInPartition, level + 1);
             result.insert(result.end(),
                           std::make_move_iterator(aggregatedPartitionResult.begin()),
                           std::make_move_iterator(aggregatedPartitionResult.end()));
-//            result.insert(result.end(), aggregatedPartitionResult.begin(), aggregatedPartitionResult.end());
-//            printRun(resultRun);
         }
     }
-
-//    printRun(result);
 
     return result;
 }
@@ -232,7 +295,7 @@ Run groupByAdaptive(int n, const int *inputData) {
     return result;
 }
 
-std::vector<std::pair<int, int>> runGroupByFunction(GroupBy groupByImplementation, int n, const int *inputData) {
+std::vector<std::pair<int, int>> runGroupByFunction(GroupBy groupByImplementation, int n, int *inputData) {
     switch(groupByImplementation) {
         case GroupBy::Hash:
             return groupByHash(n, inputData);

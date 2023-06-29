@@ -16,11 +16,11 @@ enum GroupBy {
 
 std::vector<std::pair<int, int>> groupByHash(int n, const int *inputData);
 
-std::vector<std::pair<int, int>> groupBySort(int n, const int *inputData);
+std::vector<std::pair<int, int>> groupBySort(int n, int *inputData);
 
 std::vector<std::pair<int, int>> groupByAdaptive(int n, const int *inputData);
 
-std::vector<std::pair<int, int>> runGroupByFunction(GroupBy groupByImplementation, int n, const int *inputData);
+std::vector<std::pair<int, int>> runGroupByFunction(GroupBy groupByImplementation, int n, int *inputData);
 
 std::string getGroupByName(GroupBy groupByImplementation);
 
