@@ -1,6 +1,7 @@
 #include <iostream>
 #include <random>
 #include <set>
+#include <cassert>
 
 #include "dataGenerators.h"
 
@@ -18,6 +19,36 @@ void generateUniformDistributionInMemory(int *data, int n, int upperBound) {
 
     for (auto i = 0; i < n; ++i) {
         data[i] = distribution(gen);
+    }
+
+    std::cout << "Complete" << std::endl;
+}
+
+inline int scaleNumberLinearly(int number, int startingUpperBound, int targetUpperBound) {
+    if (number == 1) {
+        return 1;
+    }
+    return 1 + (number - 1) * (static_cast<double>((targetUpperBound - 1)) / (startingUpperBound - 1));
+}
+
+inline int scaleNumberLogarithmically(int number, int startingUpperBound, int targetUpperBound) {
+    double scaledValue = log(number) / log(startingUpperBound);
+    double scaledNumber = pow(targetUpperBound, scaledValue);
+    return std::round(scaledNumber);
+}
+
+void generateUniformDistributionInMemoryWithSetCardinality(int *data, int n, int upperBound, int cardinality) {
+    assert(cardinality <= upperBound);
+    std::cout << "Generating data in memory... ";
+    std::cout.flush();
+
+    unsigned int seed = 1;
+    std::mt19937 gen(seed);
+
+    std::uniform_int_distribution<int> distribution(1, cardinality);
+
+    for (auto i = 0; i < n; ++i) {
+        data[i] = scaleNumberLogarithmically(distribution(gen), cardinality, upperBound);
     }
 
     std::cout << "Complete" << std::endl;
@@ -229,4 +260,3 @@ void generatePartiallySortedInMemory(int *data, int n, int numRepeats, float per
 
     std::cout << "Complete" << std::endl;
 }
-

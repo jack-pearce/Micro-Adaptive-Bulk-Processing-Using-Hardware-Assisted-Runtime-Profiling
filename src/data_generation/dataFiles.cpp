@@ -181,11 +181,19 @@ DataSweep DataSweeps::lowerStep50IntDistribution250mValuesSweep {
         "250m int values where max value is 100 and min value is either 1 or 51"
         "Linear input of number of discrete sections from 2 to 10,000"};
 
-DataSweep DataSweeps::logUniformIntDistribution200mValuesCardinalitySweep {
+DataSweep DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepVariableMax {
         30,
         200*1000*1000,
-        "logUniformIntDistribution200mValuesCardinalitySweep",
-        ""};
+        "logUniformIntDistribution200mValuesCardinalitySweepVariableMax",
+        "Log distribution of cardinality for 200m ints from 1 to 100m. The max value is the cardinality"
+        "value, so the distribution is dense i.e. there are no gaps."};
+
+DataSweep DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax {
+        30,
+        200*1000*1000,
+        "logUniformIntDistribution200mValuesCardinalitySweepFixedMax",
+        "Log distribution of cardinality for 200m ints from 1 to 100m. The max value is fixed at 200m, "
+        "so the distribution is sparse i.e. there are gaps."};
 
 DataSweep::DataSweep(int _totalRuns, int _numElements, std::string _sweepName, std::string _longDescription)
         : totalRuns(_totalRuns), numElements(_numElements), runsCompleted(0), sweepName(std::move(_sweepName)),
@@ -196,7 +204,8 @@ DataSweep::DataSweep(int _totalRuns, int _numElements, std::string _sweepName, s
     } else if (getSweepName() == "varyingIntDistribution250mValuesSweep" ||
                getSweepName() == "lowerStep50IntDistribution250mValuesSweep") {
         generateLogDistribution(getTotalRuns(), 2, 10000, inputs);
-    } else if (getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweep") {
+    } else if (getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweepVariableMax" ||
+            getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweepFixedMax") {
         generateLogDistribution(getTotalRuns(), 1, getNumElements() / 2.0, inputs);
     }
 }
@@ -218,8 +227,11 @@ bool DataSweep::loadNextDataSetIntoMemory(int *data) {
     } else if (getSweepName() == "lowerStep50IntDistribution250mValuesSweep") {
         generateLowerStepSelectivityInMemory(data, getNumElements(), 51, static_cast<int>(inputs[runsCompleted++]));
         return true;
-    } else if (getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweep") {
+    } else if (getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweepVariableMax") {
         generateUniformDistributionInMemory(data, getNumElements(), static_cast<int>(inputs[runsCompleted++]));
+        return true;
+    } else if (getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweepFixedMax") {
+        generateUniformDistributionInMemoryWithSetCardinality(data, getNumElements(), getNumElements(), static_cast<int>(inputs[runsCompleted++]));
         return true;
     }
     return false;

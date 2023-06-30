@@ -10,12 +10,23 @@ using Runs = std::vector<std::unique_ptr<Run>>;
 
 enum GroupBy {
     Hash,
+    HashGoogleDenseHashMap,
+    HashFollyF14FastMap,
+    HashAbseilFlatHashMap,
+    HashTessilRobinMap,
+    HashTessilHopscotchMap,
     SortRadix,
     SortRadixOpt,
     Adaptive
 };
 
 std::vector<std::pair<int, int>> groupByHash(int n, const int *inputData);
+
+Run groupByHashGoogleDenseHashMap(int n, const int *inputData);
+Run groupByHashFollyF14FastMap(int n, const int *inputData);
+Run groupByHashAbseilFlatHashMap(int n, const int *inputData);
+Run groupByHashTessilRobinMap(int n, const int *inputData);
+Run groupByHashTessilHopscotchMap(int n, const int *inputData);
 
 std::vector<std::pair<int, int>> groupBySortRadix(int n, int *inputData);
 

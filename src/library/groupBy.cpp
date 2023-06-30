@@ -4,30 +4,93 @@
 #include <memory>
 #include <algorithm>
 #include <cmath>
+#include <folly/container/F14Map.h>
+#include <absl/container/flat_hash_map.h>
+#include <tsl/robin_map.h>
+#include <tsl/hopscotch_map.h>
 
 #include "groupBy.h"
 #include "utils.h"
 #include "../utils/papiHelpers.h"
 #include "../library/papi.h"
 
+
 #define BITS_PER_PASS 10
 #define PARTITION_BUCKETS 256
 
 
 Run groupByHash(int n, const int *inputData) {
+    tsl::hopscotch_map<int, int> map;  // Tessil Hopscotch Map
 
+    for (auto i = 0; i < n; ++i) {
+        map[inputData[i]]++;
+    }
+
+    Run result(map.begin(), map.end());
+    return result;
+}
+
+Run groupByHashGoogleDenseHashMap(int n, const int *inputData) {
+    // Google SparseHash
     google::dense_hash_map<int, int> map;
     map.set_empty_key(-1);
 
     for (auto i = 0; i < n; ++i) {
         int value = inputData[i];
-
         auto it = map.find(value);
         if (it != map.end()) {
             ++(it->second);
         } else {
             map[value] = 1;
         }
+    }
+
+    Run result(map.begin(), map.end());
+    return result;
+}
+
+/*Run groupByHashFollyF14FastMap(int n, const int *inputData) {
+    // Facebook Folly
+    folly::F14FastMap<int, int> map;
+
+    for (auto i = 0; i < n; ++i) {
+        map[inputData[i]]++;
+    }
+
+    Run result(map.begin(), map.end());
+    return result;
+}*/
+
+Run groupByHashAbseilFlatHashMap(int n, const int *inputData) {
+    // Google Abseil
+    absl::flat_hash_map<int, int> map;
+
+    for (auto i = 0; i < n; ++i) {
+        map[inputData[i]]++;
+    }
+
+    Run result(map.begin(), map.end());
+    return result;
+}
+
+Run groupByHashTessilRobinMap(int n, const int *inputData) {
+    // Tessil Robin Map
+    tsl::robin_map<int, int> map;
+
+    for (auto i = 0; i < n; ++i) {
+        map[inputData[i]]++;
+    }
+
+    Run result(map.begin(), map.end());
+    return result;
+}
+
+Run groupByHashTessilHopscotchMap(int n, const int *inputData) {
+    // Tessil Hopscotch Map
+    tsl::hopscotch_map<int, int> map;
+
+    for (auto i = 0; i < n; ++i) {
+        map[inputData[i]]++;
     }
 
     Run result(map.begin(), map.end());
@@ -328,6 +391,18 @@ std::vector<std::pair<int, int>> runGroupByFunction(GroupBy groupByImplementatio
     switch(groupByImplementation) {
         case GroupBy::Hash:
             return groupByHash(n, inputData);
+        case GroupBy::HashGoogleDenseHashMap:
+            return groupByHashGoogleDenseHashMap(n, inputData);
+        case GroupBy::HashFollyF14FastMap:
+            std::cout << "Folly requires removing '-march=native' flag" << std::endl;
+            exit(1);
+//            return groupByHashFollyF14FastMap(n, inputData);
+        case GroupBy::HashAbseilFlatHashMap:
+            return groupByHashAbseilFlatHashMap(n, inputData);
+        case GroupBy::HashTessilRobinMap:
+            return groupByHashTessilRobinMap(n, inputData);
+        case GroupBy::HashTessilHopscotchMap:
+            return groupByHashTessilHopscotchMap(n, inputData);
         case GroupBy::SortRadix:
             return groupBySortRadix(n, inputData);
         case GroupBy::SortRadixOpt:
@@ -344,6 +419,16 @@ std::string getGroupByName(GroupBy groupByImplementation) {
     switch(groupByImplementation) {
         case GroupBy::Hash:
             return "GroupBy_Hash";
+        case GroupBy::HashGoogleDenseHashMap:
+            return "GroupBy_HashGoogleDenseHashMap";
+        case GroupBy::HashFollyF14FastMap:
+            return "GroupBy_HashFollyF14FastMap";
+        case GroupBy::HashAbseilFlatHashMap:
+            return "GroupBy_HashAbseilFlatHashMap";
+        case GroupBy::HashTessilRobinMap:
+            return "GroupBy_HashTessilRobinMap";
+        case GroupBy::HashTessilHopscotchMap:
+            return "GroupBy_HashTessilHopscotchMap";
         case GroupBy::SortRadix:
             return "GroupBy_SortRadix";
         case GroupBy::SortRadixOpt:
