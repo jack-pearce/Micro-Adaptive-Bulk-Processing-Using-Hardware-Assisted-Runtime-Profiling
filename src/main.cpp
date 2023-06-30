@@ -193,17 +193,17 @@ void allGroupByTests() {
                                     GroupBy::HashAbseilFlatHashMap,
                                     GroupBy::HashTessilRobinMap,
                                     GroupBy::HashTessilHopscotchMap},
-                                   5, "MapCompare");
+                                   5, "1-MapCompare");
 
     // Graph 2: Cardinality range (variable max) for simple radix sort - manually run with BITS_PER_PASS of 8, 10, 12
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepVariableMax,
                                {GroupBy::SortRadix},
-                               5, "RadixSimple");
+                               5, "2-RadixSimple");
 
     // Graph 3: Cardinality range (variable max) for optimised radix sort - manually run with BITS_PER_PASS of 8, 10, 12
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepVariableMax,
                                    {GroupBy::SortRadixOpt},
-                                   5, "RadixOpt");
+                                   5, "3-RadixOpt");
 
     // Graph 5: Cardinality range on uniform data (fixed max) for different hashmaps - compile with -march=native removed
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
@@ -212,67 +212,23 @@ void allGroupByTests() {
                                     GroupBy::HashAbseilFlatHashMap,
                                     GroupBy::HashTessilRobinMap,
                                     GroupBy::HashTessilHopscotchMap},
-                                   3, "MapCompare");
-
-    // Graph 6: Cardinality range (fixed max) for simple radix sort - manually run with BITS_PER_PASS of 8, 10, 12
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::SortRadix},
-                                   3, "RadixSimple");
-
-    // Graph 7: Cardinality range (fixed max) for optimised radix sort - manually run with BITS_PER_PASS of 8, 10, 12
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::SortRadixOpt},
-                                   3, "RadixOpt");
-}
-
-
-int main() {
-    // Graph 1: Cardinality range on uniform data (variable max) for different hashmaps - compile with -march=native removed
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepVariableMax,
-                                   {GroupBy::HashGoogleDenseHashMap,
-                                    GroupBy::HashAbseilFlatHashMap,
-                                    GroupBy::HashTessilRobinMap,
-                                    GroupBy::HashTessilHopscotchMap},
-                                   5, "1-MapCompare");
-
-    // Graph 2: Cardinality range (variable max) for simple radix sort - manually run with BITS_PER_PASS of 8, 10, 12
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepVariableMax,
-                                   {GroupBy::SortRadix},
-                                   5, "2-RadixSimple10");
-
-    // Graph 3: Cardinality range (variable max) for optimised radix sort - manually run with BITS_PER_PASS of 8, 10, 12
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepVariableMax,
-                                   {GroupBy::SortRadixOpt},
-                                   5, "3-RadixOpt10");
-
-    // Graph 5: Cardinality range on uniform data (fixed max) for different hashmaps - compile with -march=native removed
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::HashGoogleDenseHashMap,
-                                    GroupBy::HashAbseilFlatHashMap,
-                                    GroupBy::HashTessilRobinMap,
-                                    GroupBy::HashTessilHopscotchMap},
                                    5, "5-MapCompare");
 
     // Graph 6: Cardinality range (fixed max) for simple radix sort - manually run with BITS_PER_PASS of 8, 10, 12
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
                                    {GroupBy::SortRadix},
-                                   5, "6-RadixSimple10");
+                                   5, "6-RadixSimple");
 
     // Graph 7: Cardinality range (fixed max) for optimised radix sort - manually run with BITS_PER_PASS of 8, 10, 12
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
                                    {GroupBy::SortRadixOpt},
-                                   5, "7-RadixOpt10");
+                                   5, "7-RadixOpt");
+}
 
- /*   // Graph 6: Cardinality range (fixed max) for simple radix sort - manually run with BITS_PER_PASS of 8, 10, 12
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::SortRadix},
-                                   1, "RadixSimple");
 
-    // Graph 7: Cardinality range (fixed max) for optimised radix sort - manually run with BITS_PER_PASS of 8, 10, 12
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::SortRadixOpt},
-                                   1, "RadixOpt");*/
+int main() {
 
+    void allGroupByTests();
 
     return 0;
 }
