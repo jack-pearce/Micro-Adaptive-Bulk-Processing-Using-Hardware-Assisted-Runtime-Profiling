@@ -15,7 +15,7 @@
 #include "../library/papi.h"
 
 
-#define BITS_PER_PASS 12
+#define BITS_PER_PASS 10
 #define PARTITION_BUCKETS 256
 
 
