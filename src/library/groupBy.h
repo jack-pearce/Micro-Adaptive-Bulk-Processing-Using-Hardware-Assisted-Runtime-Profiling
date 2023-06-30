@@ -10,13 +10,17 @@ using Runs = std::vector<std::unique_ptr<Run>>;
 
 enum GroupBy {
     Hash,
-    Sort,
+    SortRadix,
+    SortRadixOpt,
+    SortInsertion,
     Adaptive
 };
 
 std::vector<std::pair<int, int>> groupByHash(int n, const int *inputData);
 
-std::vector<std::pair<int, int>> groupBySort(int n, int *inputData);
+std::vector<std::pair<int, int>> groupBySortRadix(int n, int *inputData);
+
+std::vector<std::pair<int, int>> groupBySortRadixOpt(int n, int *inputData);
 
 std::vector<std::pair<int, int>> groupByAdaptive(int n, const int *inputData);
 

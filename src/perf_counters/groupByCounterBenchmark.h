@@ -8,4 +8,7 @@
 void groupByCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<GroupBy> &groupByImplementations,
                                     int iterations, const std::string &fileNamePrefix);
 
+void groupByCpuCyclesSweepBenchmarkVariableSize(DataSweep &dataSweep, const std::vector<GroupBy> &groupByImplementations,
+                                                int iterations, const std::string &fileNamePrefix);
+
 #endif //MABPL_GROUPBYCOUNTERBENCHMARK_H

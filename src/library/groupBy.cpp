@@ -4,13 +4,13 @@
 #include <memory>
 #include <algorithm>
 #include <cmath>
-#include <stdio.h>
 
 #include "groupBy.h"
 #include "utils.h"
 #include "../utils/papiHelpers.h"
 #include "../library/papi.h"
 
+#define BITS_PER_PASS 8
 #define PARTITION_BUCKETS 256
 
 
@@ -34,69 +34,128 @@ Run groupByHash(int n, const int *inputData) {
     return result;
 }
 
-// Function to find the maximum element in the array
-int getMax(const int* arr, int n) {
-    int max = arr[0];
-    for (int i = 1; i < n; ++i) {
-        if (arr[i] > max) {
-            max = arr[i];
+Run groupBySortRadix(int n, int *inputData) {
+    int i;
+    int *buffer = new int[n];
+    int buckets = 1 << BITS_PER_PASS;
+    int mask = buckets - 1;
+    int* bucket = new int[buckets];
+
+    int passes = static_cast<int>(std::ceil(static_cast<double>(32) / BITS_PER_PASS)) - 1;
+    bool finalCopyRequired = (passes + 1) % 2;
+
+    for (int pass = 0; pass <= passes; pass++) {
+        for (i = 0; i < buckets; i++) {
+            bucket[i] = 0;
+        }
+
+        for (i = 0; i < n; i++) {
+            bucket[(inputData[i] >> (pass * BITS_PER_PASS)) & mask]++;
+        }
+
+        for (i = 1; i < buckets; i++) {
+            bucket[i] += bucket[i - 1];
+        }
+
+        for (i = n - 1; i >= 0; i--) {
+            buffer[--bucket[(inputData[i] >> (pass * BITS_PER_PASS)) & mask]] = inputData[i];
+        }
+
+        std::swap(inputData, buffer);
+    }
+
+    if (finalCopyRequired) {
+        std::swap(inputData, buffer);
+        std::copy(buffer, buffer + n, inputData);
+    }
+
+    delete []buffer;
+    delete []bucket;
+
+    Run result;
+    result.emplace_back(inputData[0], 1);
+
+    for (i = 1; i < n; i++) {
+        if (inputData[i] == result.back().first) {
+            result.back().second += 1;
+        } else {
+            result.emplace_back(inputData[i], 1);
         }
     }
-    return max;
+
+    return result;
 }
 
-// Counting sort used as a subroutine in Radix Sort
-void countingSort(int* arr, int n, int exp) {
-    std::vector<int> output(n);
-    std::vector<int> count(10, 0);
+Run insertionSort(int n, int *inputData) {
 
-    // Store the count of occurrences in count[]
-    for (int i = 0; i < n; ++i) {
-        count[(arr[i] / exp) % 10]++;
-    }
+    for (int i = 1; i < n; ++i) {
+        int key = inputData[i];
+        int j = i - 1;
 
-    // Change count[i] so that count[i] contains the actual
-    // position of this digit in the output[]
-    for (int i = 1; i < 10; ++i) {
-        count[i] += count[i - 1];
-    }
+        while (j >= 0 && inputData[j] > key) {
+            inputData[j + 1] = inputData[j];
+            --j;
+        }
 
-    // Build the output array
-    for (int i = n - 1; i >= 0; --i) {
-        output[count[(arr[i] / exp) % 10] - 1] = arr[i];
-        count[(arr[i] / exp) % 10]--;
-    }
-
-    // Copy the output array to arr[] so that arr[] contains
-    // sorted numbers according to the current digit
-    for (int i = 0; i < n; ++i) {
-        arr[i] = output[i];
-    }
-}
-
-/*
-Run groupBySort(int n, int *inputData) {
-    // Find the maximum number to determine the number of digits
-    int max = getMax(inputData, n);
-
-    // Perform counting sort for every digit
-    for (int exp = 1; max / exp > 0; exp *= 10) {
-        countingSort(inputData, n, exp);
+        inputData[j + 1] = key;
     }
 
     Run result;
     return result;
 }
-*/
 
-#define BITS_PER_PASS 10
+void groupBySortRadixOptAux(int start, int end, int *inputData, int *buffer, int mask, int buckets, int pass) {
+//    std::cout << "Pass " << pass << ", start " << start << ", end " << end << std::endl;
 
-Run groupBySort(int n, int *inputData) {
+    if ((end - start) < 35) {
+        std::cout << "Could have used insertion here" << std::endl;
+    }
+
+    // Need to use insertion sort when partition gets small enough
+    // Need to do aggregation during insertion sort
+
     int i;
-    int *output = new int[n];
+    int bucket[1 << BITS_PER_PASS] = {0};
+
+    for (i = start; i < end; i++) {
+        bucket[(inputData[i] >> (pass * BITS_PER_PASS)) & mask]++;
+    }
+
+    for (i = 1; i < buckets; i++) {
+        bucket[i] += bucket[i - 1];
+    }
+
+    std::vector<int> partitions(bucket, bucket + buckets);
+    for (i = 0; i < buckets; i++) {
+        partitions[i] += start;
+    }
+
+    for (i = end - 1; i >= start; i--) {
+        buffer[start + --bucket[(inputData[i] >> (pass * BITS_PER_PASS)) & mask]] = inputData[i];
+    }
+
+    std::swap(inputData, buffer);
+    --pass;
+
+    if (pass < 0) {
+        return;
+    }
+
+    if (partitions[0] > start) {
+        groupBySortRadixOptAux(start, partitions[0], inputData, buffer, mask, buckets, pass);
+    }
+    for (i = 1; i < buckets; i++) {
+        if (partitions[i] > partitions[i - 1]) {
+            groupBySortRadixOptAux(partitions[i - 1], partitions[i], inputData, buffer, mask, buckets, pass);
+        }
+    }
+}
+
+Run groupBySortRadixOpt(int n, int *inputData) {
+    int i;
+    int *buffer = new int[n];
     int buckets = 1 << BITS_PER_PASS;
     int mask = buckets - 1;
-    int* bucket = new int[buckets];
     int largest = 0;
 
     for (i = 0; i < n; i++) {
@@ -113,42 +172,27 @@ Run groupBySort(int n, int *inputData) {
     int passes = static_cast<int>(std::ceil(static_cast<double>(msbPosition) / BITS_PER_PASS)) - 1;
     bool finalCopyRequired = (passes + 1) % 2;
 
-    while (passes >= 0) {
-        for (i = 0; i < buckets; i++) {
-            bucket[i] = 0;
-        }
-
-        for (i = 0; i < n; i++) {
-            bucket[(inputData[i] >> (passes * BITS_PER_PASS)) & mask]++;
-        }
-
-        for (i = 1; i < buckets; i++) {
-            bucket[i] += bucket[i - 1];
-        }
-
-        for (i = n - 1; i >= 0; i--) {
-            output[--bucket[(inputData[i] >> (passes * BITS_PER_PASS)) & mask]] = inputData[i];
-        }
-
-
-        std::swap(inputData, output);
-        --passes;
-    }
-
-    // Need to work individually in partitions
-    // Need to use insertion sort when partition gets small enough
+    groupBySortRadixOptAux(0, n, inputData, buffer, mask, buckets, passes);
 
     if (finalCopyRequired) {
-        std::swap(inputData, output);
-        std::copy(output, output + n, inputData);
+        std::copy(buffer, buffer + n, inputData);
     }
 
-    delete []output;
+    delete []buffer;
 
     Run result;
+//    result.emplace_back(inputData[0], 1);
+//
+//    for (i = 1; i < n; i++) {
+//        if (inputData[i] == result.back().first) {
+//            result.back().second += 1;
+//        } else {
+//            result.emplace_back(inputData[i], 1);
+//        }
+//    }
+
     return result;
 }
-
 
 inline void initialiseMap(google::dense_hash_map<int, int> &map) {
     map.set_empty_key(-1);
@@ -299,12 +343,16 @@ std::vector<std::pair<int, int>> runGroupByFunction(GroupBy groupByImplementatio
     switch(groupByImplementation) {
         case GroupBy::Hash:
             return groupByHash(n, inputData);
-        case GroupBy::Sort:
-            return groupBySort(n, inputData);
+        case GroupBy::SortRadix:
+            return groupBySortRadix(n, inputData);
+        case GroupBy::SortRadixOpt:
+            return groupBySortRadixOpt(n, inputData);
+        case GroupBy::SortInsertion:
+            return insertionSort(n, inputData);
         case GroupBy::Adaptive:
             return groupByAdaptive(n, inputData);
         default:
-            std::cout << "Invalid selection of 'Select' implementation!" << std::endl;
+            std::cout << "Invalid selection of 'GroupBy' implementation!" << std::endl;
             exit(1);
     }
 }
@@ -313,8 +361,12 @@ std::string getGroupByName(GroupBy groupByImplementation) {
     switch(groupByImplementation) {
         case GroupBy::Hash:
             return "GroupBy_Hash";
-        case GroupBy::Sort:
-            return "GroupBy_Sort";
+        case GroupBy::SortRadix:
+            return "GroupBy_SortRadix";
+        case GroupBy::SortRadixOpt:
+            return "GroupBy_SortRadixOptimal";
+        case GroupBy::SortInsertion:
+            return "GroupBy_SortInsertion";
         case GroupBy::Adaptive:
             return "GroupBy_Adaptive";
         default:

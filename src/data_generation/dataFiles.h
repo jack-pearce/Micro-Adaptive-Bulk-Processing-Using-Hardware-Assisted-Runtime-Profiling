@@ -80,6 +80,8 @@ public:
     static DataSweep lowerStep50IntDistribution250mValuesSweep;
 
     static DataSweep logUniformIntDistribution200mValuesCardinalitySweep;
+
+    static DataSweep linearUniformIntDistributionInputSizeSweep;
 };
 
 #endif //MABPL_DATAFILES_H

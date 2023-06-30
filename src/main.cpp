@@ -191,7 +191,7 @@ void allSelectValuesTests() {
 
 void allGroupByTests() {
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweep,
-                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                   {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::SortRadixOpt, GroupBy::Adaptive},
                                    1, "");
 }
 
@@ -254,24 +254,31 @@ void printArray(const int* arr, int n) {
     std::cout << "\n";
 }
 
+
 int main() {
 
-/*    int n = 90;
-    int cardinality = 250;
+    int n = 200000000;
+    int cardinality = 1000;
     auto inputData = new int[n];
     generateUniformDistributionInMemory(inputData, n, cardinality);
 
     std::cout << "Original array: ";
-    printArray(inputData, n);
+//    printArray(inputData, n);
 
-    groupBySort(n, inputData);
+    groupBySortRadixOpt(n, inputData);
 
     std::cout << "Sorted array: ";
-    printArray(inputData, n);*/
+//    printArray(inputData, n);
 
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweep,
-                                   {GroupBy::Sort},
-                                   1, "SortTesting");
+/*    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweep,
+                                   {GroupBy::SortRadix},
+                                   1, "SortTesting");*/
+
+//    groupByCpuCyclesSweepBenchmarkVariableSize(DataSweeps::linearUniformIntDistributionInputSizeSweep,
+//                                   {GroupBy::SortInsertion,
+//                                    GroupBy::SortRadixOpt},
+//                                   1, "SortTesting");
+
 
     return 0;
 }
