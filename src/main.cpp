@@ -254,30 +254,33 @@ void printArray(const int* arr, int n) {
     std::cout << "\n";
 }
 
+void printRun(Run &run) {
+    for (auto pair : run) {
+        std::cout << pair.first << ", " << pair.second << std::endl;
+    }
+}
 
 int main() {
 
-    int n = 200000000;
-    int cardinality = 1000;
+/*    int n = 200000000;
+    int cardinality = 500;
     auto inputData = new int[n];
     generateUniformDistributionInMemory(inputData, n, cardinality);
 
-    std::cout << "Original array: ";
+//    std::cout << "Original array: ";
 //    printArray(inputData, n);
 
-    groupBySortRadixOpt(n, inputData);
+    Run result = groupBySortRadixOpt(n, inputData);
 
-    std::cout << "Sorted array: ";
+//    std::cout << "Sorted array: ";
 //    printArray(inputData, n);
 
-/*    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweep,
-                                   {GroupBy::SortRadix},
-                                   1, "SortTesting");*/
+    std::cout << "Aggregated count result: " << std::endl;
+    printRun( result);*/
 
-//    groupByCpuCyclesSweepBenchmarkVariableSize(DataSweeps::linearUniformIntDistributionInputSizeSweep,
-//                                   {GroupBy::SortInsertion,
-//                                    GroupBy::SortRadixOpt},
-//                                   1, "SortTesting");
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweep,
+                                   {GroupBy::SortRadixOpt},
+                                   1, "SortTesting");
 
 
     return 0;

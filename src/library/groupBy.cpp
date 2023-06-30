@@ -10,7 +10,7 @@
 #include "../utils/papiHelpers.h"
 #include "../library/papi.h"
 
-#define BITS_PER_PASS 8
+#define BITS_PER_PASS 10
 #define PARTITION_BUCKETS 256
 
 
@@ -86,34 +86,24 @@ Run groupBySortRadix(int n, int *inputData) {
     return result;
 }
 
-Run insertionSort(int n, int *inputData) {
+void groupBySortRadixOptAuxAgg(int start, int end, const int *inputData, int mask, int buckets, Run &result) {
+    int i;
+    int bucket[1 << BITS_PER_PASS] = {0};
 
-    for (int i = 1; i < n; ++i) {
-        int key = inputData[i];
-        int j = i - 1;
-
-        while (j >= 0 && inputData[j] > key) {
-            inputData[j + 1] = inputData[j];
-            --j;
-        }
-
-        inputData[j + 1] = key;
+    for (i = start; i < end; i++) {
+        bucket[inputData[i] & mask]++;
     }
 
-    Run result;
-    return result;
+    int valuePrefix = inputData[start] & ~mask;
+
+    for (i = 0; i < buckets; i++) {
+        if (bucket[i] > 0) {
+            result.emplace_back(valuePrefix | i, bucket[i]);
+        }
+    }
 }
 
-void groupBySortRadixOptAux(int start, int end, int *inputData, int *buffer, int mask, int buckets, int pass) {
-//    std::cout << "Pass " << pass << ", start " << start << ", end " << end << std::endl;
-
-    if ((end - start) < 35) {
-        std::cout << "Could have used insertion here" << std::endl;
-    }
-
-    // Need to use insertion sort when partition gets small enough
-    // Need to do aggregation during insertion sort
-
+void groupBySortRadixOptAux(int start, int end, int *inputData, int *buffer, int mask, int buckets, int pass, Run &result) {
     int i;
     int bucket[1 << BITS_PER_PASS] = {0};
 
@@ -137,23 +127,29 @@ void groupBySortRadixOptAux(int start, int end, int *inputData, int *buffer, int
     std::swap(inputData, buffer);
     --pass;
 
-    if (pass < 0) {
-        return;
-    }
-
-    if (partitions[0] > start) {
-        groupBySortRadixOptAux(start, partitions[0], inputData, buffer, mask, buckets, pass);
-    }
-    for (i = 1; i < buckets; i++) {
-        if (partitions[i] > partitions[i - 1]) {
-            groupBySortRadixOptAux(partitions[i - 1], partitions[i], inputData, buffer, mask, buckets, pass);
+    if (pass > 0) {
+        if (partitions[0] > start) {
+            groupBySortRadixOptAux(start, partitions[0], inputData, buffer, mask, buckets, pass, result);
+        }
+        for (i = 1; i < buckets; i++) {
+            if (partitions[i] > partitions[i - 1]) {
+                groupBySortRadixOptAux(partitions[i - 1], partitions[i], inputData, buffer, mask, buckets, pass, result);
+            }
+        }
+    } else {
+        if (partitions[0] > start) {
+            groupBySortRadixOptAuxAgg(start, partitions[0], inputData, mask, buckets, result);
+        }
+        for (i = 1; i < buckets; i++) {
+            if (partitions[i] > partitions[i - 1]) {
+                groupBySortRadixOptAuxAgg(partitions[i - 1], partitions[i], inputData, mask, buckets, result);
+            }
         }
     }
 }
 
 Run groupBySortRadixOpt(int n, int *inputData) {
     int i;
-    int *buffer = new int[n];
     int buckets = 1 << BITS_PER_PASS;
     int mask = buckets - 1;
     int largest = 0;
@@ -170,26 +166,15 @@ Run groupBySortRadixOpt(int n, int *inputData) {
     }
 
     int passes = static_cast<int>(std::ceil(static_cast<double>(msbPosition) / BITS_PER_PASS)) - 1;
-    bool finalCopyRequired = (passes + 1) % 2;
-
-    groupBySortRadixOptAux(0, n, inputData, buffer, mask, buckets, passes);
-
-    if (finalCopyRequired) {
-        std::copy(buffer, buffer + n, inputData);
-    }
-
-    delete []buffer;
-
     Run result;
-//    result.emplace_back(inputData[0], 1);
-//
-//    for (i = 1; i < n; i++) {
-//        if (inputData[i] == result.back().first) {
-//            result.back().second += 1;
-//        } else {
-//            result.emplace_back(inputData[i], 1);
-//        }
-//    }
+
+    if (passes > 0) {
+        int *buffer = new int[n];
+        groupBySortRadixOptAux(0, n, inputData, buffer, mask, buckets, passes, result);
+        delete []buffer;
+    } else {
+        groupBySortRadixOptAuxAgg(0, n, inputData, mask, buckets, result);
+    }
 
     return result;
 }
@@ -347,8 +332,6 @@ std::vector<std::pair<int, int>> runGroupByFunction(GroupBy groupByImplementatio
             return groupBySortRadix(n, inputData);
         case GroupBy::SortRadixOpt:
             return groupBySortRadixOpt(n, inputData);
-        case GroupBy::SortInsertion:
-            return insertionSort(n, inputData);
         case GroupBy::Adaptive:
             return groupByAdaptive(n, inputData);
         default:
@@ -365,8 +348,6 @@ std::string getGroupByName(GroupBy groupByImplementation) {
             return "GroupBy_SortRadix";
         case GroupBy::SortRadixOpt:
             return "GroupBy_SortRadixOptimal";
-        case GroupBy::SortInsertion:
-            return "GroupBy_SortInsertion";
         case GroupBy::Adaptive:
             return "GroupBy_Adaptive";
         default:

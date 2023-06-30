@@ -187,13 +187,6 @@ DataSweep DataSweeps::logUniformIntDistribution200mValuesCardinalitySweep {
         "logUniformIntDistribution200mValuesCardinalitySweep",
         ""};
 
-DataSweep DataSweeps::linearUniformIntDistributionInputSizeSweep {
-        30,
-        -1,
-        "linearUniformIntDistributionInputSizeSweep",
-        ""};
-
-
 DataSweep::DataSweep(int _totalRuns, int _numElements, std::string _sweepName, std::string _longDescription)
         : totalRuns(_totalRuns), numElements(_numElements), runsCompleted(0), sweepName(std::move(_sweepName)),
         longDescription(std::move(_longDescription)) {
@@ -205,8 +198,6 @@ DataSweep::DataSweep(int _totalRuns, int _numElements, std::string _sweepName, s
         generateLogDistribution(getTotalRuns(), 2, 10000, inputs);
     } else if (getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweep") {
         generateLogDistribution(getTotalRuns(), 1, getNumElements() / 2.0, inputs);
-    } else if (getSweepName() == "linearUniformIntDistributionInputSizeSweep") {
-        generateLinearDistribution(getTotalRuns(), 2, 100, inputs);
     }
 }
 
@@ -229,9 +220,6 @@ bool DataSweep::loadNextDataSetIntoMemory(int *data) {
         return true;
     } else if (getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweep") {
         generateUniformDistributionInMemory(data, getNumElements(), static_cast<int>(inputs[runsCompleted++]));
-        return true;
-    } else if (getSweepName() == "linearUniformIntDistributionInputSizeSweep") {
-        generateUniformDistributionInMemory(data, static_cast<int>(inputs[runsCompleted++]), 255);
         return true;
     }
     return false;

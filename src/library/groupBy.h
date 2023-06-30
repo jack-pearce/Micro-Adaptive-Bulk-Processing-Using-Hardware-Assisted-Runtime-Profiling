@@ -12,7 +12,6 @@ enum GroupBy {
     Hash,
     SortRadix,
     SortRadixOpt,
-    SortInsertion,
     Adaptive
 };
 
