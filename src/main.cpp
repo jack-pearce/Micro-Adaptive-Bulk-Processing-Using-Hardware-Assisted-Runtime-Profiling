@@ -227,9 +227,10 @@ void allGroupByTests() {
 
 
 int main() {
-
-    void allGroupByTests();
-
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                   {
+                                    GroupBy::HashFollyF14FastMap},
+                                   1, "5-MapCompare");
     return 0;
 }
 

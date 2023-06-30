@@ -42,6 +42,14 @@ void generateUniformDistributionInMemoryWithSetCardinality(int *data, int n, int
     std::cout << "Generating data in memory... ";
     std::cout.flush();
 
+    if (cardinality == 1) {
+        for (auto i = 0; i < n; ++i) {
+            data[i] = upperBound;
+        }
+        std::cout << "Complete" << std::endl;
+        return;
+    }
+
     unsigned int seed = 1;
     std::mt19937 gen(seed);
 
