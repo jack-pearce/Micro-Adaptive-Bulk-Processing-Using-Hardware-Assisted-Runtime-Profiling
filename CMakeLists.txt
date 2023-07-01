@@ -12,9 +12,9 @@ find_package(benchmark REQUIRED)
 
 link_directories(/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/libs/papi/src/install/lib)
 
-set(FOLLY_DIR "libs//folly")
-find_package(folly REQUIRED)
-find_package(gflags CONFIG REQUIRED)
+#set(FOLLY_DIR "libs//folly")
+#find_package(folly REQUIRED)
+#find_package(gflags CONFIG REQUIRED)
 
 find_package(absl REQUIRED)
 
@@ -45,7 +45,7 @@ target_link_libraries(${PROJECT_NAME} benchmark::benchmark)
 
 target_link_libraries(${PROJECT_NAME} papi)
 
-target_link_libraries(${PROJECT_NAME} Folly::folly)
+#target_link_libraries(${PROJECT_NAME} Folly::folly)
 
 target_link_libraries(${PROJECT_NAME} absl::base absl::hash absl::flat_hash_map)
 
