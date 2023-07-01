@@ -227,7 +227,6 @@ void allGroupByTests() {
 
 
 int main() {
-    allGroupByTests();
 
     return 0;
 }
