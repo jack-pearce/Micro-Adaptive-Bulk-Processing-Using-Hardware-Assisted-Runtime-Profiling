@@ -20,7 +20,7 @@
 
 
 Run groupByHash(int n, const int *inputData) {
-    tsl::hopscotch_map<int, int> map;  // Tessil Hopscotch Map
+    absl::flat_hash_map<int, int> map;
 
     for (auto i = 0; i < n; ++i) {
         map[inputData[i]]++;
