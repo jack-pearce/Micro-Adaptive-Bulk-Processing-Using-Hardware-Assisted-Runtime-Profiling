@@ -17,6 +17,8 @@ enum GroupBy {
     HashTessilHopscotchMap,
     SortRadix,
     SortRadixOpt,
+    SingleRadixPassThenHash,
+    DoubleRadixPassThenHash,
     Adaptive
 };
 
@@ -28,20 +30,15 @@ Run groupByHashAbseilFlatHashMap(int n, const int *inputData);
 Run groupByHashTessilRobinMap(int n, const int *inputData);
 Run groupByHashTessilHopscotchMap(int n, const int *inputData);
 
-std::vector<std::pair<int, int>> groupBySortRadix(int n, int *inputData);
+Run groupBySortRadix(int n, int *inputData);
+Run groupBySortRadixOpt(int n, int *inputData);
 
-std::vector<std::pair<int, int>> groupBySortRadixOpt(int n, int *inputData);
+Run groupBySingleRadixPassThenHash(int n, int *inputData);
 
-std::vector<std::pair<int, int>> groupByAdaptive(int n, const int *inputData);
+Run groupByAdaptive(int n, int *inputData);
 
-std::vector<std::pair<int, int>> runGroupByFunction(GroupBy groupByImplementation, int n, int *inputData);
-
+Run runGroupByFunction(GroupBy groupByImplementation, int n, int *inputData);
 std::string getGroupByName(GroupBy groupByImplementation);
 
-
-
-
-
-Runs groupByAdaptiveHashLevelZero(int n, const int *inputData);
 
 #endif //MABPL_GROUPBY_H

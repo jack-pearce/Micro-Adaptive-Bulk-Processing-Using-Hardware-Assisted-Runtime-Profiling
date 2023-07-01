@@ -16,7 +16,6 @@
 
 
 #define BITS_PER_PASS 10
-#define PARTITION_BUCKETS 256
 
 
 Run groupByHash(int n, const int *inputData) {
@@ -242,152 +241,108 @@ Run groupBySortRadixOpt(int n, int *inputData) {
     return result;
 }
 
-inline void initialiseMap(google::dense_hash_map<int, int> &map) {
-    map.set_empty_key(-1);
-//    map.resize(getL3cacheSize() / (4 * sizeof(int)));
+Run groupBySingleRadixPassThenHash(int n, int *inputData) {
+    int i;
+    int *buffer = new int[n];
+    int buckets = 1 << BITS_PER_PASS;
+    int mask = buckets - 1;
+    int bucket[buckets];
+
+    for (i = 0; i < buckets; i++) {
+        bucket[i] = 0;
+    }
+
+    for (i = 0; i < n; i++) {
+        bucket[inputData[i] & mask]++;
+    }
+
+    for (i = 1; i < buckets; i++) {
+        bucket[i] += bucket[i - 1];
+    }
+
+    std::vector<int> partitions(bucket, bucket + buckets);
+
+    for (i = n - 1; i >= 0; i--) {
+        buffer[--bucket[inputData[i] & mask]] = inputData[i];
+    }
+
+    std::swap(inputData, buffer);
+
+    Run result;
+    if (partitions[0] > 0) {
+        Run newResults = groupByHash(partitions[0], inputData);
+        result.insert(result.end(), newResults.begin(), newResults.end());
+    }
+    for (i = 1; i < buckets; i++) {
+        if (partitions[i] > partitions[i - 1]) {
+            Run newResults = groupByHash(partitions[i] - partitions[i - 1], inputData + partitions[i - 1]);
+            result.insert(result.end(), newResults.begin(), newResults.end());
+        }
+    }
+
+    std::swap(inputData, buffer);
+    delete []buffer;
+
+    return result;
 }
 
-Runs groupByAdaptiveHash(Run& inputRun, int level) {
+Run groupByDoubleRadixPassThenHash(int n, int *inputData) {
+    int i;
+    int *buffer = new int[n];
+    int buckets = 1 << BITS_PER_PASS;
+    int mask = buckets - 1;
+    int bucket[buckets];
+    int partitions[buckets];
 
-//    google::dense_hash_map<int, int> map;
-
-    std::unique_ptr<google::dense_hash_map<int, int>> map = std::make_unique<google::dense_hash_map<int, int>>();
-    initialiseMap(*map);
-
-    std::vector<std::unique_ptr<google::dense_hash_map<int, int>>> maps;
-
-    for (auto &pair : inputRun) {
-
-        auto it = map->find(pair.first);
-        if (it != map->end()) {
-            (it->second) += level == 0 ? 1: pair.second;
-        } else {
-            (*map)[pair.first] = level == 0 ? 1: pair.second;
+    for (int pass = 0; pass < 2; pass++) {
+        for (i = 0; i < buckets; i++) {
+            bucket[i] = 0;
         }
 
-//        if (static_cast<double>(map->size()) / static_cast<double>(map->bucket_count()) >= 0.25) {
-/*        if (static_cast<double>(map->bucket_count()) >= 500000) {
-            maps.push_back(std::move(map));
-            map = std::make_unique<google::dense_hash_map<int, int>>();
-            initialiseMap(*map);
-        }*/
-    }
-
-    // CHANGE TO A LIST OF VECTORS WHEN WE CHANGE LINEAR PROBING TO WORK IN BLOCKS ONLY
-    Runs partitionedRuns(PARTITION_BUCKETS);
-
-    for (auto& runPtr : partitionedRuns) {
-        runPtr = std::make_unique<Run>();
-    }
-
-    auto hashFunc = map->hash_function();
-
-//    maps.push_back(std::move(map));
-
-    // CHANGE LINEAR PROBING TO WORK IN BLOCKS ONLY, THEN WE CAN SPLIT HASH MAP DIRECTLY
-    for (const auto& pair : *map) {
-        const std::size_t hashValue = hashFunc(pair.first);
-        unsigned long partitionIndex = (hashValue >> (8 * level)) & 0xFF;
-        partitionedRuns[partitionIndex]->push_back(pair);
-    }
-
-/*    for (auto& mapPtr : maps) {
-        auto& mapRef = *mapPtr;
-        for (const auto& pair : mapRef) {
-            const std::size_t hashValue = hashFunc(pair.first);
-            unsigned long partitionIndex = (hashValue >> (8 * level)) & 0xFF;
-            partitionedRuns[partitionIndex]->push_back(pair);
+        for (i = 0; i < n; i++) {
+            bucket[(inputData[i] >> (pass * BITS_PER_PASS)) & mask]++;
         }
-    }*/
 
-    return partitionedRuns;
-}
+        for (i = 1; i < buckets; i++) {
+            bucket[i] += bucket[i - 1];
+        }
 
-Run groupByAdaptiveAux(Runs &inputRuns, int level) {
+        if (pass == 1) {
+            std::copy(bucket, bucket + buckets, partitions);
+        }
 
-    if (level != 0 && inputRuns.size() == 1 && inputRuns[0]->size() == 1) {
-        return *inputRuns[0];
-    }
+        for (i = n - 1; i >= 0; i--) {
+            buffer[--bucket[(inputData[i] >> (pass * BITS_PER_PASS)) & mask]] = inputData[i];
+        }
 
-    std::vector<Runs> producedGroupsOfRuns;
-    producedGroupsOfRuns.reserve(inputRuns.size());
+        std::swap(inputData, buffer);
 
-    for (auto &run : inputRuns) {
-        producedGroupsOfRuns.push_back(groupByAdaptiveHash(*run, level));
     }
 
     Run result;
 
-    for (auto partitionNumber = 0; partitionNumber < PARTITION_BUCKETS; ++partitionNumber) {
-        Runs runsInPartition;
-        runsInPartition.push_back(std::make_unique<Run>());
-        Run& runInPartition = *runsInPartition.back();
-
-        for (auto &producedGroupOfRuns : producedGroupsOfRuns) {
-
-            if (!producedGroupOfRuns[partitionNumber]->empty()) {
-                runInPartition.insert(
-                        runInPartition.end(),
-                        std::make_move_iterator(producedGroupOfRuns[partitionNumber]->begin()),
-                        std::make_move_iterator(producedGroupOfRuns[partitionNumber]->end())
-                );
-
-            }
-        }
-
-        if (!runsInPartition[0]->empty()) {
-            Run aggregatedPartitionResult = groupByAdaptiveAux(runsInPartition, level + 1);
-            result.insert(result.end(),
-                          std::make_move_iterator(aggregatedPartitionResult.begin()),
-                          std::make_move_iterator(aggregatedPartitionResult.end()));
+    if (partitions[0] > 0) {
+        Run newResults = groupByHash(partitions[0], inputData);
+        result.insert(result.end(), newResults.begin(), newResults.end());
+    }
+    for (i = 1; i < buckets; i++) {
+        if (partitions[i] > partitions[i - 1]) {
+            Run newResults = groupByHash(partitions[i] - partitions[i - 1], inputData + partitions[i - 1]);
+            result.insert(result.end(), newResults.begin(), newResults.end());
         }
     }
+
+    delete []buffer;
 
     return result;
 }
 
-
-Run groupByAdaptive(int n, const int *inputData) {
-
-//    int elementsPerRun = std::max(n/PARTITION_BUCKETS, 500000);
-
-    int elementsPerRun = 500000;
-
-    Runs runs;
-    int index = 0;
-
-    while (index < n) {
-        runs.push_back(std::make_unique<Run>());
-        Run& run = *runs.back();
-        int elementsToAdd = std::min(elementsPerRun, n - index);
-        run.reserve(elementsToAdd);
-        for (int i = 0; i < elementsToAdd; ++i) {
-            run.emplace_back(inputData[index++], 0);
-        }
-    }
-
-//    std::cout << "Initial number of runs: " << runs.size() << std::endl;
-
-//    printRuns(runs);
-
-/*    Runs runs;
-    runs.push_back(std::make_unique<Run>());
-    Run& run = *runs.back();
-
-    for (int i = 0; i < n; ++i) {
-        run.emplace_back(inputData[i], 0);
-    }*/
-
-//    long_long cycles = *Counters::getInstance().readEventSet();
-
-    auto result = groupByAdaptiveAux(runs, 0);
-
-//    std::cout << *Counters::getInstance().readEventSet() - cycles << std::endl;
-
+Run groupByAdaptive(int n, int *inputData) {
+    Run result;
     return result;
 }
 
-std::vector<std::pair<int, int>> runGroupByFunction(GroupBy groupByImplementation, int n, int *inputData) {
+Run runGroupByFunction(GroupBy groupByImplementation, int n, int *inputData) {
     switch(groupByImplementation) {
         case GroupBy::Hash:
             return groupByHash(n, inputData);
@@ -407,6 +362,10 @@ std::vector<std::pair<int, int>> runGroupByFunction(GroupBy groupByImplementatio
             return groupBySortRadix(n, inputData);
         case GroupBy::SortRadixOpt:
             return groupBySortRadixOpt(n, inputData);
+        case GroupBy::SingleRadixPassThenHash:
+            return groupBySingleRadixPassThenHash(n, inputData);
+        case GroupBy::DoubleRadixPassThenHash:
+            return groupByDoubleRadixPassThenHash(n, inputData);
         case GroupBy::Adaptive:
             return groupByAdaptive(n, inputData);
         default:
@@ -433,6 +392,10 @@ std::string getGroupByName(GroupBy groupByImplementation) {
             return "GroupBy_SortRadix";
         case GroupBy::SortRadixOpt:
             return "GroupBy_SortRadixOptimal";
+        case GroupBy::SingleRadixPassThenHash:
+            return "GroupBy_SingleRadixPassThenHash";
+        case GroupBy::DoubleRadixPassThenHash:
+            return "GroupBy_DoubleRadixPassThenHash";
         case GroupBy::Adaptive:
             return "GroupBy_Adaptive";
         default:

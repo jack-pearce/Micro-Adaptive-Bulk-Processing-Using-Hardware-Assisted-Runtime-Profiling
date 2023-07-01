@@ -185,6 +185,31 @@ void allSelectValuesTests() {
 
 }
 
+bool comparePairs(const std::pair<int, int>& pair1, const std::pair<int, int>& pair2) {
+    return pair1.first < pair2.first;
+}
+
+void groupByFunctionalityTest(const DataFile& dataFile, GroupBy groupByImplementation) {
+    auto inputData = new int[dataFile.getNumElements()];
+    copyArray(LoadedData::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
+
+    Run resultHash = groupByHash(dataFile.getNumElements(), inputData);
+    std::sort(resultHash.begin(), resultHash.end(), comparePairs);
+
+    Run resultInput = runGroupByFunction(groupByImplementation, dataFile.getNumElements(), inputData);
+    std::sort(resultInput.begin(), resultInput.end(), comparePairs);
+
+    if (resultHash.size() != resultInput.size()) {
+        std::cout << "Size of result is different from base hash implementation" << std::endl;
+    }
+
+    for (auto i = 0; i < static_cast<int> (resultHash.size()); ++i) {
+        if ((resultHash[i].first != resultInput[i].first) || (resultHash[i].second != resultInput[i].second)) {
+            std::cout << "Different result found" << std::endl;
+        }
+    }
+}
+
 void allGroupByTests() {
     // Graph 1: Cardinality range on uniform data (variable max) for different hashmaps - compile with -march=native removed
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepVariableMax,
@@ -228,57 +253,9 @@ void allGroupByTests() {
 
 int main() {
 
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                   {GroupBy::DoubleRadixPassThenHash},
+                                   1, "OnePassTest");
+
     return 0;
 }
-
-
-//int main(int argc, char** argv) {
-
-//    DataFile dataFile = DataFiles::uniformIntDistribution25kValuesMax100;
-//    auto inputData = new int[dataFile.getNumElements()];
-//    copyArray(LoadedData::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
-//    int numElements = dataFile.getNumElements();
-
-//    int numElements = 200*1000*1000;
-//    int cardinality = 48939;
-//    auto inputData = new int[numElements];
-//    generateUniformDistributionInMemory(inputData, numElements, cardinality);
-
-/*    int numElements = 500000000;
-    auto inputData = new int[numElements];
-    for (auto i = 0; i < numElements; ++i) {
-        inputData[i] = 1;
-    }*/
-
-    /*Run result = groupByHash(numElements, inputData);
-    std::sort(result.begin(), result.end(), comparePairs);
-
-    std::cout << "Hash result:" << std::endl;
-    for (auto &pair : result) {
-        std::cout << pair.first << ", " << pair.second << std::endl;
-    }*/
-
-
-/*    Run result = groupByAdaptive(numElements, inputData);
-//    std::sort(result.begin(), result.end(), comparePairs);
-
-    std::cout << "Adaptive result:" << std::endl;
-//    for (auto &pair : result) {
-//        std::cout << pair.first << ", " << pair.second << std::endl;
-//    }
-
-    delete []inputData;*/
-
-
-//    allGroupByTests();
-
-//    return 0;
-//
-//}
-
-
-
-
-
-
-
