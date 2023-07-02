@@ -210,6 +210,26 @@ void groupByFunctionalityTest(const DataFile& dataFile, GroupBy groupByImplement
     }
 }
 
+
+void groupByBenchmarkWithExtraCountersConfigurations(DataSweep &dataSweep,
+                                                     GroupBy groupByImplementation,
+                                                     int iterations,
+                                                     const std::string &fileNamePrefix) {
+    // HPC set 1
+    std::vector<std::string> benchmarkCounters = {"PERF_COUNT_HW_CPU_CYCLES",
+                                                  "INSTRUCTION_RETIRED",
+                                                  "LLC_REFERENCES",
+                                                  "PERF_COUNT_HW_CACHE_REFERENCES",
+                                                  "PERF_COUNT_HW_CACHE_MISSES",
+                                                  "PERF_COUNT_HW_CACHE_L1D",
+                                                  "L1-DCACHE-LOADS",
+                                                  "L1-DCACHE-LOAD-MISSES",
+                                                  "L1-DCACHE-STORES"};
+
+    groupByBenchmarkWithExtraCounters(dataSweep, groupByImplementation, iterations, benchmarkCounters, fileNamePrefix);
+}
+
+
 void allGroupByTests() {
     // Graph 1: Cardinality range on uniform data (variable max) for different hashmaps - compile with -march=native removed
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepVariableMax,
@@ -248,14 +268,21 @@ void allGroupByTests() {
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
                                    {GroupBy::SortRadixOpt},
                                    5, "7-RadixOpt");
+
+    // Graph 9: Cardinality range (fixed max) for single / double radix10 pass
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                   {GroupBy::SingleRadixPassThenHash,
+                                    GroupBy::DoubleRadixPassThenHash},
+                                   5, "9-SingleDoubleRadix10PassThenHash");
 }
 
 
 int main() {
 
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::DoubleRadixPassThenHash},
-                                   1, "OnePassTest");
+    groupByBenchmarkWithExtraCountersConfigurations(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                                    GroupBy::Hash,
+                                                    1,
+                                                    "CacheMisses");
 
     return 0;
 }

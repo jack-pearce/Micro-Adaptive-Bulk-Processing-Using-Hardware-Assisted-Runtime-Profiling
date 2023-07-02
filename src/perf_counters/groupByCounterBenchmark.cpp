@@ -5,6 +5,7 @@
 #include "../utils/dataHelpers.h"
 #include "../data_generation/config.h"
 #include "../library/papi.h"
+#include "../utils/papiHelpers.h"
 
 void groupByCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<GroupBy> &groupByImplementations,
                                    int iterations, const std::string &fileNamePrefix) {
@@ -103,4 +104,68 @@ void groupByCpuCyclesSweepBenchmarkVariableSize(DataSweep &dataSweep, const std:
     std::string fileName = fileNamePrefix + "_GroupBy_SweepCyclesBM_" + dataSweep.getSweepName();
     std::string fullFilePath = outputFilePath + groupByCyclesFolder + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
+}
+
+
+void groupByBenchmarkWithExtraCounters(DataSweep &dataSweep, GroupBy groupByImplementation,
+                                      int iterations, std::vector<std::string> &benchmarkCounters,
+                                      const std::string &fileNamePrefix) {
+    if (groupByImplementation == GroupBy::Adaptive)
+        std::cout << "Cannot benchmark adaptive groupBy using counters as adaptive select is already using these counters" << std::endl;
+
+    int numTests = static_cast<int>(dataSweep.getTotalRuns());
+
+    long_long benchmarkCounterValues[benchmarkCounters.size()];
+    int benchmarkEventSet = initialisePAPIandCreateEventSet(benchmarkCounters);
+
+    std::vector<std::vector<long_long>> results(numTests, std::vector<long_long>((iterations * benchmarkCounters.size()) + 1, 0));
+
+    for (auto i = 0; i < iterations; ++i) {
+
+        for (auto j = 0; j < numTests; ++j) {
+            results[j][0] = static_cast<long_long>(dataSweep.getRunInput());
+
+            int numElements = static_cast<int>(dataSweep.getNumElements());
+            auto inputData = new int[numElements];
+
+            std::cout << "Running " << getGroupByName(groupByImplementation) << " for input ";
+            std::cout << static_cast<int>(dataSweep.getRunInput()) << ", iteration ";
+            std::cout << i + 1 << "... ";
+
+            dataSweep.loadNextDataSetIntoMemory(inputData);
+
+            if (PAPI_reset(benchmarkEventSet) != PAPI_OK)
+                exit(1);
+
+            runGroupByFunction(groupByImplementation,numElements, inputData);
+
+            if (PAPI_read(benchmarkEventSet, benchmarkCounterValues) != PAPI_OK)
+                exit(1);
+
+            delete[] inputData;
+
+            for (int k = 0; k < static_cast<int>(benchmarkCounters.size()); ++k) {
+                results[j][1 + (i * benchmarkCounters.size()) + k] = benchmarkCounterValues[k];
+            }
+
+            std::cout << "Completed" << std::endl;
+        }
+        dataSweep.restartSweep();
+    }
+
+    std::vector<std::string> headers(benchmarkCounters.size() * iterations);
+    for (auto i = 0; i < iterations; ++i) {
+        std::copy(benchmarkCounters.begin(), benchmarkCounters.end(), headers.begin() + i * benchmarkCounters.size());
+    }
+    headers.insert(headers.begin(), "Cardinality");
+
+    std::string fileName =
+            fileNamePrefix +
+            "ExtraCountersCyclesBM_" +
+            getGroupByName(groupByImplementation) +
+            dataSweep.getSweepName();
+    std::string fullFilePath = outputFilePath + groupByCyclesFolder + fileName + ".csv";
+    writeHeadersAndTableToCSV(headers, results, fullFilePath);
+
+    shutdownPAPI(benchmarkEventSet, benchmarkCounterValues);
 }
