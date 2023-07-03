@@ -21,8 +21,14 @@
 vectorOfPairs groupByHash(int n, const int *inputData) {
     absl::flat_hash_map<int, int> map;
 
+    absl::flat_hash_map<int, int>::iterator it;
     for (auto i = 0; i < n; ++i) {
-        map[inputData[i]]++;
+        it = map.find(inputData[i]);
+        if (it != map.end()) {
+            ++(it->second);
+        } else {
+            map.insert({inputData[i], 1});
+        }
     }
 
     return {map.begin(), map.end()};

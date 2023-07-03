@@ -298,9 +298,9 @@ int main() {
 //    groupByBenchmarkWithExtraCountersDuringRunConfigurations(DataFiles::uniformIntDistribution200mValuesCardinality4175320Max200mClustered1k,
 //                                               "");
 
-//    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered1,
-//                                   {GroupBy::Adaptive},
-//                                   1, "");
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                   {GroupBy::Hash},
+                                   1, "");
 //
 //    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered1k,
 //                                   {GroupBy::Adaptive},
