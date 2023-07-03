@@ -193,18 +193,22 @@ void groupByFunctionalityTest(const DataFile& dataFile, GroupBy groupByImplement
     auto inputData = new int[dataFile.getNumElements()];
     copyArray(LoadedData::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
 
-    vectorOfPairs resultHash = groupByHash(dataFile.getNumElements(), inputData);
-    std::sort(resultHash.begin(), resultHash.end(), comparePairs);
+    vectorPair resultHash = groupByHash(dataFile.getNumElements(), inputData);
+    std::sort(resultHash.first.begin(), resultHash.first.end(), [](int a, int b) {
+        return a < b;
+    });
 
-    vectorOfPairs resultInput = runGroupByFunction(groupByImplementation, dataFile.getNumElements(), inputData);
-    std::sort(resultInput.begin(), resultInput.end(), comparePairs);
+    vectorPair resultInput = runGroupByFunction(groupByImplementation, dataFile.getNumElements(), inputData);
+    std::sort(resultInput.first.begin(), resultInput.first.end(), [](int a, int b) {
+        return a < b;
+    });
 
-    if (resultHash.size() != resultInput.size()) {
+    if (resultHash.first.size() != resultInput.first.size()) {
         std::cout << "Size of result is different from base hash implementation" << std::endl;
     }
 
-    for (auto i = 0; i < static_cast<int> (resultHash.size()); ++i) {
-        if ((resultHash[i].first != resultInput[i].first) || (resultHash[i].second != resultInput[i].second)) {
+    for (auto i = 0; i < static_cast<int> (resultHash.first.size()); ++i) {
+        if ((resultHash.first[i] != resultInput.first[i]) || (resultHash.second[i] != resultInput.second[i])) {
             std::cout << "Different result found" << std::endl;
         }
     }
@@ -309,6 +313,10 @@ int main() {
 //    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered100k,
 //                                   {GroupBy::Adaptive},
 //                                   1, "");
+
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                   {GroupBy::Hash, GroupBy::SortRadixOpt},
+                                   1, "");
 
     return 0;
 }

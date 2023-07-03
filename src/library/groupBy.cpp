@@ -18,18 +18,23 @@
 #define BITS_PER_PASS 10
 
 
-vectorOfPairs groupByHash(int n, const int *inputData) {
+vectorPair groupByHash(int n, const int *inputData) {
     absl::flat_hash_map<int, int> map;
 
     for (auto i = 0; i < n; ++i) {
         map[inputData[i]]++;
     }
 
-    vectorOfPairs result(map.begin(), map.end());
+    vectorPair result;
+    for (const auto& pair : map) {
+        result.first.push_back(pair.first);
+        result.second.push_back(pair.second);
+    }
+
     return result;
 }
 
-vectorOfPairs groupByHashGoogleDenseHashMap(int n, const int *inputData) {
+vectorPair groupByHashGoogleDenseHashMap(int n, const int *inputData) {
     // Google SparseHash
     google::dense_hash_map<int, int> map;
     map.set_empty_key(-1);
@@ -44,7 +49,12 @@ vectorOfPairs groupByHashGoogleDenseHashMap(int n, const int *inputData) {
         }
     }
 
-    vectorOfPairs result(map.begin(), map.end());
+    vectorPair result;
+    for (const auto& pair : map) {
+        result.first.push_back(pair.first);
+        result.second.push_back(pair.second);
+    }
+
     return result;
 }
 
@@ -56,11 +66,16 @@ vectorOfPairs groupByHashGoogleDenseHashMap(int n, const int *inputData) {
         map[inputData[i]]++;
     }
 
-    Run result(map.begin(), map.end());
+    vectorPair result;
+    for (const auto& pair : map) {
+        result.first.push_back(pair.first);
+        result.second.push_back(pair.second);
+    }
+
     return result;
 }*/
 
-vectorOfPairs groupByHashAbseilFlatHashMap(int n, const int *inputData) {
+vectorPair groupByHashAbseilFlatHashMap(int n, const int *inputData) {
     // Google Abseil
     absl::flat_hash_map<int, int> map;
 
@@ -68,11 +83,16 @@ vectorOfPairs groupByHashAbseilFlatHashMap(int n, const int *inputData) {
         map[inputData[i]]++;
     }
 
-    vectorOfPairs result(map.begin(), map.end());
+    vectorPair result;
+    for (const auto& pair : map) {
+        result.first.push_back(pair.first);
+        result.second.push_back(pair.second);
+    }
+
     return result;
 }
 
-vectorOfPairs groupByHashTessilRobinMap(int n, const int *inputData) {
+vectorPair groupByHashTessilRobinMap(int n, const int *inputData) {
     // Tessil Robin Map
     tsl::robin_map<int, int> map;
 
@@ -80,11 +100,16 @@ vectorOfPairs groupByHashTessilRobinMap(int n, const int *inputData) {
         map[inputData[i]]++;
     }
 
-    vectorOfPairs result(map.begin(), map.end());
+    vectorPair result;
+    for (const auto& pair : map) {
+        result.first.push_back(pair.first);
+        result.second.push_back(pair.second);
+    }
+
     return result;
 }
 
-vectorOfPairs groupByHashTessilHopscotchMap(int n, const int *inputData) {
+vectorPair groupByHashTessilHopscotchMap(int n, const int *inputData) {
     // Tessil Hopscotch Map
     tsl::hopscotch_map<int, int> map;
 
@@ -92,11 +117,16 @@ vectorOfPairs groupByHashTessilHopscotchMap(int n, const int *inputData) {
         map[inputData[i]]++;
     }
 
-    vectorOfPairs result(map.begin(), map.end());
+    vectorPair result;
+    for (const auto& pair : map) {
+        result.first.push_back(pair.first);
+        result.second.push_back(pair.second);
+    }
+
     return result;
 }
 
-vectorOfPairs groupBySortRadix(int n, int *inputData) {
+vectorPair groupBySortRadix(int n, int *inputData) {
     int i;
     int *buffer = new int[n];
     int buckets = 1 << BITS_PER_PASS;
@@ -134,21 +164,23 @@ vectorOfPairs groupBySortRadix(int n, int *inputData) {
     delete []buffer;
     delete []bucket;
 
-    vectorOfPairs result;
-    result.emplace_back(inputData[0], 1);
+    vectorPair result;
+    result.first.push_back(inputData[0]);
+    result.second.push_back(1);
 
     for (i = 1; i < n; i++) {
-        if (inputData[i] == result.back().first) {
-            result.back().second += 1;
+        if (inputData[i] == result.first.back()) {
+            result.second.back() += 1;
         } else {
-            result.emplace_back(inputData[i], 1);
+            result.first.push_back(inputData[i]);
+            result.second.push_back(1);
         }
     }
 
     return result;
 }
 
-void groupBySortRadixOptAuxAgg(int start, int end, const int *inputData, int mask, int buckets, vectorOfPairs &result) {
+void groupBySortRadixOptAuxAgg(int start, int end, const int *inputData, int mask, int buckets, vectorPair &result) {
     int i;
     int bucket[1 << BITS_PER_PASS] = {0};
 
@@ -160,12 +192,13 @@ void groupBySortRadixOptAuxAgg(int start, int end, const int *inputData, int mas
 
     for (i = 0; i < buckets; i++) {
         if (bucket[i] > 0) {
-            result.emplace_back(valuePrefix | i, bucket[i]);
+            result.first.push_back(valuePrefix | i);
+            result.second.push_back(bucket[i]);
         }
     }
 }
 
-void groupBySortRadixOptAux(int start, int end, int *inputData, int *buffer, int mask, int buckets, int pass, vectorOfPairs &result) {
+void groupBySortRadixOptAux(int start, int end, int *inputData, int *buffer, int mask, int buckets, int pass, vectorPair &result) {
     int i;
     int bucket[1 << BITS_PER_PASS] = {0};
 
@@ -210,7 +243,7 @@ void groupBySortRadixOptAux(int start, int end, int *inputData, int *buffer, int
     }
 }
 
-vectorOfPairs groupBySortRadixOpt(int n, int *inputData) {
+vectorPair groupBySortRadixOpt(int n, int *inputData) {
     int i;
     int buckets = 1 << BITS_PER_PASS;
     int mask = buckets - 1;
@@ -228,7 +261,7 @@ vectorOfPairs groupBySortRadixOpt(int n, int *inputData) {
     }
 
     int passes = static_cast<int>(std::ceil(static_cast<double>(msbPosition) / BITS_PER_PASS)) - 1;
-    vectorOfPairs result;
+    vectorPair result;
 
     if (passes > 0) {
         int *buffer = new int[n];
@@ -241,7 +274,7 @@ vectorOfPairs groupBySortRadixOpt(int n, int *inputData) {
     return result;
 }
 
-vectorOfPairs groupBySingleRadixPassThenHash(int n, int *inputData) {
+vectorPair groupBySingleRadixPassThenHash(int n, int *inputData) {
     int i;
     int *buffer = new int[n];
     int buckets = 1 << BITS_PER_PASS;
@@ -268,15 +301,17 @@ vectorOfPairs groupBySingleRadixPassThenHash(int n, int *inputData) {
 
     std::swap(inputData, buffer);
 
-    vectorOfPairs result;
+    vectorPair result;
     if (partitions[0] > 0) {
-        vectorOfPairs newResults = groupByHash(partitions[0], inputData);
-        result.insert(result.end(), newResults.begin(), newResults.end());
+        vectorPair newResults = groupByHash(partitions[0], inputData);
+        result.first.insert(result.first.end(), newResults.first.begin(), newResults.first.end());
+        result.second.insert(result.second.end(), newResults.second.begin(), newResults.second.end());
     }
     for (i = 1; i < buckets; i++) {
         if (partitions[i] > partitions[i - 1]) {
-            vectorOfPairs newResults = groupByHash(partitions[i] - partitions[i - 1], inputData + partitions[i - 1]);
-            result.insert(result.end(), newResults.begin(), newResults.end());
+            vectorPair newResults = groupByHash(partitions[i] - partitions[i - 1], inputData + partitions[i - 1]);
+            result.first.insert(result.first.end(), newResults.first.begin(), newResults.first.end());
+            result.second.insert(result.second.end(), newResults.second.begin(), newResults.second.end());
         }
     }
 
@@ -286,7 +321,7 @@ vectorOfPairs groupBySingleRadixPassThenHash(int n, int *inputData) {
     return result;
 }
 
-vectorOfPairs groupByDoubleRadixPassThenHash(int n, int *inputData) {
+vectorPair groupByDoubleRadixPassThenHash(int n, int *inputData) {
     int i;
     int *buffer = new int[n];
     int buckets = 1 << BITS_PER_PASS;
@@ -319,16 +354,18 @@ vectorOfPairs groupByDoubleRadixPassThenHash(int n, int *inputData) {
 
     }
 
-    vectorOfPairs result;
+    vectorPair result;
 
     if (partitions[0] > 0) {
-        vectorOfPairs newResults = groupByHash(partitions[0], inputData);
-        result.insert(result.end(), newResults.begin(), newResults.end());
+        vectorPair newResults = groupByHash(partitions[0], inputData);
+        result.first.insert(result.first.end(), newResults.first.begin(), newResults.first.end());
+        result.second.insert(result.second.end(), newResults.second.begin(), newResults.second.end());
     }
     for (i = 1; i < buckets; i++) {
         if (partitions[i] > partitions[i - 1]) {
-            vectorOfPairs newResults = groupByHash(partitions[i] - partitions[i - 1], inputData + partitions[i - 1]);
-            result.insert(result.end(), newResults.begin(), newResults.end());
+            vectorPair newResults = groupByHash(partitions[i] - partitions[i - 1], inputData + partitions[i - 1]);
+            result.first.insert(result.first.end(), newResults.first.begin(), newResults.first.end());
+            result.second.insert(result.second.end(), newResults.second.begin(), newResults.second.end());
         }
     }
 
@@ -337,7 +374,7 @@ vectorOfPairs groupByDoubleRadixPassThenHash(int n, int *inputData) {
     return result;
 }
 
-vectorOfPairs groupByAdaptive(int n, int *inputData) {
+vectorPair groupByAdaptive(int n, int *inputData) {
     int tuplesPerCheck = 50000;
     absl::flat_hash_map<int, int> map;
 
@@ -371,10 +408,16 @@ vectorOfPairs groupByAdaptive(int n, int *inputData) {
         }
     }
 
-    return {map.begin(), map.end()};
+    vectorPair result;
+    for (const auto& pair : map) {
+        result.first.push_back(pair.first);
+        result.second.push_back(pair.second);
+    }
+
+    return result;
 }
 
-vectorOfPairs runGroupByFunction(GroupBy groupByImplementation, int n, int *inputData) {
+vectorPair runGroupByFunction(GroupBy groupByImplementation, int n, int *inputData) {
     switch(groupByImplementation) {
         case GroupBy::Hash:
             return groupByHash(n, inputData);
