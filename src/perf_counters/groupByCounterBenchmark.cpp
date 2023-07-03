@@ -1,5 +1,7 @@
 #include <cassert>
 #include <iostream>
+#include <cmath>
+#include <absl/container/flat_hash_map.h>
 
 #include "groupByCounterBenchmark.h"
 #include "../utils/dataHelpers.h"
@@ -164,6 +166,60 @@ void groupByBenchmarkWithExtraCounters(DataSweep &dataSweep, GroupBy groupByImpl
             "ExtraCountersCyclesBM_" +
             getGroupByName(groupByImplementation) +
             dataSweep.getSweepName();
+    std::string fullFilePath = outputFilePath + groupByCyclesFolder + fileName + ".csv";
+    writeHeadersAndTableToCSV(headers, results, fullFilePath);
+
+    shutdownPAPI(benchmarkEventSet, benchmarkCounterValues);
+}
+
+void groupByBenchmarkWithExtraCountersDuringRun(const DataFile &dataFile,
+                                                std::vector<std::string> &benchmarkCounters,
+                                                const std::string &fileNamePrefix) {
+
+    int numElements = dataFile.getNumElements();
+    int tuplesPerMeasurement = 50000;
+    int numMeasurements = std::ceil(static_cast<float>(numElements) / tuplesPerMeasurement);
+
+    long_long benchmarkCounterValues[benchmarkCounters.size()];
+    int benchmarkEventSet = initialisePAPIandCreateEventSet(benchmarkCounters);
+
+    std::vector<std::vector<long_long>> results(numMeasurements, std::vector<long_long>(benchmarkCounters.size() + 1, 0));
+
+    auto inputData = new int[numElements];
+    copyArray(LoadedData::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
+
+    int index = 0;
+    int tuplesToProcess;
+    absl::flat_hash_map<int, int> map;
+
+    for (auto j = 0; j < numMeasurements; ++j) {
+        tuplesToProcess = std::min(tuplesPerMeasurement, numElements - index);
+
+        if (PAPI_reset(benchmarkEventSet) != PAPI_OK)
+            exit(1);
+
+        for (auto _ = 0; _ < tuplesToProcess; ++_) {map[inputData[index++]]++;}
+
+        if (PAPI_read(benchmarkEventSet, benchmarkCounterValues) != PAPI_OK)
+            exit(1);
+
+        for (int k = 0; k < static_cast<int>(benchmarkCounters.size()); ++k) {
+            results[j][1 + k] = benchmarkCounterValues[k];
+        }
+
+        results[j][0] = static_cast<long_long>(index);
+    }
+
+    delete[] inputData;
+
+    std::vector<std::string> headers(benchmarkCounters.begin(), benchmarkCounters.end());
+
+    headers.insert(headers.begin(), "Rows processed");
+
+    std::string fileName =
+            fileNamePrefix +
+            "ExtraCountersDuringRun_" +
+            dataFile.getFileName();
     std::string fullFilePath = outputFilePath + groupByCyclesFolder + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 

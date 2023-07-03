@@ -88,7 +88,7 @@ long_long *Counters::readEventSet() {
     }
 
     if (__builtin_expect(PAPI_accum(eventSet, counterValues) != PAPI_OK, false)) {
-        std::cerr << "Could not read event set!" << std::endl;
+        std::cerr << "Could not read and zero event set!" << std::endl;
         exit(1);
     }
     return counterValues;

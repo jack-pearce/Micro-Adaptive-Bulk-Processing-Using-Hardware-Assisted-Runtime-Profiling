@@ -47,6 +47,8 @@ public:
     static const DataFile nearlyFullySortedIntDistribution250mValues;
     static const DataFile partiallySortedIntDistribution250mValues;
     static const DataFile slightlySortedIntDistribution250mValues;
+
+    static const DataFile uniformIntDistribution200mValuesCardinality400kMax200m;
 };
 
 class DataSweep {

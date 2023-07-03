@@ -338,8 +338,41 @@ Run groupByDoubleRadixPassThenHash(int n, int *inputData) {
 }
 
 Run groupByAdaptive(int n, int *inputData) {
-    Run result;
-    return result;
+    int tuplesPerCheck = 50000;
+    absl::flat_hash_map<int, int> map;
+
+    float tuplesPerLastLevelCacheMissThreshold = 12.5;
+
+    std::vector<std::string> counters = {"PERF_COUNT_HW_CACHE_MISSES"};
+    long_long *counterValues = Counters::getInstance().getEvents(counters);
+    long_long lastLevelCacheMisses = 0;
+    long_long rowsProcessed = 0;
+
+    int index = 0;
+    int tuplesToProcess;
+
+    unsigned long warmUpRows = getL3cacheSize() / (sizeof(int) + sizeof(int));
+    for (auto _ = 0; _ < warmUpRows; ++_) {map[inputData[index++]]++;}
+
+    while (index < n) {
+
+        tuplesToProcess = std::min(tuplesPerCheck, n - index);
+
+        Counters::getInstance().readEventSet();
+        for (auto _ = 0; _ < tuplesToProcess; ++_) {map[inputData[index++]]++;}
+        Counters::getInstance().readEventSet();
+
+        lastLevelCacheMisses += counterValues[0];
+        rowsProcessed += tuplesToProcess;
+
+        if (__builtin_expect((static_cast<float>(rowsProcessed) / lastLevelCacheMisses)
+                                < tuplesPerLastLevelCacheMissThreshold, false)) {
+            std::cout << "LLC miss rate too high, rerunning groupBy with optimised radix sort" << std::endl;
+            return groupBySortRadixOpt(n, inputData);
+        }
+    }
+
+    return {map.begin(), map.end()};
 }
 
 Run runGroupByFunction(GroupBy groupByImplementation, int n, int *inputData) {

@@ -229,6 +229,22 @@ void groupByBenchmarkWithExtraCountersConfigurations(DataSweep &dataSweep,
     groupByBenchmarkWithExtraCounters(dataSweep, groupByImplementation, iterations, benchmarkCounters, fileNamePrefix);
 }
 
+void groupByBenchmarkWithExtraCountersDuringRunConfigurations(const DataFile &dataFile,
+                                                     const std::string &fileNamePrefix) {
+    // HPC set 1
+    std::vector<std::string> benchmarkCounters = {"PERF_COUNT_HW_CPU_CYCLES",
+                                                  "INSTRUCTION_RETIRED",
+                                                  "LLC_REFERENCES",
+                                                  "PERF_COUNT_HW_CACHE_REFERENCES",
+                                                  "PERF_COUNT_HW_CACHE_MISSES",
+                                                  "PERF_COUNT_HW_CACHE_L1D",
+                                                  "L1-DCACHE-LOADS",
+                                                  "L1-DCACHE-LOAD-MISSES",
+                                                  "L1-DCACHE-STORES"};
+
+    groupByBenchmarkWithExtraCountersDuringRun(dataFile, benchmarkCounters, fileNamePrefix);
+}
+
 
 void allGroupByTests() {
     // Graph 1: Cardinality range on uniform data (variable max) for different hashmaps - compile with -march=native removed
@@ -278,6 +294,12 @@ void allGroupByTests() {
 
 
 int main() {
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                   {GroupBy::Adaptive},
+                                   1, "");
+
+//    groupByBenchmarkWithExtraCountersDuringRunConfigurations(DataFiles::uniformIntDistribution200mValuesCardinality400kMax200m,
+//                                                             "");
 
     return 0;
 }

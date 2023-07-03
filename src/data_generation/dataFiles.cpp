@@ -99,6 +99,11 @@ const DataFile DataFiles::slightlySortedIntDistribution250mValues{
         "250m values between which are sorted. Each value is repeated 100 times before the next value."
         "25% of values are randomly swapped"};
 
+const DataFile DataFiles::uniformIntDistribution200mValuesCardinality400kMax200m{
+        200 * 1000 * 1000,
+        "uniformIntDistribution200mValuesCardinality400kMax200m",
+        "200m values with 400k unique values. Max of 200m i.e. gaps in distribution."};
+
 
 DataFile::DataFile(int _numElements, std::string _fileName, std::string _longDescription)
         : numElements(_numElements), fileName(std::move(_fileName)), longDescription(std::move(_longDescription)) {}
@@ -138,6 +143,8 @@ void DataFile::loadDataIntoMemory(int *data) const {
         generatePartiallySortedInMemory(data, getNumElements(), 100, 5);
     } else if (getFileName() == "slightlySortedIntDistribution250mValues") {
         generatePartiallySortedInMemory(data, getNumElements(), 100, 25);
+    } else if (getFileName() == "uniformIntDistribution200mValuesCardinality400kMax200m") {
+        generateUniformDistributionInMemoryWithSetCardinality(data, getNumElements(), getNumElements(), 400000);
     }
 }
 
@@ -189,7 +196,7 @@ DataSweep DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepVariabl
         "value, so the distribution is dense i.e. there are no gaps."};
 
 DataSweep DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax {
-        100,
+        30,
         200*1000*1000,
         "logUniformIntDistribution200mValuesCardinalitySweepFixedMax",
         "Log distribution of cardinality for 200m ints from 1 to 100m. The max value is fixed at 200m, "

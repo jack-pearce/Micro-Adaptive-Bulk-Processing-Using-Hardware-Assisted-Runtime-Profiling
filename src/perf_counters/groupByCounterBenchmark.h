@@ -15,4 +15,8 @@ void groupByBenchmarkWithExtraCounters(DataSweep &dataSweep, GroupBy groupByImpl
                                        int iterations, std::vector<std::string> &benchmarkCounters,
                                        const std::string &fileNamePrefix);
 
+void groupByBenchmarkWithExtraCountersDuringRun(const DataFile &dataFile,
+                                                std::vector<std::string> &benchmarkCounters,
+                                                const std::string &fileNamePrefix);
+
 #endif //MABPL_GROUPBYCOUNTERBENCHMARK_H
