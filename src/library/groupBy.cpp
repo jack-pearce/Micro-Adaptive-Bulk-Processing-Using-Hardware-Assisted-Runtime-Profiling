@@ -25,8 +25,7 @@ vectorOfPairs groupByHash(int n, const int *inputData) {
         map[inputData[i]]++;
     }
 
-    vectorOfPairs result(map.begin(), map.end());
-    return result;
+    return {map.begin(), map.end()};
 }
 
 vectorOfPairs groupByHashGoogleDenseHashMap(int n, const int *inputData) {
@@ -44,8 +43,7 @@ vectorOfPairs groupByHashGoogleDenseHashMap(int n, const int *inputData) {
         }
     }
 
-    vectorOfPairs result(map.begin(), map.end());
-    return result;
+    return {map.begin(), map.end()};
 }
 
 /*vectorOfPairs groupByHashFollyF14FastMap(int n, const int *inputData) {
@@ -56,8 +54,7 @@ vectorOfPairs groupByHashGoogleDenseHashMap(int n, const int *inputData) {
         map[inputData[i]]++;
     }
 
-    Run result(map.begin(), map.end());
-    return result;
+    return {map.begin(), map.end()};
 }*/
 
 vectorOfPairs groupByHashAbseilFlatHashMap(int n, const int *inputData) {
@@ -68,8 +65,7 @@ vectorOfPairs groupByHashAbseilFlatHashMap(int n, const int *inputData) {
         map[inputData[i]]++;
     }
 
-    vectorOfPairs result(map.begin(), map.end());
-    return result;
+    return {map.begin(), map.end()};
 }
 
 vectorOfPairs groupByHashTessilRobinMap(int n, const int *inputData) {
@@ -80,8 +76,7 @@ vectorOfPairs groupByHashTessilRobinMap(int n, const int *inputData) {
         map[inputData[i]]++;
     }
 
-    vectorOfPairs result(map.begin(), map.end());
-    return result;
+    return {map.begin(), map.end()};
 }
 
 vectorOfPairs groupByHashTessilHopscotchMap(int n, const int *inputData) {
@@ -92,8 +87,7 @@ vectorOfPairs groupByHashTessilHopscotchMap(int n, const int *inputData) {
         map[inputData[i]]++;
     }
 
-    vectorOfPairs result(map.begin(), map.end());
-    return result;
+    return {map.begin(), map.end()};
 }
 
 vectorOfPairs groupBySortRadix(int n, int *inputData) {
