@@ -62,6 +62,44 @@ void generateUniformDistributionInMemoryWithSetCardinality(int *data, int n, int
     std::cout << "Complete" << std::endl;
 }
 
+void generateUniformDistributionInMemoryWithSetCardinalityClustered(int *data, int n, int upperBound,
+                                                                    int cardinality, int spreadInCluster) {
+    assert(cardinality <= upperBound);
+    if (spreadInCluster >= cardinality) {
+        generateUniformDistributionInMemoryWithSetCardinality(data, n, upperBound ,cardinality);
+        return;
+    }
+
+    std::cout << "Generating data in memory... ";
+    std::cout.flush();
+
+    if (cardinality == 1) {
+        for (auto i = 0; i < n; ++i) {
+            data[i] = upperBound;
+        }
+        std::cout << "Complete" << std::endl;
+        return;
+    }
+
+    unsigned int seed = 1;
+    std::mt19937 gen(seed);
+    std::uniform_int_distribution<int> distribution(1, spreadInCluster);
+
+    int numberOfSections = 1 + cardinality - spreadInCluster;
+    int elementsPerSection = n / numberOfSections;
+    int index = 0;
+    for (int i = 0; i < numberOfSections - 1; i++) {
+        for (int j = 0; j < elementsPerSection; j++) {
+            data[index++] = scaleNumberLogarithmically(i + distribution(gen), cardinality, upperBound);
+        }
+    }
+    while (index < n) {
+        data[index++] = scaleNumberLogarithmically(cardinality - spreadInCluster + distribution(gen), cardinality, upperBound);
+    }
+
+    std::cout << "Complete" << std::endl;
+}
+
 void generateVaryingSelectivityInMemory(int *data, int n, int minimum, int numberOfDiscreteSections) {
     std::cout << "Generating data in memory... ";
     std::cout.flush();

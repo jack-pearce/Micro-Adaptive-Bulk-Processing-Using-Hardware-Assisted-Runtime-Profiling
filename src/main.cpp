@@ -279,10 +279,5 @@ void allGroupByTests() {
 
 int main() {
 
-    groupByBenchmarkWithExtraCountersConfigurations(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                                    GroupBy::Hash,
-                                                    1,
-                                                    "CacheMisses");
-
     return 0;
 }
