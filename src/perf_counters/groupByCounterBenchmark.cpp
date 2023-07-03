@@ -40,7 +40,7 @@ void groupByCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<Grou
 
                 std::cout << "Completed" << std::endl;
 
-                std::cout << "Result vector length: " << result.first.size() << std::endl;
+                std::cout << "Result vector length: " << result.size() << std::endl;
 
             }
             dataSweep.restartSweep();
@@ -90,7 +90,7 @@ void groupByCpuCyclesSweepBenchmarkVariableSize(DataSweep &dataSweep, const std:
 
                 std::cout << "Completed" << std::endl;
 
-                std::cout << "Result vector length: " << result.first.size() << std::endl;
+                std::cout << "Result vector length: " << result.size() << std::endl;
 
             }
             dataSweep.restartSweep();
