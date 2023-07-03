@@ -104,6 +104,11 @@ const DataFile DataFiles::uniformIntDistribution200mValuesCardinality400kMax200m
         "uniformIntDistribution200mValuesCardinality400kMax200m",
         "200m values with 400k unique values. Max of 200m i.e. gaps in distribution."};
 
+const DataFile DataFiles::uniformIntDistribution200mValuesCardinality4175320Max200mClustered1k{
+        200 * 1000 * 1000,
+        "uniformIntDistribution200mValuesCardinality4175320Max200mClustered1k",
+        "200m values with ~400k unique values. Max of 200m i.e. gaps in distribution. 1k clustering"};
+
 
 DataFile::DataFile(int _numElements, std::string _fileName, std::string _longDescription)
         : numElements(_numElements), fileName(std::move(_fileName)), longDescription(std::move(_longDescription)) {}
@@ -145,6 +150,8 @@ void DataFile::loadDataIntoMemory(int *data) const {
         generatePartiallySortedInMemory(data, getNumElements(), 100, 25);
     } else if (getFileName() == "uniformIntDistribution200mValuesCardinality400kMax200m") {
         generateUniformDistributionInMemoryWithSetCardinality(data, getNumElements(), getNumElements(), 400000);
+    } else if (getFileName() == "uniformIntDistribution200mValuesCardinality4175320Max200mClustered1k") {
+        generateUniformDistributionInMemoryWithSetCardinalityClustered(data, getNumElements(), getNumElements(), 4175320, 1000);
     }
 }
 

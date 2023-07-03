@@ -193,10 +193,10 @@ void groupByFunctionalityTest(const DataFile& dataFile, GroupBy groupByImplement
     auto inputData = new int[dataFile.getNumElements()];
     copyArray(LoadedData::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
 
-    Run resultHash = groupByHash(dataFile.getNumElements(), inputData);
+    vectorOfPairs resultHash = groupByHash(dataFile.getNumElements(), inputData);
     std::sort(resultHash.begin(), resultHash.end(), comparePairs);
 
-    Run resultInput = runGroupByFunction(groupByImplementation, dataFile.getNumElements(), inputData);
+    vectorOfPairs resultInput = runGroupByFunction(groupByImplementation, dataFile.getNumElements(), inputData);
     std::sort(resultInput.begin(), resultInput.end(), comparePairs);
 
     if (resultHash.size() != resultInput.size()) {
@@ -294,12 +294,21 @@ void allGroupByTests() {
 
 
 int main() {
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::Adaptive},
-                                   1, "");
 
-//    groupByBenchmarkWithExtraCountersDuringRunConfigurations(DataFiles::uniformIntDistribution200mValuesCardinality400kMax200m,
-//                                                             "");
+//    groupByBenchmarkWithExtraCountersDuringRunConfigurations(DataFiles::uniformIntDistribution200mValuesCardinality4175320Max200mClustered1k,
+//                                               "");
+
+//    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered1,
+//                                   {GroupBy::Adaptive},
+//                                   1, "");
+//
+//    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered1k,
+//                                   {GroupBy::Adaptive},
+//                                   1, "");
+//
+//    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered100k,
+//                                   {GroupBy::Adaptive},
+//                                   1, "");
 
     return 0;
 }

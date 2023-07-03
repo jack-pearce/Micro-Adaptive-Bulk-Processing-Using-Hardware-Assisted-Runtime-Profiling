@@ -5,8 +5,7 @@
 #include <vector>
 #include <memory>
 
-using Run = std::vector<std::pair<int, int>>;
-using Runs = std::vector<std::unique_ptr<Run>>;
+using vectorOfPairs = std::vector<std::pair<int, int>>;
 
 enum GroupBy {
     Hash,
@@ -22,22 +21,22 @@ enum GroupBy {
     Adaptive
 };
 
-std::vector<std::pair<int, int>> groupByHash(int n, const int *inputData);
+vectorOfPairs groupByHash(int n, const int *inputData);
 
-Run groupByHashGoogleDenseHashMap(int n, const int *inputData);
-Run groupByHashFollyF14FastMap(int n, const int *inputData);
-Run groupByHashAbseilFlatHashMap(int n, const int *inputData);
-Run groupByHashTessilRobinMap(int n, const int *inputData);
-Run groupByHashTessilHopscotchMap(int n, const int *inputData);
+vectorOfPairs groupByHashGoogleDenseHashMap(int n, const int *inputData);
+vectorOfPairs groupByHashFollyF14FastMap(int n, const int *inputData);
+vectorOfPairs groupByHashAbseilFlatHashMap(int n, const int *inputData);
+vectorOfPairs groupByHashTessilRobinMap(int n, const int *inputData);
+vectorOfPairs groupByHashTessilHopscotchMap(int n, const int *inputData);
 
-Run groupBySortRadix(int n, int *inputData);
-Run groupBySortRadixOpt(int n, int *inputData);
+vectorOfPairs groupBySortRadix(int n, int *inputData);
+vectorOfPairs groupBySortRadixOpt(int n, int *inputData);
 
-Run groupBySingleRadixPassThenHash(int n, int *inputData);
+vectorOfPairs groupBySingleRadixPassThenHash(int n, int *inputData);
 
-Run groupByAdaptive(int n, int *inputData);
+vectorOfPairs groupByAdaptive(int n, int *inputData);
 
-Run runGroupByFunction(GroupBy groupByImplementation, int n, int *inputData);
+vectorOfPairs runGroupByFunction(GroupBy groupByImplementation, int n, int *inputData);
 std::string getGroupByName(GroupBy groupByImplementation);
 
 
