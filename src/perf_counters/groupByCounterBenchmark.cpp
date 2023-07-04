@@ -8,9 +8,11 @@
 #include "../data_generation/config.h"
 #include "../library/papi.h"
 #include "../utils/papiHelpers.h"
+#include "../data_generation/dataGenerators.h"
 
 void groupByCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<GroupBy> &groupByImplementations,
-                                   int iterations, const std::string &fileNamePrefix) {
+                                    aggFuncPtr aggregator, int iterations,
+                                    const std::string &fileNamePrefix) {
     assert(!groupByImplementations.empty());
 
     int dataCols = iterations * static_cast<int>(groupByImplementations.size());
@@ -22,21 +24,25 @@ void groupByCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<Grou
         for (auto j = 0; j < static_cast<int>(groupByImplementations.size()); ++j) {
             for (auto k = 0; k < dataSweep.getTotalRuns(); ++k) {
                 results[k][0] = static_cast<int>(dataSweep.getRunInput());
-                auto inputData = new int[dataSweep.getNumElements()];
+                auto inputGroupBy = new int[dataSweep.getNumElements()];
+                auto inputAggregate = new int[dataSweep.getNumElements()];
 
                 std::cout << "Running " << getGroupByName(groupByImplementations[j]) << " for input ";
                 std::cout << static_cast<int>(dataSweep.getRunInput()) << "... ";
 
-                dataSweep.loadNextDataSetIntoMemory(inputData);
+                dataSweep.loadNextDataSetIntoMemory(inputGroupBy);
+                generateUniformDistributionInMemory(inputAggregate, dataSweep.getNumElements(), 10);
 
                 cycles = *Counters::getInstance().readEventSet();
 
-                auto result = runGroupByFunction(groupByImplementations[j], dataSweep.getNumElements(), inputData);
+                auto result = runGroupByFunction(groupByImplementations[j],
+                                                 dataSweep.getNumElements(), inputGroupBy, inputAggregate, aggregator);
 
                 results[k][1 + (i * groupByImplementations.size()) + j] =
                         static_cast<double>(*Counters::getInstance().readEventSet() - cycles);
 
-                delete[] inputData;
+                delete[] inputGroupBy;
+                delete []inputAggregate;
 
                 std::cout << "Completed" << std::endl;
 
@@ -59,7 +65,8 @@ void groupByCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<Grou
 }
 
 void groupByCpuCyclesSweepBenchmarkVariableSize(DataSweep &dataSweep, const std::vector<GroupBy> &groupByImplementations,
-                                    int iterations, const std::string &fileNamePrefix) {
+                                                aggFuncPtr aggregator, int iterations,
+                                                const std::string &fileNamePrefix) {
     assert(!groupByImplementations.empty());
 
     int dataCols = iterations * static_cast<int>(groupByImplementations.size());
@@ -72,21 +79,25 @@ void groupByCpuCyclesSweepBenchmarkVariableSize(DataSweep &dataSweep, const std:
             for (auto k = 0; k < dataSweep.getTotalRuns(); ++k) {
                 results[k][0] = static_cast<int>(dataSweep.getRunInput());
                 int numElements = static_cast<int>(dataSweep.getRunInput());;
-                auto inputData = new int[numElements];
+                auto inputGroupBy = new int[numElements];
+                auto inputAggregate = new int[numElements];
 
                 std::cout << "Running " << getGroupByName(groupByImplementations[j]) << " for input ";
                 std::cout << static_cast<int>(dataSweep.getRunInput()) << "... ";
 
-                dataSweep.loadNextDataSetIntoMemory(inputData);
+                dataSweep.loadNextDataSetIntoMemory(inputGroupBy);
+                generateUniformDistributionInMemory(inputAggregate, numElements, 10);
 
                 cycles = *Counters::getInstance().readEventSet();
 
-                auto result = runGroupByFunction(groupByImplementations[j], numElements, inputData);
+                auto result = runGroupByFunction(groupByImplementations[j], numElements, inputGroupBy, inputAggregate,
+                                                 aggregator);
 
                 results[k][1 + (i * groupByImplementations.size()) + j] =
                         static_cast<double>(*Counters::getInstance().readEventSet() - cycles);
 
-                delete[] inputData;
+                delete []inputGroupBy;
+                delete []inputAggregate;
 
                 std::cout << "Completed" << std::endl;
 
@@ -110,8 +121,8 @@ void groupByCpuCyclesSweepBenchmarkVariableSize(DataSweep &dataSweep, const std:
 
 
 void groupByBenchmarkWithExtraCounters(DataSweep &dataSweep, GroupBy groupByImplementation,
-                                      int iterations, std::vector<std::string> &benchmarkCounters,
-                                      const std::string &fileNamePrefix) {
+                                       aggFuncPtr aggregator, int iterations,
+                                       std::vector<std::string> &benchmarkCounters, const std::string &fileNamePrefix) {
     if (groupByImplementation == GroupBy::Adaptive)
         std::cout << "Cannot benchmark adaptive groupBy using counters as adaptive select is already using these counters" << std::endl;
 
@@ -128,23 +139,27 @@ void groupByBenchmarkWithExtraCounters(DataSweep &dataSweep, GroupBy groupByImpl
             results[j][0] = static_cast<long_long>(dataSweep.getRunInput());
 
             int numElements = static_cast<int>(dataSweep.getNumElements());
-            auto inputData = new int[numElements];
+            auto inputGroupBy = new int[numElements];
+            auto inputAggregate = new int[numElements];
 
             std::cout << "Running " << getGroupByName(groupByImplementation) << " for input ";
             std::cout << static_cast<int>(dataSweep.getRunInput()) << ", iteration ";
             std::cout << i + 1 << "... ";
 
-            dataSweep.loadNextDataSetIntoMemory(inputData);
+            dataSweep.loadNextDataSetIntoMemory(inputGroupBy);
+            generateUniformDistributionInMemory(inputAggregate, numElements, 10);
+
 
             if (PAPI_reset(benchmarkEventSet) != PAPI_OK)
                 exit(1);
 
-            runGroupByFunction(groupByImplementation,numElements, inputData);
+            runGroupByFunction(groupByImplementation, numElements, inputGroupBy, inputAggregate, aggregator);
 
             if (PAPI_read(benchmarkEventSet, benchmarkCounterValues) != PAPI_OK)
                 exit(1);
 
-            delete[] inputData;
+            delete[] inputGroupBy;
+            delete[] inputAggregate;
 
             for (int k = 0; k < static_cast<int>(benchmarkCounters.size()); ++k) {
                 results[j][1 + (i * benchmarkCounters.size()) + k] = benchmarkCounterValues[k];
@@ -173,6 +188,7 @@ void groupByBenchmarkWithExtraCounters(DataSweep &dataSweep, GroupBy groupByImpl
 }
 
 void groupByBenchmarkWithExtraCountersDuringRun(const DataFile &dataFile,
+                                                aggFuncPtr aggregator,
                                                 std::vector<std::string> &benchmarkCounters,
                                                 const std::string &fileNamePrefix) {
 
@@ -185,12 +201,16 @@ void groupByBenchmarkWithExtraCountersDuringRun(const DataFile &dataFile,
 
     std::vector<std::vector<long_long>> results(numMeasurements, std::vector<long_long>(benchmarkCounters.size() + 1, 0));
 
-    auto inputData = new int[numElements];
-    copyArray(LoadedData::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
+    auto inputGroupBy = new int[numElements];
+    auto inputAggregate = new int[numElements];
+    copyArray(LoadedData::getInstance(dataFile).getData(), inputGroupBy, dataFile.getNumElements());
+    generateUniformDistributionInMemory(inputAggregate, numElements, 10);
+
 
     int index = 0;
     int tuplesToProcess;
     absl::flat_hash_map<int, int> map;
+    absl::flat_hash_map<int, int>::iterator it;
 
     for (auto j = 0; j < numMeasurements; ++j) {
         tuplesToProcess = std::min(tuplesPerMeasurement, numElements - index);
@@ -198,7 +218,15 @@ void groupByBenchmarkWithExtraCountersDuringRun(const DataFile &dataFile,
         if (PAPI_reset(benchmarkEventSet) != PAPI_OK)
             exit(1);
 
-        for (auto _ = 0; _ < tuplesToProcess; ++_) {map[inputData[index++]]++;}
+        for (auto _ = 0; _ < tuplesToProcess; ++_) {
+            it = map.find(inputGroupBy[index]);
+            if (it != map.end()) {
+                it->second = aggregator(it->second, inputAggregate[index], false);
+            } else {
+                map.insert({inputGroupBy[index], aggregator(inputAggregate[index], 0, true)});
+            }
+            ++index;
+        }
 
         if (PAPI_read(benchmarkEventSet, benchmarkCounterValues) != PAPI_OK)
             exit(1);
@@ -210,7 +238,8 @@ void groupByBenchmarkWithExtraCountersDuringRun(const DataFile &dataFile,
         results[j][0] = static_cast<long_long>(index);
     }
 
-    delete[] inputData;
+    delete[] inputGroupBy;
+    delete[] inputAggregate;
 
     std::vector<std::string> headers(benchmarkCounters.begin(), benchmarkCounters.end());
 

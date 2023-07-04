@@ -21,22 +21,30 @@ enum GroupBy {
     Adaptive
 };
 
-vectorOfPairs groupByHash(int n, const int *inputData);
+using aggFuncPtr = int (*)(int, int, bool);
 
-vectorOfPairs groupByHashGoogleDenseHashMap(int n, const int *inputData);
-vectorOfPairs groupByHashFollyF14FastMap(int n, const int *inputData);
-vectorOfPairs groupByHashAbseilFlatHashMap(int n, const int *inputData);
-vectorOfPairs groupByHashTessilRobinMap(int n, const int *inputData);
-vectorOfPairs groupByHashTessilHopscotchMap(int n, const int *inputData);
+extern const aggFuncPtr minAggregation;
+extern const aggFuncPtr maxAggregation;
+extern const aggFuncPtr sumAggregation;
+extern const aggFuncPtr countAggregation;
 
-vectorOfPairs groupBySortRadix(int n, int *inputData);
-vectorOfPairs groupBySortRadixOpt(int n, int *inputData);
+vectorOfPairs groupByHash(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator);
 
-vectorOfPairs groupBySingleRadixPassThenHash(int n, int *inputData);
+vectorOfPairs groupByHashGoogleDenseHashMap(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator);
+vectorOfPairs groupByHashFollyF14FastMap(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator);
+vectorOfPairs groupByHashAbseilFlatHashMap(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator);
+vectorOfPairs groupByHashTessilRobinMap(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator);
+vectorOfPairs groupByHashTessilHopscotchMap(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator);
 
-vectorOfPairs groupByAdaptive(int n, int *inputData);
+vectorOfPairs groupBySortRadix(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator);
+vectorOfPairs groupBySortRadixOpt(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator);
 
-vectorOfPairs runGroupByFunction(GroupBy groupByImplementation, int n, int *inputData);
+vectorOfPairs groupBySingleRadixPassThenHash(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator);
+vectorOfPairs groupByDoubleRadixPassThenHash(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator);
+
+vectorOfPairs groupByAdaptive(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator);
+
+vectorOfPairs runGroupByFunction(GroupBy groupByImplementation, int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator);
 std::string getGroupByName(GroupBy groupByImplementation);
 
 
