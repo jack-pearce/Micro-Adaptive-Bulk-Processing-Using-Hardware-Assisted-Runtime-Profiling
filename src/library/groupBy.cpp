@@ -18,87 +18,146 @@
 #define BITS_PER_PASS 10
 
 
-vectorOfPairs groupByHash(int n, const int *inputData) {
+inline int minAggregationFunc(int a, int b, bool firstAggregation) {
+    if (firstAggregation) {
+        return a;
+    }
+    return std::min(a, b);
+}
+
+inline int maxAggregationFunc(int a, int b, bool firstAggregation) {
+    if (firstAggregation) {
+        return a;
+    }
+    return std::max(a, b);
+}
+
+inline int sumAggregationFunc(int a, int b, bool firstAggregation) {
+    if (firstAggregation) {
+        return a;
+    }
+    return a + b;
+}
+
+inline int countAggregationFunc(int a, int b, bool firstAggregation) {
+    if (firstAggregation) {
+        return 1;
+    }
+    return ++a;
+}
+
+const aggFuncPtr minAggregation = &minAggregationFunc;
+const aggFuncPtr maxAggregation = &maxAggregationFunc;
+const aggFuncPtr sumAggregation = &sumAggregationFunc;
+const aggFuncPtr countAggregation = &countAggregationFunc;
+
+vectorOfPairs groupByHash(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator) {
     absl::flat_hash_map<int, int> map;
 
     absl::flat_hash_map<int, int>::iterator it;
     for (auto i = 0; i < n; ++i) {
-        it = map.find(inputData[i]);
+        it = map.find(inputGroupBy[i]);
         if (it != map.end()) {
-            ++(it->second);
+            it->second = aggregator(it->second, inputAggregate[i], false);
         } else {
-            map.insert({inputData[i], 1});
+            map.insert({inputGroupBy[i], aggregator(inputAggregate[i], 0, true)});
         }
     }
 
     return {map.begin(), map.end()};
 }
 
-vectorOfPairs groupByHashGoogleDenseHashMap(int n, const int *inputData) {
+vectorOfPairs groupByHashGoogleDenseHashMap(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator) {
     // Google SparseHash
     google::dense_hash_map<int, int> map;
     map.set_empty_key(-1);
 
+    google::dense_hash_map<int, int>::iterator it;
     for (auto i = 0; i < n; ++i) {
-        int value = inputData[i];
-        auto it = map.find(value);
+        it = map.find(inputGroupBy[i]);
         if (it != map.end()) {
-            ++(it->second);
+            it->second = aggregator(it->second, inputAggregate[i], false);
         } else {
-            map[value] = 1;
+            map.insert({inputGroupBy[i], aggregator(inputAggregate[i], 0, true)});
         }
     }
 
     return {map.begin(), map.end()};
 }
 
-/*vectorOfPairs groupByHashFollyF14FastMap(int n, const int *inputData) {
+/*vectorOfPairs groupByHashFollyF14FastMap(int n, const int *inputGroupBy, const int *inputAggregate,
+                                           aggFuncPtr aggregator) {
     // Facebook Folly
     folly::F14FastMap<int, int> map;
 
+    folly::F14FastMap<int, int>::iterator it;
     for (auto i = 0; i < n; ++i) {
-        map[inputData[i]]++;
+        it = map.find(inputGroupBy[i]);
+        if (it != map.end()) {
+            it->second = aggregator(it->second, inputAggregate[i], false);
+        } else {
+            map.insert({inputGroupBy[i], aggregator(inputAggregate[i], 0, true)});
+        }
     }
 
     return {map.begin(), map.end()};
 }*/
 
-vectorOfPairs groupByHashAbseilFlatHashMap(int n, const int *inputData) {
+vectorOfPairs groupByHashAbseilFlatHashMap(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator) {
     // Google Abseil
     absl::flat_hash_map<int, int> map;
 
+    absl::flat_hash_map<int, int>::iterator it;
     for (auto i = 0; i < n; ++i) {
-        map[inputData[i]]++;
+        it = map.find(inputGroupBy[i]);
+        if (it != map.end()) {
+            it->second = aggregator(it->second, inputAggregate[i], false);
+        } else {
+            map.insert({inputGroupBy[i], aggregator(inputAggregate[i], 0, true)});
+        }
     }
 
     return {map.begin(), map.end()};
 }
 
-vectorOfPairs groupByHashTessilRobinMap(int n, const int *inputData) {
+vectorOfPairs groupByHashTessilRobinMap(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator) {
     // Tessil Robin Map
     tsl::robin_map<int, int> map;
 
+    tsl::robin_map<int, int>::iterator it;
     for (auto i = 0; i < n; ++i) {
-        map[inputData[i]]++;
+        it = map.find(inputGroupBy[i]);
+        if (it != map.end()) {
+            it.value() = aggregator(it->second, inputAggregate[i], false);
+        } else {
+            map.insert({inputGroupBy[i], aggregator(inputAggregate[i], 0, true)});
+        }
     }
 
     return {map.begin(), map.end()};
 }
 
-vectorOfPairs groupByHashTessilHopscotchMap(int n, const int *inputData) {
+vectorOfPairs groupByHashTessilHopscotchMap(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator) {
     // Tessil Hopscotch Map
     tsl::hopscotch_map<int, int> map;
 
+    tsl::hopscotch_map<int, int>::iterator it;
     for (auto i = 0; i < n; ++i) {
-        map[inputData[i]]++;
+        it = map.find(inputGroupBy[i]);
+        if (it != map.end()) {
+            it.value() = aggregator(it->second, inputAggregate[i], false);
+        } else {
+            map.insert({inputGroupBy[i], aggregator(inputAggregate[i], 0, true)});
+        }
     }
 
     return {map.begin(), map.end()};
 }
 
-vectorOfPairs groupBySortRadix(int n, int *inputData) {
+vectorOfPairs groupBySortRadix(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator) {
     int i;
-    int *buffer = new int[n];
+    int *bufferGroupBy = new int[n];
+    int *bufferAggregate = new int[n];
     int buckets = 1 << BITS_PER_PASS;
     int mask = buckets - 1;
     int* bucket = new int[buckets];
@@ -112,7 +171,7 @@ vectorOfPairs groupBySortRadix(int n, int *inputData) {
         }
 
         for (i = 0; i < n; i++) {
-            bucket[(inputData[i] >> (pass * BITS_PER_PASS)) & mask]++;
+            bucket[(inputGroupBy[i] >> (pass * BITS_PER_PASS)) & mask]++;
         }
 
         for (i = 1; i < buckets; i++) {
@@ -120,57 +179,49 @@ vectorOfPairs groupBySortRadix(int n, int *inputData) {
         }
 
         for (i = n - 1; i >= 0; i--) {
-            buffer[--bucket[(inputData[i] >> (pass * BITS_PER_PASS)) & mask]] = inputData[i];
+            bufferGroupBy[--bucket[(inputGroupBy[i] >> (pass * BITS_PER_PASS)) & mask]] = inputGroupBy[i];
+            bufferAggregate[bucket[(inputGroupBy[i] >> (pass * BITS_PER_PASS)) & mask]] = inputAggregate[i];
+
         }
 
-        std::swap(inputData, buffer);
+        std::swap(inputGroupBy, bufferGroupBy);
+        std::swap(inputAggregate, bufferAggregate);
     }
 
     if (finalCopyRequired) {
-        std::swap(inputData, buffer);
-        std::copy(buffer, buffer + n, inputData);
+        std::swap(inputGroupBy, bufferGroupBy);
+        std::copy(bufferGroupBy, bufferGroupBy + n, inputGroupBy);
     }
-
-    delete []buffer;
-    delete []bucket;
 
     vectorOfPairs result;
-    result.emplace_back(inputData[0], 1);
 
+    result.emplace_back(inputGroupBy[0], aggregator(inputAggregate[0], 0, true));
     for (i = 1; i < n; i++) {
-        if (inputData[i] == result.back().first) {
-            result.back().second += 1;
+        if (inputGroupBy[i] == result.back().first) {
+            result.back().second = aggregator(result.back().second, inputAggregate[i], false);
         } else {
-            result.emplace_back(inputData[i], 1);
+            result.emplace_back(inputGroupBy[i], aggregator(inputAggregate[i], 0, true));
         }
     }
+
+    if (finalCopyRequired) {
+        std::swap(inputAggregate, bufferAggregate);
+    }
+
+    delete []bufferGroupBy;
+    delete []bucket;
+    delete []bufferAggregate;
 
     return result;
 }
 
-void groupBySortRadixOptAuxAgg(int start, int end, const int *inputData, int mask, int buckets, vectorOfPairs &result) {
+void groupBySortRadixOptAux(int start, int end, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator,
+                            int *bufferGroupBy, int *bufferAggregate, int mask, int buckets, int pass, vectorOfPairs &result) {
     int i;
     int bucket[1 << BITS_PER_PASS] = {0};
 
     for (i = start; i < end; i++) {
-        bucket[inputData[i] & mask]++;
-    }
-
-    int valuePrefix = inputData[start] & ~mask;
-
-    for (i = 0; i < buckets; i++) {
-        if (bucket[i] > 0) {
-            result.emplace_back(valuePrefix | i, bucket[i]);
-        }
-    }
-}
-
-void groupBySortRadixOptAux(int start, int end, int *inputData, int *buffer, int mask, int buckets, int pass, vectorOfPairs &result) {
-    int i;
-    int bucket[1 << BITS_PER_PASS] = {0};
-
-    for (i = start; i < end; i++) {
-        bucket[(inputData[i] >> (pass * BITS_PER_PASS)) & mask]++;
+        bucket[(inputGroupBy[i] >> (pass * BITS_PER_PASS)) & mask]++;
     }
 
     for (i = 1; i < buckets; i++) {
@@ -183,42 +234,46 @@ void groupBySortRadixOptAux(int start, int end, int *inputData, int *buffer, int
     }
 
     for (i = end - 1; i >= start; i--) {
-        buffer[start + --bucket[(inputData[i] >> (pass * BITS_PER_PASS)) & mask]] = inputData[i];
+        bufferGroupBy[start + --bucket[(inputGroupBy[i] >> (pass * BITS_PER_PASS)) & mask]] = inputGroupBy[i];
+        bufferAggregate[start + bucket[(inputGroupBy[i] >> (pass * BITS_PER_PASS)) & mask]] = inputAggregate[i];
     }
 
-    std::swap(inputData, buffer);
+    std::swap(inputGroupBy, bufferGroupBy);
+    std::swap(inputAggregate, bufferAggregate);
     --pass;
 
-    if (pass > 0) {
+    if (pass >= 0) {
         if (partitions[0] > start) {
-            groupBySortRadixOptAux(start, partitions[0], inputData, buffer, mask, buckets, pass, result);
+            groupBySortRadixOptAux(start, partitions[0], inputGroupBy, inputAggregate, aggregator, bufferGroupBy,
+                                   bufferAggregate, mask, buckets, pass, result);
         }
         for (i = 1; i < buckets; i++) {
             if (partitions[i] > partitions[i - 1]) {
-                groupBySortRadixOptAux(partitions[i - 1], partitions[i], inputData, buffer, mask, buckets, pass, result);
+                groupBySortRadixOptAux(partitions[i - 1], partitions[i], inputGroupBy, inputAggregate, aggregator,
+                                       bufferGroupBy, bufferAggregate, mask, buckets, pass, result);
             }
         }
     } else {
-        if (partitions[0] > start) {
-            groupBySortRadixOptAuxAgg(start, partitions[0], inputData, mask, buckets, result);
-        }
-        for (i = 1; i < buckets; i++) {
-            if (partitions[i] > partitions[i - 1]) {
-                groupBySortRadixOptAuxAgg(partitions[i - 1], partitions[i], inputData, mask, buckets, result);
+        result.emplace_back(inputGroupBy[start], aggregator(inputAggregate[start], 0, true));
+        for (i = start + 1; i < end; i++) {
+            if (inputGroupBy[i] == result.back().first) {
+                result.back().second = aggregator(result.back().second, inputAggregate[i], false);
+            } else {
+                result.emplace_back(inputGroupBy[i], aggregator(inputAggregate[i], 0, true));
             }
         }
     }
 }
 
-vectorOfPairs groupBySortRadixOpt(int n, int *inputData) {
+vectorOfPairs groupBySortRadixOpt(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator) {
     int i;
     int buckets = 1 << BITS_PER_PASS;
     int mask = buckets - 1;
     int largest = 0;
 
     for (i = 0; i < n; i++) {
-        if (inputData[i] > largest) {
-            largest = inputData[i];
+        if (inputGroupBy[i] > largest) {
+            largest = inputGroupBy[i];
         }
     }
     int msbPosition = 0;
@@ -230,20 +285,22 @@ vectorOfPairs groupBySortRadixOpt(int n, int *inputData) {
     int passes = static_cast<int>(std::ceil(static_cast<double>(msbPosition) / BITS_PER_PASS)) - 1;
     vectorOfPairs result;
 
-    if (passes > 0) {
-        int *buffer = new int[n];
-        groupBySortRadixOptAux(0, n, inputData, buffer, mask, buckets, passes, result);
-        delete []buffer;
-    } else {
-        groupBySortRadixOptAuxAgg(0, n, inputData, mask, buckets, result);
-    }
+    int *bufferGroupBy = new int[n];
+    int *bufferAggregate = new int[n];
+
+    groupBySortRadixOptAux(0, n, inputGroupBy, inputAggregate, aggregator, bufferGroupBy,
+                           bufferAggregate, mask, buckets, passes, result);
+
+    delete []bufferGroupBy;
+    delete []bufferAggregate;
 
     return result;
 }
 
-vectorOfPairs groupBySingleRadixPassThenHash(int n, int *inputData) {
+vectorOfPairs groupBySingleRadixPassThenHash(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator) {
     int i;
-    int *buffer = new int[n];
+    int *bufferGroupBy = new int[n];
+    int *bufferAggregate = new int[n];
     int buckets = 1 << BITS_PER_PASS;
     int mask = buckets - 1;
     int bucket[buckets];
@@ -253,7 +310,7 @@ vectorOfPairs groupBySingleRadixPassThenHash(int n, int *inputData) {
     }
 
     for (i = 0; i < n; i++) {
-        bucket[inputData[i] & mask]++;
+        bucket[inputGroupBy[i] & mask]++;
     }
 
     for (i = 1; i < buckets; i++) {
@@ -263,32 +320,38 @@ vectorOfPairs groupBySingleRadixPassThenHash(int n, int *inputData) {
     std::vector<int> partitions(bucket, bucket + buckets);
 
     for (i = n - 1; i >= 0; i--) {
-        buffer[--bucket[inputData[i] & mask]] = inputData[i];
+        bufferGroupBy[--bucket[inputGroupBy[i] & mask]] = inputGroupBy[i];
+        bufferAggregate[bucket[inputGroupBy[i] & mask]] = inputAggregate[i];
     }
 
-    std::swap(inputData, buffer);
+    std::swap(inputGroupBy, bufferGroupBy);
+    std::swap(inputAggregate, bufferAggregate);
 
     vectorOfPairs result;
     if (partitions[0] > 0) {
-        vectorOfPairs newResults = groupByHash(partitions[0], inputData);
+        vectorOfPairs newResults = groupByHash(partitions[0], inputGroupBy, inputAggregate, aggregator);
         result.insert(result.end(), newResults.begin(), newResults.end());
     }
     for (i = 1; i < buckets; i++) {
         if (partitions[i] > partitions[i - 1]) {
-            vectorOfPairs newResults = groupByHash(partitions[i] - partitions[i - 1], inputData + partitions[i - 1]);
+            vectorOfPairs newResults = groupByHash(partitions[i] - partitions[i - 1], inputGroupBy + partitions[i - 1],
+                                                   inputAggregate + partitions[i - 1], aggregator);
             result.insert(result.end(), newResults.begin(), newResults.end());
         }
     }
 
-    std::swap(inputData, buffer);
-    delete []buffer;
+    std::swap(inputGroupBy, bufferGroupBy);
+    std::swap(inputAggregate, bufferAggregate);
+    delete []bufferGroupBy;
+    delete []bufferAggregate;
 
     return result;
 }
 
-vectorOfPairs groupByDoubleRadixPassThenHash(int n, int *inputData) {
+vectorOfPairs groupByDoubleRadixPassThenHash(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator) {
     int i;
-    int *buffer = new int[n];
+    int *bufferGroupBy = new int[n];
+    int *bufferAggregate = new int[n];
     int buckets = 1 << BITS_PER_PASS;
     int mask = buckets - 1;
     int bucket[buckets];
@@ -300,7 +363,7 @@ vectorOfPairs groupByDoubleRadixPassThenHash(int n, int *inputData) {
         }
 
         for (i = 0; i < n; i++) {
-            bucket[(inputData[i] >> (pass * BITS_PER_PASS)) & mask]++;
+            bucket[(inputGroupBy[i] >> (pass * BITS_PER_PASS)) & mask]++;
         }
 
         for (i = 1; i < buckets; i++) {
@@ -312,34 +375,39 @@ vectorOfPairs groupByDoubleRadixPassThenHash(int n, int *inputData) {
         }
 
         for (i = n - 1; i >= 0; i--) {
-            buffer[--bucket[(inputData[i] >> (pass * BITS_PER_PASS)) & mask]] = inputData[i];
+            bufferGroupBy[--bucket[(inputGroupBy[i] >> (pass * BITS_PER_PASS)) & mask]] = inputGroupBy[i];
+            bufferAggregate[bucket[(inputGroupBy[i] >> (pass * BITS_PER_PASS)) & mask]] = inputAggregate[i];
         }
 
-        std::swap(inputData, buffer);
+        std::swap(inputGroupBy, bufferGroupBy);
+        std::swap(inputAggregate, bufferAggregate);
 
     }
 
     vectorOfPairs result;
 
     if (partitions[0] > 0) {
-        vectorOfPairs newResults = groupByHash(partitions[0], inputData);
+        vectorOfPairs newResults = groupByHash(partitions[0], inputGroupBy, inputAggregate, aggregator);
         result.insert(result.end(), newResults.begin(), newResults.end());
     }
     for (i = 1; i < buckets; i++) {
         if (partitions[i] > partitions[i - 1]) {
-            vectorOfPairs newResults = groupByHash(partitions[i] - partitions[i - 1], inputData + partitions[i - 1]);
+            vectorOfPairs newResults = groupByHash(partitions[i] - partitions[i - 1], inputGroupBy + partitions[i - 1],
+                                                   inputAggregate + partitions[i - 1], aggregator);
             result.insert(result.end(), newResults.begin(), newResults.end());
         }
     }
 
-    delete []buffer;
+    delete []bufferGroupBy;
+    delete []bufferAggregate;
 
     return result;
 }
 
-vectorOfPairs groupByAdaptive(int n, int *inputData) {
+vectorOfPairs groupByAdaptive(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator) {
     int tuplesPerCheck = 50000;
     absl::flat_hash_map<int, int> map;
+    absl::flat_hash_map<int, int>::iterator it;
 
     float tuplesPerLastLevelCacheMissThreshold = 12.5;
 
@@ -351,15 +419,33 @@ vectorOfPairs groupByAdaptive(int n, int *inputData) {
     int index = 0;
     int tuplesToProcess;
 
-    unsigned long warmUpRows = getL3cacheSize() / (sizeof(int) + sizeof(int));
-    for (auto _ = 0; _ < warmUpRows; ++_) {map[inputData[index++]]++;}
+    unsigned long warmUpRows = std::min(getL3cacheSize() / (sizeof(int) + sizeof(int)),
+                                        static_cast<unsigned long>(n));
+    for (; index < static_cast<int>(warmUpRows); ++index) {
+        it = map.find(inputGroupBy[index]);
+        if (it != map.end()) {
+            it->second = aggregator(it->second, inputAggregate[index], false);
+        } else {
+            map.insert({inputGroupBy[index], aggregator(inputAggregate[index], 0, true)});
+        }
+    }
 
     while (index < n) {
 
         tuplesToProcess = std::min(tuplesPerCheck, n - index);
 
         Counters::getInstance().readEventSet();
-        for (auto _ = 0; _ < tuplesToProcess; ++_) {map[inputData[index++]]++;}
+
+        for (auto _ = 0; _ < tuplesToProcess; ++_) {
+            it = map.find(inputGroupBy[index]);
+            if (it != map.end()) {
+                it->second = aggregator(it->second, inputAggregate[index], false);
+            } else {
+                map.insert({inputGroupBy[index], aggregator(inputAggregate[index], 0, true)});
+            }
+            ++index;
+        }
+
         Counters::getInstance().readEventSet();
 
         lastLevelCacheMisses += counterValues[0];
@@ -367,39 +453,40 @@ vectorOfPairs groupByAdaptive(int n, int *inputData) {
 
         if (__builtin_expect((static_cast<float>(rowsProcessed) / lastLevelCacheMisses)
                                 < tuplesPerLastLevelCacheMissThreshold, false)) {
-            return groupBySortRadixOpt(n, inputData);
+            return groupBySortRadixOpt(n, inputGroupBy, inputAggregate, aggregator);
         }
     }
 
     return {map.begin(), map.end()};
 }
 
-vectorOfPairs runGroupByFunction(GroupBy groupByImplementation, int n, int *inputData) {
+vectorOfPairs runGroupByFunction(GroupBy groupByImplementation, int n, int *inputGroupBy, int *inputAggregate,
+                                 aggFuncPtr aggregator) {
     switch(groupByImplementation) {
         case GroupBy::Hash:
-            return groupByHash(n, inputData);
+            return groupByHash(n, inputGroupBy, inputAggregate, aggregator);
         case GroupBy::HashGoogleDenseHashMap:
-            return groupByHashGoogleDenseHashMap(n, inputData);
+            return groupByHashGoogleDenseHashMap(n, inputGroupBy, inputAggregate, aggregator);
         case GroupBy::HashFollyF14FastMap:
             std::cout << "Folly requires removing '-march=native' flag" << std::endl;
             exit(1);
-//            return groupByHashFollyF14FastMap(n, inputData);
+//            return groupByHashFollyF14FastMap(n, inputGroupBy, inputAggregate, aggregator);
         case GroupBy::HashAbseilFlatHashMap:
-            return groupByHashAbseilFlatHashMap(n, inputData);
+            return groupByHashAbseilFlatHashMap(n, inputGroupBy, inputAggregate, aggregator);
         case GroupBy::HashTessilRobinMap:
-            return groupByHashTessilRobinMap(n, inputData);
+            return groupByHashTessilRobinMap(n, inputGroupBy, inputAggregate, aggregator);
         case GroupBy::HashTessilHopscotchMap:
-            return groupByHashTessilHopscotchMap(n, inputData);
+            return groupByHashTessilHopscotchMap(n, inputGroupBy, inputAggregate, aggregator);
         case GroupBy::SortRadix:
-            return groupBySortRadix(n, inputData);
+            return groupBySortRadix(n, inputGroupBy, inputAggregate, aggregator);
         case GroupBy::SortRadixOpt:
-            return groupBySortRadixOpt(n, inputData);
+            return groupBySortRadixOpt(n, inputGroupBy, inputAggregate, aggregator);
         case GroupBy::SingleRadixPassThenHash:
-            return groupBySingleRadixPassThenHash(n, inputData);
+            return groupBySingleRadixPassThenHash(n, inputGroupBy, inputAggregate, aggregator);
         case GroupBy::DoubleRadixPassThenHash:
-            return groupByDoubleRadixPassThenHash(n, inputData);
+            return groupByDoubleRadixPassThenHash(n, inputGroupBy, inputAggregate, aggregator);
         case GroupBy::Adaptive:
-            return groupByAdaptive(n, inputData);
+            return groupByAdaptive(n, inputGroupBy, inputAggregate, aggregator);
         default:
             std::cout << "Invalid selection of 'GroupBy' implementation!" << std::endl;
             exit(1);
