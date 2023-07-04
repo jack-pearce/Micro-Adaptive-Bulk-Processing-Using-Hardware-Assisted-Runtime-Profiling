@@ -1,6 +1,7 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <algorithm>
 
 #include "time_benchmarking/timeBenchmarkSelect.h"
 #include "time_benchmarking/timeBenchmarkHelpers.h"
