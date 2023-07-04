@@ -85,7 +85,7 @@ vectorOfPairs groupByHashGoogleDenseHashMap(int n, int *inputGroupBy, int *input
     return {map.begin(), map.end()};
 }
 
-/*vectorOfPairs groupByHashFollyF14FastMap(int n, const int *inputGroupBy, const int *inputAggregate,
+/*vectorOfPairs groupByHashFollyF14FastMap(int n, int *inputGroupBy, int *inputAggregate,
                                            aggFuncPtr aggregator) {
     // Facebook Folly
     folly::F14FastMap<int, int> map;
