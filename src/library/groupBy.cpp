@@ -406,8 +406,8 @@ vectorOfPairs groupByDoubleRadixPassThenHash(int n, int *inputGroupBy, int *inpu
 
 vectorOfPairs groupByAdaptive(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator) {
     int tuplesPerCheck = 50000;
-    absl::flat_hash_map<int, int> map;
-    absl::flat_hash_map<int, int>::iterator it;
+    tsl::robin_map<int, int> map;
+    tsl::robin_map<int, int>::iterator it;
 
 //    float tuplesPerLastLevelCacheMissThreshold = 12.5;
     float tuplesPerLastLevelCacheMissThreshold = 0.38;
@@ -425,7 +425,7 @@ vectorOfPairs groupByAdaptive(int n, int *inputGroupBy, int *inputAggregate, agg
     for (; index < static_cast<int>(warmUpRows); ++index) {
         it = map.find(inputGroupBy[index]);
         if (it != map.end()) {
-            it->second = aggregator(it->second, inputAggregate[index], false);
+            it.value() = aggregator(it->second, inputAggregate[index], false);
         } else {
             map.insert({inputGroupBy[index], aggregator(inputAggregate[index], 0, true)});
         }
@@ -440,7 +440,7 @@ vectorOfPairs groupByAdaptive(int n, int *inputGroupBy, int *inputAggregate, agg
         for (auto _ = 0; _ < tuplesToProcess; ++_) {
             it = map.find(inputGroupBy[index]);
             if (it != map.end()) {
-                it->second = aggregator(it->second, inputAggregate[index], false);
+                it.value() = aggregator(it->second, inputAggregate[index], false);
             } else {
                 map.insert({inputGroupBy[index], aggregator(inputAggregate[index], 0, true)});
             }
