@@ -237,7 +237,7 @@ DataSweep DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMa
         "to the next cluster"};
 
 DataSweep DataSweeps::linearUniformIntDistribution200mValuesCardinalitySweepFixedMaxCrossOverPoint {
-        36,
+        31,
         200*1000*1000,
         "linearUniformIntDistribution200mValuesCardinalitySweepFixedMaxCrossOverPoint",
         "Linear distribution of cardinality for 200m ints in the groupBy cross over range"};
@@ -258,7 +258,7 @@ DataSweep::DataSweep(int _totalRuns, int _numElements, std::string _sweepName, s
             getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered100k") {
         generateLogDistribution(getTotalRuns(), 1, getNumElements() / 2.0, inputs);
     } else if (getSweepName() == "linearUniformIntDistribution200mValuesCardinalitySweepFixedMaxCrossOverPoint") {
-        generateLinearDistribution(getTotalRuns(), 100000, 800000, inputs);
+        generateLinearDistribution(getTotalRuns(), 1000000, 4000000, inputs);
     }
 }
 

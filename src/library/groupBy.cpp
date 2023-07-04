@@ -52,13 +52,13 @@ const aggFuncPtr sumAggregation = &sumAggregationFunc;
 const aggFuncPtr countAggregation = &countAggregationFunc;
 
 vectorOfPairs groupByHash(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator) {
-    absl::flat_hash_map<int, int> map;
+    tsl::robin_map<int, int> map;
 
-    absl::flat_hash_map<int, int>::iterator it;
+    tsl::robin_map<int, int>::iterator it;
     for (auto i = 0; i < n; ++i) {
         it = map.find(inputGroupBy[i]);
         if (it != map.end()) {
-            it->second = aggregator(it->second, inputAggregate[i], false);
+            it.value() = aggregator(it->second, inputAggregate[i], false);
         } else {
             map.insert({inputGroupBy[i], aggregator(inputAggregate[i], 0, true)});
         }
@@ -409,7 +409,8 @@ vectorOfPairs groupByAdaptive(int n, int *inputGroupBy, int *inputAggregate, agg
     absl::flat_hash_map<int, int> map;
     absl::flat_hash_map<int, int>::iterator it;
 
-    float tuplesPerLastLevelCacheMissThreshold = 12.5;
+//    float tuplesPerLastLevelCacheMissThreshold = 12.5;
+    float tuplesPerLastLevelCacheMissThreshold = 0.38;
 
     std::vector<std::string> counters = {"PERF_COUNT_HW_CACHE_MISSES"};
     long_long *counterValues = Counters::getInstance().getEvents(counters);

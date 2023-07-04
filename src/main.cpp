@@ -302,6 +302,30 @@ void allGroupByTests() {
                                     GroupBy::DoubleRadixPassThenHash}, countAggregation,
                                    1, "9-SingleDoubleRadix10PassThenHash");
 
+    // Graph 10: Cardinality range (fixed max) for levels of clustering
+    // Graph 2: Cardinality range (variable max) for simple radix sort - manually run with BITS_PER_PASS of 8, 10, 12
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                   {GroupBy::Hash,GroupBy::SortRadixOpt,
+                                    GroupBy::Adaptive}, countAggregation,
+                                   1, "10-NoClustering");
+
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered1,
+                                   {GroupBy::Hash,GroupBy::SortRadixOpt,
+                                    GroupBy::Adaptive}, countAggregation,
+                                   1, "10-Clustered1");
+
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered1k,
+                                   {GroupBy::Hash,GroupBy::SortRadixOpt,
+                                    GroupBy::Adaptive}, countAggregation,
+                                   1, "10-Clustered1k");
+
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered100k,
+                                   {GroupBy::Hash,GroupBy::SortRadixOpt,
+                                    GroupBy::Adaptive}, countAggregation,
+                                   1, "10-Clustered100k");
+
+// HPC CHARTS
+
     groupByBenchmarkWithExtraCountersConfigurations(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
                                                     GroupBy::Hash, countAggregation, 1,
                                                     "1HPC-HashCounters");
@@ -323,24 +347,8 @@ void allGroupByTests() {
                                                     "4HPC-HashCounters");
 
     groupByBenchmarkWithExtraCountersDuringRunConfigurations(DataFiles::uniformIntDistribution200mValuesCardinality400kMax200m,
-                                                    countAggregation,
-                                                    "5HPC-HashCounters");
-
-    // Graph 10: Cardinality range (fixed max) for levels of clustering
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered1,
-                                   {GroupBy::Hash,GroupBy::SortRadixOpt,
-                                    GroupBy::Adaptive}, countAggregation,
-                                   1, "10-Clustered1");
-
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered1k,
-                                   {GroupBy::Hash,GroupBy::SortRadixOpt,
-                                    GroupBy::Adaptive}, countAggregation,
-                                   1, "10-Clustered1k");
-
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered100k,
-                                   {GroupBy::Hash,GroupBy::SortRadixOpt,
-                                    GroupBy::Adaptive}, countAggregation,
-                                   1, "10-Clustered100k");
+                                                             countAggregation,
+                                                             "5HPC-HashCounters");
 
 
     // SET TWO - BITS_PER_PASS = 8
@@ -404,99 +412,26 @@ void allGroupByTests() {
 
 int main() {
 
-/*    groupByBenchmarkWithExtraCountersConfigurations(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                                    GroupBy::Hash, countAggregation, 1,
-                                                    "1HPC-HashCounters");
-
-    groupByBenchmarkWithExtraCountersConfigurations(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered1,
-                                                    GroupBy::Hash, countAggregation, 1,
-                                                    "2-1HPC-HashCounters");
-
-    groupByBenchmarkWithExtraCountersConfigurations(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered1k,
-                                                    GroupBy::Hash, countAggregation, 1,
-                                                    "2-1kHPC-HashCounters");
-
-    groupByBenchmarkWithExtraCountersConfigurations(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered100k,
-                                                    GroupBy::Hash, countAggregation, 1,
-                                                    "2-100kHPC-HashCounters");
-
-    groupByBenchmarkWithExtraCountersConfigurations(DataSweeps::linearUniformIntDistribution200mValuesCardinalitySweepFixedMaxCrossOverPoint,
-                                                    GroupBy::Hash, countAggregation, 1,
-                                                    "4HPC-HashCounters");
-
-    groupByBenchmarkWithExtraCountersDuringRunConfigurations(DataFiles::uniformIntDistribution200mValuesCardinality400kMax200m,
-                                                             countAggregation,
-                                                             "5HPC-HashCounters");*/
-
-
-// SET ONE - BITS_PER_PASS = 10
-    // Graph 1: Cardinality range on uniform data (variable max) for different hashmaps - compile with -march=native removed
-/*    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepVariableMax,
-                                   {GroupBy::HashGoogleDenseHashMap,
-//                                    GroupBy::HashFollyF14FastMap,   // Need to turn off -march=native for this one
-                                    GroupBy::HashAbseilFlatHashMap,
-                                    GroupBy::HashTessilRobinMap,
-                                    GroupBy::HashTessilHopscotchMap}, countAggregation,
-                                   1, "1-MapCompare");*/
-
-    // Graph 2: Cardinality range (variable max) for simple radix sort - manually run with BITS_PER_PASS of 8, 10, 12
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepVariableMax,
-                                   {GroupBy::SortRadix}, countAggregation,
-                                   1, "2-RadixSimple10");
-
-    // Graph 3: Cardinality range (variable max) for optimised radix sort - manually run with BITS_PER_PASS of 8, 10, 12
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepVariableMax,
-                                   {GroupBy::SortRadixOpt}, countAggregation,
-                                   1, "3-RadixOpt10");
-
-    // Graph 5: Cardinality range on uniform data (fixed max) for different hashmaps - compile with -march=native removed
-/*    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::HashGoogleDenseHashMap,
-//                                    GroupBy::HashFollyF14FastMap,   // Need to turn off -march=native for this one
-                                    GroupBy::HashAbseilFlatHashMap,
-                                    GroupBy::HashTessilRobinMap,
-                                    GroupBy::HashTessilHopscotchMap}, countAggregation,
-                                   1, "5-MapCompare");*/
-
-    // Graph 6: Cardinality range (fixed max) for simple radix sort - manually run with BITS_PER_PASS of 8, 10, 12
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::SortRadix}, countAggregation,
-                                   1, "6-RadixSimple10");
+                                   {GroupBy::Hash,GroupBy::SortRadixOpt,
+                                    GroupBy::Adaptive}, countAggregation,
+                                   1, "10-NoClustering");
 
-    // Graph 7: Cardinality range (fixed max) for optimised radix sort - manually run with BITS_PER_PASS of 8, 10, 12
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::SortRadixOpt}, countAggregation,
-                                   1, "7-RadixOpt10");
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered1,
+                                   {GroupBy::Hash,GroupBy::SortRadixOpt,
+                                    GroupBy::Adaptive}, countAggregation,
+                                   1, "10-Clustered1");
 
-    // Graph 9: Cardinality range (fixed max) for single / double radix10 pass
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::SingleRadixPassThenHash,
-                                    GroupBy::DoubleRadixPassThenHash}, countAggregation,
-                                   1, "9-SingleDoubleRadix10PassThenHash");
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered1k,
+                                   {GroupBy::Hash,GroupBy::SortRadixOpt,
+                                    GroupBy::Adaptive}, countAggregation,
+                                   1, "10-Clustered1k");
 
-    groupByBenchmarkWithExtraCountersConfigurations(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                                    GroupBy::Hash, countAggregation, 1,
-                                                    "1HPC-HashCounters");
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered100k,
+                                   {GroupBy::Hash,GroupBy::SortRadixOpt,
+                                    GroupBy::Adaptive}, countAggregation,
+                                   1, "10-Clustered100k");
 
-    groupByBenchmarkWithExtraCountersConfigurations(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered1,
-                                                    GroupBy::Hash, countAggregation, 1,
-                                                    "2-1HPC-HashCounters");
-
-    groupByBenchmarkWithExtraCountersConfigurations(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered1k,
-                                                    GroupBy::Hash, countAggregation, 1,
-                                                    "2-1kHPC-HashCounters");
-
-    groupByBenchmarkWithExtraCountersConfigurations(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered100k,
-                                                    GroupBy::Hash, countAggregation, 1,
-                                                    "2-100kHPC-HashCounters");
-
-    groupByBenchmarkWithExtraCountersConfigurations(DataSweeps::linearUniformIntDistribution200mValuesCardinalitySweepFixedMaxCrossOverPoint,
-                                                    GroupBy::Hash, countAggregation, 1,
-                                                    "4HPC-HashCounters");
-
-    groupByBenchmarkWithExtraCountersDuringRunConfigurations(DataFiles::uniformIntDistribution200mValuesCardinality400kMax200m,
-                                                             countAggregation,
-                                                             "5HPC-HashCounters");
 
 
     return 0;
