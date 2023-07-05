@@ -27,7 +27,6 @@ add_executable(${PROJECT_NAME}
         src/data_generation/dataFiles.cpp
         src/data_generation/config.cpp
         src/library/select.cpp
-        src/library/selectImplementation.h
         src/library/papi.cpp
         src/library/utils.cpp
         src/time_benchmarking/timeBenchmarkSelect.cpp
@@ -37,9 +36,9 @@ add_executable(${PROJECT_NAME}
         src/utils/papiHelpers.cpp
         src/perf_counters/selectCounterBenchmark.cpp
         src/library/groupBy.cpp
-        src/library/groupBy.h
         src/perf_counters/groupByCounterBenchmark.cpp
-        src/perf_counters/groupByCounterBenchmark.h)
+        src/library/groupByCount.cpp
+        src/perf_counters/groupByCountCounterBenchmark.cpp src/perf_counters/groupByCountCounterBenchmark.cpp src/perf_counters/groupByCountCounterBenchmark.h)
 
 target_link_libraries(${PROJECT_NAME} benchmark::benchmark)
 

@@ -12,6 +12,7 @@
 #include "library/papi.h"
 #include "perf_counters/selectCounterBenchmark.h"
 #include "perf_counters/groupByCounterBenchmark.h"
+#include "perf_counters/groupByCountCounterBenchmark.h"
 #include "data_generation/dataFiles.h"
 #include "utils/papiHelpers.h"
 
@@ -217,7 +218,6 @@ void groupByFunctionalityTest(const DataFile& dataFile, GroupBy groupByImplement
     delete []inputAggregate;
 }
 
-
 void groupByBenchmarkWithExtraCountersConfigurations(DataSweep &dataSweep,
                                                      GroupBy groupByImplementation,
                                                      aggFuncPtr aggregator,
@@ -412,25 +412,12 @@ void allGroupByTests() {
 
 int main() {
 
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::Hash,GroupBy::SortRadixOpt,
-                                    GroupBy::Adaptive}, countAggregation,
-                                   1, "10-NoClustering");
-
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered1,
-                                   {GroupBy::Hash,GroupBy::SortRadixOpt,
-                                    GroupBy::Adaptive}, countAggregation,
-                                   1, "10-Clustered1");
-
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered1k,
-                                   {GroupBy::Hash,GroupBy::SortRadixOpt,
-                                    GroupBy::Adaptive}, countAggregation,
-                                   1, "10-Clustered1k");
-
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered100k,
-                                   {GroupBy::Hash,GroupBy::SortRadixOpt,
-                                    GroupBy::Adaptive}, countAggregation,
-                                   1, "10-Clustered100k");
+    groupByCountCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution400mValuesCardinalitySweepFixedMax,
+                                   {GroupByCount::Count_Hash,
+                                    GroupByCount::Count_SortRadixOpt,
+                                    GroupByCount::Count_Adaptive},
+                                    1,
+                                    "10-NoClustering");
 
 
 

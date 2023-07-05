@@ -242,6 +242,14 @@ DataSweep DataSweeps::linearUniformIntDistribution200mValuesCardinalitySweepFixe
         "linearUniformIntDistribution200mValuesCardinalitySweepFixedMaxCrossOverPoint",
         "Linear distribution of cardinality for 200m ints in the groupBy cross over range"};
 
+DataSweep DataSweeps::logUniformIntDistribution400mValuesCardinalitySweepFixedMax {
+        30,
+        400*1000*1000,
+        "logUniformIntDistribution400mValuesCardinalitySweepFixedMax",
+        "Log distribution of cardinality for 400m ints from 1 to 100m. The max value is fixed at 200m, "
+        "so the distribution is sparse i.e. there are gaps."};
+
+
 DataSweep::DataSweep(int _totalRuns, int _numElements, std::string _sweepName, std::string _longDescription)
         : totalRuns(_totalRuns), numElements(_numElements), runsCompleted(0), sweepName(std::move(_sweepName)),
         longDescription(std::move(_longDescription)) {
@@ -259,6 +267,8 @@ DataSweep::DataSweep(int _totalRuns, int _numElements, std::string _sweepName, s
         generateLogDistribution(getTotalRuns(), 1, getNumElements() / 2.0, inputs);
     } else if (getSweepName() == "linearUniformIntDistribution200mValuesCardinalitySweepFixedMaxCrossOverPoint") {
         generateLinearDistribution(getTotalRuns(), 1000000, 4000000, inputs);
+    } else if (getSweepName() == "logUniformIntDistribution400mValuesCardinalitySweepFixedMax") {
+        generateLogDistribution(getTotalRuns(), 1, 100000000, inputs);
     }
 }
 
@@ -296,6 +306,9 @@ bool DataSweep::loadNextDataSetIntoMemory(int *data) {
         return true;
     } else if (getSweepName() == "linearUniformIntDistribution200mValuesCardinalitySweepFixedMaxCrossOverPoint") {
         generateUniformDistributionInMemoryWithSetCardinality(data, getNumElements(), getNumElements(), static_cast<int>(inputs[runsCompleted++]));
+        return true;
+    } else if (getSweepName() == "logUniformIntDistribution400mValuesCardinalitySweepFixedMax") {
+        generateUniformDistributionInMemoryWithSetCardinality(data, getNumElements(), 200000000, static_cast<int>(inputs[runsCompleted++]));
         return true;
     }
     return false;

@@ -89,6 +89,8 @@ public:
     static DataSweep logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered100k;
 
     static DataSweep linearUniformIntDistribution200mValuesCardinalitySweepFixedMaxCrossOverPoint;
+
+    static DataSweep logUniformIntDistribution400mValuesCardinalitySweepFixedMax;
 };
 
 #endif //MABPL_DATAFILES_H

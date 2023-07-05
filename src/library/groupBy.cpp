@@ -409,7 +409,6 @@ vectorOfPairs groupByAdaptive(int n, int *inputGroupBy, int *inputAggregate, agg
     tsl::robin_map<int, int> map;
     tsl::robin_map<int, int>::iterator it;
 
-//    float tuplesPerLastLevelCacheMissThreshold = 12.5;
     float tuplesPerLastLevelCacheMissThreshold = 0.38;
 
     std::vector<std::string> counters = {"PERF_COUNT_HW_CACHE_MISSES"};
