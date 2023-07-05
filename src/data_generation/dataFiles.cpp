@@ -249,6 +249,13 @@ DataSweep DataSweeps::logUniformIntDistribution400mValuesCardinalitySweepFixedMa
         "Log distribution of cardinality for 400m ints from 1 to 100m. The max value is fixed at 200m, "
         "so the distribution is sparse i.e. there are gaps."};
 
+DataSweep DataSweeps::logUniformInt64Distribution200mValuesCardinalitySweepFixedMax {
+        30,
+        200*1000*1000,
+        "logUniformInt64Distribution200mValuesCardinalitySweepFixedMax",
+        "Log distribution of cardinality for 200m ints from 1 to 100m. The max value is fixed at 200m, "
+        "so the distribution is sparse i.e. there are gaps. Output is 64bit ints rather than 32bit ints."};
+
 
 DataSweep::DataSweep(int _totalRuns, int _numElements, std::string _sweepName, std::string _longDescription)
         : totalRuns(_totalRuns), numElements(_numElements), runsCompleted(0), sweepName(std::move(_sweepName)),
@@ -263,7 +270,8 @@ DataSweep::DataSweep(int _totalRuns, int _numElements, std::string _sweepName, s
             getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweepFixedMax" ||
             getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered1"  ||
             getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered1k"  ||
-            getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered100k") {
+            getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered100k" ||
+            getSweepName() == "logUniformInt64Distribution200mValuesCardinalitySweepFixedMax") {
         generateLogDistribution(getTotalRuns(), 1, getNumElements() / 2.0, inputs);
     } else if (getSweepName() == "linearUniformIntDistribution200mValuesCardinalitySweepFixedMaxCrossOverPoint") {
         generateLinearDistribution(getTotalRuns(), 1000000, 4000000, inputs);
@@ -309,6 +317,18 @@ bool DataSweep::loadNextDataSetIntoMemory(int *data) {
         return true;
     } else if (getSweepName() == "logUniformIntDistribution400mValuesCardinalitySweepFixedMax") {
         generateUniformDistributionInMemoryWithSetCardinality(data, getNumElements(), 200000000, static_cast<int>(inputs[runsCompleted++]));
+        return true;
+    }
+    return false;
+}
+
+bool DataSweep::loadNextDataSetIntoMemory(int64_t *data) {
+    if (runsCompleted == totalRuns) {
+        return false;
+    }
+
+    if (getSweepName() == "logUniformInt64Distribution200mValuesCardinalitySweepFixedMax") {
+        generateUniformDistributionInMemoryWithSetCardinality(data, getNumElements(), getNumElements(), static_cast<int>(inputs[runsCompleted++]));
         return true;
     }
     return false;

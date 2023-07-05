@@ -3,6 +3,7 @@
 
 void generateUniformDistributionInMemory(int *data, int n, int upperBound);
 void generateUniformDistributionInMemoryWithSetCardinality(int *data, int n, int upperBound, int cardinality);
+void generateUniformDistributionInMemoryWithSetCardinality(int64_t *data, int n, int upperBound, int cardinality);
 void generateUniformDistributionInMemoryWithSetCardinalityClustered(int *data, int n, int upperBound, int cardinality, int spreadInCluster);
 void generateVaryingSelectivityInMemory(int *data, int n, int minimum, int numberOfDiscreteSections);
 void generateUpperStepSelectivityInMemory(int *data, int n, int step, int numberOfDiscreteSections);

@@ -62,6 +62,31 @@ void generateUniformDistributionInMemoryWithSetCardinality(int *data, int n, int
     std::cout << "Complete" << std::endl;
 }
 
+void generateUniformDistributionInMemoryWithSetCardinality(int64_t *data, int n, int upperBound, int cardinality) {
+    assert(cardinality <= upperBound);
+    std::cout << "Generating data in memory... ";
+    std::cout.flush();
+
+    if (cardinality == 1) {
+        for (auto i = 0; i < n; ++i) {
+            data[i] = upperBound;
+        }
+        std::cout << "Complete" << std::endl;
+        return;
+    }
+
+    unsigned int seed = 1;
+    std::mt19937 gen(seed);
+
+    std::uniform_int_distribution<int> distribution(1, cardinality);
+
+    for (auto i = 0; i < n; ++i) {
+        data[i] = scaleNumberLogarithmically(distribution(gen), cardinality, upperBound);
+    }
+
+    std::cout << "Complete" << std::endl;
+}
+
 void generateUniformDistributionInMemoryWithSetCardinalityClustered(int *data, int n, int upperBound,
                                                                     int cardinality, int spreadInCluster) {
     assert(cardinality <= upperBound);

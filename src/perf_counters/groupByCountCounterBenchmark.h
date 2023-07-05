@@ -8,6 +8,9 @@
 void groupByCountCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<GroupByCount> &groupByImplementations,
                                          int iterations, const std::string &fileNamePrefix);
 
+void groupByCountCpuCyclesSweepBenchmark64(DataSweep &dataSweep, const std::vector<GroupByCount> &groupByImplementations,
+                                           int iterations, const std::string &fileNamePrefix);
+
 void groupByCountCpuCyclesSweepBenchmarkVariableSize(DataSweep &dataSweep, const std::vector<GroupByCount> &groupByImplementations,
                                                      int iterations, const std::string &fileNamePrefix);
 

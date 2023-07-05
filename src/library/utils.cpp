@@ -17,3 +17,7 @@ bool arrayIsSimd256Aligned(const int* array) {
 long getL3cacheSize() {
     return sysconf(_SC_LEVEL3_CACHE_SIZE);
 }
+
+long getBytesPerCacheLine() {
+    return sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
+}

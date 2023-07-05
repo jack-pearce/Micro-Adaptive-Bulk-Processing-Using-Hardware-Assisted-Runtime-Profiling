@@ -62,6 +62,7 @@ public:
     [[nodiscard]] const std::string& getLongDescription() const;
     [[nodiscard]] float getRunInput() const;
     bool loadNextDataSetIntoMemory(int *data);
+    bool loadNextDataSetIntoMemory(int64_t *data);
     void restartSweep();
 
 private:
@@ -91,6 +92,7 @@ public:
     static DataSweep linearUniformIntDistribution200mValuesCardinalitySweepFixedMaxCrossOverPoint;
 
     static DataSweep logUniformIntDistribution400mValuesCardinalitySweepFixedMax;
+    static DataSweep logUniformInt64Distribution200mValuesCardinalitySweepFixedMax;
 };
 
 #endif //MABPL_DATAFILES_H

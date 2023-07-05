@@ -21,23 +21,39 @@ enum GroupByCount {
     Count_Adaptive
 };
 
-vectorOfPairs groupByCountHash(int n, const int *inputData);
-
-vectorOfPairs groupByCountHashGoogleDenseHashMap(int n, const int *inputData);
-vectorOfPairs groupByCountHashFollyF14FastMap(int n, const int *inputData);
-vectorOfPairs groupByCountHashAbseilFlatHashMap(int n, const int *inputData);
-vectorOfPairs groupByCountHashTessilRobinMap(int n, const int *inputData);
-vectorOfPairs groupByCountHashTessilHopscotchMap(int n, const int *inputData);
-
-vectorOfPairs groupByCountSortRadix(int n, int *inputData);
-vectorOfPairs groupByCountSortRadixOpt(int n, int *inputData);
-
-vectorOfPairs groupByCountSingleRadixPassThenHash(int n, int *inputData);
-
-vectorOfPairs groupByCountAdaptive(int n, int *inputData);
-
-vectorOfPairs runGroupByCountFunction(GroupByCount groupByImplementation, int n, int *inputData);
 std::string getGroupByCountName(GroupByCount groupByImplementation);
 
+template<typename T>
+vectorOfPairs groupByCountHash(int n, const T *inputData);
+
+template<typename T>
+vectorOfPairs groupByCountHashGoogleDenseHashMap(int n, const T *inputData);
+template<typename T>
+vectorOfPairs groupByCountHashFollyF14FastMap(int n, const T *inputData);
+template<typename T>
+vectorOfPairs groupByCountHashAbseilFlatHashMap(int n, const T *inputData);
+template<typename T>
+vectorOfPairs groupByCountHashTessilRobinMap(int n, const T *inputData);
+template<typename T>
+vectorOfPairs groupByCountHashTessilHopscotchMap(int n, const T *inputData);
+
+template<typename T>
+vectorOfPairs groupByCountSortRadix(int n, T *inputData);
+template<typename T>
+vectorOfPairs groupByCountSortRadixOpt(int n, T *inputData);
+
+template<typename T>
+vectorOfPairs groupByCountSingleRadixPassThenHash(int n, T *inputData);
+template<typename T>
+vectorOfPairs groupByDoubleRadixPassThenHash(int n, T *inputData);
+
+template<typename T>
+vectorOfPairs groupByCountAdaptive(int n, T *inputData);
+
+template<typename T>
+vectorOfPairs runGroupByCountFunction(GroupByCount groupByImplementation, int n, T *inputData);
+
+
+#include "groupByCountImplementation.h"
 
 #endif //MABPL_GROUPBYCOUNT_H

@@ -412,12 +412,32 @@ void allGroupByTests() {
 
 int main() {
 
+/*    groupByCountCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                          {Count_Hash,
+                                           GroupByCount::Count_SortRadixOpt,
+                                           GroupByCount::Count_Adaptive},
+                                          1,
+                                          "10_NoClustering");
+
     groupByCountCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution400mValuesCardinalitySweepFixedMax,
+                                          {GroupByCount::Count_Hash,
+                                           GroupByCount::Count_SortRadixOpt,
+                                           GroupByCount::Count_Adaptive},
+                                          1,
+                                          "11-NoClustering");
+
+    groupByCountCpuCyclesSweepBenchmark64(DataSweeps::logUniformInt64Distribution200mValuesCardinalitySweepFixedMax,
                                    {GroupByCount::Count_Hash,
                                     GroupByCount::Count_SortRadixOpt,
                                     GroupByCount::Count_Adaptive},
                                     1,
-                                    "10-NoClustering");
+                                    "12-NoClustering");*/
+
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                        {GroupBy::SortRadixOpt},
+                                        sumAggregation, 1,
+                                        "RadixSortIncludeFinalPass");
+
 
 
 

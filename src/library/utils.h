@@ -5,5 +5,6 @@ bool arrayIsSimd128Aligned(const int* array);
 bool arrayIsSimd256Aligned(const int* array);
 
 long getL3cacheSize();
+long getBytesPerCacheLine();
 
 #endif //MABPL_UTILS_H
