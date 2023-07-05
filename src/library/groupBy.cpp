@@ -18,32 +18,32 @@
 #define BITS_PER_PASS 10
 
 
-inline int minAggregationFunc(int a, int b, bool firstAggregation) {
+inline int minAggregationFunc(int currentAggregate, int numberToInclude, bool firstAggregation) {
     if (firstAggregation) {
-        return a;
+        return numberToInclude;
     }
-    return std::min(a, b);
+    return std::min(currentAggregate, numberToInclude);
 }
 
-inline int maxAggregationFunc(int a, int b, bool firstAggregation) {
+inline int maxAggregationFunc(int currentAggregate, int numberToInclude, bool firstAggregation) {
     if (firstAggregation) {
-        return a;
+        return numberToInclude;
     }
-    return std::max(a, b);
+    return std::max(currentAggregate, numberToInclude);
 }
 
-inline int sumAggregationFunc(int a, int b, bool firstAggregation) {
+inline int sumAggregationFunc(int currentAggregate, int numberToInclude, bool firstAggregation) {
     if (firstAggregation) {
-        return a;
+        return numberToInclude;
     }
-    return a + b;
+    return currentAggregate + numberToInclude;
 }
 
-inline int countAggregationFunc(int a, int b, bool firstAggregation) {
+inline int countAggregationFunc(int currentAggregate, int _, bool firstAggregation) {
     if (firstAggregation) {
         return 1;
     }
-    return ++a;
+    return ++currentAggregate;
 }
 
 const aggFuncPtr minAggregation = &minAggregationFunc;
@@ -60,7 +60,7 @@ vectorOfPairs groupByHash(int n, int *inputGroupBy, int *inputAggregate, aggFunc
         if (it != map.end()) {
             it.value() = aggregator(it->second, inputAggregate[i], false);
         } else {
-            map.insert({inputGroupBy[i], aggregator(inputAggregate[i], 0, true)});
+            map.insert({inputGroupBy[i], aggregator(0, inputAggregate[i], true)});
         }
     }
 
@@ -78,7 +78,7 @@ vectorOfPairs groupByHashGoogleDenseHashMap(int n, int *inputGroupBy, int *input
         if (it != map.end()) {
             it->second = aggregator(it->second, inputAggregate[i], false);
         } else {
-            map.insert({inputGroupBy[i], aggregator(inputAggregate[i], 0, true)});
+            map.insert({inputGroupBy[i], aggregator(0, inputAggregate[i], true)});
         }
     }
 
@@ -96,7 +96,7 @@ vectorOfPairs groupByHashGoogleDenseHashMap(int n, int *inputGroupBy, int *input
         if (it != map.end()) {
             it->second = aggregator(it->second, inputAggregate[i], false);
         } else {
-            map.insert({inputGroupBy[i], aggregator(inputAggregate[i], 0, true)});
+            map.insert({inputGroupBy[i], aggregator(0, inputAggregate[i], true)});
         }
     }
 
@@ -113,7 +113,7 @@ vectorOfPairs groupByHashAbseilFlatHashMap(int n, int *inputGroupBy, int *inputA
         if (it != map.end()) {
             it->second = aggregator(it->second, inputAggregate[i], false);
         } else {
-            map.insert({inputGroupBy[i], aggregator(inputAggregate[i], 0, true)});
+            map.insert({inputGroupBy[i], aggregator(0, inputAggregate[i], true)});
         }
     }
 
@@ -130,7 +130,7 @@ vectorOfPairs groupByHashTessilRobinMap(int n, int *inputGroupBy, int *inputAggr
         if (it != map.end()) {
             it.value() = aggregator(it->second, inputAggregate[i], false);
         } else {
-            map.insert({inputGroupBy[i], aggregator(inputAggregate[i], 0, true)});
+            map.insert({inputGroupBy[i], aggregator(0, inputAggregate[i], true)});
         }
     }
 
@@ -147,7 +147,7 @@ vectorOfPairs groupByHashTessilHopscotchMap(int n, int *inputGroupBy, int *input
         if (it != map.end()) {
             it.value() = aggregator(it->second, inputAggregate[i], false);
         } else {
-            map.insert({inputGroupBy[i], aggregator(inputAggregate[i], 0, true)});
+            map.insert({inputGroupBy[i], aggregator(0, inputAggregate[i], true)});
         }
     }
 
@@ -195,12 +195,12 @@ vectorOfPairs groupBySortRadix(int n, int *inputGroupBy, int *inputAggregate, ag
 
     vectorOfPairs result;
 
-    result.emplace_back(inputGroupBy[0], aggregator(inputAggregate[0], 0, true));
+    result.emplace_back(inputGroupBy[0], aggregator(0, inputAggregate[i], true));
     for (i = 1; i < n; i++) {
         if (inputGroupBy[i] == result.back().first) {
             result.back().second = aggregator(result.back().second, inputAggregate[i], false);
         } else {
-            result.emplace_back(inputGroupBy[i], aggregator(inputAggregate[i], 0, true));
+            result.emplace_back(inputGroupBy[i], aggregator(0, inputAggregate[i], true));
         }
     }
 
@@ -213,6 +213,27 @@ vectorOfPairs groupBySortRadix(int n, int *inputGroupBy, int *inputAggregate, ag
     delete []bufferAggregate;
 
     return result;
+}
+
+void groupBySortRadixOptAuxAgg(int start, int end, const int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator,
+                               int mask, int buckets, vectorOfPairs &result) {
+    int i;
+    int bucket[1 << BITS_PER_PASS] = {0};
+    bool bucketEntryPresent[1 << BITS_PER_PASS] = {false};
+
+    for (i = start; i < end; i++) {
+        bucket[inputGroupBy[i] & mask] = aggregator(bucket[inputGroupBy[i] & mask], inputAggregate[i],
+                                                    !bucketEntryPresent[inputGroupBy[i] & mask]);
+        bucketEntryPresent[inputGroupBy[i] & mask] = true;
+    }
+
+    int valuePrefix = inputGroupBy[start] & ~mask;
+
+    for (i = 0; i < buckets; i++) {
+        if (bucketEntryPresent[i]) {
+            result.emplace_back(valuePrefix | i, bucket[i]);
+        }
+    }
 }
 
 void groupBySortRadixOptAux(int start, int end, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator,
@@ -242,7 +263,7 @@ void groupBySortRadixOptAux(int start, int end, int *inputGroupBy, int *inputAgg
     std::swap(inputAggregate, bufferAggregate);
     --pass;
 
-    if (pass >= 0) {
+    if (pass > 0) {
         if (partitions[0] > start) {
             groupBySortRadixOptAux(start, partitions[0], inputGroupBy, inputAggregate, aggregator, bufferGroupBy,
                                    bufferAggregate, mask, buckets, pass, result);
@@ -254,12 +275,14 @@ void groupBySortRadixOptAux(int start, int end, int *inputGroupBy, int *inputAgg
             }
         }
     } else {
-        result.emplace_back(inputGroupBy[start], aggregator(inputAggregate[start], 0, true));
-        for (i = start + 1; i < end; i++) {
-            if (inputGroupBy[i] == result.back().first) {
-                result.back().second = aggregator(result.back().second, inputAggregate[i], false);
-            } else {
-                result.emplace_back(inputGroupBy[i], aggregator(inputAggregate[i], 0, true));
+        if (partitions[0] > start) {
+            groupBySortRadixOptAuxAgg(start, partitions[0], inputGroupBy, inputAggregate, aggregator,
+                                      mask, buckets, result);
+        }
+        for (i = 1; i < buckets; i++) {
+            if (partitions[i] > partitions[i - 1]) {
+                groupBySortRadixOptAuxAgg(partitions[i - 1], partitions[i], inputGroupBy, inputAggregate, aggregator,
+                                          mask, buckets, result);
             }
         }
     }
@@ -409,7 +432,8 @@ vectorOfPairs groupByAdaptive(int n, int *inputGroupBy, int *inputAggregate, agg
     tsl::robin_map<int, int> map;
     tsl::robin_map<int, int>::iterator it;
 
-    float tuplesPerLastLevelCacheMissThreshold = 0.38;
+//    float tuplesPerLastLevelCacheMissThreshold = 0.38;
+    float tuplesPerLastLevelCacheMissThreshold = ((7.0 / 16.0) * getBytesPerCacheLine()) / sizeof(int);
 
     std::vector<std::string> counters = {"PERF_COUNT_HW_CACHE_MISSES"};
     long_long *counterValues = Counters::getInstance().getEvents(counters);
@@ -426,7 +450,7 @@ vectorOfPairs groupByAdaptive(int n, int *inputGroupBy, int *inputAggregate, agg
         if (it != map.end()) {
             it.value() = aggregator(it->second, inputAggregate[index], false);
         } else {
-            map.insert({inputGroupBy[index], aggregator(inputAggregate[index], 0, true)});
+            map.insert({inputGroupBy[index], aggregator(0, inputAggregate[index], true)});
         }
     }
 
@@ -441,7 +465,7 @@ vectorOfPairs groupByAdaptive(int n, int *inputGroupBy, int *inputAggregate, agg
             if (it != map.end()) {
                 it.value() = aggregator(it->second, inputAggregate[index], false);
             } else {
-                map.insert({inputGroupBy[index], aggregator(inputAggregate[index], 0, true)});
+                map.insert({inputGroupBy[index], aggregator(0, inputAggregate[index], true)});
             }
             ++index;
         }
