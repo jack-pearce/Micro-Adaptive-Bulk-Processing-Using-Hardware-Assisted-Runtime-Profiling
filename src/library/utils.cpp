@@ -14,10 +14,10 @@ bool arrayIsSimd256Aligned(const int* array) {
     return reinterpret_cast<uintptr_t>(array) % simdAlignment == 0;
 }
 
-long getL3cacheSize() {
+long l3cacheSize() {
     return sysconf(_SC_LEVEL3_CACHE_SIZE);
 }
 
-long getBytesPerCacheLine() {
+long bytesPerCacheLine() {
     return sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
 }

@@ -210,7 +210,7 @@ void groupByBenchmarkWithExtraCountersDuringRun(const DataFile &dataFile,
 
     int index = 0;
     int tuplesToProcess;
-    tsl::robin_map<int, int> map(getL3cacheSize() / (3 * (sizeof(int) + sizeof(int))));
+    tsl::robin_map<int, int> map(l3cacheSize() / (3 * (sizeof(int) + sizeof(int))));
     tsl::robin_map<int, int>::iterator it;
 
     for (auto j = 0; j < numMeasurements; ++j) {

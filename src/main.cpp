@@ -443,16 +443,5 @@ int main() {
                                    1, "10-40M");*/
 
 
-
-/*
-    groupByBenchmarkWithExtraCountersConfigurations(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered10,
-                                                    GroupBy::Hash, maxAggregation, 1, "counters");
-*/
-
-/*    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered10,
-                                   {GroupBy::Hash,GroupBy::SortRadixOpt,
-                                    GroupBy::Adaptive}, maxAggregation,
-                                   1, "10-Clustered10");*/
-
     return 0;
 }

@@ -55,7 +55,7 @@ const aggFuncPtr countAggregation = &countAggregationFunc;
 
 
 vectorOfPairs groupByHash(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator) {
-    int initialSize = round((getL3cacheSize() / (3 * (sizeof(int) + sizeof(int)))) / 100000.0) * 100000;
+    int initialSize = round((l3cacheSize() / (3 * (sizeof(int) + sizeof(int)))) / 100000.0) * 100000;
     tsl::robin_map<int, int> map(initialSize);
 
     tsl::robin_map<int, int>::iterator it;
@@ -433,11 +433,11 @@ vectorOfPairs groupByDoubleRadixPassThenHash(int n, int *inputGroupBy, int *inpu
 
 vectorOfPairs groupByAdaptive(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator) {
     int tuplesPerCheck = 50000;
-    int initialSize = round((getL3cacheSize() / (3 * (sizeof(int) + sizeof(int)))) / 100000.0) * 100000;
+    int initialSize = round((l3cacheSize() / (3 * (sizeof(int) + sizeof(int)))) / 100000.0) * 100000;
     tsl::robin_map<int, int> map(initialSize);
     tsl::robin_map<int, int>::iterator it;
 
-    float tuplesPerLastLevelCacheMissThreshold = 0.5 * (getBytesPerCacheLine() / (sizeof(int) + sizeof(int)));
+    float tuplesPerLastLevelCacheMissThreshold = 0.5 * (bytesPerCacheLine() / (sizeof(int) + sizeof(int)));
 
     std::vector<std::string> counters = {"PERF_COUNT_HW_CACHE_MISSES"};
     long_long *counterValues = Counters::getInstance().getEvents(counters);
@@ -447,7 +447,7 @@ vectorOfPairs groupByAdaptive(int n, int *inputGroupBy, int *inputAggregate, agg
     int index = 0;
     int tuplesToProcess;
 
-    unsigned long warmUpRows = std::min(getL3cacheSize() / (sizeof(int) + sizeof(int)),
+    unsigned long warmUpRows = std::min(l3cacheSize() / (sizeof(int) + sizeof(int)),
                                         static_cast<unsigned long>(n));
     for (; index < static_cast<int>(warmUpRows); ++index) {
         it = map.find(inputGroupBy[index]);
