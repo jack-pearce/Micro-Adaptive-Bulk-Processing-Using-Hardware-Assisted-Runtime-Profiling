@@ -94,7 +94,14 @@ public:
     static DataSweep logUniformIntDistribution400mValuesCardinalitySweepFixedMax;
     static DataSweep logUniformInt64Distribution200mValuesCardinalitySweepFixedMax;
 
+    static DataSweep logUniformIntDistribution20mValuesCardinalitySweepVariableMax;
     static DataSweep logUniformIntDistribution20mValuesCardinalitySweepFixedMax;
+    static DataSweep logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered10;
+    static DataSweep logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered1k;
+    static DataSweep logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered100k;
+
+    static DataSweep logUniformIntDistribution40mValuesCardinalitySweepFixedMax;
+    static DataSweep logUniformInt64Distribution20mValuesCardinalitySweepFixedMax;
 };
 
 #endif //MABPL_DATAFILES_H
