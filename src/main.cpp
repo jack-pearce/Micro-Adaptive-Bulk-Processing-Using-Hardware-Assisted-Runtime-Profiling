@@ -412,11 +412,26 @@ void allGroupByTests() {
 
 int main() {
 
+//    groupByBenchmarkWithExtraCountersDuringRunConfigurations(DataFiles::uniformIntDistribution200mValuesCardinality400kMax200m,
+//                                                             maxAggregation,
+//                                                             "5HPC-HashCounters");
+
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
+                                   {GroupBy::Hash}, maxAggregation,
+                                   1, "hash");
+
+/*
+    groupByBenchmarkWithExtraCountersConfigurations(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
+                                                    GroupBy::Hash, maxAggregation, 1, "hpcs2");
+*/
+
+    //GroupBy::Hash, GroupBy::SortRadixOpt,
 
 /*    groupByCountCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
                                    {GroupByCount::Count_Hash, GroupByCount::Count_SortRadixOpt, GroupByCount::Count_Adaptive},
                                    1, "10-CountAdaptive");*/
 
+/*
     groupByCountCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered1k,
                                         {GroupByCount::Count_Hash, GroupByCount::Count_SortRadixOpt, GroupByCount::Count_Adaptive},
                                         1, "10-CountAdaptive");
@@ -436,6 +451,7 @@ int main() {
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution400mValuesCardinalitySweepFixedMax,
                                    {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive}, sumAggregation,
                                    1, "11-Adaptive");
+*/
 
     return 0;
 }

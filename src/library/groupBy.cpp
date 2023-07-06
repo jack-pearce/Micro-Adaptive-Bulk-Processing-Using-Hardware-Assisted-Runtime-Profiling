@@ -8,6 +8,8 @@
 #include <absl/container/flat_hash_map.h>
 #include <tsl/robin_map.h>
 #include <tsl/hopscotch_map.h>
+#include <random>
+#include <set>
 
 #include "groupBy.h"
 #include "utils.h"
@@ -51,8 +53,10 @@ const aggFuncPtr maxAggregation = &maxAggregationFunc;
 const aggFuncPtr sumAggregation = &sumAggregationFunc;
 const aggFuncPtr countAggregation = &countAggregationFunc;
 
+
 vectorOfPairs groupByHash(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator) {
-    tsl::robin_map<int, int> map;
+    int initialSize = round((getL3cacheSize() / (3 * (sizeof(int) + sizeof(int)))) / 100000.0) * 100000;
+    tsl::robin_map<int, int> map(initialSize);
 
     tsl::robin_map<int, int>::iterator it;
     for (auto i = 0; i < n; ++i) {
@@ -429,11 +433,11 @@ vectorOfPairs groupByDoubleRadixPassThenHash(int n, int *inputGroupBy, int *inpu
 
 vectorOfPairs groupByAdaptive(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator) {
     int tuplesPerCheck = 50000;
-    tsl::robin_map<int, int> map;
+    int initialSize = round((getL3cacheSize() / (3 * (sizeof(int) + sizeof(int)))) / 100000.0) * 100000;
+    tsl::robin_map<int, int> map(initialSize);
     tsl::robin_map<int, int>::iterator it;
 
-//    float tuplesPerLastLevelCacheMissThreshold = 0.38;
-    float tuplesPerLastLevelCacheMissThreshold = ((7.0 / 16.0) * getBytesPerCacheLine()) / sizeof(int);
+    float tuplesPerLastLevelCacheMissThreshold = 0.5 * (getBytesPerCacheLine() / (sizeof(int) + sizeof(int)));
 
     std::vector<std::string> counters = {"PERF_COUNT_HW_CACHE_MISSES"};
     long_long *counterValues = Counters::getInstance().getEvents(counters);

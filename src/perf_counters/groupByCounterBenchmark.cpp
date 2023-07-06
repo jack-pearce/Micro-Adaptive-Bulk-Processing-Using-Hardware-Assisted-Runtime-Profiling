@@ -1,12 +1,13 @@
 #include <cassert>
 #include <iostream>
 #include <cmath>
-#include <absl/container/flat_hash_map.h>
+#include <tsl/robin_map.h>
 
 #include "groupByCounterBenchmark.h"
 #include "../utils/dataHelpers.h"
 #include "../data_generation/config.h"
 #include "../library/papi.h"
+#include "../library/utils.h"
 #include "../utils/papiHelpers.h"
 #include "../data_generation/dataGenerators.h"
 
@@ -209,8 +210,8 @@ void groupByBenchmarkWithExtraCountersDuringRun(const DataFile &dataFile,
 
     int index = 0;
     int tuplesToProcess;
-    absl::flat_hash_map<int, int> map;
-    absl::flat_hash_map<int, int>::iterator it;
+    tsl::robin_map<int, int> map(getL3cacheSize() / (3 * (sizeof(int) + sizeof(int))));
+    tsl::robin_map<int, int>::iterator it;
 
     for (auto j = 0; j < numMeasurements; ++j) {
         tuplesToProcess = std::min(tuplesPerMeasurement, numElements - index);
@@ -221,9 +222,9 @@ void groupByBenchmarkWithExtraCountersDuringRun(const DataFile &dataFile,
         for (auto _ = 0; _ < tuplesToProcess; ++_) {
             it = map.find(inputGroupBy[index]);
             if (it != map.end()) {
-                it->second = aggregator(it->second, inputAggregate[index], false);
+                it.value() = aggregator(it->second, inputAggregate[index], false);
             } else {
-                map.insert({inputGroupBy[index], aggregator(inputAggregate[index], 0, true)});
+                map.insert({inputGroupBy[index], aggregator(0, inputAggregate[index], true)});
             }
             ++index;
         }
