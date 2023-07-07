@@ -3,12 +3,10 @@
 #include <cmath>
 #include <tsl/robin_map.h>
 
-#include "groupByCounterBenchmark.h"
-#include "../utils/dataHelpers.h"
-#include "../data_generation/config.h"
-#include "../library/papi.h"
-#include "../library/utils.h"
-#include "../utils/papiHelpers.h"
+#include "groupByCyclesBenchmark.h"
+#include "../utilities/dataHelpers.h"
+#include "../data_generation/machineConfiguration.h"
+#include "../utilities/papiHelpers.h"
 #include "../data_generation/dataGenerators.h"
 
 void groupByCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<GroupBy> &groupByImplementations,
@@ -35,7 +33,7 @@ void groupByCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<Grou
 
                 cycles = *Counters::getInstance().readEventSet();
 
-                auto result = runGroupByFunction<MinAggregation>(groupByImplementations[j], dataSweep.getNumElements(), inputGroupBy, inputAggregate);
+                auto result = runGroupByFunction<MaxAggregation>(groupByImplementations[j], dataSweep.getNumElements(), inputGroupBy, inputAggregate);
 
                 results[k][1 + (i * groupByImplementations.size()) + j] =
                         static_cast<double>(*Counters::getInstance().readEventSet() - cycles);
@@ -62,60 +60,6 @@ void groupByCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<Grou
     std::string fullFilePath = outputFilePath + groupByCyclesFolder + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }
-
-void groupByCpuCyclesSweepBenchmarkVariableSize(DataSweep &dataSweep, const std::vector<GroupBy> &groupByImplementations,
-                                                int iterations, const std::string &fileNamePrefix) {
-    assert(!groupByImplementations.empty());
-
-    int dataCols = iterations * static_cast<int>(groupByImplementations.size());
-    long_long cycles;
-    std::vector<std::vector<double>> results(dataSweep.getTotalRuns(),
-                                             std::vector<double>(dataCols + 1, 0));
-
-    for (auto i = 0; i < iterations; ++i) {
-        for (auto j = 0; j < static_cast<int>(groupByImplementations.size()); ++j) {
-            for (auto k = 0; k < dataSweep.getTotalRuns(); ++k) {
-                results[k][0] = static_cast<int>(dataSweep.getRunInput());
-                int numElements = static_cast<int>(dataSweep.getRunInput());;
-                auto inputGroupBy = new int[numElements];
-                auto inputAggregate = new int[numElements];
-
-                std::cout << "Running " << getGroupByName(groupByImplementations[j]) << " for input ";
-                std::cout << static_cast<int>(dataSweep.getRunInput()) << "... ";
-
-                dataSweep.loadNextDataSetIntoMemory(inputGroupBy);
-                generateUniformDistributionInMemory(inputAggregate, numElements, 10);
-
-                cycles = *Counters::getInstance().readEventSet();
-
-                auto result = runGroupByFunction<MaxAggregation>(groupByImplementations[j], numElements, inputGroupBy, inputAggregate);
-
-                results[k][1 + (i * groupByImplementations.size()) + j] =
-                        static_cast<double>(*Counters::getInstance().readEventSet() - cycles);
-
-                delete []inputGroupBy;
-                delete []inputAggregate;
-
-                std::cout << "Completed" << std::endl;
-
-                std::cout << "Result vector length: " << result.size() << std::endl;
-
-            }
-            dataSweep.restartSweep();
-        }
-    }
-
-    std::vector<std::string> headers(1 + dataCols);
-    headers [0] = "Input";
-    for (auto i = 0; i < dataCols; ++i) {
-        headers[1 + i] = getGroupByName(groupByImplementations[i % groupByImplementations.size()]);
-    }
-
-    std::string fileName = fileNamePrefix + "_GroupBy_SweepCyclesBM_" + dataSweep.getSweepName();
-    std::string fullFilePath = outputFilePath + groupByCyclesFolder + fileName + ".csv";
-    writeHeadersAndTableToCSV(headers, results, fullFilePath);
-}
-
 
 void groupByBenchmarkWithExtraCounters(DataSweep &dataSweep, GroupBy groupByImplementation, int iterations,
                                        std::vector<std::string> &benchmarkCounters, const std::string &fileNamePrefix) {
@@ -204,9 +148,10 @@ void groupByBenchmarkWithExtraCountersDuringRun(const DataFile &dataFile,
 
     int index = 0;
     int tuplesToProcess;
-    tsl::robin_map<int, int> map(l3cacheSize() / (3 * (sizeof(int) + sizeof(int))));
-    tsl::robin_map<int, int>::iterator it;
+    int initialSize = round((l3cacheSize() / (3 * (sizeof(int) + sizeof(int)))) / 100000.0) * 100000;
+    tsl::robin_map<int, int> map(initialSize);
 
+    tsl::robin_map<int, int>::iterator it;
     for (auto j = 0; j < numMeasurements; ++j) {
         tuplesToProcess = std::min(tuplesPerMeasurement, numElements - index);
 

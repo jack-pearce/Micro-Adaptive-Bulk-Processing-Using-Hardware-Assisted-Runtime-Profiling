@@ -1,8 +1,11 @@
 #ifndef MICRO_ADAPTIVE_BULK_PROCESSING_LIBRARY_DATAHELPERS_H
 #define MICRO_ADAPTIVE_BULK_PROCESSING_LIBRARY_DATAHELPERS_H
 
+#include <algorithm>
+
 #include "../../libs/papi/src/install/include/papi.h"
 #include "../data_generation/dataFiles.h"
+#include "../library/groupBy.h"
 
 class LoadedData {
 private:
@@ -30,5 +33,13 @@ void writeHeadersAndTableToCSV(std::vector<std::string>& headers,
                                std::vector<std::vector<double>>  values,
                                std::string& filePath);
 void copyArray(const int* source, int* destination, int size);
+
+template <typename T1, typename T2>
+void sortVectorOfPairs(vectorOfPairs<T1, T2> &vectorOfPairs) {;
+    std::sort(vectorOfPairs.begin(), vectorOfPairs.end(), [](const auto& pair1, const auto& pair2) {
+        return pair1.first < pair2.first;
+    });
+}
+
 
 #endif //MICRO_ADAPTIVE_BULK_PROCESSING_LIBRARY_DATAHELPERS_H

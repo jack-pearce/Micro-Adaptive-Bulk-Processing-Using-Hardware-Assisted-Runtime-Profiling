@@ -1,8 +1,8 @@
 #include <vector>
 #include <memory>
 
-#include "timeBenchmarkSelect.h"
-#include "../utils/dataHelpers.h"
+#include "selectTimeBenchmark.h"
+#include "../utilities/dataHelpers.h"
 #include "../../libs/benchmark/include/benchmark/benchmark.h"
 
 LoadedData* loadedDataFile;

@@ -3,17 +3,17 @@
 #include <iostream>
 #include <algorithm>
 
-#include "time_benchmarking/timeBenchmarkSelect.h"
+#include "time_benchmarking/selectTimeBenchmark.h"
 #include "time_benchmarking/timeBenchmarkHelpers.h"
 #include "data_generation/dataGenerators.h"
-#include "utils/dataHelpers.h"
+#include "utilities//dataHelpers.h"
 #include "library/select.h"
 #include "library/groupBy.h"
-#include "library/papi.h"
-#include "perf_counters/selectCounterBenchmark.h"
-#include "perf_counters/groupByCounterBenchmark.h"
+#include "library/utilities/papi.h"
+#include "cycles_benchmarking//selectCyclesBenchmark.h"
+#include "cycles_benchmarking/groupByCyclesBenchmark.h"
 #include "data_generation/dataFiles.h"
-#include "utils/papiHelpers.h"
+#include "utilities/papiHelpers.h"
 
 
 void dataDistributionTest(const DataFile& dataFile) {
@@ -186,75 +186,66 @@ void allSelectValuesTests() {
 
 }
 
-bool comparePairs(const std::pair<int, int>& pair1, const std::pair<int, int>& pair2) {
-    return pair1.first < pair2.first;
-}
-
-/*void groupByFunctionalityTest(const DataFile& dataFile, GroupBy groupByImplementation, aggFuncPtr aggregator) {
+void groupByCompareResultsTest(const DataFile& dataFile, GroupBy groupByImpOne, GroupBy groupByImpTwo) {
     auto inputGroupBy = new int[dataFile.getNumElements()];
     auto inputAggregate = new int[dataFile.getNumElements()];
     copyArray(LoadedData::getInstance(dataFile).getData(), inputGroupBy, dataFile.getNumElements());
     generateUniformDistributionInMemory(inputAggregate, dataFile.getNumElements(), 10);
 
-    vectorOfPairs resultHash = groupByHash(dataFile.getNumElements(), inputGroupBy, inputAggregate, aggregator);
-    std::sort(resultHash.begin(), resultHash.end(), comparePairs);
+    auto resultOne = runGroupByFunction<MaxAggregation>(groupByImpOne,
+                                                        dataFile.getNumElements(), inputGroupBy, inputAggregate);
+    sortVectorOfPairs(resultOne);
 
-    vectorOfPairs resultInput = runGroupByFunction(groupByImplementation, dataFile.getNumElements(), inputGroupBy,
-                                                   inputAggregate, aggregator);
-    std::sort(resultInput.begin(), resultInput.end(), comparePairs);
+    auto resultTwo = runGroupByFunction<MaxAggregation>(groupByImpTwo,
+                                                        dataFile.getNumElements(), inputGroupBy, inputAggregate);
+   sortVectorOfPairs(resultTwo);
 
-    if (resultHash.size() != resultInput.size()) {
-        std::cout << "Size of result is different from base hash implementation" << std::endl;
+    if (resultOne.size() != resultTwo.size()) {
+        std::cout << "Size of results are different" << std::endl;
     }
 
-    for (auto i = 0; i < static_cast<int> (resultHash.size()); ++i) {
-        if ((resultHash[i].first != resultInput[i].first) || (resultHash[i].second != resultInput[i].second)) {
-            std::cout << "Different result found" << std::endl;
+    for (auto i = 0; i < static_cast<int> (resultOne.size()); ++i) {
+        if ((resultOne[i].first != resultTwo[i].first) || (resultOne[i].second != resultTwo[i].second)) {
+            std::cout << "Different row found" << std::endl;
         }
     }
 
     delete []inputGroupBy;
     delete []inputAggregate;
-}*/
-
-/*void groupByBenchmarkWithExtraCountersConfigurations(DataSweep &dataSweep,
-                                                     GroupBy groupByImplementation,
-                                                     aggFuncPtr aggregator,
-                                                     int iterations,
-                                                     const std::string &fileNamePrefix) {
-    // HPC set 1
-    std::vector<std::string> benchmarkCounters = {"PERF_COUNT_HW_CPU_CYCLES",
-                                                  "INSTRUCTION_RETIRED",
-                                                  "LLC_REFERENCES",
-                                                  "PERF_COUNT_HW_CACHE_REFERENCES",
-                                                  "PERF_COUNT_HW_CACHE_MISSES",
-                                                  "PERF_COUNT_HW_CACHE_L1D",
-                                                  "L1-DCACHE-LOADS",
-                                                  "L1-DCACHE-LOAD-MISSES",
-                                                  "L1-DCACHE-STORES"};
-
-    groupByBenchmarkWithExtraCounters(dataSweep, groupByImplementation, aggregator, iterations, benchmarkCounters, fileNamePrefix);
-}*/
-
-/*
-void groupByBenchmarkWithExtraCountersDuringRunConfigurations(const DataFile &dataFile,
-                                                              aggFuncPtr aggregator,
-                                                     const std::string &fileNamePrefix) {
-    // HPC set 1
-    std::vector<std::string> benchmarkCounters = {"PERF_COUNT_HW_CPU_CYCLES",
-                                                  "INSTRUCTION_RETIRED",
-                                                  "LLC_REFERENCES",
-                                                  "PERF_COUNT_HW_CACHE_REFERENCES",
-                                                  "PERF_COUNT_HW_CACHE_MISSES",
-                                                  "PERF_COUNT_HW_CACHE_L1D",
-                                                  "L1-DCACHE-LOADS",
-                                                  "L1-DCACHE-LOAD-MISSES",
-                                                  "L1-DCACHE-STORES"};
-
-    groupByBenchmarkWithExtraCountersDuringRun(dataFile, aggregator, benchmarkCounters, fileNamePrefix);
 }
 
-*/
+void groupByBenchmarkWithExtraCountersConfigurations(DataSweep &dataSweep,
+                                                     GroupBy groupByImplementation,
+                                                     int iterations,
+                                                     const std::string &fileNamePrefix) {
+    std::vector<std::string> benchmarkCounters = {"PERF_COUNT_HW_CPU_CYCLES",
+                                                  "INSTRUCTION_RETIRED",
+                                                  "LLC_REFERENCES",
+                                                  "PERF_COUNT_HW_CACHE_REFERENCES",
+                                                  "PERF_COUNT_HW_CACHE_MISSES",
+                                                  "PERF_COUNT_HW_CACHE_L1D",
+                                                  "L1-DCACHE-LOADS",
+                                                  "L1-DCACHE-LOAD-MISSES",
+                                                  "L1-DCACHE-STORES"};
+
+    groupByBenchmarkWithExtraCounters(dataSweep, groupByImplementation, iterations, benchmarkCounters, fileNamePrefix);
+}
+
+void groupByBenchmarkWithExtraCountersDuringRunConfigurations(const DataFile &dataFile,
+                                                              const std::string &fileNamePrefix) {
+    // HPC set 1
+    std::vector<std::string> benchmarkCounters = {"PERF_COUNT_HW_CPU_CYCLES",
+                                                  "INSTRUCTION_RETIRED",
+                                                  "LLC_REFERENCES",
+                                                  "PERF_COUNT_HW_CACHE_REFERENCES",
+                                                  "PERF_COUNT_HW_CACHE_MISSES",
+                                                  "PERF_COUNT_HW_CACHE_L1D",
+                                                  "L1-DCACHE-LOADS",
+                                                  "L1-DCACHE-LOAD-MISSES",
+                                                  "L1-DCACHE-STORES"};
+
+    groupByBenchmarkWithExtraCountersDuringRun(dataFile, benchmarkCounters, fileNamePrefix);
+}
 
 void allGroupByTests() {
 /*
@@ -442,35 +433,6 @@ int main() {
                                    {GroupBy::Hash,GroupBy::SortRadixOpt,
                                     GroupBy::Adaptive}, maxAggregation,
                                    1, "10-40M");*/
-
-//    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepVariableMax,
-//                                   {GroupBy::Hash, GroupBy::SortRadixOpt,
-//                                    GroupBy::Adaptive},
-//                                   1, "Variable");
-
-/*    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepVariableMax,
-                                   {GroupBy::Adaptive},
-                                   1, "Variable2");*/
-/*
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::SortRadixOpt},
-                                   1, "Fixed2");
-
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered100k,
-                                   {GroupBy::SortRadixOpt},
-                                   1, "100k2");
-
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution40mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::SortRadixOpt},
-                                   1, "40M2");*/
-
-/*    groupByCountCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
-                                   {GroupByCount::Count_Hash},
-                                   1, "block");*/
-
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::SortRadixOpt, GroupBy::SortRadixOpt_Count},
-                                   1, "CountVsMax2");
 
     return 0;
 }

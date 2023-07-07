@@ -7,7 +7,7 @@
 #include <cmath>
 
 #include "dataHelpers.h"
-#include "../data_generation/config.h"
+#include "../data_generation/machineConfiguration.h"
 
 LoadedData::LoadedData(const DataFile &dataFile) : data(nullptr), dataFile(&dataFile) {
     loadData();

@@ -3,4 +3,4 @@
 .log
 /cmake-build-debug/
 /.idea/inspectionProfiles/Project_Default.xml
-src/data_generation/config.cpp
+src/data_generation/machineConfiguration.cpp

@@ -25,19 +25,18 @@ add_subdirectory(libs/hopscotch-map)
 add_executable(${PROJECT_NAME}
         src/data_generation/dataGenerators.cpp
         src/data_generation/dataFiles.cpp
-        src/data_generation/config.cpp
+        src/data_generation/machineConfiguration.cpp
         src/library/select.cpp
-        src/library/papi.cpp
-        src/library/utils.cpp
-        src/time_benchmarking/timeBenchmarkSelect.cpp
+        src/library/utilities/papi.cpp
+        src/library/utilities/systemInformation.cpp
+        src/time_benchmarking/selectTimeBenchmark.cpp
         src/time_benchmarking/timeBenchmarkHelpers.cpp
         src/main.cpp
-        src/utils/dataHelpers.cpp
-        src/utils/papiHelpers.cpp
-        src/perf_counters/selectCounterBenchmark.cpp
+        src/utilities/dataHelpers.cpp
+        src/utilities/papiHelpers.cpp
+        src/cycles_benchmarking/selectCyclesBenchmark.cpp
         src/library/groupBy.cpp
-        src/perf_counters/groupByCounterBenchmark.cpp
-        src/library/groupByImplementation.h)
+        src/cycles_benchmarking/groupByCyclesBenchmark.cpp)
 
 target_link_libraries(${PROJECT_NAME} benchmark::benchmark)
 

@@ -2,7 +2,7 @@
 
 #include "dataFiles.h"
 #include "dataGenerators.h"
-#include "../utils/dataHelpers.h"
+#include "../utilities/dataHelpers.h"
 
 const std::string selectCyclesFolder = "select_cycles_benchmark/";
 const std::string groupByCyclesFolder = "groupBy_cycles_benchmark/";

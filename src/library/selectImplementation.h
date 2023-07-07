@@ -4,8 +4,8 @@
 #include <immintrin.h>
 #include <functional>
 
-#include "papi.h"
-#include "utils.h"
+#include "utilities/papi.h"
+#include "utilities/systemInformation.h"
 
 
 template<typename T>

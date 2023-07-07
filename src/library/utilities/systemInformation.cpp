@@ -2,7 +2,7 @@
 #include <iostream>
 #include <unistd.h>
 
-#include "utils.h"
+#include "systemInformation.h"
 
 bool arrayIsSimd128Aligned(const int* array) {
     const size_t simdAlignment = sizeof(__m128i);

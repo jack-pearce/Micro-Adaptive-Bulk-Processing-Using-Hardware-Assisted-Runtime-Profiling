@@ -4,10 +4,10 @@
 #include <string>
 #include <cassert>
 
-#include "../utils/dataHelpers.h"
-#include "../utils/papiHelpers.h"
-#include "selectCounterBenchmark.h"
-#include "../data_generation/config.h"
+#include "../utilities/dataHelpers.h"
+#include "../utilities/papiHelpers.h"
+#include "selectCyclesBenchmark.h"
+#include "../data_generation/machineConfiguration.h"
 
 
 void selectSingleRunNoCounters(const DataFile &dataFile, Select selectImplementation, int threshold,

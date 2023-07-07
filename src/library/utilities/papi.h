@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 
-#include "../../libs/papi/src/install/include/papi.h"
+#include "../../../libs/papi/src/install/include/papi.h"
 
 class Counters {
 public:
