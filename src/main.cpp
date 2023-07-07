@@ -252,7 +252,7 @@ void groupByBenchmarkWithExtraCountersDuringRunConfigurations(const DataFile &da
     groupByBenchmarkWithExtraCountersDuringRun(dataFile, benchmarkCounters, fileNamePrefix);
 }
 
-void allGroupByTests() {
+void allGroupByTestsOLD() {
 /*
 // SET ONE - BITS_PER_PASS = 10
     // Graph 1: Cardinality range on uniform data (variable max) for different hashmaps - compile with -march=native removed
@@ -406,9 +406,7 @@ void allGroupByTests() {
                                    1, "9-SingleDoubleRadix8PassThenHash");*/
 }
 
-
-int main() {
-
+void allGroupByTests() {
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepVariableMax,
                                    {GroupBy::Hash,GroupBy::SortRadixOpt,
                                     GroupBy::Adaptive},
@@ -439,10 +437,20 @@ int main() {
                                     GroupBy::Adaptive},
                                    1, "NoClustering40M");
 
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                   {GroupBy::Hash,GroupBy::SortRadixOpt,
+                                    GroupBy::Adaptive},
+                                   1, "NoClustering200M");
+
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformInt64Distribution20mValuesCardinalitySweepFixedMax,
                                    {GroupBy::Hash,GroupBy::SortRadixOpt,
                                     GroupBy::Adaptive},
                                    1, "NoClustering64bitInt");
+}
+
+int main() {
+
+    allGroupByTests();
 
     return 0;
 }
