@@ -37,8 +37,7 @@ add_executable(${PROJECT_NAME}
         src/perf_counters/selectCounterBenchmark.cpp
         src/library/groupBy.cpp
         src/perf_counters/groupByCounterBenchmark.cpp
-        src/library/groupByCount.cpp
-        src/perf_counters/groupByCountCounterBenchmark.cpp src/perf_counters/groupByCountCounterBenchmark.cpp src/perf_counters/groupByCountCounterBenchmark.h src/library/groupByCountImplementation.h)
+        src/library/groupByImplementation.h)
 
 target_link_libraries(${PROJECT_NAME} benchmark::benchmark)
 

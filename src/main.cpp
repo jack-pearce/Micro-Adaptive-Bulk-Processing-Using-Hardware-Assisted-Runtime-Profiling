@@ -12,7 +12,6 @@
 #include "library/papi.h"
 #include "perf_counters/selectCounterBenchmark.h"
 #include "perf_counters/groupByCounterBenchmark.h"
-#include "perf_counters/groupByCountCounterBenchmark.h"
 #include "data_generation/dataFiles.h"
 #include "utils/papiHelpers.h"
 
@@ -191,7 +190,7 @@ bool comparePairs(const std::pair<int, int>& pair1, const std::pair<int, int>& p
     return pair1.first < pair2.first;
 }
 
-void groupByFunctionalityTest(const DataFile& dataFile, GroupBy groupByImplementation, aggFuncPtr aggregator) {
+/*void groupByFunctionalityTest(const DataFile& dataFile, GroupBy groupByImplementation, aggFuncPtr aggregator) {
     auto inputGroupBy = new int[dataFile.getNumElements()];
     auto inputAggregate = new int[dataFile.getNumElements()];
     copyArray(LoadedData::getInstance(dataFile).getData(), inputGroupBy, dataFile.getNumElements());
@@ -216,9 +215,9 @@ void groupByFunctionalityTest(const DataFile& dataFile, GroupBy groupByImplement
 
     delete []inputGroupBy;
     delete []inputAggregate;
-}
+}*/
 
-void groupByBenchmarkWithExtraCountersConfigurations(DataSweep &dataSweep,
+/*void groupByBenchmarkWithExtraCountersConfigurations(DataSweep &dataSweep,
                                                      GroupBy groupByImplementation,
                                                      aggFuncPtr aggregator,
                                                      int iterations,
@@ -235,8 +234,9 @@ void groupByBenchmarkWithExtraCountersConfigurations(DataSweep &dataSweep,
                                                   "L1-DCACHE-STORES"};
 
     groupByBenchmarkWithExtraCounters(dataSweep, groupByImplementation, aggregator, iterations, benchmarkCounters, fileNamePrefix);
-}
+}*/
 
+/*
 void groupByBenchmarkWithExtraCountersDuringRunConfigurations(const DataFile &dataFile,
                                                               aggFuncPtr aggregator,
                                                      const std::string &fileNamePrefix) {
@@ -254,18 +254,19 @@ void groupByBenchmarkWithExtraCountersDuringRunConfigurations(const DataFile &da
     groupByBenchmarkWithExtraCountersDuringRun(dataFile, aggregator, benchmarkCounters, fileNamePrefix);
 }
 
+*/
 
 void allGroupByTests() {
-
+/*
 // SET ONE - BITS_PER_PASS = 10
     // Graph 1: Cardinality range on uniform data (variable max) for different hashmaps - compile with -march=native removed
-/*    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepVariableMax,
+*//*    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepVariableMax,
                                    {GroupBy::HashGoogleDenseHashMap,
 //                                    GroupBy::HashFollyF14FastMap,   // Need to turn off -march=native for this one
                                     GroupBy::HashAbseilFlatHashMap,
                                     GroupBy::HashTessilRobinMap,
                                     GroupBy::HashTessilHopscotchMap}, countAggregation,
-                                   1, "1-MapCompare");*/
+                                   1, "1-MapCompare");*//*
 
     // Graph 2: Cardinality range (variable max) for simple radix sort - manually run with BITS_PER_PASS of 8, 10, 12
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepVariableMax,
@@ -278,13 +279,13 @@ void allGroupByTests() {
                                    1, "3-RadixOpt10");
 
     // Graph 5: Cardinality range on uniform data (fixed max) for different hashmaps - compile with -march=native removed
-/*    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+*//*    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
                                    {GroupBy::HashGoogleDenseHashMap,
 //                                    GroupBy::HashFollyF14FastMap,   // Need to turn off -march=native for this one
                                     GroupBy::HashAbseilFlatHashMap,
                                     GroupBy::HashTessilRobinMap,
                                     GroupBy::HashTessilHopscotchMap}, countAggregation,
-                                   1, "5-MapCompare");*/
+                                   1, "5-MapCompare");*//*
 
     // Graph 6: Cardinality range (fixed max) for simple radix sort - manually run with BITS_PER_PASS of 8, 10, 12
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
@@ -352,7 +353,7 @@ void allGroupByTests() {
 
 
     // SET TWO - BITS_PER_PASS = 8
-/*    // Graph 2: Cardinality range (variable max) for simple radix sort - manually run with BITS_PER_PASS of 8, 10, 12
+*//*    // Graph 2: Cardinality range (variable max) for simple radix sort - manually run with BITS_PER_PASS of 8, 10, 12
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepVariableMax,
                                    {GroupBy::SortRadix}, countAggregation,
                                    1, "2-RadixSimple8");
@@ -377,11 +378,11 @@ void allGroupByTests() {
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
                                    {GroupBy::SingleRadixPassThenHash,
                                     GroupBy::DoubleRadixPassThenHash}, countAggregation,
-                                   1, "9-SingleDoubleRadix8PassThenHash");*/
+                                   1, "9-SingleDoubleRadix8PassThenHash");*//*
 
 
     // SET THREE - BITS_PER_PASS = 12
- /*   // Graph 2: Cardinality range (variable max) for simple radix sort - manually run with BITS_PER_PASS of 8, 10, 12
+ *//*   // Graph 2: Cardinality range (variable max) for simple radix sort - manually run with BITS_PER_PASS of 8, 10, 12
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepVariableMax,
                                    {GroupBy::SortRadix}, countAggregation,
                                    1, "2-RadixSimple12");
@@ -442,6 +443,34 @@ int main() {
                                     GroupBy::Adaptive}, maxAggregation,
                                    1, "10-40M");*/
 
+//    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepVariableMax,
+//                                   {GroupBy::Hash, GroupBy::SortRadixOpt,
+//                                    GroupBy::Adaptive},
+//                                   1, "Variable");
+
+/*    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepVariableMax,
+                                   {GroupBy::Adaptive},
+                                   1, "Variable2");*/
+/*
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
+                                   {GroupBy::SortRadixOpt},
+                                   1, "Fixed2");
+
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered100k,
+                                   {GroupBy::SortRadixOpt},
+                                   1, "100k2");
+
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution40mValuesCardinalitySweepFixedMax,
+                                   {GroupBy::SortRadixOpt},
+                                   1, "40M2");*/
+
+/*    groupByCountCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
+                                   {GroupByCount::Count_Hash},
+                                   1, "block");*/
+
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
+                                   {GroupBy::SortRadixOpt, GroupBy::SortRadixOpt_Count},
+                                   1, "CountVsMax2");
 
     return 0;
 }

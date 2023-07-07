@@ -12,8 +12,7 @@
 #include "../data_generation/dataGenerators.h"
 
 void groupByCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<GroupBy> &groupByImplementations,
-                                    aggFuncPtr aggregator, int iterations,
-                                    const std::string &fileNamePrefix) {
+                                    int iterations, const std::string &fileNamePrefix) {
     assert(!groupByImplementations.empty());
 
     int dataCols = iterations * static_cast<int>(groupByImplementations.size());
@@ -36,8 +35,7 @@ void groupByCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<Grou
 
                 cycles = *Counters::getInstance().readEventSet();
 
-                auto result = runGroupByFunction(groupByImplementations[j],
-                                                 dataSweep.getNumElements(), inputGroupBy, inputAggregate, aggregator);
+                auto result = runGroupByFunction<MinAggregation>(groupByImplementations[j], dataSweep.getNumElements(), inputGroupBy, inputAggregate);
 
                 results[k][1 + (i * groupByImplementations.size()) + j] =
                         static_cast<double>(*Counters::getInstance().readEventSet() - cycles);
@@ -66,8 +64,7 @@ void groupByCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<Grou
 }
 
 void groupByCpuCyclesSweepBenchmarkVariableSize(DataSweep &dataSweep, const std::vector<GroupBy> &groupByImplementations,
-                                                aggFuncPtr aggregator, int iterations,
-                                                const std::string &fileNamePrefix) {
+                                                int iterations, const std::string &fileNamePrefix) {
     assert(!groupByImplementations.empty());
 
     int dataCols = iterations * static_cast<int>(groupByImplementations.size());
@@ -91,8 +88,7 @@ void groupByCpuCyclesSweepBenchmarkVariableSize(DataSweep &dataSweep, const std:
 
                 cycles = *Counters::getInstance().readEventSet();
 
-                auto result = runGroupByFunction(groupByImplementations[j], numElements, inputGroupBy, inputAggregate,
-                                                 aggregator);
+                auto result = runGroupByFunction<MaxAggregation>(groupByImplementations[j], numElements, inputGroupBy, inputAggregate);
 
                 results[k][1 + (i * groupByImplementations.size()) + j] =
                         static_cast<double>(*Counters::getInstance().readEventSet() - cycles);
@@ -121,8 +117,7 @@ void groupByCpuCyclesSweepBenchmarkVariableSize(DataSweep &dataSweep, const std:
 }
 
 
-void groupByBenchmarkWithExtraCounters(DataSweep &dataSweep, GroupBy groupByImplementation,
-                                       aggFuncPtr aggregator, int iterations,
+void groupByBenchmarkWithExtraCounters(DataSweep &dataSweep, GroupBy groupByImplementation, int iterations,
                                        std::vector<std::string> &benchmarkCounters, const std::string &fileNamePrefix) {
     if (groupByImplementation == GroupBy::Adaptive)
         std::cout << "Cannot benchmark adaptive groupBy using counters as adaptive select is already using these counters" << std::endl;
@@ -154,7 +149,7 @@ void groupByBenchmarkWithExtraCounters(DataSweep &dataSweep, GroupBy groupByImpl
             if (PAPI_reset(benchmarkEventSet) != PAPI_OK)
                 exit(1);
 
-            runGroupByFunction(groupByImplementation, numElements, inputGroupBy, inputAggregate, aggregator);
+            runGroupByFunction<MaxAggregation>(groupByImplementation, numElements, inputGroupBy, inputAggregate);
 
             if (PAPI_read(benchmarkEventSet, benchmarkCounterValues) != PAPI_OK)
                 exit(1);
@@ -189,7 +184,6 @@ void groupByBenchmarkWithExtraCounters(DataSweep &dataSweep, GroupBy groupByImpl
 }
 
 void groupByBenchmarkWithExtraCountersDuringRun(const DataFile &dataFile,
-                                                aggFuncPtr aggregator,
                                                 std::vector<std::string> &benchmarkCounters,
                                                 const std::string &fileNamePrefix) {
 
@@ -222,9 +216,9 @@ void groupByBenchmarkWithExtraCountersDuringRun(const DataFile &dataFile,
         for (auto _ = 0; _ < tuplesToProcess; ++_) {
             it = map.find(inputGroupBy[index]);
             if (it != map.end()) {
-                it.value() = aggregator(it->second, inputAggregate[index], false);
+                it.value() = MaxAggregation<int>()(it->second, inputAggregate[index], false);
             } else {
-                map.insert({inputGroupBy[index], aggregator(0, inputAggregate[index], true)});
+                map.insert({inputGroupBy[index], MaxAggregation<int>()(0, inputAggregate[index], true)});
             }
             ++index;
         }

@@ -5,47 +5,59 @@
 #include <vector>
 #include <memory>
 
-using vectorOfPairs = std::vector<std::pair<int, int>>;
-
 enum GroupBy {
     Hash,
-    HashGoogleDenseHashMap,
-    HashFollyF14FastMap,
-    HashAbseilFlatHashMap,
-    HashTessilRobinMap,
-    HashTessilHopscotchMap,
-    SortRadix,
+    Hash_Count,
     SortRadixOpt,
-    SingleRadixPassThenHash,
-    DoubleRadixPassThenHash,
+    SortRadixOpt_Count,
     Adaptive
 };
 
-using aggFuncPtr = int (*)(int, int, bool);
-
-extern const aggFuncPtr minAggregation;
-extern const aggFuncPtr maxAggregation;
-extern const aggFuncPtr sumAggregation;
-extern const aggFuncPtr countAggregation;
-
-vectorOfPairs groupByHash(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator);
-
-vectorOfPairs groupByHashGoogleDenseHashMap(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator);
-vectorOfPairs groupByHashFollyF14FastMap(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator);
-vectorOfPairs groupByHashAbseilFlatHashMap(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator);
-vectorOfPairs groupByHashTessilRobinMap(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator);
-vectorOfPairs groupByHashTessilHopscotchMap(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator);
-
-vectorOfPairs groupBySortRadix(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator);
-vectorOfPairs groupBySortRadixOpt(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator);
-
-vectorOfPairs groupBySingleRadixPassThenHash(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator);
-vectorOfPairs groupByDoubleRadixPassThenHash(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator);
-
-vectorOfPairs groupByAdaptive(int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator);
-
-vectorOfPairs runGroupByFunction(GroupBy groupByImplementation, int n, int *inputGroupBy, int *inputAggregate, aggFuncPtr aggregator);
 std::string getGroupByName(GroupBy groupByImplementation);
 
+template <typename T1, typename T2>
+using vectorOfPairs = std::vector<std::pair<T1, T2>>;
+
+template <typename T>
+struct MinAggregation {
+    T operator()(T currentAggregate, T numberToInclude, bool firstAggregation) const;
+};
+
+template <typename T>
+struct MaxAggregation {
+    T operator()(T currentAggregate, T numberToInclude, bool firstAggregation) const;
+};
+
+template <typename T>
+struct SumAggregation {
+    T operator()(T currentAggregate, T numberToInclude, bool firstAggregation) const;
+};
+
+template <typename T>
+struct CountAggregation {
+    T operator()(T currentAggregate, T _, bool firstAggregation) const;
+};
+
+
+template <template<typename> class Aggregator, typename T1, typename T2>
+vectorOfPairs<T1, T2> groupByHash(int n, T1 *inputGroupBy, T2 *inputAggregate);
+
+template <template<typename> class Aggregator, typename T1, typename T2>
+vectorOfPairs<T1, T2> groupBySortRadixOpt(int n, T1 *inputGroupBy, T2 *inputAggregate);
+
+template<typename T>
+vectorOfPairs<T, int> groupByHash_Count(int n, const T *inputGroupBy);
+
+template<typename T>
+vectorOfPairs<T, int> groupBySortRadixOpt_Count(int n, T *inputGroupBy);
+
+template <template<typename> class Aggregator, typename T1, typename T2>
+vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregate);
+
+template <template<typename> class Aggregator, typename T1, typename T2>
+vectorOfPairs<T1, T2> runGroupByFunction(GroupBy groupByImplementation, int n, T1 *inputGroupBy, T2 *inputAggregate);
+
+
+#include "groupByImplementation.h"
 
 #endif //MABPL_GROUPBY_H
