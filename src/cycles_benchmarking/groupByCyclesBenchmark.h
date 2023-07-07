@@ -9,6 +9,9 @@ using MABPL::GroupBy;
 void groupByCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<GroupBy> &groupByImplementations,
                                      int iterations, const std::string &fileNamePrefix);
 
+void groupByCpuCyclesSweepBenchmark64(DataSweep &dataSweep, const std::vector<GroupBy> &groupByImplementations,
+                                      int iterations, const std::string &fileNamePrefix);
+
 void groupByBenchmarkWithExtraCounters(DataSweep &dataSweep, GroupBy groupByImplementation, int iterations,
                                        std::vector<std::string> &benchmarkCounters, const std::string &fileNamePrefix);
 

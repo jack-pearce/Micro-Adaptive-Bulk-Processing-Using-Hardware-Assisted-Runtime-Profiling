@@ -407,7 +407,7 @@ void allGroupByTestsOLD() {
 }
 
 void allGroupByTests() {
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepVariableMax,
+/*    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepVariableMax,
                                    {GroupBy::Hash,GroupBy::SortRadixOpt,
                                     GroupBy::Adaptive},
                                    1, "VariableMax");
@@ -440,9 +440,9 @@ void allGroupByTests() {
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
                                    {GroupBy::Hash,GroupBy::SortRadixOpt,
                                     GroupBy::Adaptive},
-                                   1, "NoClustering200M");
+                                   1, "NoClustering200M");*/
 
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformInt64Distribution20mValuesCardinalitySweepFixedMax,
+    groupByCpuCyclesSweepBenchmark64(DataSweeps::logUniformInt64Distribution20mValuesCardinalitySweepFixedMax,
                                    {GroupBy::Hash,GroupBy::SortRadixOpt,
                                     GroupBy::Adaptive},
                                    1, "NoClustering64bitInt");
