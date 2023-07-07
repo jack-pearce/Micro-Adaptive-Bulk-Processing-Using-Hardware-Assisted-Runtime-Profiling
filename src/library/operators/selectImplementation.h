@@ -4,9 +4,11 @@
 #include <immintrin.h>
 #include <functional>
 
-#include "utilities/papi.h"
-#include "utilities/systemInformation.h"
+#include "../utilities/papi.h"
+#include "../utilities/systemInformation.h"
 
+
+namespace MABPL {
 
 template<typename T>
 int selectIndexesBranch(int n, const T *inputFilter, int *selection, T threshold) {
@@ -372,6 +374,8 @@ int runSelectFunction(Select selectImplementation,
             std::cout << "Invalid selection of 'Select' implementation!" << std::endl;
             exit(1);
     }
+}
+
 }
 
 #endif //MABPL_SELECT_IMPLEMENTATION_H

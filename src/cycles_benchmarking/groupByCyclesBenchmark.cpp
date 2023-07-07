@@ -9,6 +9,12 @@
 #include "../utilities/papiHelpers.h"
 #include "../data_generation/dataGenerators.h"
 
+using MABPL::Counters;
+using MABPL::MaxAggregation;
+using MABPL::MaxAggregation;
+using MABPL::SumAggregation;
+using MABPL::CountAggregation;
+
 void groupByCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<GroupBy> &groupByImplementations,
                                     int iterations, const std::string &fileNamePrefix) {
     assert(!groupByImplementations.empty());
@@ -33,7 +39,7 @@ void groupByCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<Grou
 
                 cycles = *Counters::getInstance().readEventSet();
 
-                auto result = runGroupByFunction<MaxAggregation>(groupByImplementations[j], dataSweep.getNumElements(), inputGroupBy, inputAggregate);
+                auto result = MABPL::runGroupByFunction<MaxAggregation>(groupByImplementations[j], dataSweep.getNumElements(), inputGroupBy, inputAggregate);
 
                 results[k][1 + (i * groupByImplementations.size()) + j] =
                         static_cast<double>(*Counters::getInstance().readEventSet() - cycles);
@@ -93,7 +99,7 @@ void groupByBenchmarkWithExtraCounters(DataSweep &dataSweep, GroupBy groupByImpl
             if (PAPI_reset(benchmarkEventSet) != PAPI_OK)
                 exit(1);
 
-            runGroupByFunction<MaxAggregation>(groupByImplementation, numElements, inputGroupBy, inputAggregate);
+            MABPL::runGroupByFunction<MaxAggregation>(groupByImplementation, numElements, inputGroupBy, inputAggregate);
 
             if (PAPI_read(benchmarkEventSet, benchmarkCounterValues) != PAPI_OK)
                 exit(1);
@@ -148,7 +154,7 @@ void groupByBenchmarkWithExtraCountersDuringRun(const DataFile &dataFile,
 
     int index = 0;
     int tuplesToProcess;
-    int initialSize = round((l3cacheSize() / (3 * (sizeof(int) + sizeof(int)))) / 100000.0) * 100000;
+    int initialSize = round((MABPL::l3cacheSize() / (3 * (sizeof(int) + sizeof(int)))) / 100000.0) * 100000;
     tsl::robin_map<int, int> map(initialSize);
 
     tsl::robin_map<int, int>::iterator it;

@@ -17,7 +17,7 @@ static void selectTimeBenchmarker(benchmark::State& state) {
     auto selection = std::make_unique<int[]>(numElements);
 
     for (auto _: state) {
-        runSelectFunction<int>(selectImplementation, numElements, inputData,
+        MABPL::runSelectFunction<int>(selectImplementation, numElements, inputData,
                           inputFilter, selection.get(), selectivity);
     }
 }

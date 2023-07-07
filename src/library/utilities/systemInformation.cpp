@@ -4,12 +4,14 @@
 
 #include "systemInformation.h"
 
-bool arrayIsSimd128Aligned(const int* array) {
+namespace MABPL {
+
+bool arrayIsSimd128Aligned(const int *array) {
     const size_t simdAlignment = sizeof(__m128i);
     return reinterpret_cast<uintptr_t>(array) % simdAlignment == 0;
 }
 
-bool arrayIsSimd256Aligned(const int* array) {
+bool arrayIsSimd256Aligned(const int *array) {
     const size_t simdAlignment = sizeof(__m256i);
     return reinterpret_cast<uintptr_t>(array) % simdAlignment == 0;
 }
@@ -20,4 +22,6 @@ long l3cacheSize() {
 
 long bytesPerCacheLine() {
     return sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
+}
+
 }

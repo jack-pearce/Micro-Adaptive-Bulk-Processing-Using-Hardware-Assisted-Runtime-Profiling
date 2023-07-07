@@ -3,10 +3,10 @@
 
 #include <vector>
 
-#include "../library/select.h"
-#include "../library/utilities/papi.h"
+#include "../library/mabpl.h"
 #include "../data_generation/dataFiles.h"
 
+using MABPL::Select;
 
 void selectSingleRunNoCounters(const DataFile &dataFile,
                                Select selectImplementation,

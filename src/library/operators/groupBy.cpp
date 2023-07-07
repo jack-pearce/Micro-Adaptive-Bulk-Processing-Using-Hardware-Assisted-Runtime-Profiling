@@ -3,8 +3,10 @@
 #include "groupBy.h"
 
 
+namespace MABPL {
+
 std::string getGroupByName(GroupBy groupByImplementation) {
-    switch(groupByImplementation) {
+    switch (groupByImplementation) {
         case GroupBy::Hash:
             return "GroupBy_Hash";
         case GroupBy::SortRadixOpt:
@@ -19,4 +21,6 @@ std::string getGroupByName(GroupBy groupByImplementation) {
             std::cout << "Invalid selection of 'GroupBy' implementation!" << std::endl;
             exit(1);
     }
+}
+
 }

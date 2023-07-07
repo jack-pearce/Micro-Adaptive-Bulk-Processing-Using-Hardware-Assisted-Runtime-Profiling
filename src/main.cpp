@@ -1,19 +1,22 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include <algorithm>
 
 #include "time_benchmarking/selectTimeBenchmark.h"
 #include "time_benchmarking/timeBenchmarkHelpers.h"
 #include "data_generation/dataGenerators.h"
 #include "utilities//dataHelpers.h"
-#include "library/select.h"
-#include "library/groupBy.h"
-#include "library/utilities/papi.h"
 #include "cycles_benchmarking//selectCyclesBenchmark.h"
 #include "cycles_benchmarking/groupByCyclesBenchmark.h"
 #include "data_generation/dataFiles.h"
-#include "utilities/papiHelpers.h"
+#include "library/mabpl.h"
+
+using MABPL::Select;
+using MABPL::GroupBy;
+
+using MABPL::MaxAggregation;
+using MABPL::MaxAggregation;
+using MABPL::SumAggregation;
 
 
 void dataDistributionTest(const DataFile& dataFile) {
@@ -31,13 +34,14 @@ void selectFunctionalityTest(const DataFile& dataFile, Select selectImplementati
         copyArray(LoadedData::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
         copyArray(LoadedData::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
 
-        auto selected = runSelectFunction(selectImplementation,
+        auto selected = MABPL::runSelectFunction(selectImplementation,
                                          dataFile.getNumElements(), inputData, inputFilter, selection, i);
         std::cout << i << "%: " << static_cast<float>(selected) / static_cast<float>(dataFile.getNumElements()) << std::endl;
 
         delete[] inputData;
         delete[] inputFilter;
         delete[] selection;
+
     }
 }
 
@@ -192,11 +196,11 @@ void groupByCompareResultsTest(const DataFile& dataFile, GroupBy groupByImpOne, 
     copyArray(LoadedData::getInstance(dataFile).getData(), inputGroupBy, dataFile.getNumElements());
     generateUniformDistributionInMemory(inputAggregate, dataFile.getNumElements(), 10);
 
-    auto resultOne = runGroupByFunction<MaxAggregation>(groupByImpOne,
+    auto resultOne = MABPL::runGroupByFunction<MaxAggregation>(groupByImpOne,
                                                         dataFile.getNumElements(), inputGroupBy, inputAggregate);
     sortVectorOfPairs(resultOne);
 
-    auto resultTwo = runGroupByFunction<MaxAggregation>(groupByImpTwo,
+    auto resultTwo = MABPL::runGroupByFunction<MaxAggregation>(groupByImpTwo,
                                                         dataFile.getNumElements(), inputGroupBy, inputAggregate);
    sortVectorOfPairs(resultTwo);
 
@@ -403,6 +407,11 @@ void allGroupByTests() {
 
 
 int main() {
+
+    groupByCompareResultsTest(DataFiles::uniformIntDistribution200mValuesCardinality400kMax200m,
+                              GroupBy::Hash, GroupBy::SortRadixOpt);
+
+//    selectFunctionalityTest(DataFiles::uniformIntDistribution250mValuesMax100, Select::ImplementationValuesVectorized);
 
 /*    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepVariableMax,
                                    {GroupBy::Hash,GroupBy::SortRadixOpt,

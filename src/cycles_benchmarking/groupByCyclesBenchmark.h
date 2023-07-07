@@ -1,9 +1,10 @@
 #ifndef MABPL_GROUPBYCYCLESBENCHMARK_H
 #define MABPL_GROUPBYCYCLESBENCHMARK_H
 
-#include "../library/groupBy.h"
+#include "../library/mabpl.h"
 #include "../data_generation/dataFiles.h"
 
+using MABPL::GroupBy;
 
 void groupByCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<GroupBy> &groupByImplementations,
                                      int iterations, const std::string &fileNamePrefix);

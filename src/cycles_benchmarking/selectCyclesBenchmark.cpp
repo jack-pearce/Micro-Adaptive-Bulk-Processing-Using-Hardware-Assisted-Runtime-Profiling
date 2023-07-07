@@ -9,6 +9,7 @@
 #include "selectCyclesBenchmark.h"
 #include "../data_generation/machineConfiguration.h"
 
+using MABPL::Counters;
 
 void selectSingleRunNoCounters(const DataFile &dataFile, Select selectImplementation, int threshold,
                                int iterations) {
@@ -21,7 +22,7 @@ void selectSingleRunNoCounters(const DataFile &dataFile, Select selectImplementa
 
         std::cout << "Running threshold " << threshold << ", iteration " << j + 1 << "... ";
 
-        runSelectFunction(selectImplementation,
+        MABPL::runSelectFunction(selectImplementation,
                           dataFile.getNumElements(), inputData, inputFilter, selection, threshold);
 
         delete[] inputData;
@@ -53,7 +54,7 @@ void selectCpuCyclesSingleInputBenchmark(const DataFile &dataFile,
 
             cycles = *Counters::getInstance().readEventSet();
 
-            runSelectFunction(selectImplementations[j],
+            MABPL::runSelectFunction(selectImplementations[j],
                               dataFile.getNumElements(), inputData, inputFilter, selection, threshold);
 
             results[i][1 + j] = *Counters::getInstance().readEventSet() - cycles;
@@ -109,7 +110,7 @@ void selectCpuCyclesMultipleInputBenchmark(const DataFile &dataFile,
 
                 cycles = *Counters::getInstance().readEventSet();
 
-                runSelectFunction(selectImplementations[j],
+                MABPL::runSelectFunction(selectImplementations[j],
                                   dataFile.getNumElements(), inputData, inputFilter, selection, j);
 
                 results[count][1 + (i * iterations) + k] = *Counters::getInstance().readEventSet() - cycles;
@@ -172,7 +173,7 @@ void selectBenchmarkWithExtraCounters(const DataFile &dataFile, Select selectImp
             if (PAPI_reset(benchmarkEventSet) != PAPI_OK)
                 exit(1);
 
-            runSelectFunction(selectImplementation,
+            MABPL::runSelectFunction(selectImplementation,
                               dataFile.getNumElements(), inputData, inputFilter, selection,
                               static_cast<int>(thresholds[i]));
 
@@ -235,7 +236,7 @@ void selectCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<Selec
 
                 cycles = *Counters::getInstance().readEventSet();
 
-                runSelectFunction(selectImplementations[j],
+                MABPL::runSelectFunction(selectImplementations[j],
                                   dataSweep.getNumElements(), inputData, inputFilter, selection, threshold);
 
                 results[k][1 + (i * selectImplementations.size()) + j] =
@@ -293,7 +294,7 @@ void selectCpuCyclesInputSweepBenchmark(const DataFile &dataFile,
 
                 cycles = *Counters::getInstance().readEventSet();
 
-                runSelectFunction(selectImplementations[j],
+                MABPL::runSelectFunction(selectImplementations[j],
                                   dataFile.getNumElements(), inputData, inputFilter,
                                   selection, static_cast<int>(thresholds[k]));
 

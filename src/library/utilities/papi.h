@@ -6,6 +6,8 @@
 
 #include "../../../libs/papi/src/install/include/papi.h"
 
+namespace MABPL {
+
 class Counters {
 public:
     static Counters& getInstance();
@@ -23,5 +25,7 @@ private:
     Counters();
     ~Counters();
 };
+
+}
 
 #endif //MABPL_PAPI_H

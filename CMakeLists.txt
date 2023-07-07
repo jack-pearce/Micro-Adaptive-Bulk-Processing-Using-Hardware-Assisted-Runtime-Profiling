@@ -26,7 +26,7 @@ add_executable(${PROJECT_NAME}
         src/data_generation/dataGenerators.cpp
         src/data_generation/dataFiles.cpp
         src/data_generation/machineConfiguration.cpp
-        src/library/select.cpp
+        src/library/operators/select.cpp
         src/library/utilities/papi.cpp
         src/library/utilities/systemInformation.cpp
         src/time_benchmarking/selectTimeBenchmark.cpp
@@ -35,8 +35,8 @@ add_executable(${PROJECT_NAME}
         src/utilities/dataHelpers.cpp
         src/utilities/papiHelpers.cpp
         src/cycles_benchmarking/selectCyclesBenchmark.cpp
-        src/library/groupBy.cpp
-        src/cycles_benchmarking/groupByCyclesBenchmark.cpp)
+        src/library/operators/groupBy.cpp
+        src/cycles_benchmarking/groupByCyclesBenchmark.cpp src/library/mabpl.h)
 
 target_link_libraries(${PROJECT_NAME} benchmark::benchmark)
 

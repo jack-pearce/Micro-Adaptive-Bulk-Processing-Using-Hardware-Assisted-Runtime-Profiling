@@ -6,6 +6,8 @@
 #include <vector>
 
 
+namespace MABPL {
+
 enum SelectIndexesChoice {
     IndexesBranch,
     IndexesPredication
@@ -57,6 +59,7 @@ template<typename T1, typename T2>
 int runSelectFunction(Select selectImplementation,
                       int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold);
 
+}
 
 #include "selectImplementation.h"
 

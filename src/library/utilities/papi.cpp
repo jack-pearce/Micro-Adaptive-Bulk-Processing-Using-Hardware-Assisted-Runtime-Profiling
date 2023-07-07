@@ -3,6 +3,9 @@
 
 #include "papi.h"
 
+
+namespace MABPL {
+
 Counters& Counters::getInstance() {
     static Counters instance;
     return instance;
@@ -92,4 +95,6 @@ long_long *Counters::readEventSet() {
         exit(1);
     }
     return counterValues;
+}
+
 }

@@ -2,9 +2,10 @@
 
 #include "select.h"
 
+namespace MABPL {
 
 std::string getSelectName(Select selectImplementation) {
-    switch(selectImplementation) {
+    switch (selectImplementation) {
         case Select::ImplementationIndexesBranch:
             return "Select_Indexes_Branch";
         case Select::ImplementationIndexesPredication:
@@ -23,4 +24,6 @@ std::string getSelectName(Select selectImplementation) {
             std::cout << "Invalid selection of 'Select' implementation!" << std::endl;
             exit(1);
     }
+}
+
 }
