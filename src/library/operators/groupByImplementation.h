@@ -322,7 +322,7 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
     int index = 0;
     int tuplesToProcess;
 
-    if constexpr (std::is_same_v<Aggregator<T2>, CountAggregation<T2>>) {
+    if constexpr (std::is_same<Aggregator<T2>, CountAggregation<T2>>::value) {
         // Count Aggregation
 
         tsl::robin_map<T1, int> map(initialSize);

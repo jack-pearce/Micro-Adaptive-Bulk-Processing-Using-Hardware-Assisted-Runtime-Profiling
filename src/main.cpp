@@ -17,6 +17,7 @@ using MABPL::GroupBy;
 using MABPL::MaxAggregation;
 using MABPL::MaxAggregation;
 using MABPL::SumAggregation;
+using MABPL::CountAggregation;
 
 
 void dataDistributionTest(const DataFile& dataFile) {
@@ -411,7 +412,12 @@ int main() {
     groupByCompareResultsTest(DataFiles::uniformIntDistribution200mValuesCardinality400kMax200m,
                               GroupBy::Hash, GroupBy::SortRadixOpt);
 
-//    selectFunctionalityTest(DataFiles::uniformIntDistribution250mValuesMax100, Select::ImplementationValuesVectorized);
+    groupByCompareResultsTest(DataFiles::uniformIntDistribution200mValuesCardinality400kMax200m,
+                              GroupBy::Hash_Count, GroupBy::SortRadixOpt_Count);
+
+    groupByCompareResultsTest(DataFiles::uniformIntDistribution200mValuesCardinality400kMax200m,
+                              GroupBy::Hash, GroupBy::Adaptive);
+
 
 /*    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepVariableMax,
                                    {GroupBy::Hash,GroupBy::SortRadixOpt,
