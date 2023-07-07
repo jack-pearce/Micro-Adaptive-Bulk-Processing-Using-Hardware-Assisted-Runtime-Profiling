@@ -409,45 +409,40 @@ void allGroupByTests() {
 
 int main() {
 
-    groupByCompareResultsTest(DataFiles::uniformIntDistribution200mValuesCardinality400kMax200m,
-                              GroupBy::Hash, GroupBy::SortRadixOpt);
-
-    groupByCompareResultsTest(DataFiles::uniformIntDistribution200mValuesCardinality400kMax200m,
-                              GroupBy::Hash_Count, GroupBy::SortRadixOpt_Count);
-
-    groupByCompareResultsTest(DataFiles::uniformIntDistribution200mValuesCardinality400kMax200m,
-                              GroupBy::Hash, GroupBy::Adaptive);
-
-
-/*    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepVariableMax,
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepVariableMax,
                                    {GroupBy::Hash,GroupBy::SortRadixOpt,
-                                    GroupBy::Adaptive}, maxAggregation,
-                                   1, "10-VariableMax");
+                                    GroupBy::Adaptive},
+                                   1, "VariableMax");
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
                                    {GroupBy::Hash,GroupBy::SortRadixOpt,
-                                    GroupBy::Adaptive}, maxAggregation,
-                                   1, "10-NoClustering");
+                                    GroupBy::Adaptive},
+                                   1, "NoClustering");
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered10,
                                    {GroupBy::Hash,GroupBy::SortRadixOpt,
-                                    GroupBy::Adaptive}, maxAggregation,
-                                   1, "10-Clustered10");
+                                    GroupBy::Adaptive},
+                                   1, "Clustered10");
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered1k,
                                    {GroupBy::Hash,GroupBy::SortRadixOpt,
-                                    GroupBy::Adaptive}, maxAggregation,
-                                   1, "10-Clustered1k");
+                                    GroupBy::Adaptive},
+                                   1, "Clustered1k");
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered100k,
                                    {GroupBy::Hash,GroupBy::SortRadixOpt,
-                                    GroupBy::Adaptive}, maxAggregation,
-                                   1, "10-Clustered100k");
+                                    GroupBy::Adaptive},
+                                   1, "Clustered100k");
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution40mValuesCardinalitySweepFixedMax,
                                    {GroupBy::Hash,GroupBy::SortRadixOpt,
-                                    GroupBy::Adaptive}, maxAggregation,
-                                   1, "10-40M");*/
+                                    GroupBy::Adaptive},
+                                   1, "NoClustering40M");
+
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformInt64Distribution20mValuesCardinalitySweepFixedMax,
+                                   {GroupBy::Hash,GroupBy::SortRadixOpt,
+                                    GroupBy::Adaptive},
+                                   1, "NoClustering64bitInt");
 
     return 0;
 }
