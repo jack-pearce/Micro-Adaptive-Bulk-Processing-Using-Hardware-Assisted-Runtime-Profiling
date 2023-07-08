@@ -43,7 +43,7 @@ struct CountAggregation {
 
 
 template<template<typename> class Aggregator, typename T1, typename T2>
-vectorOfPairs<T1, T2> groupByHash(int n, T1 *inputGroupBy, T2 *inputAggregate);
+vectorOfPairs<T1, T2>  groupByHash(int n, T1 *inputGroupBy, T2 *inputAggregate, int cardinality);
 
 template<template<typename> class Aggregator, typename T1, typename T2>
 vectorOfPairs<T1, T2> groupBySortRadixOpt(int n, T1 *inputGroupBy, T2 *inputAggregate);
@@ -55,11 +55,10 @@ template<typename T>
 vectorOfPairs<T, int> groupBySortRadixOpt_Count(int n, T *inputGroupBy);
 
 template<template<typename> class Aggregator, typename T1, typename T2>
-vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregate);
+vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregate, int cardinality);
 
 template<template<typename> class Aggregator, typename T1, typename T2>
-vectorOfPairs<T1, T2>
-runGroupByFunction(GroupBy groupByImplementation, int n, T1 *inputGroupBy, T2 *inputAggregate);
+vectorOfPairs<T1, T2> runGroupByFunction(GroupBy groupByImplementation, int n, T1 *inputGroupBy, T2 *inputAggregate, int cardinality);
 
 }
 

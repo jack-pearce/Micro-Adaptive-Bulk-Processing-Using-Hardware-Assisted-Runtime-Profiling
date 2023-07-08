@@ -198,11 +198,13 @@ void groupByCompareResultsTest(const DataFile& dataFile, GroupBy groupByImpOne, 
     generateUniformDistributionInMemory(inputAggregate, dataFile.getNumElements(), 10);
 
     auto resultOne = MABPL::runGroupByFunction<MaxAggregation>(groupByImpOne,
-                                                        dataFile.getNumElements(), inputGroupBy, inputAggregate);
+                                                               dataFile.getNumElements(), inputGroupBy, inputAggregate,
+                                                               0);
     sortVectorOfPairs(resultOne);
 
     auto resultTwo = MABPL::runGroupByFunction<MaxAggregation>(groupByImpTwo,
-                                                        dataFile.getNumElements(), inputGroupBy, inputAggregate);
+                                                               dataFile.getNumElements(), inputGroupBy, inputAggregate,
+                                                               0);
    sortVectorOfPairs(resultTwo);
 
     if (resultOne.size() != resultTwo.size()) {
@@ -454,9 +456,46 @@ int main() {
 //                              GroupBy::Hash, GroupBy::Adaptive);
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::Adaptive},
-                                   1, "ContinueSort");
+                                   {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive},
+                                   1, "");
 
+//    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
+//                                   {GroupBy::Hash, GroupBy::Adaptive},
+//                                   1, "");
+//
+//    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+//                                   {GroupBy::Hash,GroupBy::SortRadixOpt ,GroupBy::Adaptive},
+//                                   1, "");
+
+//    groupByBenchmarkWithExtraCountersDuringRunConfigurations(DataFiles::uniformIntDistribution20mValuesCardinality50kMax20m,
+//                                                             "WarmUpTest");
+//
+//    groupByBenchmarkWithExtraCountersConfigurations(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered100k,
+//                                      GroupBy::Hash,1, "");
+
+//    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered100k,
+//                                   {GroupBy::Hash},
+//                                   1, "HashCheck");
+
+/*    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
+                                   {GroupBy::Hash,GroupBy::SortRadixOpt},
+                                   1, "");
+
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered10,
+                                   {GroupBy::Hash,GroupBy::SortRadixOpt},
+                                   1, "");
+
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered1k,
+                                   {GroupBy::Hash,GroupBy::SortRadixOpt},
+                                   1, "");
+
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered100k,
+                                   {GroupBy::Hash,GroupBy::SortRadixOpt},
+                                   1, "");
+
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepVariableMax,
+                                   {GroupBy::Hash,GroupBy::SortRadixOpt},
+                                   1, "");*/
 
     return 0;
 }

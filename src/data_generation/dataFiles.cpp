@@ -110,6 +110,31 @@ const DataFile DataFiles::uniformIntDistribution200mValuesCardinality4175320Max2
         "uniformIntDistribution200mValuesCardinality4175320Max200mClustered1k",
         "200m values with ~400k unique values. Max of 200m i.e. gaps in distribution. 1k clustering"};
 
+const DataFile DataFiles::uniformIntDistribution20mValuesCardinality400kMax20m{
+        20 * 1000 * 1000,
+        "uniformIntDistribution20mValuesCardinality400kMax20m",
+        "20m values with ~400k unique values. Max of 20m i.e. gaps in distribution."};
+
+const DataFile DataFiles::uniformIntDistribution20mValuesCardinality10mMax20mClustered1k{
+        20 * 1000 * 1000,
+        "uniformIntDistribution20mValuesCardinality10mMax20mClustered1k",
+        "20m values with ~10m unique values. Max of 20m i.e. gaps in distribution. 1k clustering"};
+
+const DataFile DataFiles::uniformIntDistribution20mValuesCardinality10mMax20m{
+        20 * 1000 * 1000,
+        "uniformIntDistribution20mValuesCardinality10mMax20m",
+        "20m values with ~10m unique values. Max of 20m i.e. gaps in distribution"};
+
+const DataFile DataFiles::uniformIntDistribution20mValuesCardinality200kMax20m{
+        20 * 1000 * 1000,
+        "uniformIntDistribution20mValuesCardinality200kMax20m",
+        "20m values with ~200k unique values. Max of 20m i.e. gaps in distribution"};
+
+const DataFile DataFiles::uniformIntDistribution20mValuesCardinality50kMax20m{
+        20 * 1000 * 1000,
+        "uniformIntDistribution20mValuesCardinality50kMax20m",
+        "20m values with ~50k unique values. Max of 20m i.e. gaps in distribution"};
+
 
 DataFile::DataFile(int _numElements, std::string _fileName, std::string _longDescription)
         : numElements(_numElements), fileName(std::move(_fileName)), longDescription(std::move(_longDescription)) {}
@@ -153,6 +178,16 @@ void DataFile::loadDataIntoMemory(int *data) const {
         generateUniformDistributionInMemoryWithSetCardinality(data, getNumElements(), getNumElements(), 400000);
     } else if (getFileName() == "uniformIntDistribution200mValuesCardinality4175320Max200mClustered1k") {
         generateUniformDistributionInMemoryWithSetCardinalityClustered(data, getNumElements(), getNumElements(), 4175320, 1000);
+    } else if (getFileName() == "uniformIntDistribution20mValuesCardinality400kMax20m") {
+        generateUniformDistributionInMemoryWithSetCardinality(data, getNumElements(), 20*1000*1000, 400*1000);
+    } else if (getFileName() == "uniformIntDistribution20mValuesCardinality10mMax20mClustered1k") {
+        generateUniformDistributionInMemoryWithSetCardinalityClustered(data, getNumElements(), 20*1000*1000, 10*1000*1000, 1*1000);
+    } else if (getFileName() == "uniformIntDistribution20mValuesCardinality10mMax20m") {
+        generateUniformDistributionInMemoryWithSetCardinality(data, getNumElements(), 20*1000*1000, 10*1000*1000);
+    } else if (getFileName() == "uniformIntDistribution20mValuesCardinality200kMax20m") {
+        generateUniformDistributionInMemoryWithSetCardinality(data, getNumElements(), 20*1000*1000, 200*1000);
+    } else if (getFileName() == "uniformIntDistribution20mValuesCardinality50kMax20m") {
+        generateUniformDistributionInMemoryWithSetCardinality(data, getNumElements(), 20*1000*1000, 50*1000);
     }
 }
 

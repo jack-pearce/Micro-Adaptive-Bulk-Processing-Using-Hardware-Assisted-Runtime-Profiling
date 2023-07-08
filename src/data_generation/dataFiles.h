@@ -50,6 +50,11 @@ public:
 
     static const DataFile uniformIntDistribution200mValuesCardinality400kMax200m;
     static const DataFile uniformIntDistribution200mValuesCardinality4175320Max200mClustered1k;
+    static const DataFile uniformIntDistribution20mValuesCardinality400kMax20m;
+    static const DataFile uniformIntDistribution20mValuesCardinality10mMax20mClustered1k;
+    static const DataFile uniformIntDistribution20mValuesCardinality10mMax20m;
+    static const DataFile uniformIntDistribution20mValuesCardinality200kMax20m;
+    static const DataFile uniformIntDistribution20mValuesCardinality50kMax20m;
 };
 
 class DataSweep {

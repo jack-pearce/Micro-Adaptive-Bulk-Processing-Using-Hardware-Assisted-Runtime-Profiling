@@ -31,6 +31,8 @@ void groupByCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<Grou
                 auto inputGroupBy = new int[dataSweep.getNumElements()];
                 auto inputAggregate = new int[dataSweep.getNumElements()];
 
+                int cardinality = static_cast<int>(dataSweep.getRunInput());
+
                 std::cout << "Running " << getGroupByName(groupByImplementations[j]) << " for input ";
                 std::cout << static_cast<int>(dataSweep.getRunInput()) << "... ";
 
@@ -39,7 +41,9 @@ void groupByCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<Grou
 
                 cycles = *Counters::getInstance().readEventSet();
 
-                auto result = MABPL::runGroupByFunction<MaxAggregation>(groupByImplementations[j], dataSweep.getNumElements(), inputGroupBy, inputAggregate);
+                auto result = MABPL::runGroupByFunction<MaxAggregation>(groupByImplementations[j],
+                                                                        dataSweep.getNumElements(), inputGroupBy,
+                                                                        inputAggregate, cardinality);
 
                 results[k][1 + (i * groupByImplementations.size()) + j] =
                         static_cast<double>(*Counters::getInstance().readEventSet() - cycles);
@@ -83,6 +87,8 @@ void groupByCpuCyclesSweepBenchmark64(DataSweep &dataSweep, const std::vector<Gr
                 auto inputGroupBy = new int64_t[dataSweep.getNumElements()];
                 auto inputAggregate = new int[dataSweep.getNumElements()];
 
+                int cardinality = static_cast<int>(dataSweep.getRunInput());
+
                 std::cout << "Running " << getGroupByName(groupByImplementations[j]) << " for input ";
                 std::cout << static_cast<int>(dataSweep.getRunInput()) << "... ";
 
@@ -91,7 +97,9 @@ void groupByCpuCyclesSweepBenchmark64(DataSweep &dataSweep, const std::vector<Gr
 
                 cycles = *Counters::getInstance().readEventSet();
 
-                auto result = MABPL::runGroupByFunction<MaxAggregation>(groupByImplementations[j], dataSweep.getNumElements(), inputGroupBy, inputAggregate);
+                auto result = MABPL::runGroupByFunction<MaxAggregation>(groupByImplementations[j],
+                                                                        dataSweep.getNumElements(), inputGroupBy,
+                                                                        inputAggregate, cardinality);
 
                 results[k][1 + (i * groupByImplementations.size()) + j] =
                         static_cast<double>(*Counters::getInstance().readEventSet() - cycles);
@@ -140,6 +148,8 @@ void groupByBenchmarkWithExtraCounters(DataSweep &dataSweep, GroupBy groupByImpl
             auto inputGroupBy = new int[numElements];
             auto inputAggregate = new int[numElements];
 
+            int cardinality = static_cast<int>(dataSweep.getRunInput());
+
             std::cout << "Running " << getGroupByName(groupByImplementation) << " for input ";
             std::cout << static_cast<int>(dataSweep.getRunInput()) << ", iteration ";
             std::cout << i + 1 << "... ";
@@ -151,7 +161,8 @@ void groupByBenchmarkWithExtraCounters(DataSweep &dataSweep, GroupBy groupByImpl
             if (PAPI_reset(benchmarkEventSet) != PAPI_OK)
                 exit(1);
 
-            MABPL::runGroupByFunction<MaxAggregation>(groupByImplementation, numElements, inputGroupBy, inputAggregate);
+            MABPL::runGroupByFunction<MaxAggregation>(groupByImplementation, numElements, inputGroupBy, inputAggregate,
+                                                      cardinality);
 
             if (PAPI_read(benchmarkEventSet, benchmarkCounterValues) != PAPI_OK)
                 exit(1);
@@ -206,7 +217,11 @@ void groupByBenchmarkWithExtraCountersDuringRun(const DataFile &dataFile,
 
     int index = 0;
     int tuplesToProcess;
-    int initialSize = round((MABPL::l3cacheSize() / (3 * (sizeof(int) + sizeof(int)))) / 100000.0) * 100000;
+//    int initialSize = round((MABPL::l3cacheSize() / (3 * (sizeof(int) + sizeof(int)))) / 100000.0) * 100000;
+//    tsl::robin_map<int, int> map(initialSize);
+
+    int cardinality = 50*1000;
+    int initialSize = std::max(static_cast<int>(2.5 * cardinality), 400000);
     tsl::robin_map<int, int> map(initialSize);
 
     tsl::robin_map<int, int>::iterator it;
