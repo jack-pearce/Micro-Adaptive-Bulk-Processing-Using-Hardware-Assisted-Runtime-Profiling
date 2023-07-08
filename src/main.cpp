@@ -456,7 +456,7 @@ int main() {
 //                              GroupBy::Hash, GroupBy::Adaptive);
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive},
+                                   {GroupBy::Adaptive},
                                    1, "");
 
 //    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,

@@ -51,11 +51,7 @@ vectorOfPairs<T1, T2> groupByHash(int n, T1 *inputGroupBy, T2 *inputAggregate, i
     static_assert(std::is_integral<T1>::value, "GroupBy column must be an integer type");
     static_assert(std::is_arithmetic<T2>::value, "Payload column must be an numeric type");
 
-//    int initialSize = round((l3cacheSize() / (3 * (sizeof(int) + sizeof(int)))) / 100000.0) * 100000;
-    int initialSize = std::max(static_cast<int>(2.5 * cardinality), 400000);
-//    std::cout << "Cardinality: " << cardinality << ", Initial size: " << initialSize << std::endl;
-//    int initialSize = 20*1000*1000;
-    tsl::robin_map<T1, T2> map(initialSize);
+    tsl::robin_map<T1, T2> map(std::max(static_cast<int>(2.5 * cardinality), 400000));
 
     typename tsl::robin_map<T1, T2>::iterator it;
     for (auto i = 0; i < n; ++i) {
@@ -191,6 +187,8 @@ vectorOfPairs<T, int> groupByHash_Count(int n, const T *inputGroupBy) {
     int initialSize = round((l3cacheSize() / (3 * (sizeof(int) + sizeof(int)))) / 100000.0) * 100000;
     tsl::robin_map<T, int> map(initialSize);
 
+//    tsl::robin_map<T, int> map(std::max(static_cast<int>(2.5 * cardinality), 400000));
+
     typename tsl::robin_map<T, int>::iterator it;
     for (auto i = 0; i < n; ++i) {
         it = map.find(inputGroupBy[i]);
@@ -317,13 +315,10 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
     static_assert(std::is_integral<T1>::value, "GroupBy column must be an integer type");
 
     int tuplesPerCheck = 200000;
-//    int initialSize = round((l3cacheSize() / (3 * (sizeof(int) + sizeof(int)))) / 100000.0) * 100000;
     int initialSize = std::max(static_cast<int>(2.5 * cardinality), 400000);
 
     std::vector<std::string> counters = {"PERF_COUNT_HW_CACHE_MISSES"};
     long_long *counterValues = Counters::getInstance().getEvents(counters);
-    long_long lastLevelCacheMisses = 0;
-    long_long rowsProcessed = 0;
 
     int index = 0;
     int tuplesToProcess;
@@ -331,13 +326,15 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
     if constexpr (std::is_same<Aggregator<T2>, CountAggregation<T2>>::value) {
         // Count Aggregation
 
+        long_long lastLevelCacheMisses = 0;
+        long_long rowsProcessed = 0;
+
         tsl::robin_map<T1, int> map(initialSize);
         typename tsl::robin_map<T1, int>::iterator it;
 
-        float tuplesPerLastLevelCacheMissThreshold = (0.5 * bytesPerCacheLine()) / (sizeof(T1) + sizeof(int));
+        float tuplesPerLastLevelCacheMissThreshold = (0.125 * bytesPerCacheLine()) / (sizeof(T1) + sizeof(int));
 
-        unsigned long warmUpRows = std::min(l3cacheSize() / (sizeof(T1) + sizeof(int)),
-                                            static_cast<unsigned long>(n));
+        unsigned long warmUpRows = std::min(200000, cardinality);
 
         for (; index < static_cast<int>(warmUpRows); ++index) {
             it = map.find(inputGroupBy[index]);
@@ -388,8 +385,6 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
 
         float tuplesPerLastLevelCacheMissThreshold = (0.125 * bytesPerCacheLine()) / (sizeof(T1) + sizeof(T2));
 
-//        unsigned long warmUpRows = std::min(l3cacheSize() / (sizeof(T1) + sizeof(T2)),
-//                                            static_cast<unsigned long>(n));
         unsigned long warmUpRows = std::min(200000, cardinality);
 
         for (; index < static_cast<int>(warmUpRows); ++index) {
@@ -419,16 +414,11 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
 
             Counters::getInstance().readEventSet();
 
-            lastLevelCacheMisses += counterValues[0];
-            rowsProcessed += tuplesToProcess;
-
             if (__builtin_expect((static_cast<float>(tuplesToProcess) / counterValues[0])
                                  < tuplesPerLastLevelCacheMissThreshold, false)) {
-//            if (__builtin_expect((static_cast<float>(rowsProcessed) / lastLevelCacheMisses)
-//                                 < tuplesPerLastLevelCacheMissThreshold, false)) {
-                std::cout << "Switched to sorting the rest of the array!!!" << std::endl;
-                std::cout << "Processed: " << index << std::endl;
-                std::cout << "Reduced size by: " << index - map.size() << std::endl;
+//                std::cout << "Switched to sorting the rest of the array!!!" << std::endl;
+//                std::cout << "Processed: " << index << std::endl;
+//                std::cout << "Reduced size by: " << index - map.size() << std::endl;
 
                 int reducedNumElements = index - map.size();
                 int i = reducedNumElements;

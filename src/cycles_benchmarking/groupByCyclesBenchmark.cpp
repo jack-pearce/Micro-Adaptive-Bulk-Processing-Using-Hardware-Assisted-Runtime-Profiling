@@ -217,12 +217,12 @@ void groupByBenchmarkWithExtraCountersDuringRun(const DataFile &dataFile,
 
     int index = 0;
     int tuplesToProcess;
-//    int initialSize = round((MABPL::l3cacheSize() / (3 * (sizeof(int) + sizeof(int)))) / 100000.0) * 100000;
-//    tsl::robin_map<int, int> map(initialSize);
 
-    int cardinality = 50*1000;
-    int initialSize = std::max(static_cast<int>(2.5 * cardinality), 400000);
-    tsl::robin_map<int, int> map(initialSize);
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    int cardinality = 50*1000; /////////////////////// NEED TO UPDATE TO MATCH RUN ///////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    tsl::robin_map<int, int> map(std::max(static_cast<int>(2.5 * cardinality), 400000));
 
     tsl::robin_map<int, int>::iterator it;
     for (auto j = 0; j < numMeasurements; ++j) {
