@@ -9,10 +9,10 @@
 #include "../utilities/papi.h"
 
 
-#define BITS_PER_PASS 10
-
-
 namespace MABPL {
+
+constexpr int BITS_PER_RADIX_PASS = 10;
+constexpr float GROUPBY_MACHINE_CONSTANT = 0.125;
 
 template<typename T>
 T MinAggregation<T>::operator()(T currentAggregate, T numberToInclude, bool firstAggregation) const {
@@ -70,8 +70,8 @@ template<template<typename> class Aggregator, typename T1, typename T2>
 void groupBySortRadixOptAuxAgg(int start, int end, const T1 *inputGroupBy, T2 *inputAggregate,
                                int mask, int buckets, vectorOfPairs<T1, T2> &result) {
     int i;
-    int bucket[1 << BITS_PER_PASS] = {0};
-    bool bucketEntryPresent[1 << BITS_PER_PASS] = {false};
+    int bucket[1 << BITS_PER_RADIX_PASS] = {0};
+    bool bucketEntryPresent[1 << BITS_PER_RADIX_PASS] = {false};
 
     for (i = start; i < end; i++) {
         bucket[inputGroupBy[i] & mask] = Aggregator<T2>()(bucket[inputGroupBy[i] & mask], inputAggregate[i],
@@ -93,10 +93,10 @@ void groupBySortRadixOptAux(int start, int end, T1 *inputGroupBy, T2 *inputAggre
                             T2 *bufferAggregate, int mask, int buckets, int pass,
                             vectorOfPairs<T1, T2> &result) {
     int i;
-    int bucket[1 << BITS_PER_PASS] = {0};
+    int bucket[1 << BITS_PER_RADIX_PASS] = {0};
 
     for (i = start; i < end; i++) {
-        bucket[(inputGroupBy[i] >> (pass * BITS_PER_PASS)) & mask]++;
+        bucket[(inputGroupBy[i] >> (pass * BITS_PER_RADIX_PASS)) & mask]++;
     }
 
     for (i = 1; i < buckets; i++) {
@@ -109,8 +109,8 @@ void groupBySortRadixOptAux(int start, int end, T1 *inputGroupBy, T2 *inputAggre
     }
 
     for (i = end - 1; i >= start; i--) {
-        bufferGroupBy[start + --bucket[(inputGroupBy[i] >> (pass * BITS_PER_PASS)) & mask]] = inputGroupBy[i];
-        bufferAggregate[start + bucket[(inputGroupBy[i] >> (pass * BITS_PER_PASS)) & mask]] = inputAggregate[i];
+        bufferGroupBy[start + --bucket[(inputGroupBy[i] >> (pass * BITS_PER_RADIX_PASS)) & mask]] = inputGroupBy[i];
+        bufferAggregate[start + bucket[(inputGroupBy[i] >> (pass * BITS_PER_RADIX_PASS)) & mask]] = inputAggregate[i];
     }
 
     std::swap(inputGroupBy, bufferGroupBy);
@@ -151,7 +151,7 @@ vectorOfPairs<T1, T2> groupBySortRadixOpt(int n, T1 *inputGroupBy, T2 *inputAggr
     static_assert(std::is_arithmetic<T2>::value, "Payload column must be an numeric type");
 
     int i;
-    int buckets = 1 << BITS_PER_PASS;
+    int buckets = 1 << BITS_PER_RADIX_PASS;
     int mask = buckets - 1;
     int largest = 0;
 
@@ -166,7 +166,7 @@ vectorOfPairs<T1, T2> groupBySortRadixOpt(int n, T1 *inputGroupBy, T2 *inputAggr
         msbPosition++;
     }
 
-    int passes = static_cast<int>(std::ceil(static_cast<double>(msbPosition) / BITS_PER_PASS)) - 1;
+    int passes = static_cast<int>(std::ceil(static_cast<double>(msbPosition) / BITS_PER_RADIX_PASS)) - 1;
     vectorOfPairs<T1, T2> result;
 
     T1 *bufferGroupBy = new T1[n];
@@ -207,7 +207,7 @@ void groupBySortRadixOptAuxAgg_Count(int start, int end, const T *inputGroupBy, 
                                      vectorOfPairs<T, int> &result) {
     static_assert(std::is_integral<T>::value, "GroupBy column must be an integer type");
     int i;
-    int bucket[1 << BITS_PER_PASS] = {0};
+    int bucket[1 << BITS_PER_RADIX_PASS] = {0};
 
     for (i = start; i < end; i++) {
         bucket[inputGroupBy[i] & mask]++;
@@ -228,10 +228,10 @@ groupBySortRadixOptAux_Count(int start, int end, T *inputGroupBy, T *buffer, int
                              vectorOfPairs<T, int> &result) {
     static_assert(std::is_integral<T>::value, "GroupBy column must be an integer type");
     int i;
-    int bucket[1 << BITS_PER_PASS] = {0};
+    int bucket[1 << BITS_PER_RADIX_PASS] = {0};
 
     for (i = start; i < end; i++) {
-        bucket[(inputGroupBy[i] >> (pass * BITS_PER_PASS)) & mask]++;
+        bucket[(inputGroupBy[i] >> (pass * BITS_PER_RADIX_PASS)) & mask]++;
     }
 
     for (i = 1; i < buckets; i++) {
@@ -244,7 +244,7 @@ groupBySortRadixOptAux_Count(int start, int end, T *inputGroupBy, T *buffer, int
     }
 
     for (i = end - 1; i >= start; i--) {
-        buffer[start + --bucket[(inputGroupBy[i] >> (pass * BITS_PER_PASS)) & mask]] = inputGroupBy[i];
+        buffer[start + --bucket[(inputGroupBy[i] >> (pass * BITS_PER_RADIX_PASS)) & mask]] = inputGroupBy[i];
     }
 
     std::swap(inputGroupBy, buffer);
@@ -279,7 +279,7 @@ template<typename T>
 vectorOfPairs<T, int> groupBySortRadixOpt_Count(int n, T *inputGroupBy) {
     static_assert(std::is_integral<T>::value, "GroupBy column must be an integer type");
     int i;
-    int buckets = 1 << BITS_PER_PASS;
+    int buckets = 1 << BITS_PER_RADIX_PASS;
     int mask = buckets - 1;
     int largest = 0;
 
@@ -294,7 +294,7 @@ vectorOfPairs<T, int> groupBySortRadixOpt_Count(int n, T *inputGroupBy) {
         msbPosition++;
     }
 
-    int passes = static_cast<int>(std::ceil(static_cast<double>(msbPosition) / BITS_PER_PASS)) - 1;
+    int passes = static_cast<int>(std::ceil(static_cast<double>(msbPosition) / BITS_PER_RADIX_PASS)) - 1;
     vectorOfPairs<T, int> result;
 
     if (passes > 0) {
@@ -313,6 +313,8 @@ vectorOfPairs<T, int> groupBySortRadixOpt_Count(int n, T *inputGroupBy) {
 template<template<typename> class Aggregator, typename T1, typename T2>
 vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregate, int cardinality) {
     static_assert(std::is_integral<T1>::value, "GroupBy column must be an integer type");
+
+    int hashTableEntryBytes = sizeof(T1) + sizeof(T2);
 
     int tuplesPerCheck = 200000;
     int initialSize = std::max(static_cast<int>(2.5 * cardinality), 400000);
@@ -383,9 +385,10 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
         tsl::robin_map<T1, T2> map(initialSize);
         typename tsl::robin_map<T1, T2>::iterator it;
 
-        float tuplesPerLastLevelCacheMissThreshold = (0.125 * bytesPerCacheLine()) / (sizeof(T1) + sizeof(T2));
+        float tuplesPerLastLevelCacheMissThreshold = (GROUPBY_MACHINE_CONSTANT * bytesPerCacheLine()) / hashTableEntryBytes;
 
-        unsigned long warmUpRows = std::min(200000, cardinality);
+        unsigned long warmUpRows = std::min(static_cast<int>((l3cacheSize() / hashTableEntryBytes) /
+                (bytesPerCacheLine() / hashTableEntryBytes)), cardinality);
 
         for (; index < static_cast<int>(warmUpRows); ++index) {
             it = map.find(inputGroupBy[index]);

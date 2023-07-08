@@ -55,6 +55,8 @@ public:
     static const DataFile uniformIntDistribution20mValuesCardinality10mMax20m;
     static const DataFile uniformIntDistribution20mValuesCardinality200kMax20m;
     static const DataFile uniformIntDistribution20mValuesCardinality50kMax20m;
+
+    static const DataFile uniformIntDistribution20mValuesTwo10mCardinalitySections_100_10m_Max20m;
 };
 
 class DataSweep {
@@ -107,6 +109,10 @@ public:
 
     static DataSweep logUniformIntDistribution40mValuesCardinalitySweepFixedMax;
     static DataSweep logUniformInt64Distribution20mValuesCardinalitySweepFixedMax;
+
+    static DataSweep linearUniformIntDistribution20mValuesCardinalitySections_100_10m_Max20m;
+    static DataSweep linearUniformIntDistribution200mValuesCardinalitySections_100_10m_Max20m;
+
 };
 
 #endif //MABPL_DATAFILES_H

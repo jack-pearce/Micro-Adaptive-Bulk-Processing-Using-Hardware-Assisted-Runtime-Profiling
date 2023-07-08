@@ -452,12 +452,22 @@ void allGroupByTests() {
 
 int main() {
 
+    groupByCompareResultsTest(DataFiles::uniformIntDistribution20mValuesTwo10mCardinalitySections_100_10m_Max20m,
+                              GroupBy::Hash, GroupBy::SortRadixOpt);
+
+    groupByCompareResultsTest(DataFiles::uniformIntDistribution20mValuesTwo10mCardinalitySections_100_10m_Max20m,
+                              GroupBy::Hash, GroupBy::Adaptive);
+
+/*    groupByCpuCyclesSweepBenchmark(DataSweeps::linearUniformIntDistribution200mValuesCardinalitySections_100_10m_Max20m,
+                                   {GroupBy::Hash,GroupBy::SortRadixOpt ,GroupBy::Adaptive},
+                                   2, "");*/
+
 //    groupByCompareResultsTest(DataFiles::uniformIntDistribution200mValuesCardinality400kMax200m,
 //                              GroupBy::Hash, GroupBy::Adaptive);
 
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::Adaptive},
-                                   1, "");
+//    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
+//                                   {GroupBy::Adaptive},
+//                                   1, "");
 
 //    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
 //                                   {GroupBy::Hash, GroupBy::Adaptive},

@@ -135,6 +135,11 @@ const DataFile DataFiles::uniformIntDistribution20mValuesCardinality50kMax20m{
         "uniformIntDistribution20mValuesCardinality50kMax20m",
         "20m values with ~50k unique values. Max of 20m i.e. gaps in distribution"};
 
+const DataFile DataFiles::uniformIntDistribution20mValuesTwo10mCardinalitySections_100_10m_Max20m{
+        20 * 1000 * 1000,
+        "uniformIntDistribution20mValuesTwo10mCardinalitySections_100_10m_Max20m",
+        ""};
+
 
 DataFile::DataFile(int _numElements, std::string _fileName, std::string _longDescription)
         : numElements(_numElements), fileName(std::move(_fileName)), longDescription(std::move(_longDescription)) {}
@@ -188,6 +193,8 @@ void DataFile::loadDataIntoMemory(int *data) const {
         generateUniformDistributionInMemoryWithSetCardinality(data, getNumElements(), 20*1000*1000, 200*1000);
     } else if (getFileName() == "uniformIntDistribution20mValuesCardinality50kMax20m") {
         generateUniformDistributionInMemoryWithSetCardinality(data, getNumElements(), 20*1000*1000, 50*1000);
+    } else if (getFileName() == "uniformIntDistribution20mValuesTwo10mCardinalitySections_100_10m_Max20m") {
+        generateUniformDistributionInMemoryWithTwoCardinalitySections(data, getNumElements(), 20*1000*1000, 100, 10*1000*1000, 0.5);
     }
 }
 
@@ -347,6 +354,18 @@ DataSweep DataSweeps::logUniformInt64Distribution20mValuesCardinalitySweepFixedM
         "Log distribution of cardinality for 20m ints from 1 to 100m. The max value is fixed at 200m, "
         "so the distribution is sparse i.e. there are gaps. Output is 64bit ints rather than 32bit ints."};
 
+DataSweep DataSweeps::linearUniformIntDistribution20mValuesCardinalitySections_100_10m_Max20m {
+        30,
+        20*1000*1000,
+        "linearUniformIntDistribution20mValuesCardinalitySections_100_10m_Max20m",
+        ""};
+
+DataSweep DataSweeps::linearUniformIntDistribution200mValuesCardinalitySections_100_10m_Max20m {
+        30,
+        200*1000*1000,
+        "linearUniformIntDistribution200mValuesCardinalitySections_100_10m_Max20m",
+        ""};
+
 
 DataSweep::DataSweep(int _totalRuns, int _numElements, std::string _sweepName, std::string _longDescription)
         : totalRuns(_totalRuns), numElements(_numElements), runsCompleted(0), sweepName(std::move(_sweepName)),
@@ -377,6 +396,9 @@ DataSweep::DataSweep(int _totalRuns, int _numElements, std::string _sweepName, s
         generateLogDistribution(getTotalRuns(), 1, 100000000, inputs);
     } else if (getSweepName() == "logUniformIntDistribution40mValuesCardinalitySweepFixedMax") {
         generateLogDistribution(getTotalRuns(), 1, 10000000, inputs);
+    } else if (getSweepName() == "linearUniformIntDistribution20mValuesCardinalitySections_100_10m_Max20m" ||
+            getSweepName() == "linearUniformIntDistribution200mValuesCardinalitySections_100_10m_Max20m") {
+        generateLinearDistribution(getTotalRuns(), 0, 1, inputs);
     }
 }
 
@@ -435,6 +457,12 @@ bool DataSweep::loadNextDataSetIntoMemory(int *data) {
         return true;
     } else if (getSweepName() == "logUniformIntDistribution40mValuesCardinalitySweepFixedMax") {
         generateUniformDistributionInMemoryWithSetCardinality(data, getNumElements(), 20*1000*1000, static_cast<int>(inputs[runsCompleted++]));
+        return true;
+    } else if (getSweepName() == "linearUniformIntDistribution20mValuesCardinalitySections_100_10m_Max20m") {
+        generateUniformDistributionInMemoryWithTwoCardinalitySections(data, getNumElements(), 20*1000*1000, 100, 10*1000*1000, inputs[runsCompleted++]);
+        return true;
+    } else if (getSweepName() == "linearUniformIntDistribution200mValuesCardinalitySections_100_10m_Max20m") {
+        generateUniformDistributionInMemoryWithTwoCardinalitySections(data, getNumElements(), 20*1000*1000, 100, 10*1000*1000, inputs[runsCompleted++]);
         return true;
     }
     return false;
