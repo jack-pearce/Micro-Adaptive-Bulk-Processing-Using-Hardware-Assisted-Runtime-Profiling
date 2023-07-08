@@ -452,15 +452,19 @@ void allGroupByTests() {
 
 int main() {
 
-    groupByCompareResultsTest(DataFiles::uniformIntDistribution20mValuesTwo10mCardinalitySections_100_10m_Max20m,
-                              GroupBy::Hash, GroupBy::SortRadixOpt);
+//    groupByCompareResultsTest(DataFiles::uniformIntDistribution20mValuesTwo10mCardinalitySections_100_10m_Max20m,
+//                              GroupBy::Hash, GroupBy::SortRadixOpt);
+//
+//    groupByCompareResultsTest(DataFiles::uniformIntDistribution20mValuesTwo10mCardinalitySections_100_10m_Max20m,
+//                              GroupBy::Hash, GroupBy::Adaptive);
 
-    groupByCompareResultsTest(DataFiles::uniformIntDistribution20mValuesTwo10mCardinalitySections_100_10m_Max20m,
-                              GroupBy::Hash, GroupBy::Adaptive);
-
-/*    groupByCpuCyclesSweepBenchmark(DataSweeps::linearUniformIntDistribution200mValuesCardinalitySections_100_10m_Max20m,
+    groupByCpuCyclesSweepBenchmark(DataSweeps::linearUniformIntDistribution20mValuesCardinalitySections_100_10m_Max20m,
                                    {GroupBy::Hash,GroupBy::SortRadixOpt ,GroupBy::Adaptive},
-                                   2, "");*/
+                                   2, "TwoCardinalitySections20m");
+
+    groupByCpuCyclesSweepBenchmark(DataSweeps::linearUniformIntDistribution200mValuesCardinalitySections_100_10m_Max20m,
+                                   {GroupBy::Hash,GroupBy::SortRadixOpt ,GroupBy::Adaptive},
+                                   2, "TwoCardinalitySections200m");
 
 //    groupByCompareResultsTest(DataFiles::uniformIntDistribution200mValuesCardinality400kMax200m,
 //                              GroupBy::Hash, GroupBy::Adaptive);
