@@ -112,6 +112,7 @@ public:
 
     static DataSweep linearUniformIntDistribution20mValuesCardinalitySections_100_10m_Max20m;
     static DataSweep linearUniformIntDistribution200mValuesCardinalitySections_100_10m_Max20m;
+    static DataSweep linearUniformIntDistribution200mValuesCardinalitySections_100_100m_Max200m;
 
 };
 

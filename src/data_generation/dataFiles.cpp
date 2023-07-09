@@ -361,9 +361,15 @@ DataSweep DataSweeps::linearUniformIntDistribution20mValuesCardinalitySections_1
         ""};
 
 DataSweep DataSweeps::linearUniformIntDistribution200mValuesCardinalitySections_100_10m_Max20m {
-        30,
+        3,
         200*1000*1000,
         "linearUniformIntDistribution200mValuesCardinalitySections_100_10m_Max20m",
+        ""};
+
+DataSweep DataSweeps::linearUniformIntDistribution200mValuesCardinalitySections_100_100m_Max200m {
+        10,
+        200*1000*1000,
+        "linearUniformIntDistribution200mValuesCardinalitySections_100_100m_Max200m",
         ""};
 
 
@@ -397,7 +403,8 @@ DataSweep::DataSweep(int _totalRuns, int _numElements, std::string _sweepName, s
     } else if (getSweepName() == "logUniformIntDistribution40mValuesCardinalitySweepFixedMax") {
         generateLogDistribution(getTotalRuns(), 1, 10000000, inputs);
     } else if (getSweepName() == "linearUniformIntDistribution20mValuesCardinalitySections_100_10m_Max20m" ||
-            getSweepName() == "linearUniformIntDistribution200mValuesCardinalitySections_100_10m_Max20m") {
+            getSweepName() == "linearUniformIntDistribution200mValuesCardinalitySections_100_10m_Max20m" ||
+            getSweepName() == "linearUniformIntDistribution200mValuesCardinalitySections_100_100m_Max200m") {
         generateLinearDistribution(getTotalRuns(), 0, 1, inputs);
     }
 }
@@ -463,6 +470,9 @@ bool DataSweep::loadNextDataSetIntoMemory(int *data) {
         return true;
     } else if (getSweepName() == "linearUniformIntDistribution200mValuesCardinalitySections_100_10m_Max20m") {
         generateUniformDistributionInMemoryWithTwoCardinalitySections(data, getNumElements(), 20*1000*1000, 100, 10*1000*1000, inputs[runsCompleted++]);
+        return true;
+    } else if (getSweepName() == "linearUniformIntDistribution200mValuesCardinalitySections_100_100m_Max200m") {
+        generateUniformDistributionInMemoryWithTwoCardinalitySections(data, getNumElements(), 200*1000*1000, 100, 100*1000*1000, inputs[runsCompleted++]);
         return true;
     }
     return false;
