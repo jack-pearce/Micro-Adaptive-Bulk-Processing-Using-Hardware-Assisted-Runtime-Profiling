@@ -452,7 +452,12 @@ void allGroupByTests() {
 
 int main() {
 
-    groupByBenchmarkWithExtraCountersDuringRunConfigurations(DataFiles::uniformIntDistribution20mValuesCardinality10mMax20mClustered1k, "");
+        groupByCpuCyclesSweepBenchmark(DataSweeps::linearUniformIntDistribution200mValuesCardinalitySections_100_100m_Max200m,
+                                   {GroupBy::Hash,GroupBy::SortRadixOpt ,GroupBy::Adaptive},
+                                   2, "");
+
+
+//    groupByBenchmarkWithExtraCountersDuringRunConfigurations(DataFiles::uniformIntDistribution20mValuesCardinality10mMax20mClustered1k, "");
 
 //    groupByCpuCyclesSweepBenchmark(DataSweeps::linearUniformIntDistribution200mValuesCardinalitySections_100_10m_Max20m,
 //                                   {GroupBy::Hash,GroupBy::SortRadixOpt ,GroupBy::Adaptive},

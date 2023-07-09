@@ -361,7 +361,7 @@ DataSweep DataSweeps::linearUniformIntDistribution20mValuesCardinalitySections_1
         ""};
 
 DataSweep DataSweeps::linearUniformIntDistribution200mValuesCardinalitySections_100_10m_Max20m {
-        3,
+        10,
         200*1000*1000,
         "linearUniformIntDistribution200mValuesCardinalitySections_100_10m_Max20m",
         ""};
