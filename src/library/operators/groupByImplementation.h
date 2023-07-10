@@ -404,9 +404,6 @@ vectorOfPairs<T1, T2> groupByAdaptiveSwitchToSortOnly(int n, T1 *inputGroupBy, T
 
         if (__builtin_expect((static_cast<float>(tuplesToProcess) / counterValues[0])
                              < tuplesPerLastLevelCacheMissThreshold, false)) {
-//                std::cout << "Switched to sorting the rest of the array!!!" << std::endl;
-//                std::cout << "Processed: " << index << std::endl;
-//                std::cout << "Reduced size by: " << index - map.size() << std::endl;
 
             int reducedNumElements = index - map.size();
             int i = reducedNumElements;
