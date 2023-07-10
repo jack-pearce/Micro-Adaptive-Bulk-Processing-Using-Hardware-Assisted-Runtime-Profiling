@@ -27,15 +27,16 @@ void groupByCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<Grou
     for (auto i = 0; i < iterations; ++i) {
         for (auto j = 0; j < static_cast<int>(groupByImplementations.size()); ++j) {
             for (auto k = 0; k < dataSweep.getTotalRuns(); ++k) {
-//                results[k][0] = static_cast<int>(dataSweep.getRunInput());
-                results[k][0] = dataSweep.getRunInput();
+                if (dataSweep.getSweepName().find("CardinalitySweep") != std::string::npos) {
+                    results[k][0] = static_cast<int>(dataSweep.getRunInput());
+                } else {
+                    results[k][0] = dataSweep.getRunInput();
+                }
+
                 auto inputGroupBy = new int[dataSweep.getNumElements()];
                 auto inputAggregate = new int[dataSweep.getNumElements()];
 
-//              int cardinality = static_cast<int>(dataSweep.getRunInput());
-                //////////////////////////////////////////////////////////////////////////////////////////////////////
-                int cardinality = 3*1000*1000; //////////////////// NEED TO UPDATE TO MATCH RUN /////////////////////
-                //////////////////////////////////////////////////////////////////////////////////////////////////////
+                int cardinality = dataSweep.getCardinality();
 
                 std::cout << "Running " << getGroupByName(groupByImplementations[j]) << " for input ";
                 std::cout << static_cast<int>(dataSweep.getRunInput()) << "... ";
@@ -87,11 +88,17 @@ void groupByCpuCyclesSweepBenchmark64(DataSweep &dataSweep, const std::vector<Gr
     for (auto i = 0; i < iterations; ++i) {
         for (auto j = 0; j < static_cast<int>(groupByImplementations.size()); ++j) {
             for (auto k = 0; k < dataSweep.getTotalRuns(); ++k) {
-                results[k][0] = static_cast<int>(dataSweep.getRunInput());
+
+                if (dataSweep.getSweepName().find("CardinalitySweep") != std::string::npos) {
+                    results[k][0] = static_cast<int>(dataSweep.getRunInput());
+                } else {
+                    results[k][0] = dataSweep.getRunInput();
+                }
+
                 auto inputGroupBy = new int64_t[dataSweep.getNumElements()];
                 auto inputAggregate = new int[dataSweep.getNumElements()];
 
-                int cardinality = static_cast<int>(dataSweep.getRunInput());
+                int cardinality = dataSweep.getCardinality();
 
                 std::cout << "Running " << getGroupByName(groupByImplementations[j]) << " for input ";
                 std::cout << static_cast<int>(dataSweep.getRunInput()) << "... ";

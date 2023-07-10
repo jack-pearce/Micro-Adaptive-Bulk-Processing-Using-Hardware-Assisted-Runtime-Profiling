@@ -67,6 +67,7 @@ public:
     [[nodiscard]] int getNumElements() const;
     [[nodiscard]] const std::string& getSweepName() const;
     [[nodiscard]] const std::string& getLongDescription() const;
+    [[nodiscard]] int getCardinality() const;
     [[nodiscard]] float getRunInput() const;
     bool loadNextDataSetIntoMemory(int *data);
     bool loadNextDataSetIntoMemory(int64_t *data);

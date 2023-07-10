@@ -513,6 +513,37 @@ bool DataSweep::loadNextDataSetIntoMemory(int64_t *data) {
     return false;
 }
 
+int DataSweep::getCardinality() const {
+    if (getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweepVariableMax" ||
+        getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweepFixedMax" ||
+        getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered1" ||
+        getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered1k" ||
+        getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered100k" ||
+        getSweepName() == "linearUniformIntDistribution200mValuesCardinalitySweepFixedMaxCrossOverPoint" ||
+        getSweepName() == "logUniformIntDistribution400mValuesCardinalitySweepFixedMax" ||
+        getSweepName() == "logUniformIntDistribution20mValuesCardinalitySweepVariableMax" ||
+        getSweepName() == "logUniformIntDistribution20mValuesCardinalitySweepFixedMax" ||
+        getSweepName() == "logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered10" ||
+        getSweepName() == "logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered1k" ||
+        getSweepName() == "logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered100k" ||
+        getSweepName() == "logUniformIntDistribution40mValuesCardinalitySweepFixedMax" ||
+        getSweepName() == "logUniformIntDistribution20mValuesCardinalitySweepFixedMax" ||
+        getSweepName() == "logUniformInt64Distribution200mValuesCardinalitySweepFixedMax" ||
+        getSweepName() == "logUniformInt64Distribution20mValuesCardinalitySweepFixedMax") {
+        return static_cast<int>(inputs[runsCompleted]);
+    } else if (getSweepName() == "linearUniformIntDistribution20mValuesCardinalitySections_100_10m_Max20m" ||
+        getSweepName() == "linearUniformIntDistribution200mValuesCardinalitySections_100_10m_Max20m") {
+        return 10*1000*1000;
+    } else if (getSweepName() == "linearUniformIntDistribution200mValuesCardinalitySections_100_100m_Max200m") {
+        return 100*1000*1000;
+    } else if (getSweepName() == "linearUniformIntDistribution20mValuesCardinalitySections_100_3m_Max20m" ||
+        getSweepName() == "linearUniformIntDistribution20mValuesCardinalitySections_3m_100_Max20m") {
+        return 3*1000*1000;
+    } else {
+        return -1;
+    }
+}
+
 const std::string& DataSweep::getLongDescription() const {
     return longDescription;
 }
