@@ -447,8 +447,16 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
 
 template<template<typename> class Aggregator, typename T1, typename T2>
 vectorOfPairs<T1, T2> groupByAdaptiveSortRadix(int n, T1 *inputGroupBy, T2 *inputAggregate,
-                                               vectorOfPairs<int, int> &sectionsToBeSorted, T1 largest,
-                                               vectorOfPairs<T1, T2> &result) {
+                                               vectorOfPairs<int, int> &sectionsToBeSorted,
+                                               tsl::robin_map<T1, T2> &map, T1 largest, vectorOfPairs<T1, T2> &result) {
+    int i;
+
+    for (const auto& section : sectionsToBeSorted) {
+        for (i = section.first; i < section.second; i++) {
+            largest = std::max(largest, inputGroupBy[i]);
+        }
+    }
+
     int msbPosition = 0;
     while (largest != 0) {
         largest >>= 1;
@@ -457,7 +465,6 @@ vectorOfPairs<T1, T2> groupByAdaptiveSortRadix(int n, T1 *inputGroupBy, T2 *inpu
 
     int pass = static_cast<int>(std::ceil(static_cast<double>(msbPosition) / BITS_PER_RADIX_PASS)) - 1;
 
-    int i;
     int numBuckets = 1 << BITS_PER_RADIX_PASS;
     std::vector<int> buckets(1 << BITS_PER_RADIX_PASS, 0);
 
@@ -472,6 +479,9 @@ vectorOfPairs<T1, T2> groupByAdaptiveSortRadix(int n, T1 *inputGroupBy, T2 *inpu
             buckets[(inputGroupBy[i] >> (pass * BITS_PER_RADIX_PASS)) & mask]++;
         }
     }
+    for (auto it = map.begin(); it != map.end(); ++it) {
+        buckets[(it->first >> (pass * BITS_PER_RADIX_PASS)) & mask]++;
+    }
 
     for (i = 1; i < numBuckets; i++) {
         buckets[i] += buckets[i - 1];
@@ -479,8 +489,12 @@ vectorOfPairs<T1, T2> groupByAdaptiveSortRadix(int n, T1 *inputGroupBy, T2 *inpu
 
     std::vector<int> partitions(buckets.data(), buckets.data() + numBuckets);
 
+    for (auto it = map.begin(); it != map.end(); it++) {
+        bufferGroupBy[--buckets[(it->first >> (pass * BITS_PER_RADIX_PASS)) & mask]] = it->first;
+        bufferAggregate[buckets[(it->first >> (pass * BITS_PER_RADIX_PASS)) & mask]] = it->second;
+    }
     for (const auto& section : vectorOfPairs<int, int>(sectionsToBeSorted.rbegin(), sectionsToBeSorted.rend())) {
-        for (i = section.second - 1; i >= section.first; i--) {
+        for (i = section.first; i < section.second; i++) {
             bufferGroupBy[--buckets[(inputGroupBy[i] >> (pass * BITS_PER_RADIX_PASS)) & mask]] = inputGroupBy[i];
             bufferAggregate[buckets[(inputGroupBy[i] >> (pass * BITS_PER_RADIX_PASS)) & mask]] = inputAggregate[i];
         }
@@ -531,7 +545,7 @@ vectorOfPairs<T1, T2> groupByAdaptive2(int n, T1 *inputGroupBy, T2 *inputAggrega
     static_assert(std::is_integral<T1>::value, "GroupBy column must be an integer type");
     static_assert(std::is_arithmetic<T2>::value, "Payload column must be an numeric type");
 
-    constexpr int tuplesPerChunk = 200 * 1000;
+    constexpr int tuplesPerChunk = 75 * 1000;
     constexpr int tuplesBetweenHashing = 2*1000*1000;
     int initialSize = std::max(static_cast<int>(2.5 * cardinality), 400000);
 
@@ -544,37 +558,17 @@ vectorOfPairs<T1, T2> groupByAdaptive2(int n, T1 *inputGroupBy, T2 *inputAggrega
     int hashTableEntryBytes = sizeof(T1) + sizeof(T2);
     float tuplesPerLastLevelCacheMissThreshold = (GROUPBY_MACHINE_CONSTANT * bytesPerCacheLine()) / hashTableEntryBytes;
 
-    int warmUpTuples = std::min(static_cast<int>((l3cacheSize() / hashTableEntryBytes) /
-                                                 (bytesPerCacheLine() / hashTableEntryBytes)), cardinality);
-
     int index = 0;
     int tuplesToProcess;
-
-    int hashStartIndex;
     int chunkStartIndex;
-    int sortStartIndex;
 
     vectorOfPairs<int, int> sectionsToBeSorted;
-//    T1 largest = std::numeric_limits<T1>::lowest(); //////////////////////////////////////////////////////////////
     int elements = 0;
 
     vectorOfPairs<T1, T2> result;
-
-    T1 largest = 20000000; ////////////////////////////////////////////////////////////////////////////////////////
+    T1 mapLargest = std::numeric_limits<T1>::lowest();
 
     while (index < n) {
-
-        hashStartIndex = index;
-        tuplesToProcess = std::min(warmUpTuples, n - index);
-
-        for (; index < hashStartIndex + tuplesToProcess; ++index) {
-            it = map.find(inputGroupBy[index]);
-            if (it != map.end()) {
-                it.value() = Aggregator<T2>()(it->second, inputAggregate[index], false);
-            } else {
-                map.insert({inputGroupBy[index], Aggregator<T2>()(0, inputAggregate[index], true)});
-            }
-        }
 
         while (index < n) {
 
@@ -589,35 +583,18 @@ vectorOfPairs<T1, T2> groupByAdaptive2(int n, T1 *inputGroupBy, T2 *inputAggrega
                     it.value() = Aggregator<T2>()(it->second, inputAggregate[index], false);
                 } else {
                     map.insert({inputGroupBy[index], Aggregator<T2>()(0, inputAggregate[index], true)});
+                    mapLargest = std::max(mapLargest, inputGroupBy[index]);
                 }
             }
 
             Counters::getInstance().readEventSet();
 
             if ((static_cast<float>(tuplesToProcess) / counterValues[0]) < tuplesPerLastLevelCacheMissThreshold) {
-                std::cout << "Switched to sorting the rest of the array!!!" << std::endl;
-                std::cout << "Processed: " << index << std::endl;
-                std::cout << "Reduced size by: " << index - map.size() << std::endl;
-
-                int reducedNumElements = index - hashStartIndex - map.size();
-                int startIndexOfAggregatedElements = hashStartIndex + reducedNumElements;
-                int i = startIndexOfAggregatedElements;
-
-//                for (it = map.begin(); it != map.end(); ++it) {
-//                    largest = std::max(largest, it->first);
-//                    inputGroupBy[i] = it->first;
-//                    inputAggregate[i++] = it->second;
-//                }
-
-                sortStartIndex = index;
                 tuplesToProcess = std::min(tuplesBetweenHashing, n - index);
 
-                for (; index < sortStartIndex + tuplesToProcess; ++index) {
-                    largest = std::max(largest, inputGroupBy[index]);
-                }
-
-                sectionsToBeSorted.emplace_back(startIndexOfAggregatedElements, index);
-                elements += index - (startIndexOfAggregatedElements);
+                sectionsToBeSorted.emplace_back(index, index + tuplesToProcess);
+                index += tuplesToProcess;
+                elements += tuplesToProcess;
 
                 break;
             }
@@ -627,8 +604,9 @@ vectorOfPairs<T1, T2> groupByAdaptive2(int n, T1 *inputGroupBy, T2 *inputAggrega
     if (sectionsToBeSorted.empty()) {
         return {map.begin(), map.end()};
     }
+    elements += map.size();
     return groupByAdaptiveSortRadix<Aggregator>(elements, inputGroupBy, inputAggregate, sectionsToBeSorted,
-                                                largest, result);
+                                                map, mapLargest,result);
 }
 
 template<template<typename> class Aggregator, typename T1, typename T2>
