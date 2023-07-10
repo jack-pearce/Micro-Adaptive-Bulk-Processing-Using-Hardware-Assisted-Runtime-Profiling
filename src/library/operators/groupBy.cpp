@@ -17,6 +17,8 @@ std::string getGroupByName(GroupBy groupByImplementation) {
             return "GroupBy_SortRadixOptimal_Count";
         case GroupBy::Adaptive:
             return "GroupBy_Adaptive";
+        case GroupBy::Adaptive2:
+            return "GroupBy_Adaptive_NEW";
         default:
             std::cout << "Invalid selection of 'GroupBy' implementation!" << std::endl;
             exit(1);

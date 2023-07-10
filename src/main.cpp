@@ -19,7 +19,6 @@ using MABPL::MaxAggregation;
 using MABPL::SumAggregation;
 using MABPL::CountAggregation;
 
-
 void dataDistributionTest(const DataFile& dataFile) {
     LoadedData::getInstance(dataFile);
     std::cout << dataFile.getNumElements() << " elements" << std::endl;
@@ -199,12 +198,12 @@ void groupByCompareResultsTest(const DataFile& dataFile, GroupBy groupByImpOne, 
 
     auto resultOne = MABPL::runGroupByFunction<MaxAggregation>(groupByImpOne,
                                                                dataFile.getNumElements(), inputGroupBy, inputAggregate,
-                                                               0);
+                                                               10000000);
     sortVectorOfPairs(resultOne);
 
     auto resultTwo = MABPL::runGroupByFunction<MaxAggregation>(groupByImpTwo,
                                                                dataFile.getNumElements(), inputGroupBy, inputAggregate,
-                                                               0);
+                                                               10000000);
    sortVectorOfPairs(resultTwo);
 
     if (resultOne.size() != resultTwo.size()) {
@@ -452,10 +451,21 @@ void allGroupByTests() {
 
 int main() {
 
-        groupByCpuCyclesSweepBenchmark(DataSweeps::linearUniformIntDistribution200mValuesCardinalitySections_100_100m_Max200m,
-                                   {GroupBy::Hash,GroupBy::SortRadixOpt ,GroupBy::Adaptive},
-                                   2, "");
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
+                                   {GroupBy::Adaptive2},
+                                   1, "JustAdaptiveNEW");
 
+/*    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
+                                   {GroupBy::Hash,GroupBy::SortRadixOpt ,GroupBy::Adaptive, GroupBy::Adaptive2},
+                                   1, "");*/
+
+//    groupByCpuCyclesSweepBenchmark(DataSweeps::linearUniformIntDistribution20mValuesCardinalitySections_100_10m_Max20m,
+//                           {GroupBy::Hash,GroupBy::SortRadixOpt ,GroupBy::Adaptive, GroupBy::Adaptive2},
+//                           1, "");
+
+
+//    groupByCompareResultsTest(DataFiles::uniformIntDistribution20mValuesTwo10mCardinalitySections_100_10m_Max20m,
+//                              GroupBy::Hash, GroupBy::Adaptive2);
 
 //    groupByBenchmarkWithExtraCountersDuringRunConfigurations(DataFiles::uniformIntDistribution20mValuesCardinality10mMax20mClustered1k, "");
 

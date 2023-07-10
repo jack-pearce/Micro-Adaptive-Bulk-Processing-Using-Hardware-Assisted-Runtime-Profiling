@@ -32,9 +32,9 @@ void groupByCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<Grou
                 auto inputGroupBy = new int[dataSweep.getNumElements()];
                 auto inputAggregate = new int[dataSweep.getNumElements()];
 
-//              int cardinality = static_cast<int>(dataSweep.getRunInput());
+              int cardinality = static_cast<int>(dataSweep.getRunInput());
                 //////////////////////////////////////////////////////////////////////////////////////////////////////
-                int cardinality = 100*1000*1000; //////////////////// NEED TO UPDATE TO MATCH RUN /////////////////////
+//                int cardinality = 10*1000*1000; //////////////////// NEED TO UPDATE TO MATCH RUN /////////////////////
                 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
                 std::cout << "Running " << getGroupByName(groupByImplementations[j]) << " for input ";

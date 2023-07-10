@@ -13,7 +13,8 @@ enum GroupBy {
     Hash_Count,
     SortRadixOpt,
     SortRadixOpt_Count,
-    Adaptive
+    Adaptive,
+    Adaptive2
 };
 
 std::string getGroupByName(GroupBy groupByImplementation);
