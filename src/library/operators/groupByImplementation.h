@@ -91,8 +91,7 @@ void groupBySortRadixOptAuxAgg(int start, int end, const T1 *inputGroupBy, T2 *i
 }
 
 template<template<typename> class Aggregator, typename T1, typename T2>
-void
-groupBySortRadixOptAux(int start, int end, T1 *inputGroupBy, T2 *inputAggregate, T1 *bufferGroupBy, T2 *bufferAggregate,
+void groupBySortRadixOptAux(int start, int end, T1 *inputGroupBy, T2 *inputAggregate, T1 *bufferGroupBy, T2 *bufferAggregate,
                        int mask, int numBuckets, std::vector<int> &buckets, int pass, vectorOfPairs <T1, T2> &result) {
     int i;
 
@@ -364,120 +363,66 @@ vectorOfPairs<T1, T2> groupByAdaptiveSwitchToSortOnly(int n, T1 *inputGroupBy, T
     int index = 0;
     int tuplesToProcess;
 
-    if constexpr (std::is_same<Aggregator<T2>, CountAggregation<T2>>::value) {
-        // Count Aggregation
-
-        long_long lastLevelCacheMisses = 0;
-        long_long rowsProcessed = 0;
-
-        tsl::robin_map<T1, int> map(initialSize);
-        typename tsl::robin_map<T1, int>::iterator it;
-
-        float tuplesPerLastLevelCacheMissThreshold = (0.125 * bytesPerCacheLine()) / (sizeof(T1) + sizeof(int));
-
-        unsigned long warmUpRows = std::min(200000, cardinality);
-
-        for (; index < static_cast<int>(warmUpRows); ++index) {
-            it = map.find(inputGroupBy[index]);
-            if (it != map.end()) {
-                it.value() = CountAggregation<int>()(it->second, inputGroupBy[index], false);
-            } else {
-                map.insert({inputGroupBy[index], CountAggregation<int>()(0, inputGroupBy[index], true)});
-            }
-        }
-
-        while (index < n) {
-
-            tuplesToProcess = std::min(tuplesPerCheck, n - index);
-
-            Counters::getInstance().readEventSet();
-
-            for (auto _ = 0; _ < tuplesToProcess; ++_) {
-                it = map.find(inputGroupBy[index]);
-                if (it != map.end()) {
-                    it.value() = CountAggregation<int>()(it->second, inputGroupBy[index], false);
-                } else {
-                    map.insert({inputGroupBy[index], CountAggregation<int>()(0, inputGroupBy[index], true)});
-                }
-                ++index;
-            }
-
-
-            Counters::getInstance().readEventSet();
-
-            lastLevelCacheMisses += counterValues[0];
-            rowsProcessed += tuplesToProcess;
-
-            if (__builtin_expect((static_cast<float>(rowsProcessed) / lastLevelCacheMisses)
-                                 < tuplesPerLastLevelCacheMissThreshold, false)) {
-                return groupBySortRadixOpt_Count(n, inputGroupBy);
-            }
-        }
-
-        return {map.begin(), map.end()};
-
-    } else {
-        // Non-Count Aggregation
-
+    if (!std::is_same<Aggregator<T2>, CountAggregation<T2>>::value) {
         static_assert(std::is_arithmetic<T2>::value, "Payload column must be an numeric type");
+    }
 
-        tsl::robin_map<T1, T2> map(initialSize);
-        typename tsl::robin_map<T1, T2>::iterator it;
+    tsl::robin_map<T1, T2> map(initialSize);
+    typename tsl::robin_map<T1, T2>::iterator it;
 
-        float tuplesPerLastLevelCacheMissThreshold = (GROUPBY_MACHINE_CONSTANT * bytesPerCacheLine()) / hashTableEntryBytes;
+    float tuplesPerLastLevelCacheMissThreshold = (GROUPBY_MACHINE_CONSTANT * bytesPerCacheLine()) / hashTableEntryBytes;
 
-        unsigned long warmUpRows = std::min(static_cast<int>((l3cacheSize() / hashTableEntryBytes) /
-                                                             (bytesPerCacheLine() / hashTableEntryBytes)), cardinality);
+    unsigned long warmUpRows = std::min(static_cast<int>((l3cacheSize() / hashTableEntryBytes) /
+                                                         (bytesPerCacheLine() / hashTableEntryBytes)), cardinality);
 
-        for (; index < static_cast<int>(warmUpRows); ++index) {
+    for (; index < static_cast<int>(warmUpRows); ++index) {
+        it = map.find(inputGroupBy[index]);
+        if (it != map.end()) {
+            it.value() = Aggregator<T2>()(it->second, inputAggregate[index], false);
+        } else {
+            map.insert({inputGroupBy[index], Aggregator<T2>()(0, inputAggregate[index], true)});
+        }
+    }
+
+    while (index < n) {
+
+        tuplesToProcess = std::min(tuplesPerCheck, n - index);
+
+        Counters::getInstance().readEventSet();
+
+        for (auto _ = 0; _ < tuplesToProcess; ++_) {
             it = map.find(inputGroupBy[index]);
             if (it != map.end()) {
                 it.value() = Aggregator<T2>()(it->second, inputAggregate[index], false);
             } else {
                 map.insert({inputGroupBy[index], Aggregator<T2>()(0, inputAggregate[index], true)});
             }
+            ++index;
         }
 
-        while (index < n) {
+        Counters::getInstance().readEventSet();
 
-            tuplesToProcess = std::min(tuplesPerCheck, n - index);
-
-            Counters::getInstance().readEventSet();
-
-            for (auto _ = 0; _ < tuplesToProcess; ++_) {
-                it = map.find(inputGroupBy[index]);
-                if (it != map.end()) {
-                    it.value() = Aggregator<T2>()(it->second, inputAggregate[index], false);
-                } else {
-                    map.insert({inputGroupBy[index], Aggregator<T2>()(0, inputAggregate[index], true)});
-                }
-                ++index;
-            }
-
-            Counters::getInstance().readEventSet();
-
-            if (__builtin_expect((static_cast<float>(tuplesToProcess) / counterValues[0])
-                                 < tuplesPerLastLevelCacheMissThreshold, false)) {
+        if (__builtin_expect((static_cast<float>(tuplesToProcess) / counterValues[0])
+                             < tuplesPerLastLevelCacheMissThreshold, false)) {
 //                std::cout << "Switched to sorting the rest of the array!!!" << std::endl;
 //                std::cout << "Processed: " << index << std::endl;
 //                std::cout << "Reduced size by: " << index - map.size() << std::endl;
 
-                int reducedNumElements = index - map.size();
-                int i = reducedNumElements;
+            int reducedNumElements = index - map.size();
+            int i = reducedNumElements;
 
-                for (it = map.begin(); it != map.end(); ++it) {
-                    inputGroupBy[i] = it->first;
-                    inputAggregate[i++] = it->second;
-                }
-
-                return groupBySortRadixOpt<Aggregator>(n - reducedNumElements,
-                                                       inputGroupBy + reducedNumElements,
-                                                       inputAggregate + reducedNumElements);
+            for (it = map.begin(); it != map.end(); ++it) {
+                inputGroupBy[i] = it->first;
+                inputAggregate[i++] = it->second;
             }
-        }
 
-        return {map.begin(), map.end()};
+            return groupBySortRadixOpt<Aggregator>(n - reducedNumElements,
+                                                   inputGroupBy + reducedNumElements,
+                                                   inputAggregate + reducedNumElements);
+        }
     }
+
+    return {map.begin(), map.end()};
 }
 
 template<template<typename> class Aggregator, typename T1, typename T2>
