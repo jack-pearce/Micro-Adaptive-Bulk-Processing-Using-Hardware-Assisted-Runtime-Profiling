@@ -451,9 +451,13 @@ void allGroupByTests() {
 
 int main() {
 
-    groupByCpuCyclesSweepBenchmark(DataSweeps::linearUniformIntDistribution20mValuesCardinalitySections_100_10m_Max20m,
+    groupByCpuCyclesSweepBenchmark(DataSweeps::linearUniformIntDistribution20mValuesCardinalitySections_3m_100_Max20m,
                                    {GroupBy::Hash,GroupBy::SortRadixOpt ,GroupBy::Adaptive, GroupBy::Adaptive2},
                                    1, "");
+
+//    groupByCpuCyclesSweepBenchmark(DataSweeps::linearUniformIntDistribution20mValuesCardinalitySections_100_10m_Max20m,
+//                                   {GroupBy::Hash,GroupBy::SortRadixOpt ,GroupBy::Adaptive, GroupBy::Adaptive2},
+//                                   1, "");
 
 //    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
 //                                   {GroupBy::Adaptive2},

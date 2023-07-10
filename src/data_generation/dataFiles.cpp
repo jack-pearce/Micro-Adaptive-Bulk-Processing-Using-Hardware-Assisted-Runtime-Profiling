@@ -372,6 +372,18 @@ DataSweep DataSweeps::linearUniformIntDistribution200mValuesCardinalitySections_
         "linearUniformIntDistribution200mValuesCardinalitySections_100_100m_Max200m",
         ""};
 
+DataSweep DataSweeps::linearUniformIntDistribution20mValuesCardinalitySections_100_3m_Max20m {
+        30,
+        20*1000*1000,
+        "linearUniformIntDistribution20mValuesCardinalitySections_100_3m_Max20m",
+        ""};
+
+DataSweep DataSweeps::linearUniformIntDistribution20mValuesCardinalitySections_3m_100_Max20m {
+        30,
+        20*1000*1000,
+        "linearUniformIntDistribution20mValuesCardinalitySections_3m_100_Max20m",
+        ""};
+
 
 DataSweep::DataSweep(int _totalRuns, int _numElements, std::string _sweepName, std::string _longDescription)
         : totalRuns(_totalRuns), numElements(_numElements), runsCompleted(0), sweepName(std::move(_sweepName)),
@@ -404,7 +416,9 @@ DataSweep::DataSweep(int _totalRuns, int _numElements, std::string _sweepName, s
         generateLogDistribution(getTotalRuns(), 1, 10000000, inputs);
     } else if (getSweepName() == "linearUniformIntDistribution20mValuesCardinalitySections_100_10m_Max20m" ||
             getSweepName() == "linearUniformIntDistribution200mValuesCardinalitySections_100_10m_Max20m" ||
-            getSweepName() == "linearUniformIntDistribution200mValuesCardinalitySections_100_100m_Max200m") {
+            getSweepName() == "linearUniformIntDistribution200mValuesCardinalitySections_100_100m_Max200m" ||
+            getSweepName() == "linearUniformIntDistribution20mValuesCardinalitySections_100_3m_Max20m"||
+            getSweepName() == "linearUniformIntDistribution20mValuesCardinalitySections_3m_100_Max20m") {
         generateLinearDistribution(getTotalRuns(), 0, 1, inputs);
     }
 }
@@ -473,6 +487,12 @@ bool DataSweep::loadNextDataSetIntoMemory(int *data) {
         return true;
     } else if (getSweepName() == "linearUniformIntDistribution200mValuesCardinalitySections_100_100m_Max200m") {
         generateUniformDistributionInMemoryWithTwoCardinalitySections(data, getNumElements(), 200*1000*1000, 100, 100*1000*1000, inputs[runsCompleted++]);
+        return true;
+    } else if (getSweepName() == "linearUniformIntDistribution20mValuesCardinalitySections_100_3m_Max20m") {
+        generateUniformDistributionInMemoryWithTwoCardinalitySections(data, getNumElements(), 20*1000*1000, 100, 3*1000*1000, inputs[runsCompleted++]);
+        return true;
+    } else if (getSweepName() == "linearUniformIntDistribution20mValuesCardinalitySections_3m_100_Max20m") {
+        generateUniformDistributionInMemoryWithTwoCardinalitySections(data, getNumElements(), 20*1000*1000, 3*1000*1000, 100, inputs[runsCompleted++]);
         return true;
     }
     return false;
