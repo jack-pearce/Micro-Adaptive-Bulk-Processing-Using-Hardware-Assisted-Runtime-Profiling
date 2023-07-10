@@ -117,6 +117,11 @@ public:
     static DataSweep linearUniformIntDistribution20mValuesCardinalitySections_100_3m_Max20m;
     static DataSweep linearUniformIntDistribution20mValuesCardinalitySections_3m_100_Max20m;
 
+    static DataSweep linearUniformIntDistribution20mValuesMultipleCardinalitySections_100_3m_Max20m;
+    static DataSweep linearUniformIntDistribution20mValuesMultipleCardinalitySections_3m_100_Max20m;
+    static DataSweep linearUniformIntDistribution200mValuesMultipleCardinalitySections_100_3m_Max20m;
+    static DataSweep linearUniformIntDistribution200mValuesMultipleCardinalitySections_3m_100_Max20m;
+
 };
 
 #endif //MABPL_DATAFILES_H
