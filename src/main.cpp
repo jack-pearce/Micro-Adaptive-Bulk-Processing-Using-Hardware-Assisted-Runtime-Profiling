@@ -410,49 +410,49 @@ void allGroupByTestsOLD() {
 void allGroupByTests() {
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepVariableMax,
                                    {GroupBy::Hash,GroupBy::SortRadixOpt,
-                                    GroupBy::Adaptive},
+                                    GroupBy::AdaptiveSwitchToSortOnly},
                                    1, "VariableMax");
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
                                    {GroupBy::Hash,GroupBy::SortRadixOpt,
-                                    GroupBy::Adaptive},
+                                    GroupBy::AdaptiveSwitchToSortOnly},
                                    1, "NoClustering");
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered10,
                                    {GroupBy::Hash,GroupBy::SortRadixOpt,
-                                    GroupBy::Adaptive},
+                                    GroupBy::AdaptiveSwitchToSortOnly},
                                    1, "Clustered10");
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered1k,
                                    {GroupBy::Hash,GroupBy::SortRadixOpt,
-                                    GroupBy::Adaptive},
+                                    GroupBy::AdaptiveSwitchToSortOnly},
                                    1, "Clustered1k");
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered100k,
                                    {GroupBy::Hash,GroupBy::SortRadixOpt,
-                                    GroupBy::Adaptive},
+                                    GroupBy::AdaptiveSwitchToSortOnly},
                                    1, "Clustered100k");
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution40mValuesCardinalitySweepFixedMax,
                                    {GroupBy::Hash,GroupBy::SortRadixOpt,
-                                    GroupBy::Adaptive},
+                                    GroupBy::AdaptiveSwitchToSortOnly},
                                    1, "NoClustering40M");
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
                                    {GroupBy::Hash,GroupBy::SortRadixOpt,
-                                    GroupBy::Adaptive},
+                                    GroupBy::AdaptiveSwitchToSortOnly},
                                    1, "NoClustering200M");
 
     groupByCpuCyclesSweepBenchmark64(DataSweeps::logUniformInt64Distribution20mValuesCardinalitySweepFixedMax,
                                    {GroupBy::Hash,GroupBy::SortRadixOpt,
-                                    GroupBy::Adaptive},
+                                    GroupBy::AdaptiveSwitchToSortOnly},
                                    1, "NoClustering64bitInt");
 }
 
 int main() {
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::linearUniformIntDistribution20mValuesCardinalitySections_3m_100_Max20m,
-                                   {GroupBy::Hash,GroupBy::SortRadixOpt ,GroupBy::Adaptive, GroupBy::Adaptive2},
+                                   {GroupBy::Hash, GroupBy::SortRadixOpt , GroupBy::AdaptiveSwitchToSortOnly, GroupBy::Adaptive},
                                    1, "");
 
 //    groupByCpuCyclesSweepBenchmark(DataSweeps::linearUniformIntDistribution20mValuesCardinalitySections_100_10m_Max20m,

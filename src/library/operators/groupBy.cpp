@@ -11,14 +11,10 @@ std::string getGroupByName(GroupBy groupByImplementation) {
             return "GroupBy_Hash";
         case GroupBy::SortRadixOpt:
             return "GroupBy_SortRadixOptimal";
-        case GroupBy::Hash_Count:
-            return "GroupBy_Hash_Count";
-        case GroupBy::SortRadixOpt_Count:
-            return "GroupBy_SortRadixOptimal_Count";
         case GroupBy::Adaptive:
             return "GroupBy_Adaptive";
-        case GroupBy::Adaptive2:
-            return "GroupBy_Adaptive_NEW";
+        case GroupBy::AdaptiveSwitchToSortOnly:
+            return "GroupBy_Adaptive_SwitchToSortOnly";
         default:
             std::cout << "Invalid selection of 'GroupBy' implementation!" << std::endl;
             exit(1);
