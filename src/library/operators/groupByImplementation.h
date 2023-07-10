@@ -309,34 +309,29 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
 
     while (index < n) {
 
-        while (index < n) {
+        chunkStartIndex = index;
+        tuplesToProcess = std::min(tuplesPerChunk, n - index);
 
-            chunkStartIndex = index;
-            tuplesToProcess = std::min(tuplesPerChunk, n - index);
+        Counters::getInstance().readEventSet();
 
-            Counters::getInstance().readEventSet();
-
-            for (; index < chunkStartIndex + tuplesToProcess; ++index) {
-                it = map.find(inputGroupBy[index]);
-                if (it != map.end()) {
-                    it.value() = Aggregator<T2>()(it->second, inputAggregate[index], false);
-                } else {
-                    map.insert({inputGroupBy[index], Aggregator<T2>()(0, inputAggregate[index], true)});
-                    mapLargest = std::max(mapLargest, inputGroupBy[index]);
-                }
+        for (; index < chunkStartIndex + tuplesToProcess; ++index) {
+            it = map.find(inputGroupBy[index]);
+            if (it != map.end()) {
+                it.value() = Aggregator<T2>()(it->second, inputAggregate[index], false);
+            } else {
+                map.insert({inputGroupBy[index], Aggregator<T2>()(0, inputAggregate[index], true)});
+                mapLargest = std::max(mapLargest, inputGroupBy[index]);
             }
+        }
 
-            Counters::getInstance().readEventSet();
+        Counters::getInstance().readEventSet();
 
-            if ((static_cast<float>(tuplesToProcess) / counterValues[0]) < tuplesPerLastLevelCacheMissThreshold) {
-                tuplesToProcess = std::min(tuplesBetweenHashing, n - index);
+        if ((static_cast<float>(tuplesToProcess) / counterValues[0]) < tuplesPerLastLevelCacheMissThreshold) {
+            tuplesToProcess = std::min(tuplesBetweenHashing, n - index);
 
-                sectionsToBeSorted.emplace_back(index, index + tuplesToProcess);
-                index += tuplesToProcess;
-                elements += tuplesToProcess;
-
-                break;
-            }
+            sectionsToBeSorted.emplace_back(index, index + tuplesToProcess);
+            index += tuplesToProcess;
+            elements += tuplesToProcess;
         }
     }
 

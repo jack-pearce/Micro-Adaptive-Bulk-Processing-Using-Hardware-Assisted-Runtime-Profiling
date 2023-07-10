@@ -462,10 +462,7 @@ void allGroupByTests() {
 
 int main() {
 
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepVariableMax,
-                                   {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive,
-                                    GroupBy::AdaptiveSwitchToSortOnly},
-                                   1, "1-NoClustering-VariableUpperBound");
+    allGroupByTests();
 
     return 0;
 }
