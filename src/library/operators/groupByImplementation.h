@@ -75,8 +75,8 @@ vectorOfPairs<T1, T2> groupByHash(int n, T1 *inputGroupBy, T2 *inputAggregate, i
 }
 
 
-/*template<template<typename> class Aggregator, typename T1, typename T2>
-vectorOfPairs<T1, T2> groupByHash(int n, T1 *inputGroupBy, T2 *inputAggregate, int cardinality) {
+template<template<typename> class Aggregator, typename T1, typename T2>
+vectorOfPairs<T1, T2> groupByHashOLD(int n, T1 *inputGroupBy, T2 *inputAggregate, int cardinality) {
     static_assert(std::is_integral<T1>::value, "GroupBy column must be an integer type");
     static_assert(std::is_arithmetic<T2>::value, "Payload column must be an numeric type");
 
@@ -93,7 +93,7 @@ vectorOfPairs<T1, T2> groupByHash(int n, T1 *inputGroupBy, T2 *inputAggregate, i
     }
 
     return {map.begin(), map.end()};
-}*/
+}
 
 template<template<typename> class Aggregator, typename T1, typename T2>
 void groupBySortRadixOptAuxAgg(int start, int end, const T1 *inputGroupBy, T2 *inputAggregate, int mask, int numBuckets,
@@ -215,13 +215,17 @@ vectorOfPairs<T1, T2> groupBySortRadixOpt(int n, T1 *inputGroupBy, T2 *inputAggr
 template<template<typename> class Aggregator, typename T1, typename T2>
 vectorOfPairs<T1, T2> groupByAdaptiveSortRadix(int n, T1 *inputGroupBy, T2 *inputAggregate,
                                                vectorOfPairs<int, int> &sectionsToBeSorted,
-                                               tsl::robin_map<T1, T2> &map, T1 largest, vectorOfPairs<T1, T2> &result) {
+                                               tsl::robin_map<T1, T2> &map, vectorOfPairs<T1, T2> &result) {
     int i;
+    T1 largest = sectionsToBeSorted[0].first;
 
     for (const auto& section : sectionsToBeSorted) {
         for (i = section.first; i < section.second; i++) {
             largest = std::max(largest, inputGroupBy[i]);
         }
+    }
+    for (auto it = map.begin(); it != map.end(); ++it) {
+        largest = std::max(largest, it->first);
     }
 
     int msbPosition = 0;
@@ -327,30 +331,17 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
 
     int index = 0;
     int tuplesToProcess;
-    int chunkStartIndex;
 
     vectorOfPairs<int, int> sectionsToBeSorted;
     int elements = 0;
 
     vectorOfPairs<T1, T2> result;
-    T1 mapLargest = std::numeric_limits<T1>::lowest();
 
     while (index < n) {
 
-//        chunkStartIndex = index;
         tuplesToProcess = std::min(tuplesPerChunk, n - index);
 
         Counters::getInstance().readEventSet();
-
-//        for (; index < chunkStartIndex + tuplesToProcess; ++index) {
-//            it = map.find(inputGroupBy[index]);
-//            if (it != map.end()) {
-//                it.value() = Aggregator<T2>()(it->second, inputAggregate[index], false);
-//            } else {
-//                map.insert({inputGroupBy[index], Aggregator<T2>()(0, inputAggregate[index], true)});
-//                mapLargest = std::max(mapLargest, inputGroupBy[index]);
-//            }
-//        }
 
         groupByHashAux<Aggregator>(tuplesToProcess, inputGroupBy, inputAggregate, map, index);
 
@@ -370,7 +361,7 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
     }
     elements += map.size();
     return groupByAdaptiveSortRadix<Aggregator>(elements, inputGroupBy, inputAggregate, sectionsToBeSorted,
-                                                map, mapLargest,result);
+                                                map, result);
 }
 
 template<template<typename> class Aggregator, typename T1, typename T2>
@@ -458,6 +449,8 @@ vectorOfPairs<T1, T2> runGroupByFunction(GroupBy groupByImplementation, int n, T
             return groupByAdaptive<Aggregator>(n, inputGroupBy, inputAggregate, cardinality);
         case GroupBy::AdaptiveSwitchToSortOnly:
             return groupByAdaptiveSwitchToSortOnly<Aggregator>(n, inputGroupBy, inputAggregate, cardinality);
+        case GroupBy::HashOLD:
+            return groupByHashOLD<Aggregator>(n, inputGroupBy, inputAggregate, cardinality);
         default:
             std::cout << "Invalid selection of 'GroupBy' implementation!" << std::endl;
             exit(1);

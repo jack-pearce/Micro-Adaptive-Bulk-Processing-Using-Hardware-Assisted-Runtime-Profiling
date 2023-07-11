@@ -15,6 +15,8 @@ std::string getGroupByName(GroupBy groupByImplementation) {
             return "GroupBy_Adaptive";
         case GroupBy::AdaptiveSwitchToSortOnly:
             return "GroupBy_Adaptive_SwitchToSortOnly";
+        case GroupBy::HashOLD:
+            return "GroupBy_HashOLD";
         default:
             std::cout << "Invalid selection of 'GroupBy' implementation!" << std::endl;
             exit(1);
