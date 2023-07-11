@@ -48,6 +48,33 @@ T CountAggregation<T>::operator()(T currentAggregate, T _, bool firstAggregation
 }
 
 template<template<typename> class Aggregator, typename T1, typename T2>
+inline void groupByHashAux(int n, T1 *inputGroupBy, T2 *inputAggregate, tsl::robin_map<T1, T2> &map, int &index) {
+    typename tsl::robin_map<T1, T2>::iterator it;
+    int startingIndex = index;
+    for (; index < startingIndex + n; ++index) {
+        it = map.find(inputGroupBy[index]);
+        if (it != map.end()) {
+            it.value() = Aggregator<T2>()(it->second, inputAggregate[index], false);
+        } else {
+            map.insert({inputGroupBy[index], Aggregator<T2>()(0, inputAggregate[index], true)});
+        }
+    }
+}
+
+template<template<typename> class Aggregator, typename T1, typename T2>
+vectorOfPairs<T1, T2> groupByHash(int n, T1 *inputGroupBy, T2 *inputAggregate, int cardinality) {
+    static_assert(std::is_integral<T1>::value, "GroupBy column must be an integer type");
+    static_assert(std::is_arithmetic<T2>::value, "Payload column must be an numeric type");
+
+    tsl::robin_map<T1, T2> map(std::max(static_cast<int>(2.5 * cardinality), 400000));
+
+    groupByHashAux<Aggregator>(n, inputGroupBy, inputAggregate, map, 0);
+
+    return {map.begin(), map.end()};
+}
+
+
+/*template<template<typename> class Aggregator, typename T1, typename T2>
 vectorOfPairs<T1, T2> groupByHash(int n, T1 *inputGroupBy, T2 *inputAggregate, int cardinality) {
     static_assert(std::is_integral<T1>::value, "GroupBy column must be an integer type");
     static_assert(std::is_arithmetic<T2>::value, "Payload column must be an numeric type");
@@ -65,7 +92,7 @@ vectorOfPairs<T1, T2> groupByHash(int n, T1 *inputGroupBy, T2 *inputAggregate, i
     }
 
     return {map.begin(), map.end()};
-}
+}*/
 
 template<template<typename> class Aggregator, typename T1, typename T2>
 void groupBySortRadixOptAuxAgg(int start, int end, const T1 *inputGroupBy, T2 *inputAggregate, int mask, int numBuckets,
@@ -309,20 +336,22 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
 
     while (index < n) {
 
-        chunkStartIndex = index;
+//        chunkStartIndex = index;
         tuplesToProcess = std::min(tuplesPerChunk, n - index);
 
         Counters::getInstance().readEventSet();
 
-        for (; index < chunkStartIndex + tuplesToProcess; ++index) {
-            it = map.find(inputGroupBy[index]);
-            if (it != map.end()) {
-                it.value() = Aggregator<T2>()(it->second, inputAggregate[index], false);
-            } else {
-                map.insert({inputGroupBy[index], Aggregator<T2>()(0, inputAggregate[index], true)});
-                mapLargest = std::max(mapLargest, inputGroupBy[index]);
-            }
-        }
+//        for (; index < chunkStartIndex + tuplesToProcess; ++index) {
+//            it = map.find(inputGroupBy[index]);
+//            if (it != map.end()) {
+//                it.value() = Aggregator<T2>()(it->second, inputAggregate[index], false);
+//            } else {
+//                map.insert({inputGroupBy[index], Aggregator<T2>()(0, inputAggregate[index], true)});
+//                mapLargest = std::max(mapLargest, inputGroupBy[index]);
+//            }
+//        }
+
+        groupByHashAux<Aggregator>(tuplesToProcess, inputGroupBy, inputAggregate, map, index);
 
         Counters::getInstance().readEventSet();
 
