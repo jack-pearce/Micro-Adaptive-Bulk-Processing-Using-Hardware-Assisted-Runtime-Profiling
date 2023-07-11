@@ -10,9 +10,8 @@ namespace MABPL {
 
 enum GroupBy {
     Hash,
-    SortRadixOpt,
+    Sort,
     Adaptive,
-    AdaptiveSwitchToSortOnly
 };
 
 std::string getGroupByName(GroupBy groupByImplementation);
@@ -45,14 +44,10 @@ template<template<typename> class Aggregator, typename T1, typename T2>
 vectorOfPairs<T1, T2>  groupByHash(int n, T1 *inputGroupBy, T2 *inputAggregate, int cardinality);
 
 template<template<typename> class Aggregator, typename T1, typename T2>
-vectorOfPairs<T1, T2> groupBySortRadixOpt(int n, T1 *inputGroupBy, T2 *inputAggregate);
+vectorOfPairs<T1, T2> groupBySort(int n, T1 *inputGroupBy, T2 *inputAggregate);
 
 template<template<typename> class Aggregator, typename T1, typename T2>
 vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregate, int cardinality);
-
-template<template<typename> class Aggregator, typename T1, typename T2>
-vectorOfPairs<T1, T2> groupByAdaptiveSwitchToSortOnly(int n, T1 *inputGroupBy, T2 *inputAggregate, int cardinality);
-
 
 template<template<typename> class Aggregator, typename T1, typename T2>
 vectorOfPairs<T1, T2> runGroupByFunction(GroupBy groupByImplementation, int n, T1 *inputGroupBy, T2 *inputAggregate, int cardinality);

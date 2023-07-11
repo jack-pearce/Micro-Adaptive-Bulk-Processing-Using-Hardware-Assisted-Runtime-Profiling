@@ -140,7 +140,7 @@ void groupByCpuCyclesSweepBenchmark64(DataSweep &dataSweep, const std::vector<Gr
 
 void groupByBenchmarkWithExtraCounters(DataSweep &dataSweep, GroupBy groupByImplementation, int iterations,
                                        std::vector<std::string> &benchmarkCounters, const std::string &fileNamePrefix) {
-    if (groupByImplementation == GroupBy::AdaptiveSwitchToSortOnly)
+    if (groupByImplementation == GroupBy::Adaptive)
         std::cout << "Cannot benchmark adaptive groupBy using counters as adaptive select is already using these counters" << std::endl;
 
     int numTests = static_cast<int>(dataSweep.getTotalRuns());

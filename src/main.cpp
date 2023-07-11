@@ -253,7 +253,7 @@ void groupByBenchmarkWithExtraCountersDuringRunConfigurations(const DataFile &da
     groupByBenchmarkWithExtraCountersDuringRun(dataFile, benchmarkCounters, fileNamePrefix);
 }
 
-void allGroupByTestsOLD() {
+//void allGroupByTestsOLD() {
 /*
 // SET ONE - BITS_PER_PASS = 10
     // Graph 1: Cardinality range on uniform data (variable max) for different hashmaps - compile with -march=native removed
@@ -406,108 +406,90 @@ void allGroupByTestsOLD() {
                                    {GroupBy::SingleRadixPassThenHash,
                                     GroupBy::DoubleRadixPassThenHash}, countAggregation,
                                    1, "9-SingleDoubleRadix8PassThenHash");*/
-}
+//}
 
 void allGroupByTests() {
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive,
-                                    GroupBy::AdaptiveSwitchToSortOnly},
+                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                    1, "1-NoClustering");
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered10,
-                                   {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive,
-                                    GroupBy::AdaptiveSwitchToSortOnly},
+                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                    1, "1-Clustered10");
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered1k,
-                                   {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive,
-                                    GroupBy::AdaptiveSwitchToSortOnly},
+                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                    1, "1-Clustered1k");
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered100k,
-                                   {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive,
-                                    GroupBy::AdaptiveSwitchToSortOnly},
+                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                    1, "1-Clustered100k");
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepVariableMax,
-                                   {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive,
-                                    GroupBy::AdaptiveSwitchToSortOnly},
+                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                    1, "1-NoClustering-VariableUpperBound");
 
     groupByCpuCyclesSweepBenchmark64(DataSweeps::logUniformInt64Distribution20mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive,
-                                    GroupBy::AdaptiveSwitchToSortOnly},
+                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                    1, "1-NoClustering-64bitInts");
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution40mValuesCardinalitySweepFixedMax,
-                                     {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive,
-                                      GroupBy::AdaptiveSwitchToSortOnly},
+                                     {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                      1, "1-NoClustering-40mValues");
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                     {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive,
-                                      GroupBy::AdaptiveSwitchToSortOnly},
+                                     {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                      1, "1-NoClustering-200mValues");
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::linearUniformIntDistribution20mValuesCardinalitySections_100_3m_Max20m,
-                                     {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive,
-                                      GroupBy::AdaptiveSwitchToSortOnly},
+                                     {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                      1, "2-TwoSection_100_3m");
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::linearUniformIntDistribution20mValuesCardinalitySections_3m_100_Max20m,
-                                   {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive,
-                                    GroupBy::AdaptiveSwitchToSortOnly},
+                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                    1, "2-TwoSection_3m_100");
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::linearUniformIntDistribution200mValuesMultipleCardinalitySections_100_10m_Max100m,
-                                   {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive},
+                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                    1, "3-MultipleSection_100_10m");
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::linearUniformIntDistribution200mValuesMultipleCardinalitySections_10m_100_Max100m,
-                                   {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive},
+                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                    1, "3-MultipleSection_10m_100");
 }
 
 int main() {
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive,
-                                    GroupBy::AdaptiveSwitchToSortOnly},
+                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                    1, "1-NoClustering");
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered10,
-                                   {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive,
-                                    GroupBy::AdaptiveSwitchToSortOnly},
+                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                    1, "1-Clustered10");
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered1k,
-                                   {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive,
-                                    GroupBy::AdaptiveSwitchToSortOnly},
+                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                    1, "1-Clustered1k");
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered100k,
-                                   {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive,
-                                    GroupBy::AdaptiveSwitchToSortOnly},
+                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                    1, "1-Clustered100k");
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepVariableMax,
-                                   {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive,
-                                    GroupBy::AdaptiveSwitchToSortOnly},
+                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                    1, "1-NoClustering-VariableUpperBound");
 
     groupByCpuCyclesSweepBenchmark64(DataSweeps::logUniformInt64Distribution20mValuesCardinalitySweepFixedMax,
-                                     {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive,
-                                      GroupBy::AdaptiveSwitchToSortOnly},
+                                     {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                      1, "1-NoClustering-64bitInts");
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution40mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive,
-                                    GroupBy::AdaptiveSwitchToSortOnly},
+                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                    1, "1-NoClustering-40mValues");
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive,
-                                    GroupBy::AdaptiveSwitchToSortOnly},
+                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                    1, "1-NoClustering-200mValues");
 
 

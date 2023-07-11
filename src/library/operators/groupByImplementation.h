@@ -62,22 +62,6 @@ inline void groupByHashAux(int n, T1 *inputGroupBy, T2 *inputAggregate, tsl::rob
 }
 
 template<template<typename> class Aggregator, typename T1, typename T2>
-inline void groupByAdaptiveHash(int n, T1 *inputGroupBy, T2 *inputAggregate, tsl::robin_map<T1, T2> &map,
-                                int &index, T1 &largest) {
-    typename tsl::robin_map<T1, T2>::iterator it;
-    int startingIndex = index;
-    for (; index < startingIndex + n; ++index) {
-        it = map.find(inputGroupBy[index]);
-        if (it != map.end()) {
-            it.value() = Aggregator<T2>()(it->second, inputAggregate[index], false);
-        } else {
-            map.insert({inputGroupBy[index], Aggregator<T2>()(0, inputAggregate[index], true)});
-            largest = std::max(largest, inputGroupBy[index]);
-        }
-    }
-}
-
-template<template<typename> class Aggregator, typename T1, typename T2>
 vectorOfPairs<T1, T2> groupByHash(int n, T1 *inputGroupBy, T2 *inputAggregate, int cardinality) {
     static_assert(std::is_integral<T1>::value, "GroupBy column must be an integer type");
     static_assert(std::is_arithmetic<T2>::value, "Payload column must be an numeric type");
@@ -91,8 +75,8 @@ vectorOfPairs<T1, T2> groupByHash(int n, T1 *inputGroupBy, T2 *inputAggregate, i
 }
 
 template<template<typename> class Aggregator, typename T1, typename T2>
-void groupBySortRadixOptAuxAgg(int start, int end, const T1 *inputGroupBy, T2 *inputAggregate, int mask, int numBuckets,
-                               std::vector<int> &buckets, vectorOfPairs <T1, T2> &result) {
+void groupBySortAuxAgg(int start, int end, const T1 *inputGroupBy, T2 *inputAggregate, int mask, int numBuckets,
+                       std::vector<int> &buckets, vectorOfPairs <T1, T2> &result) {
     int i;
     bool bucketEntryPresent[1 << BITS_PER_RADIX_PASS] = {false};
 
@@ -114,8 +98,8 @@ void groupBySortRadixOptAuxAgg(int start, int end, const T1 *inputGroupBy, T2 *i
 }
 
 template<template<typename> class Aggregator, typename T1, typename T2>
-void groupBySortRadixOptAux(int start, int end, T1 *inputGroupBy, T2 *inputAggregate, T1 *bufferGroupBy, T2 *bufferAggregate,
-                       int mask, int numBuckets, std::vector<int> &buckets, int pass, vectorOfPairs <T1, T2> &result) {
+void groupBySortAux(int start, int end, T1 *inputGroupBy, T2 *inputAggregate, T1 *bufferGroupBy, T2 *bufferAggregate,
+                    int mask, int numBuckets, std::vector<int> &buckets, int pass, vectorOfPairs <T1, T2> &result) {
     int i;
 
     for (i = start; i < end; i++) {
@@ -143,35 +127,35 @@ void groupBySortRadixOptAux(int start, int end, T1 *inputGroupBy, T2 *inputAggre
 
     if (pass > 0) {
         if (partitions[0] > start) {
-            groupBySortRadixOptAux<Aggregator>(start, partitions[0], inputGroupBy, inputAggregate,
-                                               bufferGroupBy,
-                                               bufferAggregate, mask, numBuckets, buckets, pass, result);
+            groupBySortAux<Aggregator>(start, partitions[0], inputGroupBy, inputAggregate,
+                                       bufferGroupBy,
+                                       bufferAggregate, mask, numBuckets, buckets, pass, result);
         }
         for (i = 1; i < numBuckets; i++) {
             if (partitions[i] > partitions[i - 1]) {
-                groupBySortRadixOptAux<Aggregator>(partitions[i - 1], partitions[i], inputGroupBy,
-                                                   inputAggregate,
-                                                   bufferGroupBy, bufferAggregate, mask, numBuckets, buckets,
-                                                   pass, result);
+                groupBySortAux<Aggregator>(partitions[i - 1], partitions[i], inputGroupBy,
+                                           inputAggregate,
+                                           bufferGroupBy, bufferAggregate, mask, numBuckets, buckets,
+                                           pass, result);
             }
         }
     } else {
         if (partitions[0] > start) {
-            groupBySortRadixOptAuxAgg<Aggregator>(start, partitions[0], inputGroupBy, inputAggregate,
-                                                  mask, numBuckets, buckets, result);
+            groupBySortAuxAgg<Aggregator>(start, partitions[0], inputGroupBy, inputAggregate,
+                                          mask, numBuckets, buckets, result);
         }
         for (i = 1; i < numBuckets; i++) {
             if (partitions[i] > partitions[i - 1]) {
-                groupBySortRadixOptAuxAgg<Aggregator>(partitions[i - 1], partitions[i], inputGroupBy,
-                                                      inputAggregate,
-                                                      mask, numBuckets, buckets, result);
+                groupBySortAuxAgg<Aggregator>(partitions[i - 1], partitions[i], inputGroupBy,
+                                              inputAggregate,
+                                              mask, numBuckets, buckets, result);
             }
         }
     }
 }
 
 template<template<typename> class Aggregator, typename T1, typename T2>
-vectorOfPairs<T1, T2> groupBySortRadixOpt(int n, T1 *inputGroupBy, T2 *inputAggregate) {
+vectorOfPairs<T1, T2> groupBySort(int n, T1 *inputGroupBy, T2 *inputAggregate) {
     static_assert(std::is_integral<T1>::value, "GroupBy column must be an integer type");
     static_assert(std::is_arithmetic<T2>::value, "Payload column must be an numeric type");
 
@@ -198,8 +182,8 @@ vectorOfPairs<T1, T2> groupBySortRadixOpt(int n, T1 *inputGroupBy, T2 *inputAggr
     T1 *bufferGroupBy = new T1[n];
     T2 *bufferAggregate = new T2[n];
 
-    groupBySortRadixOptAux<Aggregator>(0, n, inputGroupBy, inputAggregate, bufferGroupBy,
-                                       bufferAggregate, mask, numBuckets, buckets, pass, result);
+    groupBySortAux<Aggregator>(0, n, inputGroupBy, inputAggregate, bufferGroupBy,
+                               bufferAggregate, mask, numBuckets, buckets, pass, result);
 
     delete[]bufferGroupBy;
     delete[]bufferAggregate;
@@ -208,10 +192,26 @@ vectorOfPairs<T1, T2> groupBySortRadixOpt(int n, T1 *inputGroupBy, T2 *inputAggr
 }
 
 template<template<typename> class Aggregator, typename T1, typename T2>
-vectorOfPairs<T1, T2> groupByAdaptiveSortRadix(int n, T1 *inputGroupBy, T2 *inputAggregate,
-                                               vectorOfPairs<int, int> &sectionsToBeSorted,
-                                               tsl::robin_map<T1, T2> &map, T1 largest,
-                                               vectorOfPairs<T1, T2> &result) {
+inline void groupByAdaptiveAuxHash(int n, T1 *inputGroupBy, T2 *inputAggregate, tsl::robin_map<T1, T2> &map,
+                                   int &index, T1 &largest) {
+    typename tsl::robin_map<T1, T2>::iterator it;
+    int startingIndex = index;
+    for (; index < startingIndex + n; ++index) {
+        it = map.find(inputGroupBy[index]);
+        if (it != map.end()) {
+            it.value() = Aggregator<T2>()(it->second, inputAggregate[index], false);
+        } else {
+            map.insert({inputGroupBy[index], Aggregator<T2>()(0, inputAggregate[index], true)});
+            largest = std::max(largest, inputGroupBy[index]);
+        }
+    }
+}
+
+template<template<typename> class Aggregator, typename T1, typename T2>
+vectorOfPairs<T1, T2> groupByAdaptiveAuxSort(int n, T1 *inputGroupBy, T2 *inputAggregate,
+                                             vectorOfPairs<int, int> &sectionsToBeSorted,
+                                             tsl::robin_map<T1, T2> &map, T1 largest,
+                                             vectorOfPairs<T1, T2> &result) {
     int i;
     for (const auto& section : sectionsToBeSorted) {
         for (i = section.first; i < section.second; i++) {
@@ -269,26 +269,26 @@ vectorOfPairs<T1, T2> groupByAdaptiveSortRadix(int n, T1 *inputGroupBy, T2 *inpu
 
     if (pass > 0) {
         if (partitions[0] > 0) {
-            groupBySortRadixOptAux<Aggregator>(0, partitions[0], inputGroupBy, inputAggregate,
-                                               bufferGroupBy, bufferAggregate, mask, numBuckets, buckets,
-                                               pass, result);
+            groupBySortAux<Aggregator>(0, partitions[0], inputGroupBy, inputAggregate,
+                                       bufferGroupBy, bufferAggregate, mask, numBuckets, buckets,
+                                       pass, result);
         }
         for (i = 1; i < numBuckets; i++) {
             if (partitions[i] > partitions[i - 1]) {
-                groupBySortRadixOptAux<Aggregator>(partitions[i - 1], partitions[i], inputGroupBy,
-                                                   inputAggregate, bufferGroupBy, bufferAggregate, mask,
-                                                   numBuckets, buckets, pass, result);
+                groupBySortAux<Aggregator>(partitions[i - 1], partitions[i], inputGroupBy,
+                                           inputAggregate, bufferGroupBy, bufferAggregate, mask,
+                                           numBuckets, buckets, pass, result);
             }
         }
     } else {
         if (partitions[0] > 0) {
-            groupBySortRadixOptAuxAgg<Aggregator>(0, partitions[0], inputGroupBy, inputAggregate,
-                                                  mask, numBuckets, buckets, result);
+            groupBySortAuxAgg<Aggregator>(0, partitions[0], inputGroupBy, inputAggregate,
+                                          mask, numBuckets, buckets, result);
         }
         for (i = 1; i < numBuckets; i++) {
             if (partitions[i] > partitions[i - 1]) {
-                groupBySortRadixOptAuxAgg<Aggregator>(partitions[i - 1], partitions[i], inputGroupBy,
-                                                      inputAggregate, mask, numBuckets, buckets, result);
+                groupBySortAuxAgg<Aggregator>(partitions[i - 1], partitions[i], inputGroupBy,
+                                              inputAggregate, mask, numBuckets, buckets, result);
             }
         }
     }
@@ -335,7 +335,7 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
 
         Counters::getInstance().readEventSet();
 
-        groupByAdaptiveHash<Aggregator>(tuplesToProcess, inputGroupBy, inputAggregate, map, index, mapLargest);
+        groupByAdaptiveAuxHash<Aggregator>(tuplesToProcess, inputGroupBy, inputAggregate, map, index, mapLargest);
 
         Counters::getInstance().readEventSet();
 
@@ -352,82 +352,8 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
         return {map.begin(), map.end()};
     }
     elements += map.size();
-    return groupByAdaptiveSortRadix<Aggregator>(elements, inputGroupBy, inputAggregate, sectionsToBeSorted,
-                                                map, mapLargest, result);
-}
-
-template<template<typename> class Aggregator, typename T1, typename T2>
-vectorOfPairs<T1, T2> groupByAdaptiveSwitchToSortOnly(int n, T1 *inputGroupBy, T2 *inputAggregate, int cardinality) {
-    static_assert(std::is_integral<T1>::value, "GroupBy column must be an integer type");
-
-    int hashTableEntryBytes = sizeof(T1) + sizeof(T2);
-
-    int tuplesPerCheck = 200000;
-    int initialSize = std::max(static_cast<int>(2.5 * cardinality), 400000);
-
-    std::vector<std::string> counters = {"PERF_COUNT_HW_CACHE_MISSES"};
-    long_long *counterValues = Counters::getInstance().getEvents(counters);
-
-    int index = 0;
-    int tuplesToProcess;
-
-    if (!std::is_same<Aggregator<T2>, CountAggregation<T2>>::value) {
-        static_assert(std::is_arithmetic<T2>::value, "Payload column must be an numeric type");
-    }
-
-    tsl::robin_map<T1, T2> map(initialSize);
-    typename tsl::robin_map<T1, T2>::iterator it;
-
-    float tuplesPerLastLevelCacheMissThreshold = (GROUPBY_MACHINE_CONSTANT * bytesPerCacheLine()) / hashTableEntryBytes;
-
-    unsigned long warmUpRows = std::min(static_cast<int>((l3cacheSize() / hashTableEntryBytes) /
-                                                         (bytesPerCacheLine() / hashTableEntryBytes)), cardinality);
-
-    for (; index < static_cast<int>(warmUpRows); ++index) {
-        it = map.find(inputGroupBy[index]);
-        if (it != map.end()) {
-            it.value() = Aggregator<T2>()(it->second, inputAggregate[index], false);
-        } else {
-            map.insert({inputGroupBy[index], Aggregator<T2>()(0, inputAggregate[index], true)});
-        }
-    }
-
-    while (index < n) {
-
-        tuplesToProcess = std::min(tuplesPerCheck, n - index);
-
-        Counters::getInstance().readEventSet();
-
-        for (auto _ = 0; _ < tuplesToProcess; ++_) {
-            it = map.find(inputGroupBy[index]);
-            if (it != map.end()) {
-                it.value() = Aggregator<T2>()(it->second, inputAggregate[index], false);
-            } else {
-                map.insert({inputGroupBy[index], Aggregator<T2>()(0, inputAggregate[index], true)});
-            }
-            ++index;
-        }
-
-        Counters::getInstance().readEventSet();
-
-        if (__builtin_expect((static_cast<float>(tuplesToProcess) / counterValues[0])
-                             < tuplesPerLastLevelCacheMissThreshold, false)) {
-
-            int reducedNumElements = index - map.size();
-            int i = reducedNumElements;
-
-            for (it = map.begin(); it != map.end(); ++it) {
-                inputGroupBy[i] = it->first;
-                inputAggregate[i++] = it->second;
-            }
-
-            return groupBySortRadixOpt<Aggregator>(n - reducedNumElements,
-                                                   inputGroupBy + reducedNumElements,
-                                                   inputAggregate + reducedNumElements);
-        }
-    }
-
-    return {map.begin(), map.end()};
+    return groupByAdaptiveAuxSort<Aggregator>(elements, inputGroupBy, inputAggregate, sectionsToBeSorted,
+                                              map, mapLargest, result);
 }
 
 template<template<typename> class Aggregator, typename T1, typename T2>
@@ -435,12 +361,10 @@ vectorOfPairs<T1, T2> runGroupByFunction(GroupBy groupByImplementation, int n, T
     switch (groupByImplementation) {
         case GroupBy::Hash:
             return groupByHash<Aggregator>(n, inputGroupBy, inputAggregate, cardinality);
-        case GroupBy::SortRadixOpt:
-            return groupBySortRadixOpt<Aggregator>(n, inputGroupBy, inputAggregate);
+        case GroupBy::Sort:
+            return groupBySort<Aggregator>(n, inputGroupBy, inputAggregate);
         case GroupBy::Adaptive:
             return groupByAdaptive<Aggregator>(n, inputGroupBy, inputAggregate, cardinality);
-        case GroupBy::AdaptiveSwitchToSortOnly:
-            return groupByAdaptiveSwitchToSortOnly<Aggregator>(n, inputGroupBy, inputAggregate, cardinality);
         default:
             std::cout << "Invalid selection of 'GroupBy' implementation!" << std::endl;
             exit(1);
