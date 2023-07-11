@@ -68,7 +68,8 @@ vectorOfPairs<T1, T2> groupByHash(int n, T1 *inputGroupBy, T2 *inputAggregate, i
 
     tsl::robin_map<T1, T2> map(std::max(static_cast<int>(2.5 * cardinality), 400000));
 
-    groupByHashAux<Aggregator>(n, inputGroupBy, inputAggregate, map, 0);
+    int index = 0;
+    groupByHashAux<Aggregator>(n, inputGroupBy, inputAggregate, map, index);
 
     return {map.begin(), map.end()};
 }
