@@ -459,24 +459,18 @@ void allGroupByTests() {
                                     GroupBy::AdaptiveSwitchToSortOnly},
                                    5, "2-TwoSection_3m_100");
 
-    groupByCpuCyclesSweepBenchmark(DataSweeps::linearUniformIntDistribution20mValuesMultipleCardinalitySections_100_10m_Max100m,
+    groupByCpuCyclesSweepBenchmark(DataSweeps::linearUniformIntDistribution200mValuesMultipleCardinalitySections_100_10m_Max100m,
                                    {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive},
                                    1, "3-MultipleSection_100_3m");
 
-    groupByCpuCyclesSweepBenchmark(DataSweeps::linearUniformIntDistribution20mValuesMultipleCardinalitySections_10m_100_Max100m,
+    groupByCpuCyclesSweepBenchmark(DataSweeps::linearUniformIntDistribution200mValuesMultipleCardinalitySections_10m_100_Max100m,
                                    {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive},
                                    1, "3-MultipleSection_3m_100");
 }
 
 int main() {
 
-    groupByCpuCyclesSweepBenchmark(DataSweeps::linearUniformIntDistribution20mValuesMultipleCardinalitySections_100_10m_Max100m,
-                                   {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive},
-                                   1, "3-MultipleSection_100_10m");
-
-    groupByCpuCyclesSweepBenchmark(DataSweeps::linearUniformIntDistribution20mValuesMultipleCardinalitySections_10m_100_Max100m,
-                                   {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive},
-                                   1, "3-MultipleSection_10m_100");
+    allGroupByTests();
 
     return 0;
 }

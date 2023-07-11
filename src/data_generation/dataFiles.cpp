@@ -396,16 +396,16 @@ DataSweep DataSweeps::linearUniformIntDistribution20mValuesMultipleCardinalitySe
         "linearUniformIntDistribution20mValuesMultipleCardinalitySections_3m_100_Max20m",
         ""};
 
-DataSweep DataSweeps::linearUniformIntDistribution20mValuesMultipleCardinalitySections_100_10m_Max100m {
+DataSweep DataSweeps::linearUniformIntDistribution200mValuesMultipleCardinalitySections_100_10m_Max100m {
         30,
         200*1000*1000,
-        "linearUniformIntDistribution20mValuesMultipleCardinalitySections_100_10m_Max100m",
+        "linearUniformIntDistribution200mValuesMultipleCardinalitySections_100_10m_Max100m",
         ""};
 
-DataSweep DataSweeps::linearUniformIntDistribution20mValuesMultipleCardinalitySections_10m_100_Max100m {
+DataSweep DataSweeps::linearUniformIntDistribution200mValuesMultipleCardinalitySections_10m_100_Max100m {
         30,
         200*1000*1000,
-        "linearUniformIntDistribution20mValuesMultipleCardinalitySections_10m_100_Max100m",
+        "linearUniformIntDistribution200mValuesMultipleCardinalitySections_10m_100_Max100m",
         ""};
 
 
@@ -446,8 +446,8 @@ DataSweep::DataSweep(int _totalRuns, int _numElements, std::string _sweepName, s
             getSweepName() == "linearUniformIntDistribution20mValuesCardinalitySections_3m_100_Max20m" ||
             getSweepName() == "linearUniformIntDistribution20mValuesMultipleCardinalitySections_100_3m_Max20m" ||
             getSweepName() == "linearUniformIntDistribution20mValuesMultipleCardinalitySections_3m_100_Max20m" ||
-            getSweepName() == "linearUniformIntDistribution20mValuesMultipleCardinalitySections_100_10m_Max100m" ||
-            getSweepName() == "linearUniformIntDistribution20mValuesMultipleCardinalitySections_10m_100_Max100m") {
+            getSweepName() == "linearUniformIntDistribution200mValuesMultipleCardinalitySections_100_10m_Max100m" ||
+            getSweepName() == "linearUniformIntDistribution200mValuesMultipleCardinalitySections_10m_100_Max100m") {
         generateLinearDistribution(getTotalRuns(), 0, 1, inputs);
     }
 }
@@ -529,10 +529,10 @@ bool DataSweep::loadNextDataSetIntoMemory(int *data) {
     } else if (getSweepName() == "linearUniformIntDistribution20mValuesMultipleCardinalitySections_3m_100_Max20m") {
         generateUniformDistributionInMemoryWithMultipleTwoCardinalitySections(data, getNumElements(), 20*1000*1000, 3*1000*1000, 100, inputs[runsCompleted++], 5);
         return true;
-    } else if (getSweepName() == "linearUniformIntDistribution20mValuesMultipleCardinalitySections_100_10m_Max100m") {
+    } else if (getSweepName() == "linearUniformIntDistribution200mValuesMultipleCardinalitySections_100_10m_Max100m") {
         generateUniformDistributionInMemoryWithMultipleTwoCardinalitySections(data, getNumElements(), 100*1000*1000, 100, 10*1000*1000, inputs[runsCompleted++], 5);
         return true;
-    } else if (getSweepName() == "linearUniformIntDistribution20mValuesMultipleCardinalitySections_10m_100_Max100m") {
+    } else if (getSweepName() == "linearUniformIntDistribution200mValuesMultipleCardinalitySections_10m_100_Max100m") {
         generateUniformDistributionInMemoryWithMultipleTwoCardinalitySections(data, getNumElements(), 100*1000*1000, 10*1000*1000, 100, inputs[runsCompleted++], 5);
         return true;
     }
@@ -580,8 +580,8 @@ int DataSweep::getCardinality() const {
     } else if (getSweepName() == "linearUniformIntDistribution20mValuesCardinalitySections_100_3m_Max20m" ||
         getSweepName() == "linearUniformIntDistribution20mValuesCardinalitySections_3m_100_Max20m") {
         return 3*1000*1000;
-    }  else if (getSweepName() == "linearUniformIntDistribution20mValuesMultipleCardinalitySections_100_10m_Max100m"  ||
-                getSweepName() == "linearUniformIntDistribution20mValuesMultipleCardinalitySections_10m_100_Max100m") {
+    }  else if (getSweepName() == "linearUniformIntDistribution200mValuesMultipleCardinalitySections_100_10m_Max100m"  ||
+                getSweepName() == "linearUniformIntDistribution200mValuesMultipleCardinalitySections_10m_100_Max100m") {
         return 10*1000*1000;
     } else {
         return -1;
