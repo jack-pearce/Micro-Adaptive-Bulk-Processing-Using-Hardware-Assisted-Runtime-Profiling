@@ -461,11 +461,11 @@ void allGroupByTests() {
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::linearUniformIntDistribution200mValuesMultipleCardinalitySections_100_10m_Max100m,
                                    {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive},
-                                   1, "3-MultipleSection_100_3m");
+                                   1, "3-MultipleSection_100_10m");
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::linearUniformIntDistribution200mValuesMultipleCardinalitySections_10m_100_Max100m,
                                    {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive},
-                                   1, "3-MultipleSection_3m_100");
+                                   1, "3-MultipleSection_10m_100");
 }
 
 int main() {
