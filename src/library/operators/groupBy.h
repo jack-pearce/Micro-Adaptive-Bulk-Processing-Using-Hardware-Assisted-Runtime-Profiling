@@ -12,8 +12,7 @@ enum GroupBy {
     Hash,
     SortRadixOpt,
     Adaptive,
-    AdaptiveSwitchToSortOnly,
-    HashOLD
+    AdaptiveSwitchToSortOnly
 };
 
 std::string getGroupByName(GroupBy groupByImplementation);

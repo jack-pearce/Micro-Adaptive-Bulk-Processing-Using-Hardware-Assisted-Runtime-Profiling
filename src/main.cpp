@@ -452,12 +452,12 @@ void allGroupByTests() {
     groupByCpuCyclesSweepBenchmark(DataSweeps::linearUniformIntDistribution20mValuesCardinalitySections_100_3m_Max20m,
                                      {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive,
                                       GroupBy::AdaptiveSwitchToSortOnly},
-                                     5, "2-TwoSection_100_3m");
+                                     1, "2-TwoSection_100_3m");
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::linearUniformIntDistribution20mValuesCardinalitySections_3m_100_Max20m,
                                    {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive,
                                     GroupBy::AdaptiveSwitchToSortOnly},
-                                   5, "2-TwoSection_3m_100");
+                                   1, "2-TwoSection_3m_100");
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::linearUniformIntDistribution200mValuesMultipleCardinalitySections_100_10m_Max100m,
                                    {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive},
@@ -471,12 +471,45 @@ void allGroupByTests() {
 int main() {
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::Hash, GroupBy::HashOLD, GroupBy::Adaptive},
+                                   {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive,
+                                    GroupBy::AdaptiveSwitchToSortOnly},
+                                   1, "1-NoClustering");
+
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered10,
+                                   {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive,
+                                    GroupBy::AdaptiveSwitchToSortOnly},
+                                   1, "1-Clustered10");
+
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered1k,
+                                   {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive,
+                                    GroupBy::AdaptiveSwitchToSortOnly},
+                                   1, "1-Clustered1k");
+
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered100k,
+                                   {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive,
+                                    GroupBy::AdaptiveSwitchToSortOnly},
+                                   1, "1-Clustered100k");
+
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepVariableMax,
+                                   {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive,
+                                    GroupBy::AdaptiveSwitchToSortOnly},
                                    1, "1-NoClustering-VariableUpperBound");
 
-    groupByCpuCyclesSweepBenchmark(DataSweeps::linearUniformIntDistribution20mValuesCardinalitySections_100_3m_Max20m,
-                                   {GroupBy::Hash, GroupBy::HashOLD, GroupBy::Adaptive},
-                                   1, "1-NoClustering-VariableUpperBound");
+    groupByCpuCyclesSweepBenchmark64(DataSweeps::logUniformInt64Distribution20mValuesCardinalitySweepFixedMax,
+                                     {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive,
+                                      GroupBy::AdaptiveSwitchToSortOnly},
+                                     1, "1-NoClustering-64bitInts");
+
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution40mValuesCardinalitySweepFixedMax,
+                                   {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive,
+                                    GroupBy::AdaptiveSwitchToSortOnly},
+                                   1, "1-NoClustering-40mValues");
+
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                   {GroupBy::Hash, GroupBy::SortRadixOpt, GroupBy::Adaptive,
+                                    GroupBy::AdaptiveSwitchToSortOnly},
+                                   1, "1-NoClustering-200mValues");
+
 
     return 0;
 }
