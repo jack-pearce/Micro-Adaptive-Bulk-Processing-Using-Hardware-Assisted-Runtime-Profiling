@@ -492,6 +492,5 @@ int main() {
                                    {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                    1, "1-NoClustering-200mValues");
 
-
     return 0;
 }

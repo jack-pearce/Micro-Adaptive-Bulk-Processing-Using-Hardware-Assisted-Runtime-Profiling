@@ -9,6 +9,7 @@ void generateUnequalLowerStepSelectivityInMemory(int *data, int n, int step, int
 void generatePartiallySortedInMemory(int *data, int n, int numRepeats, float percentageRandom);
 
 void generateUniformDistributionInMemory(int *data, int n, int upperBound);
+void generateUniqueValuesRandomisedInMemory(int *data, int n);
 void generateUniformDistributionInMemoryWithSetCardinality(int *data, int n, int upperBound, int cardinality);
 void generateUniformDistributionInMemoryWithSetCardinality(int64_t *data, int n, int upperBound, int cardinality);
 void generateUniformDistributionInMemoryWithSetCardinalityClustered(int *data, int n, int upperBound, int cardinality, int spreadInCluster);
