@@ -217,6 +217,11 @@ void generateUniformDistributionInMemory(int *data, int n, int upperBound) {
     std::cout << "Generating data in memory... ";
     std::cout.flush();
 
+    if (upperBound == n) {
+        generateUniqueValuesRandomisedInMemory(data, n);
+        return;
+    }
+
     unsigned int seed = 1;
     std::mt19937 gen(seed);
 
@@ -245,6 +250,25 @@ inline int scaleNumberLogarithmically(int number, int startingUpperBound, int ta
 }
 
 void generateUniqueValuesRandomisedInMemory(int *data, int n) {
+    // Fisher–Yates shuffle
+
+    for (int i = 1; i <= n; ++i) {
+        data[i - 1] = i;
+    }
+
+    unsigned int seed = 1;
+    std::mt19937 gen(seed);
+    std::uniform_int_distribution<> dis(1, 1);
+    int j;
+
+    for (int i = n - 1; i > 0; --i) {
+        dis = std::uniform_int_distribution<>(1, i);
+        j = dis(gen);
+        std::swap(data[i], data[j]);
+    }
+}
+
+void generateUniqueValuesRandomisedInMemory(int64_t *data, int n) {
     // Fisher–Yates shuffle
 
     for (int i = 1; i <= n; ++i) {
@@ -303,6 +327,11 @@ void generateUniformDistributionInMemoryWithSetCardinality(int64_t *data, int n,
             data[i] = upperBound;
         }
         std::cout << "Complete" << std::endl;
+        return;
+    }
+
+    if (cardinality == n) {
+        generateUniqueValuesRandomisedInMemory(data, n);
         return;
     }
 

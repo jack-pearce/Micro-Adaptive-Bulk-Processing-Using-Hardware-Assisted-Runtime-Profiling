@@ -18,4 +18,6 @@ void groupByBenchmarkWithExtraCounters(DataSweep &dataSweep, GroupBy groupByImpl
 void groupByBenchmarkWithExtraCountersDuringRun(const DataFile &dataFile, std::vector<std::string> &benchmarkCounters,
                                                 const std::string &fileNamePrefix);
 
+void tessilRobinMapInitialisationBenchmark(const std::string &fileNamePrefix);
+
 #endif //MABPL_GROUPBYCYCLESBENCHMARK_H

@@ -10,6 +10,7 @@ void generatePartiallySortedInMemory(int *data, int n, int numRepeats, float per
 
 void generateUniformDistributionInMemory(int *data, int n, int upperBound);
 void generateUniqueValuesRandomisedInMemory(int *data, int n);
+void generateUniqueValuesRandomisedInMemory(int64_t *data, int n);
 void generateUniformDistributionInMemoryWithSetCardinality(int *data, int n, int upperBound, int cardinality);
 void generateUniformDistributionInMemoryWithSetCardinality(int64_t *data, int n, int upperBound, int cardinality);
 void generateUniformDistributionInMemoryWithSetCardinalityClustered(int *data, int n, int upperBound, int cardinality, int spreadInCluster);

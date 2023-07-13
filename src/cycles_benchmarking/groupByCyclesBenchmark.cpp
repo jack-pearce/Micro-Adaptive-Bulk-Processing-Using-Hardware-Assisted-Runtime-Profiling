@@ -278,3 +278,45 @@ void groupByBenchmarkWithExtraCountersDuringRun(const DataFile &dataFile,
 
     shutdownPAPI(benchmarkEventSet, benchmarkCounterValues);
 }
+
+void tessilRobinMapInitialisationBenchmark(const std::string &fileNamePrefix) {
+
+    int totalPoints = 30;
+    std::vector<float> points;
+    generateLogDistribution(30, 1, 10*1000*1000, points);
+
+    long_long cycles;
+    std::vector<std::vector<double>> results(totalPoints,
+                                             std::vector<double>(2, 0));
+
+    int n = 75*1000;
+
+    for (auto i = 0; i < totalPoints; ++i) {
+
+        int *inputGroupBy = new int[n];
+        int *inputAggregate = new int[n];
+        generateUniformDistributionInMemoryWithSetCardinality(inputGroupBy, n, 20 * 1000 * 1000, static_cast<int>(points[i]));
+        generateUniformDistributionInMemory(inputAggregate, n, 10);
+
+        results[i][0] = static_cast<int>(points[i]);
+
+        cycles = *Counters::getInstance().readEventSet();
+
+        int initialSize = std::max(static_cast<int>(2.5 * points[i]), 400000);
+        tsl::robin_map<int, int> map(initialSize);
+
+        results[i][1] = static_cast<double>(*Counters::getInstance().readEventSet() - cycles);
+
+        delete []inputGroupBy;
+        delete []inputAggregate;
+
+    }
+
+    std::vector<std::string> headers(2);
+    headers [0] = "Cardinality";
+    headers [1] = "Cycles";
+
+    std::string fileName = fileNamePrefix + "_tsl_robinMap_initialisation_";
+    std::string fullFilePath = outputFilePath + groupByCyclesFolder + fileName + ".csv";
+    writeHeadersAndTableToCSV(headers, results, fullFilePath);
+}

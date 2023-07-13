@@ -420,19 +420,22 @@ DataSweep::DataSweep(int _totalRuns, int _numElements, std::string _sweepName, s
                getSweepName() == "lowerStep50IntDistribution250mValuesSweep") {
         generateLogDistribution(getTotalRuns(), 2, 10000, inputs);
     } else if (getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweepVariableMax" ||
-            getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweepFixedMax" ||
             getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered1"  ||
             getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered1k"  ||
             getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered100k" ||
             getSweepName() == "logUniformInt64Distribution200mValuesCardinalitySweepFixedMax") {
         generateLogDistribution(getTotalRuns(), 1, getNumElements() / 2.0, inputs);
+    } else if (getSweepName() == "logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered10"  ||
+               getSweepName() == "logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered1k"  ||
+               getSweepName() == "logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered100k") {
+        generateLogDistribution(getTotalRuns(), 1, getNumElements() / 2.0, inputs);
     } else if (getSweepName() == "logUniformIntDistribution20mValuesCardinalitySweepVariableMax" ||
                getSweepName() == "logUniformIntDistribution20mValuesCardinalitySweepFixedMax" ||
-               getSweepName() == "logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered10"  ||
-               getSweepName() == "logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered1k"  ||
-               getSweepName() == "logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered100k" ||
                getSweepName() == "logUniformInt64Distribution20mValuesCardinalitySweepFixedMax") {
-        generateLogDistribution(getTotalRuns(), 1, getNumElements() / 2.0, inputs);
+        generateLogDistribution(getTotalRuns(), 1, getNumElements(), inputs);
+    } else if (getSweepName() == "logUniformIntDistribution40mValuesCardinalitySweepFixedMax" ||
+               getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweepFixedMax") {
+        generateLogDistribution(getTotalRuns(), 1, getNumElements(), inputs);
     }else if (getSweepName() == "linearUniformIntDistribution200mValuesCardinalitySweepFixedMaxCrossOverPoint") {
         generateLinearDistribution(getTotalRuns(), 150000, 1200000, inputs);
     } else if (getSweepName() == "logUniformIntDistribution400mValuesCardinalitySweepFixedMax") {
@@ -506,7 +509,7 @@ bool DataSweep::loadNextDataSetIntoMemory(int *data) {
         generateUniformDistributionInMemoryWithSetCardinalityClustered(data, getNumElements(), 20*1000*1000, static_cast<int>(inputs[runsCompleted++]), 100000);
         return true;
     } else if (getSweepName() == "logUniformIntDistribution40mValuesCardinalitySweepFixedMax") {
-        generateUniformDistributionInMemoryWithSetCardinality(data, getNumElements(), 20*1000*1000, static_cast<int>(inputs[runsCompleted++]));
+        generateUniformDistributionInMemoryWithSetCardinality(data, getNumElements(), 40*1000*1000, static_cast<int>(inputs[runsCompleted++]));
         return true;
     } else if (getSweepName() == "linearUniformIntDistribution20mValuesCardinalitySections_100_10m_Max20m") {
         generateUniformDistributionInMemoryWithTwoCardinalitySections(data, getNumElements(), 20*1000*1000, 100, 10*1000*1000, inputs[runsCompleted++]);

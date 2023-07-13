@@ -460,37 +460,8 @@ void allGroupByTests() {
 
 int main() {
 
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                   1, "1-NoClustering");
+    tessilRobinMapInitialisationBenchmark("MapInitialisationCostNoWrites");
 
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered10,
-                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                   1, "1-Clustered10");
-
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered1k,
-                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                   1, "1-Clustered1k");
-
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered100k,
-                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                   1, "1-Clustered100k");
-
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepVariableMax,
-                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                   1, "1-NoClustering-VariableUpperBound");
-
-    groupByCpuCyclesSweepBenchmark64(DataSweeps::logUniformInt64Distribution20mValuesCardinalitySweepFixedMax,
-                                     {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                     1, "1-NoClustering-64bitInts");
-
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution40mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                   1, "1-NoClustering-40mValues");
-
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                   1, "1-NoClustering-200mValues");
 
     return 0;
 }
