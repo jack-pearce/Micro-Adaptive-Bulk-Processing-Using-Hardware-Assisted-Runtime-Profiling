@@ -474,7 +474,7 @@ int main() {
     generateUniformDistributionInMemory(inputAggregate, dataFile.getNumElements(), 10);
 
     MABPL::groupByAdaptiveParallel<MaxAggregation>(dataFile.getNumElements(), inputGroupBy, inputAggregate,
-                                                   cardinality, 2);
+                                                   cardinality, 8);
 
 //    groupByCompareResultsTest(DataFiles::uniformIntDistribution20mValuesTwo10mCardinalitySections_100_10m_Max20m,
 //                              GroupBy::Hash, GroupBy::Adaptive);

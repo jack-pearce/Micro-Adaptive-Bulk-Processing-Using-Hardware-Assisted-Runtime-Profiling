@@ -4,6 +4,8 @@
 
 #include <iostream>
 #include <limits>
+#include <atomic>
+#include <condition_variable>
 #include "tsl/robin_map.h"
 
 #include "../utilities/systemInformation.h"
@@ -363,6 +365,12 @@ struct ThreadArgs {
     T2* inputAggregate;
     int cardinality;
     vectorOfPairs<T1, T2>* result;
+    int threadNumber;
+    std::atomic<int> *numFinishedThreads;
+    std::vector<bool> *threadFinishedAndWaitingFlags;
+    std::condition_variable *cv;
+    ThreadArgs *mergeThread1;
+    ThreadArgs *mergeThread2;
 
     ~ThreadArgs() {
         delete result;
@@ -370,14 +378,25 @@ struct ThreadArgs {
 };
 
 template<template<typename> class Aggregator, typename T1, typename T2>
-void *groupByAdaptiveParallelAux(void *arg) {
+void *groupByAdaptiveParallelPerformMerge(void *arg) {
     auto* args = static_cast<ThreadArgs<Aggregator, T1, T2>*>(arg);
-    int n = args->n;
-    T1 *inputGroupBy = args->inputGroupBy;
-    T2 *inputAggregate = args->inputAggregate;
-    int cardinality = args->cardinality;
+    std::vector<bool> *threadFinishedAndWaitingFlags = args->threadFinishedAndWaitingFlags;
+    std::atomic<int> *numFinishedThreads = args->numFinishedThreads;
+    std::condition_variable *cv = args->cv;
+    ThreadArgs<Aggregator, T1, T2> *mergeThread1 = args->mergeThread1;
+    ThreadArgs<Aggregator, T1, T2> *mergeThread2 = args->mergeThread2;
 
-    constexpr int tuplesPerChunk = 75 * 1000;
+    std::cout << "Merging results " << mergeThread1->threadNumber << " and " << mergeThread2->threadNumber << std::endl;
+
+    (*threadFinishedAndWaitingFlags)[args->threadNumber] = true;
+    (*numFinishedThreads)++;
+    cv->notify_one();
+    return nullptr;
+
+    // What should cardinality be?
+    // If cardinality is greater than a certain value then we should simply sort straight away
+
+/*    constexpr int tuplesPerChunk = 75 * 1000;
     constexpr int tuplesBetweenHashing = 2*1000*1000;
     int maxCardinality = std::min(cardinality, n);
     int initialSize = std::max(static_cast<int>(2.5 * maxCardinality), 400000);
@@ -427,7 +446,134 @@ void *groupByAdaptiveParallelAux(void *arg) {
         elements += map.size();
         groupByAdaptiveAuxSort<Aggregator>(elements, inputGroupBy, inputAggregate,
                                            sectionsToBeSorted,map, mapLargest, *(args->result));
+    }*/
+    return nullptr;
+}
+
+template<template<typename> class Aggregator, typename T1, typename T2>
+vectorOfPairs<T1, T2> groupByAdaptiveParallelMerge(std::condition_variable &cv, std::mutex &cvMutex,
+                                                   std::atomic<int> &numFinishedThreads,
+                                                   std::vector<bool> &threadFinishedAndWaitingFlags, int dop,
+                                                   std::vector<ThreadArgs<Aggregator, T1, T2>*> &threadArgs,
+                                                   pthread_t *threads) {
+    int mergesComplete = 0;
+    std::unique_lock<std::mutex> lock(cvMutex);
+
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+
+    while (mergesComplete < dop - 1) {
+        cv.wait(lock, [&numFinishedThreads] { return numFinishedThreads >= 2; });
+        numFinishedThreads -= 2;
+
+        int thread1Id = -1;
+        int thread2Id = -1;
+
+        for (int i = 0; i < static_cast<int>(threadFinishedAndWaitingFlags.size()); i++) {
+            if (threadFinishedAndWaitingFlags[i]) {
+                threadFinishedAndWaitingFlags[i] = false;
+                if (thread1Id < 0) {
+                    thread1Id = i;
+                } else {
+                    thread2Id = i;
+                    break;
+                }
+            }
+        }
+
+        int threadNumber = dop + mergesComplete;
+        threadArgs[threadNumber] = new ThreadArgs<Aggregator, T1, T2>;
+        threadArgs[threadNumber]->result = new vectorOfPairs<T1, T2>;
+        threadArgs[threadNumber]->threadNumber = threadNumber;
+        threadArgs[threadNumber]->numFinishedThreads = &numFinishedThreads;
+        threadArgs[threadNumber]->threadFinishedAndWaitingFlags = &threadFinishedAndWaitingFlags;
+        threadArgs[threadNumber]->cv = &cv;
+        threadArgs[threadNumber]->mergeThread1 = threadArgs[thread1Id];
+        threadArgs[threadNumber]->mergeThread2 = threadArgs[thread2Id];
+
+        pthread_create(&threads[threadNumber],
+                       &attr,
+                       groupByAdaptiveParallelPerformMerge<Aggregator, T1, T2>,
+                       threadArgs[threadNumber]);
+
+        mergesComplete++;
     }
+
+    pthread_attr_destroy(&attr);
+    cv.wait(lock, [&numFinishedThreads] { return numFinishedThreads == 1; });
+//    return threadArgs.back()->result;
+    vectorOfPairs<T1, T2> result;
+    return result;
+}
+
+template<template<typename> class Aggregator, typename T1, typename T2>
+void *groupByAdaptiveParallelAux(void *arg) {
+    auto* args = static_cast<ThreadArgs<Aggregator, T1, T2>*>(arg);
+    int n = args->n;
+    T1 *inputGroupBy = args->inputGroupBy;
+    T2 *inputAggregate = args->inputAggregate;
+    int cardinality = args->cardinality;
+    std::vector<bool> *threadFinishedAndWaitingFlags = args->threadFinishedAndWaitingFlags;
+    std::atomic<int> *numFinishedThreads = args->numFinishedThreads;
+    std::condition_variable *cv = args->cv;
+
+    constexpr int tuplesPerChunk = 75 * 1000;
+    constexpr int tuplesBetweenHashing = 2*1000*1000;
+    int maxCardinality = std::min(cardinality, n);
+    int initialSize = std::max(static_cast<int>(2.5 * maxCardinality), 400000);
+
+    tsl::robin_map<T1, T2> map(initialSize);
+    typename tsl::robin_map<T1, T2>::iterator it;
+
+    int eventSet = PAPI_NULL;
+    std::vector<std::string> counters = {"PERF_COUNT_HW_CACHE_MISSES"};
+    long_long counterValues[1] = {0};
+    createThreadEventSet(&eventSet, counters);
+
+    int hashTableEntryBytes = sizeof(T1) + sizeof(T2);
+    float tuplesPerLastLevelCacheMissThreshold = (GROUPBY_MACHINE_CONSTANT * bytesPerCacheLine()) / hashTableEntryBytes;
+
+    int index = 0;
+    int tuplesToProcess;
+
+    vectorOfPairs<int, int> sectionsToBeSorted;
+    int elements = 0;
+
+    T1 mapLargest = std::numeric_limits<T1>::lowest();
+
+    while (index < n) {
+
+        tuplesToProcess = std::min(tuplesPerChunk, n - index);
+
+        readThreadEventSet(eventSet, 1, counterValues);
+
+        groupByAdaptiveAuxHash<Aggregator>(tuplesToProcess, inputGroupBy, inputAggregate, map, index, mapLargest);
+
+        readThreadEventSet(eventSet, 1, counterValues);
+
+        if ((static_cast<float>(tuplesToProcess) / counterValues[0]) < tuplesPerLastLevelCacheMissThreshold) {
+            tuplesToProcess = std::min(tuplesBetweenHashing, n - index);
+
+            sectionsToBeSorted.emplace_back(index, index + tuplesToProcess);
+            index += tuplesToProcess;
+            elements += tuplesToProcess;
+        }
+    }
+
+    destroyThreadEventSet(eventSet, counterValues);
+
+    if (sectionsToBeSorted.empty()) {
+        args->result->reserve(map.size());
+        args->result->insert(args->result->end(), map.begin(), map.end());
+    } else {
+        elements += map.size();
+        groupByAdaptiveAuxSort<Aggregator>(elements, inputGroupBy, inputAggregate,
+                                           sectionsToBeSorted,map, mapLargest, *(args->result));
+    }
+    (*threadFinishedAndWaitingFlags)[args->threadNumber] = true;
+    (*numFinishedThreads)++;
+    cv->notify_one();
     return nullptr;
 }
 
@@ -439,12 +585,21 @@ vectorOfPairs<T1, T2> groupByAdaptiveParallel(int n, T1 *inputGroupBy, T2 *input
     Counters::getInstance();
     pthread_t threads[dop];
 
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+
     std::vector<int> elementsPerThread(dop, n / dop);
     elementsPerThread[dop - 1] = n - ((dop - 1) * (n / dop));
     T1 *threadInputGroupBy = inputGroupBy;
     T2 *threadInputAggregate = inputAggregate;
 
-    std::vector<ThreadArgs<Aggregator, T1, T2>*> threadArgs(dop);
+    std::atomic<int> numFinishedThreads = 0;
+    std::vector<bool> threadFinishedAndWaitingFlags((dop * 2) - 1, false);
+    std::condition_variable cv;
+    std::mutex cvMutex;
+
+    std::vector<ThreadArgs<Aggregator, T1, T2>*> threadArgs((dop * 2) - 1);
 
     for (int i = 0; i < dop; ++i) {
         threadArgs[i] = new ThreadArgs<Aggregator, T1, T2>;
@@ -453,9 +608,13 @@ vectorOfPairs<T1, T2> groupByAdaptiveParallel(int n, T1 *inputGroupBy, T2 *input
         threadArgs[i]->inputAggregate = threadInputAggregate;
         threadArgs[i]->cardinality = cardinality;
         threadArgs[i]->result = new vectorOfPairs<T1, T2>;
+        threadArgs[i]->threadNumber = i;
+        threadArgs[i]->numFinishedThreads = &numFinishedThreads;
+        threadArgs[i]->threadFinishedAndWaitingFlags = &threadFinishedAndWaitingFlags;
+        threadArgs[i]->cv = &cv;
 
         pthread_create(&threads[i],
-                                         nullptr,
+                                         &attr,
                                          groupByAdaptiveParallelAux<Aggregator, T1, T2>,
                                          threadArgs[i]);
 
@@ -463,11 +622,21 @@ vectorOfPairs<T1, T2> groupByAdaptiveParallel(int n, T1 *inputGroupBy, T2 *input
         threadInputAggregate += elementsPerThread[i];
     }
 
-    for (int i = 0; i < dop; ++i) {
+    pthread_attr_destroy(&attr);
+
+    groupByAdaptiveParallelMerge<Aggregator, T1, T2>(cv, cvMutex, numFinishedThreads,
+                                                     threadFinishedAndWaitingFlags, dop, threadArgs, threads);
+
+/*    for (int i = 0; i < dop; ++i) {
         void* returnValue;
         pthread_join(threads[i], &returnValue);
         std::cout << "Result size: " << threadArgs[i]->result->size() << std::endl;
         delete threadArgs[i];
+    }*/
+
+    std::cout << "Finished threads: " << numFinishedThreads << std::endl;
+    for (auto flag : threadFinishedAndWaitingFlags) {
+        std::cout << "Thread completion flag: " << flag << std::endl;
     }
 
     vectorOfPairs<T1, T2> result;
