@@ -12,9 +12,12 @@ enum GroupBy {
     Hash,
     Sort,
     Adaptive,
+    AdaptiveParallel
 };
 
 std::string getGroupByName(GroupBy groupByImplementation);
+
+void* groupByAdaptiveParallelAuxTest(void* threadId);
 
 template<typename T1, typename T2>
 using vectorOfPairs = std::vector<std::pair<T1, T2>>;
@@ -50,7 +53,11 @@ template<template<typename> class Aggregator, typename T1, typename T2>
 vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregate, int cardinality);
 
 template<template<typename> class Aggregator, typename T1, typename T2>
-vectorOfPairs<T1, T2> runGroupByFunction(GroupBy groupByImplementation, int n, T1 *inputGroupBy, T2 *inputAggregate, int cardinality);
+vectorOfPairs<T1, T2> groupByAdaptiveParallel(int n, T1 *inputGroupBy, T2 *inputAggregate, int cardinality, int dop);
+
+template<template<typename> class Aggregator, typename T1, typename T2>
+vectorOfPairs<T1, T2> runGroupByFunction(GroupBy groupByImplementation, int n, T1 *inputGroupBy, T2 *inputAggregate,
+                                         int cardinality, int dop = 2);
 
 }
 

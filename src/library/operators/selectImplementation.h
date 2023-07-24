@@ -42,13 +42,13 @@ inline int runSelectIndexesChunk(SelectIndexesChoice selectIndexesChoice,
                                  int &consecutivePredications) {
     int selected;
     if (selectIndexesChoice == SelectIndexesChoice::IndexesBranch) {
-        Counters::getInstance().readEventSet();
+        Counters::getInstance().readSharedEventSet();
         selected = selectIndexesBranch(tuplesToProcess, inputData, selection, threshold);
-        Counters::getInstance().readEventSet();
+        Counters::getInstance().readSharedEventSet();
     } else {
-        Counters::getInstance().readEventSet();
+        Counters::getInstance().readSharedEventSet();
         selected = selectIndexesPredication(tuplesToProcess, inputData, selection, threshold);
-        Counters::getInstance().readEventSet();
+        Counters::getInstance().readSharedEventSet();
     }
     n -= tuplesToProcess;
     inputData += tuplesToProcess;
@@ -114,7 +114,7 @@ int selectIndexesAdaptive(int n, const T *inputFilter, int *selection, T thresho
     SelectIndexesChoice selectIndexesChoice = SelectIndexesChoice::IndexesPredication;
 
     std::vector<std::string> counters = {"PERF_COUNT_HW_BRANCH_MISSES"};
-    long_long *counterValues = Counters::getInstance().getEvents(counters);
+    long_long *counterValues = Counters::getInstance().getSharedEventSetEvents(counters);
 
     while (n > 0) {
         if (__builtin_expect(consecutivePredications == maxConsecutivePredications, false)) {
@@ -263,13 +263,13 @@ inline int runSelectValuesChunk(SelectValuesChoice selectValuesChoice,
                                 int &consecutivePredications) {
     int selected;
     if (selectValuesChoice == SelectValuesChoice::ValuesBranch) {
-        Counters::getInstance().readEventSet();
+        Counters::getInstance().readSharedEventSet();
         selected = selectValuesBranch(tuplesToProcess, inputData, inputFilter, selection, threshold);
-        Counters::getInstance().readEventSet();
+        Counters::getInstance().readSharedEventSet();
     } else {
-        Counters::getInstance().readEventSet();
+        Counters::getInstance().readSharedEventSet();
         selected = selectValuesVectorized(tuplesToProcess, inputData, inputFilter, selection, threshold);
-        Counters::getInstance().readEventSet();
+        Counters::getInstance().readSharedEventSet();
     }
     n -= tuplesToProcess;
     inputData += tuplesToProcess;
@@ -320,7 +320,7 @@ int selectValuesAdaptive(int n, const T2 *inputData, const T1 *inputFilter, T2 *
     SelectValuesChoice selectValuesChoice = SelectValuesChoice::ValuesBranch;
 
     std::vector<std::string> counters = {"PERF_COUNT_HW_BRANCH_MISSES"};
-    long_long *counterValues = Counters::getInstance().getEvents(counters);
+    long_long *counterValues = Counters::getInstance().getSharedEventSetEvents(counters);
 
     while (n > 0) {
 

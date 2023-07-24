@@ -44,14 +44,14 @@ void groupByCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<Grou
                 dataSweep.loadNextDataSetIntoMemory(inputGroupBy);
                 generateUniformDistributionInMemory(inputAggregate, dataSweep.getNumElements(), 10);
 
-                cycles = *Counters::getInstance().readEventSet();
+                cycles = *Counters::getInstance().readSharedEventSet();
 
                 auto result = MABPL::runGroupByFunction<MaxAggregation>(groupByImplementations[j],
                                                                         dataSweep.getNumElements(), inputGroupBy,
                                                                         inputAggregate, cardinality);
 
                 results[k][1 + (i * groupByImplementations.size()) + j] =
-                        static_cast<double>(*Counters::getInstance().readEventSet() - cycles);
+                        static_cast<double>(*Counters::getInstance().readSharedEventSet() - cycles);
 
                 delete[] inputGroupBy;
                 delete []inputAggregate;
@@ -106,14 +106,14 @@ void groupByCpuCyclesSweepBenchmark64(DataSweep &dataSweep, const std::vector<Gr
                 dataSweep.loadNextDataSetIntoMemory(inputGroupBy);
                 generateUniformDistributionInMemory(inputAggregate, dataSweep.getNumElements(), 10);
 
-                cycles = *Counters::getInstance().readEventSet();
+                cycles = *Counters::getInstance().readSharedEventSet();
 
                 auto result = MABPL::runGroupByFunction<MaxAggregation>(groupByImplementations[j],
                                                                         dataSweep.getNumElements(), inputGroupBy,
                                                                         inputAggregate, cardinality);
 
                 results[k][1 + (i * groupByImplementations.size()) + j] =
-                        static_cast<double>(*Counters::getInstance().readEventSet() - cycles);
+                        static_cast<double>(*Counters::getInstance().readSharedEventSet() - cycles);
 
                 delete[] inputGroupBy;
                 delete []inputAggregate;
@@ -293,12 +293,12 @@ void tessilRobinMapInitialisationBenchmark(const std::string &fileNamePrefix) {
 
         results[i][0] = static_cast<int>(points[i]);
 
-        cycles = *Counters::getInstance().readEventSet();
+        cycles = *Counters::getInstance().readSharedEventSet();
 
         int initialSize = std::max(static_cast<int>(2.5 * points[i]), 400000);
         tsl::robin_map<int, int> map(initialSize);
 
-        results[i][1] = static_cast<double>(*Counters::getInstance().readEventSet() - cycles);
+        results[i][1] = static_cast<double>(*Counters::getInstance().readSharedEventSet() - cycles);
 
     }
 

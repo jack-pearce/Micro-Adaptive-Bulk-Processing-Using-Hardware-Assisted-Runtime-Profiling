@@ -5,11 +5,12 @@
 #include "time_benchmarking/selectTimeBenchmark.h"
 #include "time_benchmarking/timeBenchmarkHelpers.h"
 #include "data_generation/dataGenerators.h"
-#include "utilities//dataHelpers.h"
+#include "utilities/dataHelpers.h"
 #include "cycles_benchmarking//selectCyclesBenchmark.h"
 #include "cycles_benchmarking/groupByCyclesBenchmark.h"
 #include "data_generation/dataFiles.h"
 #include "library/mabpl.h"
+#include "library/utilities/papi.h"
 
 using MABPL::Select;
 using MABPL::GroupBy;
@@ -409,37 +410,37 @@ void groupByBenchmarkWithExtraCountersDuringRunConfigurations(const DataFile &da
 //}
 
 void allGroupByTests() {
-//    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
-//                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-//                                   10, "1-NoClustering");
-//
-//    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered10,
-//                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-//                                   10, "1-Clustered10");
-//
-//    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered1k,
-//                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-//                                   10, "1-Clustered1k");
-//
-//    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered100k,
-//                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-//                                   10, "1-Clustered100k");
-//
-//    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepVariableMax,
-//                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-//                                   10, "1-NoClustering-VariableUpperBound");
-//
-//    groupByCpuCyclesSweepBenchmark64(DataSweeps::logUniformInt64Distribution20mValuesCardinalitySweepFixedMax,
-//                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-//                                   10, "1-NoClustering-64bitInts");
-//
-//    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution40mValuesCardinalitySweepFixedMax,
-//                                     {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-//                                     10, "1-NoClustering-40mValues");
-//
-//    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-//                                     {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-//                                     10, "1-NoClustering-200mValues");
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
+                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                   10, "1-NoClustering");
+
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered10,
+                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                   10, "1-Clustered10");
+
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered1k,
+                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                   10, "1-Clustered1k");
+
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered100k,
+                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                   10, "1-Clustered100k");
+
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepVariableMax,
+                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                   10, "1-NoClustering-VariableUpperBound");
+
+    groupByCpuCyclesSweepBenchmark64(DataSweeps::logUniformInt64Distribution20mValuesCardinalitySweepFixedMax,
+                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                   10, "1-NoClustering-64bitInts");
+
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution40mValuesCardinalitySweepFixedMax,
+                                     {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                     10, "1-NoClustering-40mValues");
+
+    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                     {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                     10, "1-NoClustering-200mValues");
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::linearUniformIntDistribution20mValuesCardinalitySections_100_3m_Max20m,
                                      {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
@@ -462,7 +463,21 @@ void allGroupByTests() {
 
 int main() {
 
-    allGroupByTests();
+    DataFile dataFile = DataFiles::uniformIntDistribution20mValuesCardinality10mMax20m;
+
+    auto inputGroupBy = new int[dataFile.getNumElements()];
+    auto inputAggregate = new int[dataFile.getNumElements()];
+
+    int cardinality = 10 * 1000 * 1000;
+
+    dataFile.loadDataIntoMemory(inputGroupBy);
+    generateUniformDistributionInMemory(inputAggregate, dataFile.getNumElements(), 10);
+
+    MABPL::groupByAdaptiveParallel<MaxAggregation>(dataFile.getNumElements(), inputGroupBy, inputAggregate,
+                                                   cardinality, 2);
+
+//    groupByCompareResultsTest(DataFiles::uniformIntDistribution20mValuesTwo10mCardinalitySections_100_10m_Max20m,
+//                              GroupBy::Hash, GroupBy::Adaptive);
 
     return 0;
 }
