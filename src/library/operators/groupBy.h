@@ -17,7 +17,6 @@ enum GroupBy {
 
 std::string getGroupByName(GroupBy groupByImplementation);
 
-void* groupByAdaptiveParallelAuxTest(void* threadId);
 
 template<typename T1, typename T2>
 using vectorOfPairs = std::vector<std::pair<T1, T2>>;

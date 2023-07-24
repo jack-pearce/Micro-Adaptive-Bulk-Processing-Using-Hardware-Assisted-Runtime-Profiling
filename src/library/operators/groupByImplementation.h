@@ -365,8 +365,10 @@ vectorOfPairs<T1, T2> groupByAdaptiveParallelAux(int n, T1 *inputGroupBy, T2 *in
     tsl::robin_map<T1, T2> map(initialSize);
     typename tsl::robin_map<T1, T2>::iterator it;
 
+    int eventSet = PAPI_NULL;
     std::vector<std::string> counters = {"PERF_COUNT_HW_CACHE_MISSES"};
-    long_long *counterValues = Counters::getInstance().getSharedEventSetEvents(counters);
+    long_long counterValues[1] = {0};
+    createThreadEventSet(&eventSet, counters);
 
     int hashTableEntryBytes = sizeof(T1) + sizeof(T2);
     float tuplesPerLastLevelCacheMissThreshold = (GROUPBY_MACHINE_CONSTANT * bytesPerCacheLine()) / hashTableEntryBytes;
@@ -384,11 +386,11 @@ vectorOfPairs<T1, T2> groupByAdaptiveParallelAux(int n, T1 *inputGroupBy, T2 *in
 
         tuplesToProcess = std::min(tuplesPerChunk, n - index);
 
-        Counters::getInstance().readSharedEventSet();
+        readThreadEventSet(eventSet, 1, counterValues);
 
         groupByAdaptiveAuxHash<Aggregator>(tuplesToProcess, inputGroupBy, inputAggregate, map, index, mapLargest);
 
-        Counters::getInstance().readSharedEventSet();
+        readThreadEventSet(eventSet, 1, counterValues);
 
         if ((static_cast<float>(tuplesToProcess) / counterValues[0]) < tuplesPerLastLevelCacheMissThreshold) {
             tuplesToProcess = std::min(tuplesBetweenHashing, n - index);
@@ -407,9 +409,20 @@ vectorOfPairs<T1, T2> groupByAdaptiveParallelAux(int n, T1 *inputGroupBy, T2 *in
                                               map, mapLargest, result);
 }
 
-struct GroupByArgs {
-    int threadId;
-};
+template<template<typename> class Aggregator, typename T1, typename T2>
+void* groupByAdaptiveParallelAuxCaller(void* arg) {
+    auto* args = static_cast<std::tuple<int, T1*, T2*, int>*>(arg);
+
+    int n = std::get<0>(*args);
+    T1* inputGroupBy = std::get<1>(*args);
+    T2* inputAggregate = std::get<2>(*args);
+    int cardinality = std::get<3>(*args);
+
+    vectorOfPairs<T1, T2> result = groupByAdaptiveParallelAux<Aggregator>(n, inputGroupBy, inputAggregate, cardinality);
+
+    std::cout << "Result length: " << result.size() << std::endl;
+    return nullptr;
+}
 
 template<template<typename> class Aggregator, typename T1, typename T2>
 vectorOfPairs<T1, T2> groupByAdaptiveParallel(int n, T1 *inputGroupBy, T2 *inputAggregate, int cardinality, int dop) {
@@ -417,18 +430,24 @@ vectorOfPairs<T1, T2> groupByAdaptiveParallel(int n, T1 *inputGroupBy, T2 *input
     static_assert(std::is_arithmetic<T2>::value, "Payload column must be an numeric type");
 
     Counters::getInstance();
-
     pthread_t threads[dop];
-    GroupByArgs args[dop];
+
+    std::vector<int> elementsPerThread(dop, n / dop);
+    elementsPerThread[dop - 1] = n - ((dop - 1) * (n / dop));
+    T1 *threadInputGroupBy = inputGroupBy;
+    T2 *threadInputAggregate = inputAggregate;
 
     for (int i = 0; i < dop; ++i) {
-        args[i].threadId = i;
+        std::tuple<int, T1*, T2*, int> args{elementsPerThread[i], threadInputGroupBy,
+                                            threadInputAggregate, cardinality};
 
-        int ret = pthread_create(&threads[i], nullptr, groupByAdaptiveParallelAuxTest, &args[i]);
-        if (__builtin_expect(ret != 0, false)) {
-            std::cerr << "Error creating thread " << i << std::endl;
-            exit(1);
-        }
+        pthread_create(&threads[i],
+                                         nullptr,
+                                         groupByAdaptiveParallelAuxCaller<Aggregator, T1, T2>,
+                                         &args);
+
+        threadInputGroupBy += elementsPerThread[i];
+        threadInputAggregate += elementsPerThread[i];
     }
 
     for (int i = 0; i < dop; ++i) {
