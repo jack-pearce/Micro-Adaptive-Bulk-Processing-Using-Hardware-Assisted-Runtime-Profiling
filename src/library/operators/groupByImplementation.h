@@ -357,10 +357,30 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
 }
 
 template<template<typename> class Aggregator, typename T1, typename T2>
-vectorOfPairs<T1, T2> groupByAdaptiveParallelAux(int n, T1 *inputGroupBy, T2 *inputAggregate, int cardinality) {
+struct ThreadArgs {
+    int n;
+    T1* inputGroupBy;
+    T2* inputAggregate;
+    int cardinality;
+    vectorOfPairs<T1, T2>* result;
+
+    ~ThreadArgs() {
+        delete result;
+    }
+};
+
+template<template<typename> class Aggregator, typename T1, typename T2>
+void *groupByAdaptiveParallelAux(void *arg) {
+    auto* args = static_cast<ThreadArgs<Aggregator, T1, T2>*>(arg);
+    int n = args->n;
+    T1 *inputGroupBy = args->inputGroupBy;
+    T2 *inputAggregate = args->inputAggregate;
+    int cardinality = args->cardinality;
+
     constexpr int tuplesPerChunk = 75 * 1000;
     constexpr int tuplesBetweenHashing = 2*1000*1000;
-    int initialSize = std::max(static_cast<int>(2.5 * cardinality), 400000);
+    int maxCardinality = std::min(cardinality, n);
+    int initialSize = std::max(static_cast<int>(2.5 * maxCardinality), 400000);
 
     tsl::robin_map<T1, T2> map(initialSize);
     typename tsl::robin_map<T1, T2>::iterator it;
@@ -379,7 +399,6 @@ vectorOfPairs<T1, T2> groupByAdaptiveParallelAux(int n, T1 *inputGroupBy, T2 *in
     vectorOfPairs<int, int> sectionsToBeSorted;
     int elements = 0;
 
-    vectorOfPairs<T1, T2> result;
     T1 mapLargest = std::numeric_limits<T1>::lowest();
 
     while (index < n) {
@@ -402,25 +421,13 @@ vectorOfPairs<T1, T2> groupByAdaptiveParallelAux(int n, T1 *inputGroupBy, T2 *in
     }
 
     if (sectionsToBeSorted.empty()) {
-        return {map.begin(), map.end()};
+        args->result->reserve(map.size());
+        args->result->insert(args->result->end(), map.begin(), map.end());
+    } else {
+        elements += map.size();
+        groupByAdaptiveAuxSort<Aggregator>(elements, inputGroupBy, inputAggregate,
+                                           sectionsToBeSorted,map, mapLargest, *(args->result));
     }
-    elements += map.size();
-    return groupByAdaptiveAuxSort<Aggregator>(elements, inputGroupBy, inputAggregate, sectionsToBeSorted,
-                                              map, mapLargest, result);
-}
-
-template<template<typename> class Aggregator, typename T1, typename T2>
-void* groupByAdaptiveParallelAuxCaller(void* arg) {
-    auto* args = static_cast<std::tuple<int, T1*, T2*, int>*>(arg);
-
-    int n = std::get<0>(*args);
-    T1* inputGroupBy = std::get<1>(*args);
-    T2* inputAggregate = std::get<2>(*args);
-    int cardinality = std::get<3>(*args);
-
-    vectorOfPairs<T1, T2> result = groupByAdaptiveParallelAux<Aggregator>(n, inputGroupBy, inputAggregate, cardinality);
-
-    std::cout << "Result length: " << result.size() << std::endl;
     return nullptr;
 }
 
@@ -437,14 +444,20 @@ vectorOfPairs<T1, T2> groupByAdaptiveParallel(int n, T1 *inputGroupBy, T2 *input
     T1 *threadInputGroupBy = inputGroupBy;
     T2 *threadInputAggregate = inputAggregate;
 
+    std::vector<ThreadArgs<Aggregator, T1, T2>*> threadArgs(dop);
+
     for (int i = 0; i < dop; ++i) {
-        std::tuple<int, T1*, T2*, int> args{elementsPerThread[i], threadInputGroupBy,
-                                            threadInputAggregate, cardinality};
+        threadArgs[i] = new ThreadArgs<Aggregator, T1, T2>;
+        threadArgs[i]->n = elementsPerThread[i];
+        threadArgs[i]->inputGroupBy = threadInputGroupBy;
+        threadArgs[i]->inputAggregate = threadInputAggregate;
+        threadArgs[i]->cardinality = cardinality;
+        threadArgs[i]->result = new vectorOfPairs<T1, T2>;
 
         pthread_create(&threads[i],
                                          nullptr,
-                                         groupByAdaptiveParallelAuxCaller<Aggregator, T1, T2>,
-                                         &args);
+                                         groupByAdaptiveParallelAux<Aggregator, T1, T2>,
+                                         threadArgs[i]);
 
         threadInputGroupBy += elementsPerThread[i];
         threadInputAggregate += elementsPerThread[i];
@@ -453,9 +466,9 @@ vectorOfPairs<T1, T2> groupByAdaptiveParallel(int n, T1 *inputGroupBy, T2 *input
     for (int i = 0; i < dop; ++i) {
         void* returnValue;
         pthread_join(threads[i], &returnValue);
+        std::cout << "Result size: " << threadArgs[i]->result->size() << std::endl;
+        delete threadArgs[i];
     }
-
-    std::cout << "All threads have completed." << std::endl;
 
     vectorOfPairs<T1, T2> result;
     return result;

@@ -463,7 +463,7 @@ void allGroupByTests() {
 
 int main() {
 
-    DataFile dataFile = DataFiles::uniformIntDistribution20mValuesCardinality10mMax20m;
+    DataFile dataFile = DataFiles::uniformIntDistribution20mValuesTwo10mCardinalitySections_100_10m_Max20m;
 
     auto inputGroupBy = new int[dataFile.getNumElements()];
     auto inputAggregate = new int[dataFile.getNumElements()];
