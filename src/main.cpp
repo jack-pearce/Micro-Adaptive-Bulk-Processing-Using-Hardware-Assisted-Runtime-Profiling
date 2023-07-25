@@ -10,12 +10,11 @@
 #include "cycles_benchmarking/groupByCyclesBenchmark.h"
 #include "data_generation/dataFiles.h"
 #include "library/mabpl.h"
-#include "library/utilities/papi.h"
 
 using MABPL::Select;
 using MABPL::GroupBy;
 
-using MABPL::MaxAggregation;
+using MABPL::MinAggregation;
 using MABPL::MaxAggregation;
 using MABPL::SumAggregation;
 using MABPL::CountAggregation;
@@ -463,8 +462,7 @@ void allGroupByTests() {
 
 int main() {
 
-    long_long cycles;
-
+/*    long_long cycles;
     cycles = *MABPL::Counters::getInstance().readSharedEventSet();
 
     DataFile dataFile = DataFiles::uniformIntDistribution20mValuesCardinality10mMax20m;
@@ -481,14 +479,23 @@ int main() {
                                                                                             inputGroupBy, inputAggregate,
                                                                                             cardinality, 4);
 
-    std::cout << "Cycles: " << static_cast<int>(*MABPL::Counters::getInstance().readSharedEventSet() - cycles) << std::endl;
+    delete[] inputGroupBy;
+    delete []inputAggregate;
+
+    std::cout << "Cycles: " << static_cast<int>(*MABPL::Counters::getInstance().readSharedEventSet() - cycles) << std::endl;*/
+
 
 //    groupByCompareResultsTest(DataFiles::uniformIntDistribution250mValuesMax1000000,
 //                              GroupBy::Hash, GroupBy::AdaptiveParallel);
 
-//    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
-//                                   {GroupBy::Adaptive, GroupBy::AdaptiveParallel},
-//                                   1, "ParallelTest");
+//    groupByWallTimeSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+//                                   {GroupBy::Hash},
+//                                   1, "WallTimeTest");
 
-    return 0;
+    groupByWallTimeDopSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                     1, "WallTime200m", {4});
+
+//    groupByWallTimeDopSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+//                                     1, "WallTimeTest");
+
 }

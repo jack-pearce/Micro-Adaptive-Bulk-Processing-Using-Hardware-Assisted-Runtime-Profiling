@@ -56,7 +56,7 @@ vectorOfPairs<T1, T2> groupByAdaptiveParallel(int n, T1 *inputGroupBy, T2 *input
 
 template<template<typename> class Aggregator, typename T1, typename T2>
 vectorOfPairs<T1, T2> runGroupByFunction(GroupBy groupByImplementation, int n, T1 *inputGroupBy, T2 *inputAggregate,
-                                         int cardinality, int dop = 4);
+                                         int cardinality, int dop = 2);
 
 }
 

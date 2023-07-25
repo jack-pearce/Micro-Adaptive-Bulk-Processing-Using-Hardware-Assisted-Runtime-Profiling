@@ -10,6 +10,8 @@ bool arrayIsSimd256Aligned(const int *array);
 long l3cacheSize();
 long bytesPerCacheLine();
 
+int maxDop();
+
 }
 
 #endif //MABPL_SYSTEMINFORMATION_H

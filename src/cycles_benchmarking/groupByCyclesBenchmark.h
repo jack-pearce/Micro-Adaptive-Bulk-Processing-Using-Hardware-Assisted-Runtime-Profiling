@@ -9,6 +9,12 @@ using MABPL::GroupBy;
 void groupByCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<GroupBy> &groupByImplementations,
                                      int iterations, const std::string &fileNamePrefix);
 
+void groupByWallTimeSweepBenchmark(DataSweep &dataSweep, const std::vector<GroupBy> &groupByImplementations,
+                                   int iterations, const std::string &fileNamePrefix);
+
+void groupByWallTimeDopSweepBenchmark(DataSweep &dataSweep, int iterations, const std::string &fileNamePrefix,
+                                      std::vector<int> dop);
+
 void groupByCpuCyclesSweepBenchmark64(DataSweep &dataSweep, const std::vector<GroupBy> &groupByImplementations,
                                       int iterations, const std::string &fileNamePrefix);
 

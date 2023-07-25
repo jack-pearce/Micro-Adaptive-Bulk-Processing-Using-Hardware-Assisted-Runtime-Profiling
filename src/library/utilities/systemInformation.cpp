@@ -1,6 +1,7 @@
 #include <immintrin.h>
 #include <iostream>
 #include <unistd.h>
+#include <thread>
 
 #include "systemInformation.h"
 
@@ -22,6 +23,10 @@ long l3cacheSize() {
 
 long bytesPerCacheLine() {
     return sysconf(_SC_LEVEL1_DCACHE_LINESIZE);
+}
+
+int maxDop() {
+    return static_cast<int>(std::thread::hardware_concurrency());
 }
 
 }

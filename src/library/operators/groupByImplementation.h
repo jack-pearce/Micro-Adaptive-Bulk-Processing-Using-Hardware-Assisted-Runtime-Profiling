@@ -399,6 +399,7 @@ void *groupByAdaptiveParallelPerformMerge(void *arg) {
     std::condition_variable *cv = args->cv;
     ThreadArgs<Aggregator, T1, T2> *mergeThread1 = args->mergeThread1;
     ThreadArgs<Aggregator, T1, T2> *mergeThread2 = args->mergeThread2;
+
     vectorOfPairs<T1,T2> *inputResult1 = mergeThread1->result;
     vectorOfPairs<T1,T2> *inputResult2 = mergeThread2->result;
     vectorOfPairs<T1,T2> *result = args->result;
@@ -420,18 +421,14 @@ void *groupByAdaptiveParallelPerformMerge(void *arg) {
             if (!result->empty() && result->back().first == (*inputResult1)[l].first) {
                 result->back().second = Aggregator<T2>()(result->back().second, (*inputResult1)[l].second, false);
             } else {
-//                result->emplace_back((*inputResult1)[l].first, (*inputResult1)[l].second);
-                result->insert(result->end(), std::make_move_iterator(inputResult1->begin() + l),
-                              std::make_move_iterator(inputResult1->begin() + l + 1));
+                result->emplace_back((*inputResult1)[l].first, (*inputResult1)[l].second);
             }
             l += 1;
         } else {
             if (!result->empty() && result->back().first == (*inputResult2)[r].first) {
                 result->back().second = Aggregator<T2>()(result->back().second, (*inputResult2)[r].second, false);
             } else {
-//                result->emplace_back((*inputResult2)[r].first, (*inputResult2)[r].second);
-                result->insert(result->end(), std::make_move_iterator(inputResult2->begin() + r),
-                              std::make_move_iterator(inputResult2->begin() + r + 1));
+                result->emplace_back((*inputResult2)[r].first, (*inputResult2)[r].second);
             }
             r += 1;
         }
@@ -595,6 +592,7 @@ template<template<typename> class Aggregator, typename T1, typename T2>
 vectorOfPairs<T1, T2> groupByAdaptiveParallel(int n, T1 *inputGroupBy, T2 *inputAggregate, int cardinality, int dop) {
     static_assert(std::is_integral<T1>::value, "GroupBy column must be an integer type");
     static_assert(std::is_arithmetic<T2>::value, "Payload column must be an numeric type");
+    assert(1 < dop && dop <= maxDop());
 
     Counters::getInstance();
     pthread_t threads[dop];
@@ -652,7 +650,6 @@ vectorOfPairs<T1, T2> runGroupByFunction(GroupBy groupByImplementation, int n, T
         case GroupBy::Adaptive:
             return groupByAdaptive<Aggregator>(n, inputGroupBy, inputAggregate, cardinality);
         case GroupBy::AdaptiveParallel:
-            assert(dop > 1);
             return groupByAdaptiveParallel<Aggregator>(n, inputGroupBy, inputAggregate, cardinality, dop);
         default:
             std::cout << "Invalid selection of 'GroupBy' implementation!" << std::endl;
