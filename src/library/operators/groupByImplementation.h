@@ -404,8 +404,6 @@ void *groupByAdaptiveParallelPerformMerge(void *arg) {
     vectorOfPairs<T1,T2> *inputResult2 = mergeThread2->result;
     vectorOfPairs<T1,T2> *result = args->result;
 
-//    std::cout << "Merging results " << mergeThread1->threadNumber << " and " << mergeThread2->threadNumber << std::endl;
-
     // Change sorting algo to radix sort?
     if (!mergeThread1->resultSorted) {
         sortVectorOfPairs(*inputResult1);
@@ -500,6 +498,7 @@ vectorOfPairs<T1, T2> groupByAdaptiveParallelMerge(std::condition_variable &cv, 
         threadArgs[threadNumber]->cv = &cv;
         threadArgs[threadNumber]->mergeThread1 = threadArgs[thread1Id];
         threadArgs[threadNumber]->mergeThread2 = threadArgs[thread2Id];
+        threadArgs[threadNumber]->resultSorted = true;
 
         pthread_create(&threads[threadNumber],
                        &attr,

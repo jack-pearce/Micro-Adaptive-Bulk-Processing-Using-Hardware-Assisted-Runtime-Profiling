@@ -462,40 +462,15 @@ void allGroupByTests() {
 
 int main() {
 
-/*    long_long cycles;
-    cycles = *MABPL::Counters::getInstance().readSharedEventSet();
 
-    DataFile dataFile = DataFiles::uniformIntDistribution20mValuesCardinality10mMax20m;
-
-    auto inputGroupBy = new int[dataFile.getNumElements()];
-    auto inputAggregate = new int[dataFile.getNumElements()];
-
-    int cardinality = 10 * 1000 * 1000;
-
-    dataFile.loadDataIntoMemory(inputGroupBy);
-    generateUniformDistributionInMemory(inputAggregate, dataFile.getNumElements(), 10);
-
-    MABPL::vectorOfPairs<int, int> result =  MABPL::groupByAdaptiveParallel<MaxAggregation>(dataFile.getNumElements(),
-                                                                                            inputGroupBy, inputAggregate,
-                                                                                            cardinality, 4);
-
-    delete[] inputGroupBy;
-    delete []inputAggregate;
-
-    std::cout << "Cycles: " << static_cast<int>(*MABPL::Counters::getInstance().readSharedEventSet() - cycles) << std::endl;*/
-
-
-//    groupByCompareResultsTest(DataFiles::uniformIntDistribution250mValuesMax1000000,
-//                              GroupBy::Hash, GroupBy::AdaptiveParallel);
+    groupByCompareResultsTest(DataFiles::uniformIntDistribution20mValuesTwo10mCardinalitySections_100_10m_Max20m,
+                              GroupBy::Hash, GroupBy::AdaptiveParallel);
 
 //    groupByWallTimeSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
 //                                   {GroupBy::Hash},
 //                                   1, "WallTimeTest");
 
-    groupByWallTimeDopSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                     1, "WallTime200m", {4});
-
 //    groupByWallTimeDopSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-//                                     1, "WallTimeTest");
+//                                     1, "WallTime200m", {4});
 
 }
