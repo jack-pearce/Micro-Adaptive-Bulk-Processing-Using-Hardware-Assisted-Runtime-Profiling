@@ -358,7 +358,7 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
                                               map, mapLargest, result);
 }
 
-template<template<typename> class Aggregator, typename T1, typename T2>
+template<typename T1, typename T2>
 struct ThreadArgs {
     int n;
     T1* inputGroupBy;
@@ -393,12 +393,12 @@ void sortVectorOfPairs(MABPL::vectorOfPairs<T1, T2> &vectorOfPairs) {;
 
 template<template<typename> class Aggregator, typename T1, typename T2>
 void *groupByAdaptiveParallelPerformMerge(void *arg) {
-    auto* args = static_cast<ThreadArgs<Aggregator, T1, T2>*>(arg);
+    auto* args = static_cast<ThreadArgs<T1, T2>*>(arg);
     std::vector<bool> *threadFinishedAndWaitingFlags = args->threadFinishedAndWaitingFlags;
     std::atomic<int> *numFinishedThreads = args->numFinishedThreads;
     std::condition_variable *cv = args->cv;
-    ThreadArgs<Aggregator, T1, T2> *mergeThread1 = args->mergeThread1;
-    ThreadArgs<Aggregator, T1, T2> *mergeThread2 = args->mergeThread2;
+    ThreadArgs<T1, T2> *mergeThread1 = args->mergeThread1;
+    ThreadArgs<T1, T2> *mergeThread2 = args->mergeThread2;
 
     vectorOfPairs<T1,T2> *inputResult1 = mergeThread1->result;
     vectorOfPairs<T1,T2> *inputResult2 = mergeThread2->result;
@@ -461,7 +461,7 @@ template<template<typename> class Aggregator, typename T1, typename T2>
 vectorOfPairs<T1, T2> groupByAdaptiveParallelMerge(std::condition_variable &cv, std::mutex &cvMutex,
                                                    std::atomic<int> &numFinishedThreads,
                                                    std::vector<bool> &threadFinishedAndWaitingFlags, int dop,
-                                                   std::vector<ThreadArgs<Aggregator, T1, T2>*> &threadArgs,
+                                                   std::vector<ThreadArgs<T1, T2>*> &threadArgs,
                                                    pthread_t *threads) {
     int mergesComplete = 0;
     std::unique_lock<std::mutex> lock(cvMutex);
@@ -490,7 +490,7 @@ vectorOfPairs<T1, T2> groupByAdaptiveParallelMerge(std::condition_variable &cv, 
         }
 
         int threadNumber = dop + mergesComplete;
-        threadArgs[threadNumber] = new ThreadArgs<Aggregator, T1, T2>;
+        threadArgs[threadNumber] = new ThreadArgs<T1, T2>;
         threadArgs[threadNumber]->result = new vectorOfPairs<T1, T2>;
         threadArgs[threadNumber]->threadNumber = threadNumber;
         threadArgs[threadNumber]->numFinishedThreads = &numFinishedThreads;
@@ -517,7 +517,7 @@ vectorOfPairs<T1, T2> groupByAdaptiveParallelMerge(std::condition_variable &cv, 
 
 template<template<typename> class Aggregator, typename T1, typename T2>
 void *groupByAdaptiveParallelAux(void *arg) {
-    auto* args = static_cast<ThreadArgs<Aggregator, T1, T2>*>(arg);
+    auto* args = static_cast<ThreadArgs<T1, T2>*>(arg);
     int n = args->n;
     T1 *inputGroupBy = args->inputGroupBy;
     T2 *inputAggregate = args->inputAggregate;
@@ -610,10 +610,10 @@ vectorOfPairs<T1, T2> groupByAdaptiveParallel(int n, T1 *inputGroupBy, T2 *input
     std::condition_variable cv;
     std::mutex cvMutex;
 
-    std::vector<ThreadArgs<Aggregator, T1, T2>*> threadArgs((dop * 2) - 1);
+    std::vector<ThreadArgs<T1, T2>*> threadArgs((dop * 2) - 1);
 
     for (int i = 0; i < dop; ++i) {
-        threadArgs[i] = new ThreadArgs<Aggregator, T1, T2>;
+        threadArgs[i] = new ThreadArgs<T1, T2>;
         threadArgs[i]->n = elementsPerThread[i];
         threadArgs[i]->inputGroupBy = threadInputGroupBy;
         threadArgs[i]->inputAggregate = threadInputAggregate;
