@@ -205,7 +205,7 @@ void groupByCompareResultsTest(const DataFile& dataFile, GroupBy groupByImpOne, 
     auto resultTwo = MABPL::runGroupByFunction<MaxAggregation>(groupByImpTwo,
                                                                dataFile.getNumElements(), inputGroupBy, inputAggregate,
                                                                10000000);
-   sortVectorOfPairs(resultTwo);
+    sortVectorOfPairs(resultTwo);
 
     if (resultOne.size() != resultTwo.size()) {
         std::cout << "Size of results are different" << std::endl;
@@ -463,7 +463,11 @@ void allGroupByTests() {
 
 int main() {
 
-    DataFile dataFile = DataFiles::uniformIntDistribution20mValuesTwo10mCardinalitySections_100_10m_Max20m;
+    long_long cycles;
+
+    cycles = *MABPL::Counters::getInstance().readSharedEventSet();
+
+    DataFile dataFile = DataFiles::uniformIntDistribution20mValuesCardinality10mMax20m;
 
     auto inputGroupBy = new int[dataFile.getNumElements()];
     auto inputAggregate = new int[dataFile.getNumElements()];
@@ -473,11 +477,18 @@ int main() {
     dataFile.loadDataIntoMemory(inputGroupBy);
     generateUniformDistributionInMemory(inputAggregate, dataFile.getNumElements(), 10);
 
-    MABPL::groupByAdaptiveParallel<MaxAggregation>(dataFile.getNumElements(), inputGroupBy, inputAggregate,
-                                                   cardinality, 8);
+    MABPL::vectorOfPairs<int, int> result =  MABPL::groupByAdaptiveParallel<MaxAggregation>(dataFile.getNumElements(),
+                                                                                            inputGroupBy, inputAggregate,
+                                                                                            cardinality, 4);
 
-//    groupByCompareResultsTest(DataFiles::uniformIntDistribution20mValuesTwo10mCardinalitySections_100_10m_Max20m,
-//                              GroupBy::Hash, GroupBy::Adaptive);
+    std::cout << "Cycles: " << static_cast<int>(*MABPL::Counters::getInstance().readSharedEventSet() - cycles) << std::endl;
+
+//    groupByCompareResultsTest(DataFiles::uniformIntDistribution250mValuesMax1000000,
+//                              GroupBy::Hash, GroupBy::AdaptiveParallel);
+
+//    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
+//                                   {GroupBy::Adaptive, GroupBy::AdaptiveParallel},
+//                                   1, "ParallelTest");
 
     return 0;
 }

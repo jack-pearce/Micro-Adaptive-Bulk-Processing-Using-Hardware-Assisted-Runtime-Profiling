@@ -365,6 +365,7 @@ struct ThreadArgs {
     T2* inputAggregate;
     int cardinality;
     vectorOfPairs<T1, T2>* result;
+    bool resultSorted;
     int threadNumber;
     std::atomic<int> *numFinishedThreads;
     std::vector<bool> *threadFinishedAndWaitingFlags;
@@ -375,7 +376,20 @@ struct ThreadArgs {
     ~ThreadArgs() {
         delete result;
     }
+
+    vectorOfPairs<T1, T2> extractResult() {
+        vectorOfPairs<T1, T2>* tmp = result;
+        result = nullptr;
+        return vectorOfPairs<T1, T2>(std::move(*tmp));
+    }
 };
+
+template <typename T1, typename T2>
+void sortVectorOfPairs(MABPL::vectorOfPairs<T1, T2> &vectorOfPairs) {;
+    std::sort(vectorOfPairs.begin(), vectorOfPairs.end(), [](const auto& pair1, const auto& pair2) {
+        return pair1.first < pair2.first;
+    });
+}
 
 template<template<typename> class Aggregator, typename T1, typename T2>
 void *groupByAdaptiveParallelPerformMerge(void *arg) {
@@ -385,68 +399,66 @@ void *groupByAdaptiveParallelPerformMerge(void *arg) {
     std::condition_variable *cv = args->cv;
     ThreadArgs<Aggregator, T1, T2> *mergeThread1 = args->mergeThread1;
     ThreadArgs<Aggregator, T1, T2> *mergeThread2 = args->mergeThread2;
+    vectorOfPairs<T1,T2> *inputResult1 = mergeThread1->result;
+    vectorOfPairs<T1,T2> *inputResult2 = mergeThread2->result;
+    vectorOfPairs<T1,T2> *result = args->result;
 
-    std::cout << "Merging results " << mergeThread1->threadNumber << " and " << mergeThread2->threadNumber << std::endl;
+//    std::cout << "Merging results " << mergeThread1->threadNumber << " and " << mergeThread2->threadNumber << std::endl;
+
+    // Change sorting algo to radix sort?
+    if (!mergeThread1->resultSorted) {
+        sortVectorOfPairs(*inputResult1);
+    }
+    if (!mergeThread2->resultSorted) {
+        sortVectorOfPairs(*inputResult2);
+    }
+
+    size_t l = 0;
+    size_t r = 0;
+    while (l < inputResult1->size() && r < inputResult2->size()) {
+        if ((*inputResult1)[l].first < (*inputResult2)[r].first) {
+            if (!result->empty() && result->back().first == (*inputResult1)[l].first) {
+                result->back().second = Aggregator<T2>()(result->back().second, (*inputResult1)[l].second, false);
+            } else {
+//                result->emplace_back((*inputResult1)[l].first, (*inputResult1)[l].second);
+                result->insert(result->end(), std::make_move_iterator(inputResult1->begin() + l),
+                              std::make_move_iterator(inputResult1->begin() + l + 1));
+            }
+            l += 1;
+        } else {
+            if (!result->empty() && result->back().first == (*inputResult2)[r].first) {
+                result->back().second = Aggregator<T2>()(result->back().second, (*inputResult2)[r].second, false);
+            } else {
+//                result->emplace_back((*inputResult2)[r].first, (*inputResult2)[r].second);
+                result->insert(result->end(), std::make_move_iterator(inputResult2->begin() + r),
+                              std::make_move_iterator(inputResult2->begin() + r + 1));
+            }
+            r += 1;
+        }
+    }
+
+    if (l < inputResult1->size()) {
+        if (!result->empty() && result->back().first == (*inputResult1)[l].first) {
+            result->back().second = Aggregator<T2>()(result->back().second, (*inputResult1)[l].second, false);
+            l += 1;
+        }
+        result->insert(result->end(), std::make_move_iterator(inputResult1->begin() + l),
+                      std::make_move_iterator(inputResult1->end()));
+    } else if (r < inputResult2->size()) {
+        if (!result->empty() && result->back().first == (*inputResult2)[r].first) {
+            result->back().second = Aggregator<T2>()(result->back().second, (*inputResult2)[r].second, false);
+            r += 1;
+        }
+        result->insert(result->end(), std::make_move_iterator(inputResult2->begin() + r),
+                      std::make_move_iterator(inputResult2->end()));
+    }
+
+    delete mergeThread1;
+    delete mergeThread2;
 
     (*threadFinishedAndWaitingFlags)[args->threadNumber] = true;
     (*numFinishedThreads)++;
     cv->notify_one();
-    return nullptr;
-
-    // What should cardinality be?
-    // If cardinality is greater than a certain value then we should simply sort straight away
-
-/*    constexpr int tuplesPerChunk = 75 * 1000;
-    constexpr int tuplesBetweenHashing = 2*1000*1000;
-    int maxCardinality = std::min(cardinality, n);
-    int initialSize = std::max(static_cast<int>(2.5 * maxCardinality), 400000);
-
-    tsl::robin_map<T1, T2> map(initialSize);
-    typename tsl::robin_map<T1, T2>::iterator it;
-
-    int eventSet = PAPI_NULL;
-    std::vector<std::string> counters = {"PERF_COUNT_HW_CACHE_MISSES"};
-    long_long counterValues[1] = {0};
-    createThreadEventSet(&eventSet, counters);
-
-    int hashTableEntryBytes = sizeof(T1) + sizeof(T2);
-    float tuplesPerLastLevelCacheMissThreshold = (GROUPBY_MACHINE_CONSTANT * bytesPerCacheLine()) / hashTableEntryBytes;
-
-    int index = 0;
-    int tuplesToProcess;
-
-    vectorOfPairs<int, int> sectionsToBeSorted;
-    int elements = 0;
-
-    T1 mapLargest = std::numeric_limits<T1>::lowest();
-
-    while (index < n) {
-
-        tuplesToProcess = std::min(tuplesPerChunk, n - index);
-
-        readThreadEventSet(eventSet, 1, counterValues);
-
-        groupByAdaptiveAuxHash<Aggregator>(tuplesToProcess, inputGroupBy, inputAggregate, map, index, mapLargest);
-
-        readThreadEventSet(eventSet, 1, counterValues);
-
-        if ((static_cast<float>(tuplesToProcess) / counterValues[0]) < tuplesPerLastLevelCacheMissThreshold) {
-            tuplesToProcess = std::min(tuplesBetweenHashing, n - index);
-
-            sectionsToBeSorted.emplace_back(index, index + tuplesToProcess);
-            index += tuplesToProcess;
-            elements += tuplesToProcess;
-        }
-    }
-
-    if (sectionsToBeSorted.empty()) {
-        args->result->reserve(map.size());
-        args->result->insert(args->result->end(), map.begin(), map.end());
-    } else {
-        elements += map.size();
-        groupByAdaptiveAuxSort<Aggregator>(elements, inputGroupBy, inputAggregate,
-                                           sectionsToBeSorted,map, mapLargest, *(args->result));
-    }*/
     return nullptr;
 }
 
@@ -502,8 +514,8 @@ vectorOfPairs<T1, T2> groupByAdaptiveParallelMerge(std::condition_variable &cv, 
 
     pthread_attr_destroy(&attr);
     cv.wait(lock, [&numFinishedThreads] { return numFinishedThreads == 1; });
-//    return threadArgs.back()->result;
-    vectorOfPairs<T1, T2> result;
+    vectorOfPairs<T1, T2> result = threadArgs.back()->extractResult();
+    delete threadArgs.back();
     return result;
 }
 
@@ -566,10 +578,12 @@ void *groupByAdaptiveParallelAux(void *arg) {
     if (sectionsToBeSorted.empty()) {
         args->result->reserve(map.size());
         args->result->insert(args->result->end(), map.begin(), map.end());
+        args->resultSorted = false;
     } else {
         elements += map.size();
         groupByAdaptiveAuxSort<Aggregator>(elements, inputGroupBy, inputAggregate,
                                            sectionsToBeSorted,map, mapLargest, *(args->result));
+        args->resultSorted = true;
     }
     (*threadFinishedAndWaitingFlags)[args->threadNumber] = true;
     (*numFinishedThreads)++;
@@ -623,24 +637,8 @@ vectorOfPairs<T1, T2> groupByAdaptiveParallel(int n, T1 *inputGroupBy, T2 *input
     }
 
     pthread_attr_destroy(&attr);
-
-    groupByAdaptiveParallelMerge<Aggregator, T1, T2>(cv, cvMutex, numFinishedThreads,
-                                                     threadFinishedAndWaitingFlags, dop, threadArgs, threads);
-
-/*    for (int i = 0; i < dop; ++i) {
-        void* returnValue;
-        pthread_join(threads[i], &returnValue);
-        std::cout << "Result size: " << threadArgs[i]->result->size() << std::endl;
-        delete threadArgs[i];
-    }*/
-
-    std::cout << "Finished threads: " << numFinishedThreads << std::endl;
-    for (auto flag : threadFinishedAndWaitingFlags) {
-        std::cout << "Thread completion flag: " << flag << std::endl;
-    }
-
-    vectorOfPairs<T1, T2> result;
-    return result;
+    return groupByAdaptiveParallelMerge<Aggregator, T1, T2>(cv, cvMutex, numFinishedThreads,
+                                                            threadFinishedAndWaitingFlags, dop, threadArgs, threads);
 }
 
 template<template<typename> class Aggregator, typename T1, typename T2>
