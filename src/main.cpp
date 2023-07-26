@@ -462,14 +462,14 @@ void allGroupByTests() {
 
 int main() {
 
-//    groupByCompareResultsTest(DataFiles::uniformIntDistribution25kValuesMax100,
+//    groupByCompareResultsTest(DataFiles::uniformIntDistribution250mValuesMax100,
 //                              GroupBy::Hash, GroupBy::AdaptiveParallel);
 
-//    groupByWallTimeSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-//                                   {GroupBy::Hash},
-//                                   1, "WallTimeTest");
+    groupByWallTimeSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered1k,
+                                   {GroupBy::AdaptiveParallel},
+                                   1, "TestEmplaceBack");
 
-    groupByWallTimeDopSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                     1, "WallTime200mRadix", {4});
+//    groupByWallTimeDopSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+//                                     1, "WallTime200mRadix", {4});
 
 }

@@ -567,10 +567,8 @@ vectorOfPairs<T1, T2> groupByAdaptiveParallelMerge(std::condition_variable &cv, 
         threadArgs[threadNumber]->mergeThread2 = threadArgs[thread2Id];
         threadArgs[threadNumber]->resultSorted = true;
 
-        pthread_create(&threads[threadNumber],
-                       &attr,
-                       groupByAdaptiveParallelPerformMerge<Aggregator, T1, T2>,
-                       threadArgs[threadNumber]);
+        pthread_create(&threads[threadNumber], &attr,
+                       groupByAdaptiveParallelPerformMerge<Aggregator, T1, T2>,threadArgs[threadNumber]);
 
         mergesComplete++;
     }
@@ -659,9 +657,10 @@ vectorOfPairs<T1, T2> groupByAdaptiveParallel(int n, T1 *inputGroupBy, T2 *input
     static_assert(std::is_integral<T1>::value, "GroupBy column must be an integer type");
     static_assert(std::is_arithmetic<T2>::value, "Payload column must be an numeric type");
     assert(1 < dop && dop <= maxDop());
+    int totalThreads = (dop * 2) - 1;
 
     Counters::getInstance();
-    pthread_t threads[dop];
+    pthread_t threads[totalThreads];
 
     pthread_attr_t attr;
     pthread_attr_init(&attr);
@@ -673,11 +672,11 @@ vectorOfPairs<T1, T2> groupByAdaptiveParallel(int n, T1 *inputGroupBy, T2 *input
     T2 *threadInputAggregate = inputAggregate;
 
     std::atomic<int> numFinishedThreads = 0;
-    std::vector<bool> threadFinishedAndWaitingFlags((dop * 2) - 1, false);
+    std::vector<bool> threadFinishedAndWaitingFlags(totalThreads, false);
     std::condition_variable cv;
     std::mutex cvMutex;
 
-    std::vector<ThreadArgs<T1, T2>*> threadArgs((dop * 2) - 1);
+    std::vector<ThreadArgs<T1, T2>*> threadArgs(totalThreads);
 
     for (int i = 0; i < dop; ++i) {
         threadArgs[i] = new ThreadArgs<T1, T2>;
@@ -691,10 +690,8 @@ vectorOfPairs<T1, T2> groupByAdaptiveParallel(int n, T1 *inputGroupBy, T2 *input
         threadArgs[i]->threadFinishedAndWaitingFlags = &threadFinishedAndWaitingFlags;
         threadArgs[i]->cv = &cv;
 
-        pthread_create(&threads[i],
-                                         &attr,
-                                         groupByAdaptiveParallelAux<Aggregator, T1, T2>,
-                                         threadArgs[i]);
+        pthread_create(&threads[i], &attr, groupByAdaptiveParallelAux<Aggregator, T1, T2>,
+                       threadArgs[i]);
 
         threadInputGroupBy += elementsPerThread[i];
         threadInputAggregate += elementsPerThread[i];
