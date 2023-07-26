@@ -205,6 +205,10 @@ void groupByWallTimeDopSweepBenchmark(DataSweep &dataSweep, int iterations, cons
 void groupByCpuCyclesSweepBenchmark64(DataSweep &dataSweep, const std::vector<GroupBy> &groupByImplementations,
                                     int iterations, const std::string &fileNamePrefix) {
     assert(!groupByImplementations.empty());
+    if (std::count(groupByImplementations.begin(), groupByImplementations.end(), GroupBy::AdaptiveParallel)) {
+        std::cout << "Cannot use cpu cycles to time multi-threaded programs, use wall time instead" << std::endl;
+        exit(1);
+    }
 
     int dataCols = iterations * static_cast<int>(groupByImplementations.size());
     long_long cycles;

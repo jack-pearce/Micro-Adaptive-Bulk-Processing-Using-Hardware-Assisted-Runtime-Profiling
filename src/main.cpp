@@ -548,9 +548,18 @@ void allGroupByParallelTests() {
 
 int main() {
 
-    selectIndexesCompareResultsTest(DataFiles::bestCaseIndexesTunedUnequalLowerStep50IntDistribution250mValues,
-                                    Select::ImplementationIndexesAdaptive,
-                                    Select::ImplementationIndexesAdaptiveParallel);
+//    selectIndexesCompareResultsTest(DataFiles::bestCaseIndexesTunedUnequalLowerStep50IntDistribution250mValues,
+//                                    Select::ImplementationIndexesAdaptive,
+//                                    Select::ImplementationIndexesAdaptiveParallel);
+
+    std::vector<float> inputThresholdDistribution;
+    generateLogDistribution(30, 1, 10*1000, inputThresholdDistribution);
+    selectCpuCyclesInputSweepBenchmark(DataFiles::uniformIntDistribution250mValuesMax10000,
+                                       {Select::ImplementationIndexesBranch,
+                                        Select::ImplementationIndexesPredication,
+                                        Select::ImplementationIndexesAdaptive},
+                                       inputThresholdDistribution,
+                                       5, "Test");
 
 
     return 0;
