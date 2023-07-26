@@ -214,6 +214,12 @@ void selectBenchmarkWithExtraCounters(const DataFile &dataFile, Select selectImp
 void selectCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<Select> &selectImplementations,
                                    int threshold, int iterations, const std::string &fileNamePrefix) {
     assert(!selectImplementations.empty());
+    if (std::count(selectImplementations.begin(), selectImplementations.end(), Select::ImplementationIndexesAdaptiveParallel) ||
+        std::count(selectImplementations.begin(), selectImplementations.end(), Select::ImplementationValuesAdaptiveParallel )) {
+        std::cout << "Cannot use cpu cycles to time multi-threaded programs, use wall time instead" << std::endl;
+        exit(1);
+    }
+
 
     int dataCols = iterations * static_cast<int>(selectImplementations.size());
     long_long cycles;
@@ -268,11 +274,131 @@ void selectCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<Selec
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }
 
+void selectWallTimeSweepBenchmark(DataSweep &dataSweep, const std::vector<Select> &selectImplementations,
+                                   int threshold, int iterations, const std::string &fileNamePrefix) {
+    assert(!selectImplementations.empty());
+
+    int dataCols = iterations * static_cast<int>(selectImplementations.size());
+    long_long wallTime;
+    std::vector<std::vector<double>> results(dataSweep.getTotalRuns(),
+                                             std::vector<double>(dataCols + 1, 0));
+
+    for (auto i = 0; i < iterations; ++i) {
+        for (auto j = 0; j < static_cast<int>(selectImplementations.size()); ++j) {
+            for (auto k = 0; k < dataSweep.getTotalRuns(); ++k) {
+                results[k][0] = static_cast<double>(dataSweep.getRunInput());
+                auto inputData = new int[dataSweep.getNumElements()];
+                auto inputFilter = new int[dataSweep.getNumElements()];
+                auto selection = new int[dataSweep.getNumElements()];
+
+                std::cout << "Running " << getSelectName(selectImplementations[j]) << " for input ";
+                std::cout << dataSweep.getRunInput() << "... ";
+
+                dataSweep.loadNextDataSetIntoMemory(inputData);
+                copyArray(inputData, inputFilter, dataSweep.getNumElements());
+
+                wallTime = PAPI_get_real_usec();
+
+                MABPL::runSelectFunction(selectImplementations[j],
+                                         dataSweep.getNumElements(), inputData, inputFilter, selection, threshold);
+
+                results[k][1 + (i * selectImplementations.size()) + j] =
+                        static_cast<double>(PAPI_get_real_usec() - wallTime);
+
+                delete[] inputData;
+                delete[] inputFilter;
+                delete[] selection;
+
+                std::cout << "Completed" << std::endl;
+            }
+            dataSweep.restartSweep();
+        }
+    }
+
+    std::vector<std::string> headers(1 + dataCols);
+    headers [0] = "Input";
+    for (auto i = 0; i < dataCols; ++i) {
+        headers[1 + i] = getSelectName(selectImplementations[i % selectImplementations.size()]);
+    }
+
+    std::string fileName =
+            fileNamePrefix +
+            "SweepWallTimeBM_" +
+            dataSweep.getSweepName() +
+            "_threshold_" +
+            std::to_string(threshold);
+    std::string fullFilePath = outputFilePath + selectCyclesFolder + fileName + ".csv";
+    writeHeadersAndTableToCSV(headers, results, fullFilePath);
+}
+
+void selectWallTimeDopSweepBenchmark(DataSweep &dataSweep, Select selectImplementation, int threshold,
+                                     int iterations, const std::string &fileNamePrefix, std::vector<int> dop) {
+    assert(selectImplementation == Select::ImplementationValuesAdaptiveParallel ||
+           selectImplementation == Select::ImplementationIndexesAdaptiveParallel);
+
+    int dataCols = iterations * static_cast<int>(dop.size());
+    long_long wallTime;
+    std::vector<std::vector<double>> results(dataSweep.getTotalRuns(),
+                                             std::vector<double>(dataCols + 1, 0));
+
+    for (auto i = 0; i < iterations; ++i) {
+        for (auto j = 0; j < static_cast<int>(dop.size()); ++j) {
+            for (auto k = 0; k < dataSweep.getTotalRuns(); ++k) {
+                results[k][0] = static_cast<double>(dataSweep.getRunInput());
+                auto inputData = new int[dataSweep.getNumElements()];
+                auto inputFilter = new int[dataSweep.getNumElements()];
+                auto selection = new int[dataSweep.getNumElements()];
+
+                std::cout << "Running dop of " << dop[j] << " for input ";
+                std::cout << dataSweep.getRunInput() << "... ";
+
+                dataSweep.loadNextDataSetIntoMemory(inputData);
+                copyArray(inputData, inputFilter, dataSweep.getNumElements());
+
+                wallTime = PAPI_get_real_usec();
+
+                MABPL::runSelectFunction(selectImplementation,dataSweep.getNumElements(), inputData, inputFilter,
+                                         selection, threshold, dop[j]);
+
+                results[k][1 + (i * dop.size()) + j] =
+                        static_cast<double>(PAPI_get_real_usec() - wallTime);
+
+                delete[] inputData;
+                delete[] inputFilter;
+                delete[] selection;
+
+                std::cout << "Completed" << std::endl;
+            }
+            dataSweep.restartSweep();
+        }
+    }
+
+    std::vector<std::string> headers(1 + dataCols);
+    headers [0] = "Input";
+    for (auto i = 0; i < dataCols; ++i) {
+        headers[1 + i] = "dop-" + std::to_string(dop[i % dop.size()]);
+    }
+
+    std::string fileName =
+            fileNamePrefix +
+            "DopSweepWallTimeBM_" +
+            dataSweep.getSweepName() +
+            "_threshold_" +
+            std::to_string(threshold);
+    std::string fullFilePath = outputFilePath + selectCyclesFolder + fileName + ".csv";
+    writeHeadersAndTableToCSV(headers, results, fullFilePath);
+}
+
 void selectCpuCyclesInputSweepBenchmark(const DataFile &dataFile,
                                         const std::vector<Select> &selectImplementations,
                                         std::vector<float> &thresholds, int iterations,
                                         const std::string &fileNamePrefix) {
     assert(!selectImplementations.empty());
+    if (std::count(selectImplementations.begin(), selectImplementations.end(), Select::ImplementationIndexesAdaptiveParallel) ||
+        std::count(selectImplementations.begin(), selectImplementations.end(), Select::ImplementationValuesAdaptiveParallel )) {
+        std::cout << "Cannot use cpu cycles to time multi-threaded programs, use wall time instead" << std::endl;
+        exit(1);
+    }
 
     int dataCols = iterations * static_cast<int>(selectImplementations.size());
     long_long cycles;
@@ -317,6 +443,113 @@ void selectCpuCyclesInputSweepBenchmark(const DataFile &dataFile,
     }
 
     std::string fileName = fileNamePrefix + "InputSweepCyclesBM_" + dataFile.getFileName();
+    std::string fullFilePath = outputFilePath + selectCyclesFolder + fileName + ".csv";
+    writeHeadersAndTableToCSV(headers, results, fullFilePath);
+}
+
+void selectWallTimeInputSweepBenchmark(const DataFile &dataFile,
+                                        const std::vector<Select> &selectImplementations,
+                                        std::vector<float> &thresholds, int iterations,
+                                        const std::string &fileNamePrefix) {
+    assert(!selectImplementations.empty());
+
+    int dataCols = iterations * static_cast<int>(selectImplementations.size());
+    long_long wallTime;
+    std::vector<std::vector<double>> results(thresholds.size(),
+                                             std::vector<double>(dataCols + 1, 0));
+
+    for (auto i = 0; i < iterations; ++i) {
+        for (auto j = 0; j < static_cast<int>(selectImplementations.size()); ++j) {
+            for (auto k = 0; k < static_cast<int>(thresholds.size()); ++k) {
+                results[k][0] = static_cast<int>(thresholds[k]);
+                auto inputData = new int[dataFile.getNumElements()];
+                auto inputFilter = new int[dataFile.getNumElements()];
+                auto selection = new int[dataFile.getNumElements()];
+                copyArray(LoadedData::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
+                copyArray(LoadedData::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
+
+                std::cout << "Running " << getSelectName(selectImplementations[j]) << " for threshold ";
+                std::cout << std::to_string(static_cast<int>(thresholds[k])) << "... ";
+
+                wallTime = PAPI_get_real_usec();
+
+                MABPL::runSelectFunction(selectImplementations[j],
+                                         dataFile.getNumElements(), inputData, inputFilter,
+                                         selection, static_cast<int>(thresholds[k]));
+
+                results[k][1 + (i * selectImplementations.size()) + j] =
+                        static_cast<double>(PAPI_get_real_usec() - wallTime);
+
+                delete[] inputData;
+                delete[] inputFilter;
+                delete[] selection;
+
+                std::cout << "Completed" << std::endl;
+            }
+        }
+    }
+
+    std::vector<std::string> headers(1 + dataCols);
+    headers [0] = "Input";
+    for (auto i = 0; i < dataCols; ++i) {
+        headers[1 + i] = getSelectName(selectImplementations[i % selectImplementations.size()]);
+    }
+
+    std::string fileName = fileNamePrefix + "InputSweepWallTimeBM_" + dataFile.getFileName();
+    std::string fullFilePath = outputFilePath + selectCyclesFolder + fileName + ".csv";
+    writeHeadersAndTableToCSV(headers, results, fullFilePath);
+}
+
+void selectWallTimeDopAndInputSweepBenchmark(const DataFile &dataFile,
+                                             Select selectImplementation,
+                                             std::vector<float> &thresholds, int iterations,
+                                             const std::string &fileNamePrefix, std::vector<int> dop) {
+    assert(selectImplementation == Select::ImplementationValuesAdaptiveParallel ||
+           selectImplementation == Select::ImplementationIndexesAdaptiveParallel);
+
+    int dataCols = iterations * static_cast<int>(dop.size());
+    long_long wallTime;
+    std::vector<std::vector<double>> results(thresholds.size(),
+                                             std::vector<double>(dataCols + 1, 0));
+
+    for (auto i = 0; i < iterations; ++i) {
+        for (auto j = 0; j < static_cast<int>(dop.size()); ++j) {
+            for (auto k = 0; k < static_cast<int>(thresholds.size()); ++k) {
+                results[k][0] = static_cast<int>(thresholds[k]);
+                auto inputData = new int[dataFile.getNumElements()];
+                auto inputFilter = new int[dataFile.getNumElements()];
+                auto selection = new int[dataFile.getNumElements()];
+                copyArray(LoadedData::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
+                copyArray(LoadedData::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
+
+                std::cout << "Running dop of " << dop[j] << " for input ";
+                std::cout << std::to_string(static_cast<int>(thresholds[k])) << "... ";
+
+                wallTime = PAPI_get_real_usec();
+
+                MABPL::runSelectFunction(selectImplementation,
+                                         dataFile.getNumElements(), inputData, inputFilter,
+                                         selection, static_cast<int>(thresholds[k]), dop[j]);
+
+                results[k][1 + (i * dop.size()) + j] =
+                        static_cast<double>(PAPI_get_real_usec() - wallTime);
+
+                delete[] inputData;
+                delete[] inputFilter;
+                delete[] selection;
+
+                std::cout << "Completed" << std::endl;
+            }
+        }
+    }
+
+    std::vector<std::string> headers(1 + dataCols);
+    headers [0] = "Input";
+    for (auto i = 0; i < dataCols; ++i) {
+        headers[1 + i] = "dop-" + std::to_string(dop[i % dop.size()]);
+    }
+
+    std::string fileName = fileNamePrefix + "DopAndInputSweepWallTimeBM_" + dataFile.getFileName();
     std::string fullFilePath = outputFilePath + selectCyclesFolder + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }

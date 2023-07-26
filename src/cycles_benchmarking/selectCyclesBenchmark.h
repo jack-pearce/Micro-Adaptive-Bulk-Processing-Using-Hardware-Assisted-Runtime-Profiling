@@ -28,10 +28,28 @@ void selectBenchmarkWithExtraCounters(const DataFile &dataFile, Select selectImp
 void selectCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<Select> &selectImplementations,
                                    int threshold, int iterations, const std::string &fileNamePrefix);
 
+void selectWallTimeSweepBenchmark(DataSweep &dataSweep, const std::vector<Select> &selectImplementations,
+                                   int threshold, int iterations, const std::string &fileNamePrefix);
+
+void selectWallTimeDopSweepBenchmark(DataSweep &dataSweep, Select selectImplementation, int threshold, int iterations,
+                                     const std::string &fileNamePrefix, std::vector<int> dop);
+
 void selectCpuCyclesInputSweepBenchmark(const DataFile &dataFile,
                                         const std::vector<Select> &selectImplementations,
                                         std::vector<float> &thresholds, int iterations,
                                         const std::string &fileNamePrefix);
+
+void selectWallTimeInputSweepBenchmark(const DataFile &dataFile,
+                                        const std::vector<Select> &selectImplementations,
+                                        std::vector<float> &thresholds, int iterations,
+                                        const std::string &fileNamePrefix);
+
+void selectWallTimeDopAndInputSweepBenchmark(const DataFile &dataFile,
+                                             Select selectImplementation,
+                                             std::vector<float> &thresholds, int iterations,
+                                             const std::string &fileNamePrefix, std::vector<int> dop);
+
+
 
 
 #endif //MICRO_ADAPTIVE_BULK_PROCESSING_COUNTERBENCHMARK_H
