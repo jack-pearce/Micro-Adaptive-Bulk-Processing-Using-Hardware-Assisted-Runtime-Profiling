@@ -90,17 +90,21 @@ void selectBenchmarkWithExtraCountersConfigurations(const DataFile &dataFile, Se
 }
 
 void selectIndexesCompareResultsTest(const DataFile& dataFile, Select selectImpOne, Select selectImpTwo) {
-    int threshold = 1;
+    int threshold = 3;
     auto inputFilter = new int[dataFile.getNumElements()];
     auto selectionOne = new int[dataFile.getNumElements()];
     copyArray(LoadedData::getInstance(dataFile).getData(), inputFilter,
               dataFile.getNumElements());
+
+    std::cout << "Running " << getSelectName(selectImpOne) << "..." << std::endl;
 
     int resultOne = MABPL::runSelectFunction(selectImpOne, dataFile.getNumElements(),
                                              inputFilter, inputFilter, selectionOne, threshold);
     std::sort(selectionOne, selectionOne + resultOne);
 
     auto selectionTwo = new int[dataFile.getNumElements()];
+
+    std::cout << std::endl << "Running " << getSelectName(selectImpTwo) << "..." << std::endl;
 
     int resultTwo = MABPL::runSelectFunction(selectImpTwo, dataFile.getNumElements(),
                                              inputFilter, inputFilter, selectionTwo, threshold);
@@ -110,6 +114,11 @@ void selectIndexesCompareResultsTest(const DataFile& dataFile, Select selectImpO
         std::cout << "Size of results are different" << std::endl;
     }
 
+/*    for (auto i = 0; i < 400; i++) {
+        std::cout << inputFilter[i] << std::endl;
+    }
+    std::cout << std::endl;
+
     for (auto i = 0; i < resultOne; i++) {
         std::cout << selectionOne[i] << std::endl;
     }
@@ -118,13 +127,13 @@ void selectIndexesCompareResultsTest(const DataFile& dataFile, Select selectImpO
     for (auto i = 0; i < resultTwo; i++) {
         std::cout << selectionTwo[i] << std::endl;
     }
-    std::cout << std::endl;
+    std::cout << std::endl;*/
 
-//    for (auto i = 0; i < static_cast<int>(resultOne); ++i) {
-//        if (selectionOne[i] != selectionTwo[i]) {
-//            std::cout << "Different index found" << std::endl;
-//        }
-//    }
+    for (auto i = 0; i < static_cast<int>(resultOne); ++i) {
+        if (selectionOne[i] != selectionTwo[i]) {
+            std::cout << "Different index found" << std::endl;
+        }
+    }
 
     delete[] inputFilter;
     delete[] selectionOne;
@@ -539,9 +548,10 @@ void allGroupByParallelTests() {
 
 int main() {
 
-    selectIndexesCompareResultsTest(DataFiles::uniformIntDistribution25kValuesMax100,
-                                    Select::ImplementationIndexesPredication,
+    selectIndexesCompareResultsTest(DataFiles::bestCaseIndexesTunedUnequalLowerStep50IntDistribution250mValues,
+                                    Select::ImplementationIndexesAdaptive,
                                     Select::ImplementationIndexesAdaptiveParallel);
+
 
     return 0;
 }

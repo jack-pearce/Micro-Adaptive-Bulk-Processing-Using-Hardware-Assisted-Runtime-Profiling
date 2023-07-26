@@ -35,10 +35,10 @@ std::string getSelectName(Select selectImplementation);
 
 
 template<typename T>
-int selectIndexesBranch(int n, const T *inputFilter, int *selection, T threshold);
+int selectIndexesBranch(int endIndex, const T *inputFilter, int *selection, T threshold, int startIndex = 0);
 
 template<typename T>
-int selectIndexesPredication(int n, const T *inputFilter, int *selection, T threshold);
+int selectIndexesPredication(int endIndex, const T *inputFilter, int *selection, T threshold, int startIndex = 0);
 
 template<typename T>
 int selectIndexesAdaptive(int n, const T *inputFilter, int *selection, T threshold);

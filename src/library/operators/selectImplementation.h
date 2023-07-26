@@ -14,9 +14,9 @@
 namespace MABPL {
 
 template<typename T>
-int selectIndexesBranch(int n, const T *inputFilter, int *selection, T threshold) {
+int selectIndexesBranch(int endIndex, const T *inputFilter, int *selection, T threshold, int startIndex) {
     auto k = 0;
-    for (auto i = 0; i < n; ++i) {
+    for (auto i = startIndex; i < endIndex; ++i) {
         if (inputFilter[i] <= threshold) {
             selection[k++] = i;
         }
@@ -25,9 +25,9 @@ int selectIndexesBranch(int n, const T *inputFilter, int *selection, T threshold
 }
 
 template<typename T>
-int selectIndexesPredication(int n, const T *inputFilter, int *selection, T threshold) {
+int selectIndexesPredication(int endIndex, const T *inputFilter, int *selection, T threshold, int startIndex) {
     auto k = 0;
-    for (auto i = 0; i < n; ++i) {
+    for (auto i = startIndex; i < endIndex; ++i) {
         selection[k] = i;
         k += (inputFilter[i] <= threshold);
     }
@@ -37,8 +37,9 @@ int selectIndexesPredication(int n, const T *inputFilter, int *selection, T thre
 template<typename T>
 inline int runSelectIndexesChunk(SelectIndexesChoice selectIndexesChoice,
                                  int tuplesToProcess,
+                                 int &startIndex,
                                  int &n,
-                                 const T *&inputData,
+                                 const T *inputData,
                                  int *&selection,
                                  T threshold,
                                  int &k,
@@ -46,15 +47,17 @@ inline int runSelectIndexesChunk(SelectIndexesChoice selectIndexesChoice,
     int selected;
     if (selectIndexesChoice == SelectIndexesChoice::IndexesBranch) {
         Counters::getInstance().readSharedEventSet();
-        selected = selectIndexesBranch(tuplesToProcess, inputData, selection, threshold);
+        selected = selectIndexesBranch(startIndex + tuplesToProcess, inputData, selection, threshold,
+                                       startIndex);
         Counters::getInstance().readSharedEventSet();
     } else {
         Counters::getInstance().readSharedEventSet();
-        selected = selectIndexesPredication(tuplesToProcess, inputData, selection, threshold);
+        selected = selectIndexesPredication(startIndex + tuplesToProcess, inputData, selection,
+                                            threshold, startIndex);
         Counters::getInstance().readSharedEventSet();
     }
     n -= tuplesToProcess;
-    inputData += tuplesToProcess;
+    startIndex += tuplesToProcess;
     selection += selected;
     k += selected;
     consecutivePredications += (selectIndexesChoice == SelectIndexesChoice::IndexesPredication);
@@ -110,6 +113,7 @@ int selectIndexesAdaptive(int n, const T *inputFilter, int *selection, T thresho
     float m_BranchBurst = (upperBranchCrossoverBranchMisses_BranchBurst - lowerBranchCrossoverBranchMisses_BranchBurst) /
                           (upperCrossoverSelectivity - lowerCrossoverSelectivity);
 
+    int startIndex = 0;
     int k = 0;
     int consecutivePredications = 0;
     int tuplesToProcess;
@@ -125,8 +129,9 @@ int selectIndexesAdaptive(int n, const T *inputFilter, int *selection, T thresho
             selectIndexesChoice = SelectIndexesChoice::IndexesBranch;
             consecutivePredications = 0;
             tuplesToProcess = std::min(n, tuplesInBranchBurst);
-            selected = runSelectIndexesChunk<T>(selectIndexesChoice, tuplesToProcess, n,
-                                                inputFilter, selection, threshold, k, consecutivePredications);
+            selected = runSelectIndexesChunk<T>(selectIndexesChoice, tuplesToProcess, startIndex,n,
+                                                inputFilter, selection, threshold, k,
+                                                consecutivePredications);
             performSelectIndexesAdaption(selectIndexesChoice, counterValues, lowerCrossoverSelectivity,
                                          upperCrossoverSelectivity,
                                          lowerBranchCrossoverBranchMisses_BranchBurst,
@@ -135,8 +140,9 @@ int selectIndexesAdaptive(int n, const T *inputFilter, int *selection, T thresho
                                          consecutivePredications);
         } else {
             tuplesToProcess = std::min(n, tuplesPerAdaption);
-            selected = runSelectIndexesChunk<T>(selectIndexesChoice, tuplesToProcess, n, inputFilter, selection,
-                                                threshold, k, consecutivePredications);
+            selected = runSelectIndexesChunk<T>(selectIndexesChoice, tuplesToProcess, startIndex,n,
+                                                inputFilter, selection, threshold, k,
+                                                consecutivePredications);
             performSelectIndexesAdaption(selectIndexesChoice, counterValues, lowerCrossoverSelectivity,
                                          upperCrossoverSelectivity,
                                          lowerBranchCrossoverBranchMisses, m,
@@ -161,8 +167,9 @@ struct SelectIndexesThreadArgs {
 template<typename T>
 inline int runSelectIndexesChunkParallel(SelectIndexesChoice selectIndexesChoice,
                                          int tuplesToProcess,
+                                         int &startIndex,
                                          int &n,
-                                         const T *&inputData,
+                                         const T *inputData,
                                          int *&selection,
                                          T threshold,
                                          int &k,
@@ -172,15 +179,17 @@ inline int runSelectIndexesChunkParallel(SelectIndexesChoice selectIndexesChoice
     int selected;
     if (selectIndexesChoice == SelectIndexesChoice::IndexesBranch) {
         readThreadEventSet(eventSet, 1, counterValues);
-        selected = selectIndexesBranch(tuplesToProcess, inputData, selection, threshold);
+        selected = selectIndexesBranch(startIndex + tuplesToProcess, inputData, selection, threshold,
+                                       startIndex);
         readThreadEventSet(eventSet, 1, counterValues);
     } else {
         readThreadEventSet(eventSet, 1, counterValues);
-        selected = selectIndexesPredication(tuplesToProcess, inputData, selection, threshold);
+        selected = selectIndexesPredication(startIndex + tuplesToProcess, inputData, selection,
+                                            threshold, startIndex);
         readThreadEventSet(eventSet, 1, counterValues);
     }
     n -= tuplesToProcess;
-    inputData += tuplesToProcess;
+    startIndex += tuplesToProcess;
     selection += selected;
     k += selected;
     consecutivePredications += (selectIndexesChoice == SelectIndexesChoice::IndexesPredication);
@@ -238,7 +247,7 @@ void *selectIndexesAdaptiveParallelAux(void *arg) {
             selectIndexesChoice = SelectIndexesChoice::IndexesBranch;
             consecutivePredications = 0;
             tuplesToProcess = std::min(n, tuplesInBranchBurst);
-            selected = runSelectIndexesChunkParallel<T>(selectIndexesChoice, tuplesToProcess, n,
+            selected = runSelectIndexesChunkParallel<T>(selectIndexesChoice, tuplesToProcess, startIndex, n,
                                                 inputFilter, threadSelection, threshold, k,
                                                 consecutivePredications, eventSet, counterValues);
             performSelectIndexesAdaption(selectIndexesChoice, counterValues, lowerCrossoverSelectivity,
@@ -249,8 +258,8 @@ void *selectIndexesAdaptiveParallelAux(void *arg) {
                                          consecutivePredications);
         } else {
             tuplesToProcess = std::min(n, tuplesPerAdaption);
-            selected = runSelectIndexesChunkParallel<T>(selectIndexesChoice, tuplesToProcess, n, inputFilter,
-                                                        threadSelection, threshold, k,
+            selected = runSelectIndexesChunkParallel<T>(selectIndexesChoice, tuplesToProcess, startIndex, n,
+                                                        inputFilter,threadSelection, threshold, k,
                                                         consecutivePredications, eventSet, counterValues);
             performSelectIndexesAdaption(selectIndexesChoice, counterValues, lowerCrossoverSelectivity,
                                          upperCrossoverSelectivity,
