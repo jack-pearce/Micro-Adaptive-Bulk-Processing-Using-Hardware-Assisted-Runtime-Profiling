@@ -365,7 +365,6 @@ struct ThreadArgs {
     T2* inputAggregate;
     int cardinality;
     vectorOfPairs<T1, T2>* result;
-    bool resultSorted;
     int threadNumber;
     std::atomic<int> *numFinishedThreads;
     std::vector<bool> *threadFinishedAndWaitingFlags;
@@ -468,13 +467,6 @@ void *groupByAdaptiveParallelPerformMerge(void *arg) {
     ThreadArgs<T1, T2> *mergeThread1 = args->mergeThread1;
     ThreadArgs<T1, T2> *mergeThread2 = args->mergeThread2;
 
-    if (!mergeThread1->resultSorted) {
-        sortVectorOfPairs(mergeThread1->result);
-    }
-    if (!mergeThread2->resultSorted) {
-        sortVectorOfPairs(mergeThread2->result);
-    }
-
     vectorOfPairs<T1,T2> *inputResult1 = mergeThread1->result;
     vectorOfPairs<T1,T2> *inputResult2 = mergeThread2->result;
     vectorOfPairs<T1,T2> *result = args->result;
@@ -565,7 +557,6 @@ vectorOfPairs<T1, T2> groupByAdaptiveParallelMerge(std::condition_variable &cv, 
         threadArgs[threadNumber]->cv = &cv;
         threadArgs[threadNumber]->mergeThread1 = threadArgs[thread1Id];
         threadArgs[threadNumber]->mergeThread2 = threadArgs[thread2Id];
-        threadArgs[threadNumber]->resultSorted = true;
 
         pthread_create(&threads[threadNumber], &attr,
                        groupByAdaptiveParallelPerformMerge<Aggregator, T1, T2>,threadArgs[threadNumber]);
@@ -639,12 +630,11 @@ void *groupByAdaptiveParallelAux(void *arg) {
     if (sectionsToBeSorted.empty()) {
         args->result->reserve(map.size());
         args->result->insert(args->result->end(), map.begin(), map.end());
-        args->resultSorted = false;
+        sortVectorOfPairs(args->result);
     } else {
         elements += map.size();
         groupByAdaptiveAuxSort<Aggregator>(elements, inputGroupBy, inputAggregate,
                                            sectionsToBeSorted,map, mapLargest, *(args->result));
-        args->resultSorted = true;
     }
     (*threadFinishedAndWaitingFlags)[args->threadNumber] = true;
     (*numFinishedThreads)++;
