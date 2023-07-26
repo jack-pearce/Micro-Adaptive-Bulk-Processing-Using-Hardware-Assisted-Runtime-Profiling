@@ -89,6 +89,48 @@ void selectBenchmarkWithExtraCountersConfigurations(const DataFile &dataFile, Se
                                      benchmarkCounters, "");
 }
 
+void selectIndexesCompareResultsTest(const DataFile& dataFile, Select selectImpOne, Select selectImpTwo) {
+    int threshold = 1;
+    auto inputFilter = new int[dataFile.getNumElements()];
+    auto selectionOne = new int[dataFile.getNumElements()];
+    copyArray(LoadedData::getInstance(dataFile).getData(), inputFilter,
+              dataFile.getNumElements());
+
+    int resultOne = MABPL::runSelectFunction(selectImpOne, dataFile.getNumElements(),
+                                             inputFilter, inputFilter, selectionOne, threshold);
+    std::sort(selectionOne, selectionOne + resultOne);
+
+    auto selectionTwo = new int[dataFile.getNumElements()];
+
+    int resultTwo = MABPL::runSelectFunction(selectImpTwo, dataFile.getNumElements(),
+                                             inputFilter, inputFilter, selectionTwo, threshold);
+    std::sort(selectionTwo, selectionTwo + resultTwo);
+
+    if (resultOne != resultTwo) {
+        std::cout << "Size of results are different" << std::endl;
+    }
+
+    for (auto i = 0; i < resultOne; i++) {
+        std::cout << selectionOne[i] << std::endl;
+    }
+    std::cout << std::endl;
+
+    for (auto i = 0; i < resultTwo; i++) {
+        std::cout << selectionTwo[i] << std::endl;
+    }
+    std::cout << std::endl;
+
+//    for (auto i = 0; i < static_cast<int>(resultOne); ++i) {
+//        if (selectionOne[i] != selectionTwo[i]) {
+//            std::cout << "Different index found" << std::endl;
+//        }
+//    }
+
+    delete[] inputFilter;
+    delete[] selectionOne;
+    delete[] selectionTwo;
+}
+
 void allSelectIndexesTests() {
     // Graph 1: Selectivity range on uniform data
     std::vector<float> inputThresholdDistribution;
@@ -497,7 +539,9 @@ void allGroupByParallelTests() {
 
 int main() {
 
-    allGroupByParallelTests();
+    selectIndexesCompareResultsTest(DataFiles::uniformIntDistribution25kValuesMax100,
+                                    Select::ImplementationIndexesPredication,
+                                    Select::ImplementationIndexesAdaptiveParallel);
 
     return 0;
 }

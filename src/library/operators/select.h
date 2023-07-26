@@ -60,7 +60,8 @@ template<typename T1, typename T2>
 int selectValuesAdaptive(int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold);
 
 template<typename T1, typename T2>
-int selectValuesAdaptive(int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold, int dop = 2);
+int selectValuesAdaptiveParallel(int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold,
+                                 int dop = 2);
 
 
 template<typename T1, typename T2>

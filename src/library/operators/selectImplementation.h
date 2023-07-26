@@ -3,6 +3,9 @@
 
 #include <immintrin.h>
 #include <functional>
+#include <cassert>
+#include <atomic>
+#include <cstring>
 
 #include "../utilities/papi.h"
 #include "../utilities/systemInformation.h"
@@ -146,8 +149,163 @@ int selectIndexesAdaptive(int n, const T *inputFilter, int *selection, T thresho
 }
 
 template<typename T>
-int selectIndexesAdaptiveParallel(int n, const T *inputFilter, int *selection, T threshold, int dop) {
+struct SelectIndexesThreadArgs {
+    int startIndex;
+    int n;
+    const T* inputFilter;
+    int *selection;
+    T threshold;
+    std::atomic<int> *selectedCount;
+};
 
+template<typename T>
+inline int runSelectIndexesChunkParallel(SelectIndexesChoice selectIndexesChoice,
+                                         int tuplesToProcess,
+                                         int &n,
+                                         const T *&inputData,
+                                         int *&selection,
+                                         T threshold,
+                                         int &k,
+                                         int &consecutivePredications,
+                                         int eventSet,
+                                         long_long *counterValues) {
+    int selected;
+    if (selectIndexesChoice == SelectIndexesChoice::IndexesBranch) {
+        readThreadEventSet(eventSet, 1, counterValues);
+        selected = selectIndexesBranch(tuplesToProcess, inputData, selection, threshold);
+        readThreadEventSet(eventSet, 1, counterValues);
+    } else {
+        readThreadEventSet(eventSet, 1, counterValues);
+        selected = selectIndexesPredication(tuplesToProcess, inputData, selection, threshold);
+        readThreadEventSet(eventSet, 1, counterValues);
+    }
+    n -= tuplesToProcess;
+    inputData += tuplesToProcess;
+    selection += selected;
+    k += selected;
+    consecutivePredications += (selectIndexesChoice == SelectIndexesChoice::IndexesPredication);
+    return selected;
+}
+
+template<typename T>
+void *selectIndexesAdaptiveParallelAux(void *arg) {
+    auto* args = static_cast<SelectIndexesThreadArgs<T>*>(arg);
+    int startIndex = args->startIndex;
+    int n = args->n;
+    const T *inputFilter = args->inputFilter;
+    int *overallSelection = args->selection;
+    T threshold = args->threshold;
+    std::atomic<int> *selectedCount = args->selectedCount;
+
+    auto threadSelection = new int[n];
+    auto threadSelectionStart = threadSelection;
+
+    int tuplesPerAdaption = 50000;
+    int maxConsecutivePredications = 10;
+    int tuplesInBranchBurst = 1000;
+
+    float lowerCrossoverSelectivity = 0.03; // Could use a tuning function to identify these cross-over points
+    float upperCrossoverSelectivity = 0.98; // Could use a tuning function to identify these cross-over points
+
+    // Equations below are only valid at the extreme ends of selectivity
+    // Y intercept of number of branch misses (at lower cross-over selectivity)
+    float lowerBranchCrossoverBranchMisses = lowerCrossoverSelectivity * static_cast<float>(tuplesPerAdaption);
+    float upperBranchCrossoverBranchMisses = (1 - upperCrossoverSelectivity) * static_cast<float>(tuplesPerAdaption);
+
+    // Gradient of number of branch misses between lower cross-over selectivity and upper cross-over selectivity
+    float m = (upperBranchCrossoverBranchMisses - lowerBranchCrossoverBranchMisses) /
+              (upperCrossoverSelectivity - lowerCrossoverSelectivity);
+
+    // Modified values for short branch burst chunks
+    float lowerBranchCrossoverBranchMisses_BranchBurst = lowerCrossoverSelectivity * static_cast<float>(tuplesInBranchBurst);
+    float upperBranchCrossoverBranchMisses_BranchBurst = (1 - upperCrossoverSelectivity) * static_cast<float>(tuplesInBranchBurst);
+    float m_BranchBurst = (upperBranchCrossoverBranchMisses_BranchBurst - lowerBranchCrossoverBranchMisses_BranchBurst) /
+                          (upperCrossoverSelectivity - lowerCrossoverSelectivity);
+
+    int k = 0;
+    int consecutivePredications = 0;
+    int tuplesToProcess;
+    int selected;
+    SelectIndexesChoice selectIndexesChoice = SelectIndexesChoice::IndexesPredication;
+
+    int eventSet = PAPI_NULL;
+    std::vector<std::string> counters = {"PERF_COUNT_HW_BRANCH_MISSES"};
+    long_long counterValues[1] = {0};
+    createThreadEventSet(&eventSet, counters);
+
+    while (n > 0) {
+        if (__builtin_expect(consecutivePredications == maxConsecutivePredications, false)) {
+            selectIndexesChoice = SelectIndexesChoice::IndexesBranch;
+            consecutivePredications = 0;
+            tuplesToProcess = std::min(n, tuplesInBranchBurst);
+            selected = runSelectIndexesChunkParallel<T>(selectIndexesChoice, tuplesToProcess, n,
+                                                inputFilter, threadSelection, threshold, k,
+                                                consecutivePredications, eventSet, counterValues);
+            performSelectIndexesAdaption(selectIndexesChoice, counterValues, lowerCrossoverSelectivity,
+                                         upperCrossoverSelectivity,
+                                         lowerBranchCrossoverBranchMisses_BranchBurst,
+                                         m_BranchBurst,
+                                         static_cast<float>(selected) / static_cast<float>(tuplesInBranchBurst),
+                                         consecutivePredications);
+        } else {
+            tuplesToProcess = std::min(n, tuplesPerAdaption);
+            selected = runSelectIndexesChunkParallel<T>(selectIndexesChoice, tuplesToProcess, n, inputFilter,
+                                                        threadSelection, threshold, k,
+                                                        consecutivePredications, eventSet, counterValues);
+            performSelectIndexesAdaption(selectIndexesChoice, counterValues, lowerCrossoverSelectivity,
+                                         upperCrossoverSelectivity,
+                                         lowerBranchCrossoverBranchMisses, m,
+                                         static_cast<float>(selected) / static_cast<float>(tuplesPerAdaption),
+                                         consecutivePredications);
+        }
+    }
+
+    destroyThreadEventSet(eventSet, counterValues);
+
+    int overallSelectionStartIndex = (*selectedCount).fetch_add(k);
+    memcpy(overallSelection + overallSelectionStartIndex, threadSelectionStart, k * sizeof(int));
+
+    delete []threadSelectionStart;
+    delete args;
+
+    return nullptr;
+}
+
+template<typename T>
+int selectIndexesAdaptiveParallel(int n, const T *inputFilter, int *selection, T threshold, int dop) {
+    assert(1 < dop && dop <= maxDop());
+
+    Counters::getInstance();
+    pthread_t threads[dop];
+
+    std::vector<int> elementsPerThread(dop, n / dop);
+    elementsPerThread[dop - 1] = n - ((dop - 1) * (n / dop));
+    int startIndex = 0;
+
+    std::atomic<int> selectedCount = 0;
+
+    std::vector<SelectIndexesThreadArgs<T>*> threadArgs(dop);
+
+    for (int i = 0; i < dop; ++i) {
+        threadArgs[i] = new SelectIndexesThreadArgs<T>;
+        threadArgs[i]->startIndex = startIndex;
+        threadArgs[i]->n = elementsPerThread[i];
+        threadArgs[i]->inputFilter = inputFilter;
+        threadArgs[i]->selection = selection;
+        threadArgs[i]->threshold = threshold;
+        threadArgs[i]->selectedCount = &selectedCount;
+
+        pthread_create(&threads[i], NULL, selectIndexesAdaptiveParallelAux<T>,
+                       threadArgs[i]);
+
+        startIndex += elementsPerThread[i];
+    }
+
+    for (int i = 0; i < dop; ++i) {
+        pthread_join(threads[i], nullptr);
+    }
+
+    return selectedCount;
 }
 
 template<typename T1, typename T2>
@@ -354,8 +512,8 @@ int selectValuesAdaptive(int n, const T2 *inputData, const T1 *inputFilter, T2 *
 }
 
 template<typename T1, typename T2>
-int selectValuesAdaptive(int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold, int dop) {
-
+int selectValuesAdaptiveParallel(int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold, int dop) {
+    return 0;
 }
 
 template<typename T1, typename T2>
@@ -383,7 +541,7 @@ int runSelectFunction(Select selectImplementation,
         case Select::ImplementationValuesAdaptive:
             return selectValuesAdaptive(n, inputData, inputFilter, selection, threshold);
         case Select::ImplementationValuesAdaptiveParallel:
-            return selectValuesAdaptive(n, inputData, inputFilter, selection, threshold, dop);
+            return selectValuesAdaptiveParallel(n, inputData, inputFilter, selection, threshold, dop);
         default:
             std::cout << "Invalid selection of 'Select' implementation!" << std::endl;
             exit(1);
