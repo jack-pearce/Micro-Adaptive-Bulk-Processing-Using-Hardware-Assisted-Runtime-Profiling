@@ -253,6 +253,18 @@ void groupByBenchmarkWithExtraCountersDuringRunConfigurations(const DataFile &da
     groupByBenchmarkWithExtraCountersDuringRun(dataFile, benchmarkCounters, fileNamePrefix);
 }
 
+void groupByWallTimeDopSweepBenchmarkCalcDopRange(DataSweep &dataSweep, int iterations,
+                                                  const std::string &fileNamePrefix) {
+    int dop = 2;
+    std::vector<int> dopValues;
+    while (dop <= MABPL::maxDop()) {
+        dopValues.push_back(dop);
+        dop += 2;
+    }
+
+    groupByWallTimeDopSweepBenchmark(dataSweep, iterations, fileNamePrefix, dopValues);
+}
+
 //void allGroupByTestsOLD() {
 /*
 // SET ONE - BITS_PER_PASS = 10
@@ -408,7 +420,7 @@ void groupByBenchmarkWithExtraCountersDuringRunConfigurations(const DataFile &da
                                    1, "9-SingleDoubleRadix8PassThenHash");*/
 //}
 
-void allGroupByTests() {
+void allGroupBySingleThreadedTests() {
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
                                    {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                    10, "1-NoClustering");
@@ -460,18 +472,32 @@ void allGroupByTests() {
     tessilRobinMapInitialisationBenchmark("4-MapOverheadCosts");
 }
 
+void allGroupByParallelTests() {
+    groupByWallTimeSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                  {GroupBy::Adaptive},
+                                  5, "5-DOP-1-CardinalitySweepSingle");
+
+    groupByWallTimeDopSweepBenchmarkCalcDopRange(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                                 5, "5-DOP-1-CardinalitySweepParallel");
+
+    groupByWallTimeSweepBenchmark(DataSweeps::linearUniformIntDistribution200mValuesMultipleCardinalitySections_100_10m_Max100m,
+                                  {GroupBy::Adaptive},
+                                  5, "5-DOP-2-MultipleCardinalitySectionsFwdSingle");
+
+    groupByWallTimeDopSweepBenchmarkCalcDopRange(DataSweeps::linearUniformIntDistribution200mValuesMultipleCardinalitySections_100_10m_Max100m,
+                                                 5, "5-DOP-2-MultipleCardinalitySectionsFwdParallel");
+
+    groupByWallTimeSweepBenchmark(DataSweeps::linearUniformIntDistribution200mValuesMultipleCardinalitySections_10m_100_Max100m,
+                                  {GroupBy::Adaptive},
+                                  5, "5-DOP-2-MultipleCardinalitySectionsBwdSingle");
+
+    groupByWallTimeDopSweepBenchmarkCalcDopRange(DataSweeps::linearUniformIntDistribution200mValuesMultipleCardinalitySections_10m_100_Max100m,
+                                                 5, "5-DOP-2-MultipleCardinalitySectionsBwdParallel");
+}
+
 int main() {
 
-//    groupByCompareResultsTest(DataFiles::uniformIntDistribution250mValuesMax100,
-//                              GroupBy::Hash, GroupBy::AdaptiveParallel);
+    allGroupByParallelTests();
 
-//    groupByWallTimeSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered1k,
-//                                   {GroupBy::AdaptiveParallel},
-//                                   1, "TestEmplaceBack");
-
-//    groupByWallTimeDopSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-//                                     1, "WallTime200mRadix", {4});
-
-    std::cout << MABPL::maxDop() << std::endl;
-
+    return 0;
 }
