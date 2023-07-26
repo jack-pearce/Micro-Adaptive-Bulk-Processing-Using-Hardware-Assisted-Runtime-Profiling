@@ -465,11 +465,13 @@ int main() {
 //    groupByCompareResultsTest(DataFiles::uniformIntDistribution250mValuesMax100,
 //                              GroupBy::Hash, GroupBy::AdaptiveParallel);
 
-    groupByWallTimeSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered1k,
-                                   {GroupBy::AdaptiveParallel},
-                                   1, "TestEmplaceBack");
+//    groupByWallTimeSweepBenchmark(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered1k,
+//                                   {GroupBy::AdaptiveParallel},
+//                                   1, "TestEmplaceBack");
 
 //    groupByWallTimeDopSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
 //                                     1, "WallTime200mRadix", {4});
+
+    std::cout << MABPL::maxDop() << std::endl;
 
 }
