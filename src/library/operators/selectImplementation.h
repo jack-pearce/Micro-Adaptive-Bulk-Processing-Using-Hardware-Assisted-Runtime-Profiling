@@ -145,6 +145,11 @@ int selectIndexesAdaptive(int n, const T *inputFilter, int *selection, T thresho
     return k;
 }
 
+template<typename T>
+int selectIndexesAdaptiveParallel(int n, const T *inputFilter, int *selection, T threshold, int dop) {
+
+}
+
 template<typename T1, typename T2>
 int selectValuesBranch(int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold) {
     auto k = 0;
@@ -348,10 +353,14 @@ int selectValuesAdaptive(int n, const T2 *inputData, const T1 *inputFilter, T2 *
     return k;
 }
 
+template<typename T1, typename T2>
+int selectValuesAdaptive(int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold, int dop) {
+
+}
 
 template<typename T1, typename T2>
 int runSelectFunction(Select selectImplementation,
-                      int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold) {
+                      int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold, int dop) {
     switch(selectImplementation) {
         case Select::ImplementationIndexesBranch:
             static_assert(std::is_same<T2, int>::value, "selection array type must be int for select indexes function");
@@ -362,6 +371,9 @@ int runSelectFunction(Select selectImplementation,
         case Select::ImplementationIndexesAdaptive:
             static_assert(std::is_same<T2, int>::value, "selection array type must be int for select indexes function");
             return selectIndexesAdaptive(n, inputFilter, selection, threshold);
+        case Select::ImplementationIndexesAdaptiveParallel:
+            static_assert(std::is_same<T2, int>::value, "selection array type must be int for select indexes function");
+            return selectIndexesAdaptiveParallel(n, inputFilter, selection, threshold, dop);
         case Select::ImplementationValuesBranch:
             return selectValuesBranch(n, inputData, inputFilter, selection, threshold);
         case Select::ImplementationValuesPredication:
@@ -370,6 +382,8 @@ int runSelectFunction(Select selectImplementation,
             return selectValuesVectorized(n, inputData, inputFilter, selection, threshold);
         case Select::ImplementationValuesAdaptive:
             return selectValuesAdaptive(n, inputData, inputFilter, selection, threshold);
+        case Select::ImplementationValuesAdaptiveParallel:
+            return selectValuesAdaptive(n, inputData, inputFilter, selection, threshold, dop);
         default:
             std::cout << "Invalid selection of 'Select' implementation!" << std::endl;
             exit(1);
