@@ -38,6 +38,24 @@ const DataFile& LoadedData::getDataFile() const {
     return *dataFile;
 }
 
+void generateEvenIntLogDistribution(int numPoints, double minValue, double maxValue, std::vector<float> &points) {
+    for (auto i = 0; i < numPoints; ++i) {
+        auto t = i / static_cast<double>(numPoints - 1); // Normalized parameter between 0 and 1
+        auto value = std::pow(10.0, t * (std::log10(maxValue) - std::log10(minValue)) + std::log10(minValue));
+        points.push_back(static_cast<float>(value));
+    }
+
+    int tmp;
+    for (size_t i = 0; i < points.size(); ++i) {
+        tmp = static_cast<int>(points[i]);
+        if (tmp % 2 == 1) {
+            tmp++;
+        }
+        points[i] = tmp;
+    }
+}
+
+
 void generateLogDistribution(int numPoints, double minValue, double maxValue, std::vector<float> &points) {
     for (auto i = 0; i < numPoints; ++i) {
         auto t = i / static_cast<double>(numPoints - 1); // Normalized parameter between 0 and 1

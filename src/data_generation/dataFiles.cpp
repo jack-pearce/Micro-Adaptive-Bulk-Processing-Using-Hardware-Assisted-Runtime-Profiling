@@ -232,7 +232,7 @@ DataSweep DataSweeps::varyingIntDistribution250mValuesSweep {
         "Linear input of number of discrete sections from 2 to 10,000"};
 
 DataSweep DataSweeps::lowerStep50IntDistribution250mValuesSweep {
-        100,
+        50,
         250*1000*1000,
         "lowerStep50IntDistribution250mValuesSweep",
         "250m int values where max value is 100 and min value is either 1 or 51"
@@ -425,7 +425,7 @@ DataSweep::DataSweep(int _totalRuns, int _numElements, std::string _sweepName, s
         generateLogDistribution(getTotalRuns(), 0.01, 100, inputs);
     } else if (getSweepName() == "varyingIntDistribution250mValuesSweep" ||
                getSweepName() == "lowerStep50IntDistribution250mValuesSweep") {
-        generateLogDistribution(getTotalRuns(), 2, 10000, inputs);
+        generateEvenIntLogDistribution(getTotalRuns(), 2, 10000, inputs);
     } else if (getSweepName() == "lowerStep50IntDistribution250mValuesPercentageStepSweep") {
         generateLinearDistribution(getTotalRuns(), 0, 1, inputs);
     } else if (getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweepVariableMax" ||

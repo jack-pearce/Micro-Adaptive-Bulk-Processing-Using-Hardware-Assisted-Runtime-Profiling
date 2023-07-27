@@ -701,10 +701,13 @@ void allGroupByParallelTests() {
 
 int main() {
 
-    selectValuesCompareResultsTest(DataFiles::bestCaseIndexesTunedUnequalLowerStep50IntDistribution250mValues,
-                                   Select::ImplementationValuesVectorized,
-                                   Select::ImplementationValuesAdaptiveParallel);
+    selectWallTimeSweepBenchmark(DataSweeps::lowerStep50IntDistribution250mValuesSweep,
+                                 {Select::ImplementationIndexesAdaptive},
+                                 50, 1, "7-DOP-2-StepPeriodSweepSingle");
 
+    selectWallTimeDopSweepBenchmarkCalcDopRange(DataSweeps::lowerStep50IntDistribution250mValuesSweep,
+                                                Select::ImplementationIndexesAdaptiveParallel,
+                                                50, 1, "7-DOP-2-StepPeriodSweepParallel");
 
     return 0;
 }

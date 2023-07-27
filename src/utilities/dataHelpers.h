@@ -22,6 +22,7 @@ public:
     void operator=(const LoadedData&) = delete;
 };
 
+void generateEvenIntLogDistribution(int numPoints, double minValue, double maxValue, std::vector<float> &points);
 void generateLogDistribution(int numPoints, double minValue, double maxValue, std::vector<float> &points);
 void generateLinearDistribution(int numPoints, double minValue, double maxValue, std::vector<float> &points);
 void displayDistribution(const DataFile &dataFile);
