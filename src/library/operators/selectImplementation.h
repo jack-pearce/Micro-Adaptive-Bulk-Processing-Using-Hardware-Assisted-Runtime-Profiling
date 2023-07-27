@@ -530,8 +530,160 @@ int selectValuesAdaptive(int n, const T2 *inputData, const T1 *inputFilter, T2 *
 }
 
 template<typename T1, typename T2>
+struct SelectValuesThreadArgs {
+    int startIndex;
+    int n;
+    const T2* inputData;
+    const T1* inputFilter;
+    T2 *selection;
+    T1 threshold;
+    std::atomic<int> *selectedCount;
+};
+
+template<typename T1, typename T2>
+inline int runSelectValuesChunkParallel(SelectValuesChoice selectValuesChoice,
+                                        int tuplesToProcess,
+                                        int &startIndex,
+                                        int &n,
+                                        const T2 *inputData,
+                                        const T1 *inputFilter,
+                                        T2 *&selection,
+                                        T1 threshold,
+                                        int &k,
+                                        int &consecutivePredications,
+                                        int eventSet,
+                                        long_long *counterValues) {
+    int selected;
+    if (selectValuesChoice == SelectValuesChoice::ValuesBranch) {
+        readThreadEventSet(eventSet, 1, counterValues);
+        selected = selectValuesBranch(startIndex + tuplesToProcess, inputData, inputFilter, selection,
+                                      threshold, startIndex);
+        readThreadEventSet(eventSet, 1, counterValues);
+    } else {
+        readThreadEventSet(eventSet, 1, counterValues);
+        selected = selectValuesVectorized(startIndex + tuplesToProcess, inputData, inputFilter, selection,
+                                          threshold, startIndex);
+        readThreadEventSet(eventSet, 1, counterValues);
+    }
+    n -= tuplesToProcess;
+    startIndex += tuplesToProcess;
+    selection += selected;
+    k += selected;
+    consecutivePredications += (selectValuesChoice == SelectValuesChoice::ValuesVectorized);
+    return selected;
+}
+
+template<typename T1, typename T2>
+void *selectValuesAdaptiveParallelAux(void *arg) {
+    auto* args = static_cast<SelectValuesThreadArgs<T1, T2>*>(arg);
+    int startIndex = args->startIndex;
+    int n = args->n;
+    const T2 *inputData = args->inputData;
+    const T1 *inputFilter = args->inputFilter;
+    T2 *overallSelection = args->selection;
+    T1 threshold = args->threshold;
+    std::atomic<int> *selectedCount = args->selectedCount;
+
+    auto threadSelection = new int[n];
+    auto threadSelectionStart = threadSelection;
+
+    auto tuplesPerAdaption = 50000;
+    auto maxConsecutiveVectorized = 10;
+    auto tuplesInBranchBurst = 1000;
+
+    float crossoverSelectivity = 0.003; // Could use a tuning function to identify this cross-over point
+
+    // Equation below are only valid at the extreme ends of selectivity
+    float branchCrossoverBranchMisses = crossoverSelectivity * static_cast<float>(tuplesPerAdaption);
+
+    // Modified values for short branch burst chunks
+    float branchCrossoverBranchMisses_BranchBurst = crossoverSelectivity * static_cast<float>(tuplesInBranchBurst);
+
+    int k = 0;
+    int consecutiveVectorized = 0;
+    int tuplesToProcess;
+    int selected;
+    SelectValuesChoice selectValuesChoice = SelectValuesChoice::ValuesBranch;
+
+    int eventSet = PAPI_NULL;
+    std::vector<std::string> counters = {"PERF_COUNT_HW_BRANCH_MISSES"};
+    long_long counterValues[1] = {0};
+    createThreadEventSet(&eventSet, counters);
+
+    while (n > 0) {
+
+        if (__builtin_expect(consecutiveVectorized == maxConsecutiveVectorized, false)) {
+            selectValuesChoice = SelectValuesChoice::ValuesVectorized;
+            consecutiveVectorized = 0;
+            tuplesToProcess = std::min(n, tuplesInBranchBurst);
+            selected = runSelectValuesChunkParallel<T1,T2>(selectValuesChoice, tuplesToProcess,
+                                                           startIndex, n,inputData, inputFilter,
+                                                           threadSelection, threshold, k,
+                                                           consecutiveVectorized, eventSet, counterValues);
+            performSelectValuesAdaption(selectValuesChoice, counterValues, crossoverSelectivity,
+                                        branchCrossoverBranchMisses_BranchBurst,
+                                        static_cast<float>(selected) / static_cast<float>(tuplesInBranchBurst),
+                                        consecutiveVectorized);
+        } else {
+            tuplesToProcess = std::min(n, tuplesPerAdaption);
+            selected = runSelectValuesChunkParallel<T1,T2>(selectValuesChoice, tuplesToProcess,
+                                                           startIndex,n,inputData, inputFilter,
+                                                           threadSelection, threshold, k,
+                                                           consecutiveVectorized, eventSet, counterValues);
+            performSelectValuesAdaption(selectValuesChoice, counterValues, crossoverSelectivity,
+                                        branchCrossoverBranchMisses,
+                                        static_cast<float>(selected) / static_cast<float>(tuplesPerAdaption),
+                                        consecutiveVectorized);
+        }
+    }
+
+    destroyThreadEventSet(eventSet, counterValues);
+
+    int overallSelectionStartIndex = (*selectedCount).fetch_add(k);
+    memcpy(overallSelection + overallSelectionStartIndex, threadSelectionStart, k * sizeof(int));
+
+    delete []threadSelectionStart;
+    delete args;
+
+    return nullptr;
+}
+
+template<typename T1, typename T2>
 int selectValuesAdaptiveParallel(int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold, int dop) {
-    return 0;
+    assert(1 < dop && dop <= maxDop());
+
+    Counters::getInstance();
+    pthread_t threads[dop];
+
+    std::vector<int> elementsPerThread(dop, n / dop);
+    elementsPerThread[dop - 1] = n - ((dop - 1) * (n / dop));
+    int startIndex = 0;
+
+    std::atomic<int> selectedCount = 0;
+
+    std::vector<SelectValuesThreadArgs<T1, T2>*> threadArgs(dop);
+
+    for (int i = 0; i < dop; ++i) {
+        threadArgs[i] = new SelectValuesThreadArgs<T1, T2>;
+        threadArgs[i]->startIndex = startIndex;
+        threadArgs[i]->n = elementsPerThread[i];
+        threadArgs[i]->inputData = inputData;
+        threadArgs[i]->inputFilter = inputFilter;
+        threadArgs[i]->selection = selection;
+        threadArgs[i]->threshold = threshold;
+        threadArgs[i]->selectedCount = &selectedCount;
+
+        pthread_create(&threads[i], NULL, selectValuesAdaptiveParallelAux<T1, T2>,
+                       threadArgs[i]);
+
+        startIndex += elementsPerThread[i];
+    }
+
+    for (int i = 0; i < dop; ++i) {
+        pthread_join(threads[i], nullptr);
+    }
+
+    return selectedCount;
 }
 
 template<typename T1, typename T2>

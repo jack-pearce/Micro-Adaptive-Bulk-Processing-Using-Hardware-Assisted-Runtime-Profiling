@@ -703,7 +703,7 @@ int main() {
 
     selectValuesCompareResultsTest(DataFiles::bestCaseIndexesTunedUnequalLowerStep50IntDistribution250mValues,
                                    Select::ImplementationValuesVectorized,
-                                   Select::ImplementationValuesAdaptive);
+                                   Select::ImplementationValuesAdaptiveParallel);
 
 
     return 0;
