@@ -166,9 +166,9 @@ void DataFile::loadDataIntoMemory(int *data) const {
     } else if (getFileName() == "worstCaseValuesTunedLowerStep50IntDistribution250mValues") {
         generateLowerStepSelectivityInMemory(data, getNumElements(), 51, 5000);
     } else if (getFileName() == "bestCaseIndexesTunedUnequalLowerStep50IntDistribution250mValues") {
-        generateUnequalLowerStepSelectivityInMemory(data, getNumElements(), 51, 10, 10);
+        generateUnequalLowerStepSelectivityInMemory(data, getNumElements(), 51, 10, 0.91);
     } else if (getFileName() == "bestCaseValuesTunedUnequalLowerStep50IntDistribution250mValues") {
-        generateUnequalLowerStepSelectivityInMemory(data, getNumElements(), 51, 10, 15);
+        generateUnequalLowerStepSelectivityInMemory(data, getNumElements(), 51, 10, 0.94);
     } else if (getFileName() == "fullySortedIntDistribution250mValues") {
         generatePartiallySortedInMemory(data, getNumElements(), 100, 0);
     } else if (getFileName() == "veryNearlyFullySortedIntDistribution250mValues") {
@@ -232,11 +232,18 @@ DataSweep DataSweeps::varyingIntDistribution250mValuesSweep {
         "Linear input of number of discrete sections from 2 to 10,000"};
 
 DataSweep DataSweeps::lowerStep50IntDistribution250mValuesSweep {
-        30,
+        100,
         250*1000*1000,
         "lowerStep50IntDistribution250mValuesSweep",
         "250m int values where max value is 100 and min value is either 1 or 51"
         "Linear input of number of discrete sections from 2 to 10,000"};
+
+DataSweep DataSweeps::lowerStep50IntDistribution250mValuesPercentageStepSweep {
+        101,
+        250*1000*1000,
+        "lowerStep50IntDistribution250mValuesPercentageStepSweep",
+        "250m int values where max value is 100 and min value is either 1 or 51"
+        "Linear input of percentage of input which is 51"};
 
 DataSweep DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepVariableMax {
         30,
@@ -419,6 +426,8 @@ DataSweep::DataSweep(int _totalRuns, int _numElements, std::string _sweepName, s
     } else if (getSweepName() == "varyingIntDistribution250mValuesSweep" ||
                getSweepName() == "lowerStep50IntDistribution250mValuesSweep") {
         generateLogDistribution(getTotalRuns(), 2, 10000, inputs);
+    } else if (getSweepName() == "lowerStep50IntDistribution250mValuesPercentageStepSweep") {
+        generateLinearDistribution(getTotalRuns(), 0, 1, inputs);
     } else if (getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweepVariableMax" ||
             getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered1"  ||
             getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered1k"  ||
@@ -471,6 +480,9 @@ bool DataSweep::loadNextDataSetIntoMemory(int *data) {
         return true;
     } else if (getSweepName() == "lowerStep50IntDistribution250mValuesSweep") {
         generateLowerStepSelectivityInMemory(data, getNumElements(), 51, static_cast<int>(inputs[runsCompleted++]));
+        return true;
+    } else if (getSweepName() == "lowerStep50IntDistribution250mValuesPercentageStepSweep") {
+        generateUnequalLowerStepSelectivityInMemory(data, getNumElements(), 51, 10, inputs[runsCompleted++]);
         return true;
     } else if (getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweepVariableMax") {
         generateUniformDistributionInMemory(data, getNumElements(), static_cast<int>(inputs[runsCompleted++]));

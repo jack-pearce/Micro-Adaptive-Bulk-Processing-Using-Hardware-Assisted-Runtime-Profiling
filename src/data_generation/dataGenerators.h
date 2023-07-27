@@ -5,7 +5,7 @@
 void generateVaryingSelectivityInMemory(int *data, int n, int minimum, int numberOfDiscreteSections);
 void generateUpperStepSelectivityInMemory(int *data, int n, int step, int numberOfDiscreteSections);
 void generateLowerStepSelectivityInMemory(int *data, int n, int step, int numberOfDiscreteSections);
-void generateUnequalLowerStepSelectivityInMemory(int *data, int n, int step, int numberOfDiscreteSections, int sectionRatio);
+void generateUnequalLowerStepSelectivityInMemory(int *data, int n, int step, int numberOfDiscreteSections, float percentStepSection);
 void generatePartiallySortedInMemory(int *data, int n, int numRepeats, float percentageRandom);
 
 void generateUniformDistributionInMemory(int *data, int n, int upperBound);

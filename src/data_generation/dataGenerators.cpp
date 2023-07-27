@@ -106,15 +106,15 @@ void generateLowerStepSelectivityInMemory(int *data, int n, int step, int number
     std::cout << "Complete" << std::endl;
 }
 
-
-void generateUnequalLowerStepSelectivityInMemory(int *data, int n, int step, int numberOfDiscreteSections, int sectionRatio) {
+void generateUnequalLowerStepSelectivityInMemory(int *data, int n, int step, int numberOfDiscreteSections,
+                                                 float percentStepSection) {
     std::cout << "Generating data in memory... ";
     std::cout.flush();
 
     int elementsPerSection = n / numberOfDiscreteSections;
 
-    auto elementsPerStepSection = elementsPerSection * sectionRatio / (1 + sectionRatio);
-    auto elementsPerNoStepSection = elementsPerSection - elementsPerStepSection;
+    auto elementsPerStepSection = static_cast<int>(elementsPerSection * percentStepSection);
+    auto elementsPerNoStepSection = static_cast<int>(elementsPerSection - elementsPerStepSection);
 
     unsigned int seed = 1;
     std::mt19937 gen(seed);

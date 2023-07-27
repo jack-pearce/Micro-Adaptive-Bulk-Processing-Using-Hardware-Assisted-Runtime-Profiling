@@ -91,6 +91,8 @@ public:
 
     static DataSweep lowerStep50IntDistribution250mValuesSweep;
 
+    static DataSweep lowerStep50IntDistribution250mValuesPercentageStepSweep;
+
     static DataSweep logUniformIntDistribution200mValuesCardinalitySweepVariableMax;
     static DataSweep logUniformIntDistribution200mValuesCardinalitySweepFixedMax;
     static DataSweep logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered1;
