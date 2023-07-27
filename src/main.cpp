@@ -140,6 +140,61 @@ void selectIndexesCompareResultsTest(const DataFile& dataFile, Select selectImpO
     delete[] selectionTwo;
 }
 
+void selectValuesCompareResultsTest(const DataFile& dataFile, Select selectImpOne, Select selectImpTwo) {
+    int threshold = 3;
+    auto inputFilter = new int[dataFile.getNumElements()];
+    auto inputData = new int[dataFile.getNumElements()];
+    auto selectionOne = new int[dataFile.getNumElements()];
+    copyArray(LoadedData::getInstance(dataFile).getData(), inputFilter,
+              dataFile.getNumElements());
+    copyArray(LoadedData::getInstance(dataFile).getData(), inputData,
+              dataFile.getNumElements());
+
+    std::cout << "Running " << getSelectName(selectImpOne) << "..." << std::endl;
+
+    int resultOne = MABPL::runSelectFunction(selectImpOne, dataFile.getNumElements(),
+                                             inputData, inputFilter, selectionOne, threshold);
+    std::sort(selectionOne, selectionOne + resultOne);
+
+    auto selectionTwo = new int[dataFile.getNumElements()];
+
+    std::cout << std::endl << "Running " << getSelectName(selectImpTwo) << "..." << std::endl;
+
+    int resultTwo = MABPL::runSelectFunction(selectImpTwo, dataFile.getNumElements(),
+                                             inputData, inputFilter, selectionTwo, threshold);
+    std::sort(selectionTwo, selectionTwo + resultTwo);
+
+    if (resultOne != resultTwo) {
+        std::cout << "Size of results are different" << std::endl;
+    }
+
+/*    for (auto i = 0; i < 400; i++) {
+        std::cout << inputFilter[i] << std::endl;
+    }
+    std::cout << std::endl;
+
+    for (auto i = 0; i < resultOne; i++) {
+        std::cout << selectionOne[i] << std::endl;
+    }
+    std::cout << std::endl;
+
+    for (auto i = 0; i < resultTwo; i++) {
+        std::cout << selectionTwo[i] << std::endl;
+    }
+    std::cout << std::endl;*/
+
+    for (auto i = 0; i < static_cast<int>(resultOne); ++i) {
+        if (selectionOne[i] != selectionTwo[i]) {
+            std::cout << "Different index found" << std::endl;
+        }
+    }
+
+    delete[] inputFilter;
+    delete[] inputData;
+    delete[] selectionOne;
+    delete[] selectionTwo;
+}
+
 void selectWallTimeDopSweepBenchmarkCalcDopRange(DataSweep &dataSweep, Select selectImplementation,
                                                  int threshold, int iterations,
                                                  const std::string &fileNamePrefix) {
@@ -310,7 +365,33 @@ void allSelectIndexesParallelTests() {
 }
 
 void allSelectValuesParallelTests() {
+    std::vector<float> inputThresholdDistribution;
+    generateLogDistribution(30, 1, 10*1000, inputThresholdDistribution);
+    selectWallTimeInputSweepBenchmark(DataFiles::uniformIntDistribution250mValuesMax10000,
+                                      {Select::ImplementationValuesAdaptive},
+                                      inputThresholdDistribution,
+                                      5, "7-DOP-1-SelectivitySweepSingle");
 
+    selectWallTimeDopAndInputSweepBenchmarkCalcDopRange(DataFiles::uniformIntDistribution250mValuesMax10000,
+                                                        Select::ImplementationValuesAdaptiveParallel,
+                                                        inputThresholdDistribution,
+                                                        5, "7-DOP-1-SelectivitySweepParallel");
+
+    selectWallTimeSweepBenchmark(DataSweeps::lowerStep50IntDistribution250mValuesSweep,
+                                 {Select::ImplementationValuesAdaptive},
+                                 50, 5, "7-DOP-2-StepPeriodSweepSingle");
+
+    selectWallTimeDopSweepBenchmarkCalcDopRange(DataSweeps::lowerStep50IntDistribution250mValuesSweep,
+                                                Select::ImplementationValuesAdaptiveParallel,
+                                                50, 5, "7-DOP-2-StepPeriodSweepParallel");
+
+    selectWallTimeSweepBenchmark(DataSweeps::lowerStep50IntDistribution250mValuesPercentageStepSweep,
+                                 {Select::ImplementationValuesAdaptive},
+                                 50, 5, "7-DOP-3-StepPercentageSweepSingle");
+
+    selectWallTimeDopSweepBenchmarkCalcDopRange(DataSweeps::lowerStep50IntDistribution250mValuesPercentageStepSweep,
+                                                Select::ImplementationValuesAdaptiveParallel,
+                                                50, 5, "7-DOP-3-StepPercentageSweepParallel");
 }
 
 void groupByCompareResultsTest(const DataFile& dataFile, GroupBy groupByImpOne, GroupBy groupByImpTwo) {
@@ -620,23 +701,9 @@ void allGroupByParallelTests() {
 
 int main() {
 
-//    selectIndexesCompareResultsTest(DataFiles::bestCaseIndexesTunedUnequalLowerStep50IntDistribution250mValues, Select::ImplementationIndexesPredication,
-//                                    Select::ImplementationIndexesAdaptiveParallel);
-
-//    std::vector<float> inputThresholdDistribution;
-//    generateLogDistribution(30, 1, 10*1000, inputThresholdDistribution);
-//    selectWallTimeDopAndInputSweepBenchmarkCalcDopRange(DataFiles::uniformIntDistribution250mValuesMax10000,
-//                                                        Select::ImplementationIndexesAdaptiveParallel,
-//                                                        inputThresholdDistribution,
-//                                                        2, "TEST-7-DOP-3-SelectivitySweepParallel");
-
-    selectWallTimeSweepBenchmark(DataSweeps::lowerStep50IntDistribution250mValuesPercentageStepSweep,
-                                 {Select::ImplementationIndexesAdaptive},
-                                 50, 2, "7-DOP-3-StepPercentageSweepSingle");
-
-    selectWallTimeDopSweepBenchmarkCalcDopRange(DataSweeps::lowerStep50IntDistribution250mValuesPercentageStepSweep,
-                                                Select::ImplementationIndexesAdaptiveParallel,
-                                                50, 2, "7-DOP-3-StepPercentageSweepParallel");
+    selectValuesCompareResultsTest(DataFiles::uniformIntDistribution25kValuesMax100,
+                                   Select::ImplementationValuesVectorized,
+                                   Select::ImplementationValuesBranch);
 
 
     return 0;
