@@ -701,9 +701,7 @@ void allGroupByParallelTests() {
 
 int main() {
 
-    allSelectIndexesParallelTests();
 
-    allSelectValuesParallelTests();
 
     return 0;
 }

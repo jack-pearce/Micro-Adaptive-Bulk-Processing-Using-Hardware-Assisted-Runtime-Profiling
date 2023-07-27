@@ -5,6 +5,8 @@
 #include <vector>
 #include <memory>
 
+#include "../utilities/dataStructures.h"
+
 
 namespace MABPL {
 
@@ -17,9 +19,6 @@ enum GroupBy {
 
 std::string getGroupByName(GroupBy groupByImplementation);
 
-
-template<typename T1, typename T2>
-using vectorOfPairs = std::vector<std::pair<T1, T2>>;
 
 template<typename T>
 struct MinAggregation {

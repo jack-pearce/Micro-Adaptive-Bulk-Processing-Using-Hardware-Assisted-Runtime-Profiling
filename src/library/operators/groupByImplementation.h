@@ -14,7 +14,7 @@
 
 namespace MABPL {
 
-constexpr int BITS_PER_RADIX_PASS = 10;
+constexpr int BITS_PER_GROUPBY_RADIX_PASS = 10;
 constexpr float GROUPBY_MACHINE_CONSTANT = 0.125;
 
 template<typename T>
@@ -80,7 +80,7 @@ template<template<typename> class Aggregator, typename T1, typename T2>
 void groupBySortAuxAgg(int start, int end, const T1 *inputGroupBy, T2 *inputAggregate, int mask, int numBuckets,
                        std::vector<int> &buckets, vectorOfPairs <T1, T2> &result) {
     int i;
-    bool bucketEntryPresent[1 << BITS_PER_RADIX_PASS] = {false};
+    bool bucketEntryPresent[1 << BITS_PER_GROUPBY_RADIX_PASS] = {false};
 
     for (i = start; i < end; i++) {
         buckets[inputGroupBy[i] & mask] = Aggregator<T2>()(buckets[inputGroupBy[i] & mask], inputAggregate[i],
@@ -105,7 +105,7 @@ void groupBySortAux(int start, int end, T1 *inputGroupBy, T2 *inputAggregate, T1
     int i;
 
     for (i = start; i < end; i++) {
-        buckets[(inputGroupBy[i] >> (pass * BITS_PER_RADIX_PASS)) & mask]++;
+        buckets[(inputGroupBy[i] >> (pass * BITS_PER_GROUPBY_RADIX_PASS)) & mask]++;
     }
 
     for (i = 1; i < numBuckets; i++) {
@@ -118,8 +118,8 @@ void groupBySortAux(int start, int end, T1 *inputGroupBy, T2 *inputAggregate, T1
     }
 
     for (i = end - 1; i >= start; i--) {
-        bufferGroupBy[start + --buckets[(inputGroupBy[i] >> (pass * BITS_PER_RADIX_PASS)) & mask]] = inputGroupBy[i];
-        bufferAggregate[start + buckets[(inputGroupBy[i] >> (pass * BITS_PER_RADIX_PASS)) & mask]] = inputAggregate[i];
+        bufferGroupBy[start + --buckets[(inputGroupBy[i] >> (pass * BITS_PER_GROUPBY_RADIX_PASS)) & mask]] = inputGroupBy[i];
+        bufferAggregate[start + buckets[(inputGroupBy[i] >> (pass * BITS_PER_GROUPBY_RADIX_PASS)) & mask]] = inputAggregate[i];
     }
 
     std::fill(buckets.begin(), buckets.end(), 0);
@@ -162,7 +162,7 @@ vectorOfPairs<T1, T2> groupBySort(int n, T1 *inputGroupBy, T2 *inputAggregate) {
     static_assert(std::is_arithmetic<T2>::value, "Payload column must be an numeric type");
 
     int i;
-    int numBuckets = 1 << BITS_PER_RADIX_PASS;
+    int numBuckets = 1 << BITS_PER_GROUPBY_RADIX_PASS;
     int mask = numBuckets - 1;
     int largest = 0;
 
@@ -177,10 +177,10 @@ vectorOfPairs<T1, T2> groupBySort(int n, T1 *inputGroupBy, T2 *inputAggregate) {
         msbPosition++;
     }
 
-    int pass = static_cast<int>(std::ceil(static_cast<double>(msbPosition) / BITS_PER_RADIX_PASS)) - 1;
+    int pass = static_cast<int>(std::ceil(static_cast<double>(msbPosition) / BITS_PER_GROUPBY_RADIX_PASS)) - 1;
     vectorOfPairs<T1, T2> result;
 
-    std::vector<int> buckets(1 << BITS_PER_RADIX_PASS, 0);
+    std::vector<int> buckets(1 << BITS_PER_GROUPBY_RADIX_PASS, 0);
     T1 *bufferGroupBy = new T1[n];
     T2 *bufferAggregate = new T2[n];
 
@@ -227,10 +227,10 @@ vectorOfPairs<T1, T2> groupByAdaptiveAuxSort(int n, T1 *inputGroupBy, T2 *inputA
         msbPosition++;
     }
 
-    int pass = static_cast<int>(std::ceil(static_cast<double>(msbPosition) / BITS_PER_RADIX_PASS)) - 1;
+    int pass = static_cast<int>(std::ceil(static_cast<double>(msbPosition) / BITS_PER_GROUPBY_RADIX_PASS)) - 1;
 
-    int numBuckets = 1 << BITS_PER_RADIX_PASS;
-    std::vector<int> buckets(1 << BITS_PER_RADIX_PASS, 0);
+    int numBuckets = 1 << BITS_PER_GROUPBY_RADIX_PASS;
+    std::vector<int> buckets(1 << BITS_PER_GROUPBY_RADIX_PASS, 0);
 
     int mask = numBuckets - 1;
 
@@ -240,11 +240,11 @@ vectorOfPairs<T1, T2> groupByAdaptiveAuxSort(int n, T1 *inputGroupBy, T2 *inputA
 
     for (const auto& section : sectionsToBeSorted) {
         for (i = section.first; i < section.second; i++) {
-            buckets[(inputGroupBy[i] >> (pass * BITS_PER_RADIX_PASS)) & mask]++;
+            buckets[(inputGroupBy[i] >> (pass * BITS_PER_GROUPBY_RADIX_PASS)) & mask]++;
         }
     }
     for (auto it = map.begin(); it != map.end(); ++it) {
-        buckets[(it->first >> (pass * BITS_PER_RADIX_PASS)) & mask]++;
+        buckets[(it->first >> (pass * BITS_PER_GROUPBY_RADIX_PASS)) & mask]++;
     }
 
     for (i = 1; i < numBuckets; i++) {
@@ -254,13 +254,13 @@ vectorOfPairs<T1, T2> groupByAdaptiveAuxSort(int n, T1 *inputGroupBy, T2 *inputA
     std::vector<int> partitions(buckets.data(), buckets.data() + numBuckets);
 
     for (auto it = map.begin(); it != map.end(); it++) {
-        bufferGroupBy[--buckets[(it->first >> (pass * BITS_PER_RADIX_PASS)) & mask]] = it->first;
-        bufferAggregate[buckets[(it->first >> (pass * BITS_PER_RADIX_PASS)) & mask]] = it->second;
+        bufferGroupBy[--buckets[(it->first >> (pass * BITS_PER_GROUPBY_RADIX_PASS)) & mask]] = it->first;
+        bufferAggregate[buckets[(it->first >> (pass * BITS_PER_GROUPBY_RADIX_PASS)) & mask]] = it->second;
     }
     for (const auto& section : vectorOfPairs<int, int>(sectionsToBeSorted.rbegin(), sectionsToBeSorted.rend())) {
         for (i = section.first; i < section.second; i++) {
-            bufferGroupBy[--buckets[(inputGroupBy[i] >> (pass * BITS_PER_RADIX_PASS)) & mask]] = inputGroupBy[i];
-            bufferAggregate[buckets[(inputGroupBy[i] >> (pass * BITS_PER_RADIX_PASS)) & mask]] = inputAggregate[i];
+            bufferGroupBy[--buckets[(inputGroupBy[i] >> (pass * BITS_PER_GROUPBY_RADIX_PASS)) & mask]] = inputGroupBy[i];
+            bufferAggregate[buckets[(inputGroupBy[i] >> (pass * BITS_PER_GROUPBY_RADIX_PASS)) & mask]] = inputAggregate[i];
         }
     }
 
@@ -382,81 +382,6 @@ struct GroupByThreadArgs {
         return vectorOfPairs<T1, T2>(std::move(*tmp));
     }
 };
-
-template <typename T1, typename T2>
-void sortVectorOfPairsAux(int start, int end, vectorOfPairs<T1, T2> *inputVectorOfPairs, vectorOfPairs<T1, T2> *buffer,
-                          int mask, int numBuckets, std::vector<int> &buckets, int pass) {
-    int i;
-
-    for (i = start; i < end; i++) {
-        buckets[((*inputVectorOfPairs)[i].first >> (pass * BITS_PER_RADIX_PASS)) & mask]++;
-    }
-
-    for (i = 1; i < numBuckets; i++) {
-        buckets[i] += buckets[i - 1];
-    }
-
-    std::vector<int> partitions(buckets.data(), buckets.data() + numBuckets);
-    for (i = 0; i < numBuckets; i++) {
-        partitions[i] += start;
-    }
-
-    for (i = end - 1; i >= start; i--) {
-        (*buffer)[start + --buckets[((*inputVectorOfPairs)[i].first >> (pass * BITS_PER_RADIX_PASS)) & mask]] =
-                std::move((*inputVectorOfPairs)[i]);
-
-    }
-
-    std::fill(buckets.begin(), buckets.end(), 0);
-    std::swap(inputVectorOfPairs, buffer);
-    --pass;
-
-    if (pass >= 0) {
-        if (partitions[0] > start) {
-            sortVectorOfPairsAux(start, partitions[0], inputVectorOfPairs, buffer, mask, numBuckets,
-                                 buckets, pass);
-        }
-        for (i = 1; i < numBuckets; i++) {
-            if (partitions[i] > partitions[i - 1]) {
-                sortVectorOfPairsAux(partitions[i - 1], partitions[i], inputVectorOfPairs, buffer,
-                                     mask, numBuckets, buckets, pass);
-            }
-        }
-    }
-}
-
-template <typename T1, typename T2>
-void sortVectorOfPairs(vectorOfPairs<T1, T2> *&inputVectorOfPairs) {
-    size_t i;
-    int numBuckets = 1 << BITS_PER_RADIX_PASS;
-    int mask = numBuckets - 1;
-    int largest = 0;
-
-    for (i = 0; i < inputVectorOfPairs->size(); i++) {
-        if ((*inputVectorOfPairs)[i].first > largest) {
-            largest = (*inputVectorOfPairs)[i].first;
-        }
-    }
-    int msbPosition = 0;
-    while (largest != 0) {
-        largest >>= 1;
-        msbPosition++;
-    }
-
-    int pass = static_cast<int>(std::ceil(static_cast<double>(msbPosition) / BITS_PER_RADIX_PASS)) - 1;
-
-    std::vector<int> buckets(1 << BITS_PER_RADIX_PASS, 0);
-    auto *buffer = new vectorOfPairs<T1, T2>(inputVectorOfPairs->size(), std::pair<T1, T2>(0, 0));
-
-    sortVectorOfPairsAux(0, inputVectorOfPairs->size(), inputVectorOfPairs, buffer,
-                         mask, numBuckets, buckets, pass);
-
-    if (pass % 2 == 0) {
-        std::swap(inputVectorOfPairs, buffer);
-    }
-
-    delete buffer;
-}
 
 template<template<typename> class Aggregator, typename T1, typename T2>
 void *groupByAdaptiveParallelPerformMerge(void *arg) {

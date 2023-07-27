@@ -36,7 +36,8 @@ add_executable(${PROJECT_NAME}
         src/utilities/papiHelpers.cpp
         src/cycles_benchmarking/selectCyclesBenchmark.cpp
         src/library/operators/groupBy.cpp
-        src/cycles_benchmarking/groupByCyclesBenchmark.cpp src/library/mabpl.h)
+        src/cycles_benchmarking/groupByCyclesBenchmark.cpp
+        src/library/mabpl.h)
 
 target_link_libraries(${PROJECT_NAME} benchmark::benchmark)
 
