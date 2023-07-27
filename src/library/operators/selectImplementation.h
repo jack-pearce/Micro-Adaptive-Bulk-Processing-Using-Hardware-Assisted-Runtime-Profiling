@@ -39,7 +39,7 @@ inline int runSelectIndexesChunk(SelectIndexesChoice selectIndexesChoice,
                                  int tuplesToProcess,
                                  int &startIndex,
                                  int &n,
-                                 const T *inputData,
+                                 const T *inputFilter,
                                  int *&selection,
                                  T threshold,
                                  int &k,
@@ -47,12 +47,12 @@ inline int runSelectIndexesChunk(SelectIndexesChoice selectIndexesChoice,
     int selected;
     if (selectIndexesChoice == SelectIndexesChoice::IndexesBranch) {
         Counters::getInstance().readSharedEventSet();
-        selected = selectIndexesBranch(startIndex + tuplesToProcess, inputData, selection, threshold,
+        selected = selectIndexesBranch(startIndex + tuplesToProcess, inputFilter, selection, threshold,
                                        startIndex);
         Counters::getInstance().readSharedEventSet();
     } else {
         Counters::getInstance().readSharedEventSet();
-        selected = selectIndexesPredication(startIndex + tuplesToProcess, inputData, selection,
+        selected = selectIndexesPredication(startIndex + tuplesToProcess, inputFilter, selection,
                                             threshold, startIndex);
         Counters::getInstance().readSharedEventSet();
     }
@@ -169,7 +169,7 @@ inline int runSelectIndexesChunkParallel(SelectIndexesChoice selectIndexesChoice
                                          int tuplesToProcess,
                                          int &startIndex,
                                          int &n,
-                                         const T *inputData,
+                                         const T *inputFilter,
                                          int *&selection,
                                          T threshold,
                                          int &k,
@@ -179,12 +179,12 @@ inline int runSelectIndexesChunkParallel(SelectIndexesChoice selectIndexesChoice
     int selected;
     if (selectIndexesChoice == SelectIndexesChoice::IndexesBranch) {
         readThreadEventSet(eventSet, 1, counterValues);
-        selected = selectIndexesBranch(startIndex + tuplesToProcess, inputData, selection, threshold,
+        selected = selectIndexesBranch(startIndex + tuplesToProcess, inputFilter, selection, threshold,
                                        startIndex);
         readThreadEventSet(eventSet, 1, counterValues);
     } else {
         readThreadEventSet(eventSet, 1, counterValues);
-        selected = selectIndexesPredication(startIndex + tuplesToProcess, inputData, selection,
+        selected = selectIndexesPredication(startIndex + tuplesToProcess, inputFilter, selection,
                                             threshold, startIndex);
         readThreadEventSet(eventSet, 1, counterValues);
     }
@@ -318,9 +318,10 @@ int selectIndexesAdaptiveParallel(int n, const T *inputFilter, int *selection, T
 }
 
 template<typename T1, typename T2>
-int selectValuesBranch(int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold) {
+int selectValuesBranch(int endIndex, const T2 *inputData, const T1 *inputFilter, T2 *selection,
+                       T1 threshold, int startIndex) {
     auto k = 0;
-    for (auto i = 0; i < n; ++i) {
+    for (auto i = startIndex; i < endIndex; ++i) {
         if (inputFilter[i] <= threshold) {
             selection[k++] = inputData[i];
         }
@@ -329,9 +330,10 @@ int selectValuesBranch(int n, const T2 *inputData, const T1 *inputFilter, T2 *se
 }
 
 template<typename T1, typename T2>
-int selectValuesPredication(int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold) {
+int selectValuesPredication(int endIndex, const T2 *inputData, const T1 *inputFilter, T2 *selection,
+                            T1 threshold, int startIndex) {
     auto k = 0;
-    for (auto i = 0; i < n; ++i) {
+    for (auto i = startIndex; i < endIndex; ++i) {
         selection[k] = inputData[i];
 //        selection[k] = inputData[(0L - (inputFilter[i] <= threshold)) & i];
         k += (inputFilter[i] <= threshold);
@@ -343,23 +345,24 @@ int selectValuesPredication(int n, const T2 *inputData, const T1 *inputFilter, T
 #ifdef __AVX2__
 
 template<typename T1, typename T2>
-int selectValuesVectorized(int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold) {
+int selectValuesVectorized(int endIndex, const T2 *inputData, const T1 *inputFilter, T2 *selection,
+                           T1 threshold, int startIndex) {
     auto k = 0;
 
     // Process unaligned tuples
-    auto unalignedCount = 0;
-    for (auto i = 0; !arrayIsSimd256Aligned(inputFilter + i); ++i) {
+    auto misalignedCount = 0;
+    for (auto i = startIndex; !arrayIsSimd256Aligned(inputFilter + i); ++i) {
         selection[k] = inputData[i];
         k += (inputFilter[i] <= threshold);
-        ++unalignedCount;
+        ++misalignedCount;
     }
 
     // Vectorize the loop for aligned tuples
     int simdWidth = sizeof(__m256i) / sizeof(int);
-    int simdIterations = (n - unalignedCount) / simdWidth;
+    int simdIterations = (endIndex - startIndex - misalignedCount) / simdWidth;
     __m256i thresholdVector = _mm256_set1_epi32(threshold);
 
-    for (auto i = unalignedCount; i < unalignedCount + (simdIterations * simdWidth); i += simdWidth) {
+    for (auto i = startIndex + misalignedCount; i < startIndex + misalignedCount + (simdIterations * simdWidth); i += simdWidth) {
         __m256i filterVector = _mm256_load_si256((__m256i *)(inputFilter + i));
 
         // Compare filterVector <= thresholdVector
@@ -372,7 +375,7 @@ int selectValuesVectorized(int n, const T2 *inputData, const T1 *inputFilter, T2
     }
 
     // Process any remaining tuples
-    for (auto i = unalignedCount + simdIterations * simdWidth; i < n; ++i) {
+    for (auto i = startIndex + misalignedCount + simdIterations * simdWidth; i < endIndex; ++i) {
         selection[k] = inputData[i];
         k += (inputFilter[i] <= threshold);
     }
@@ -383,23 +386,24 @@ int selectValuesVectorized(int n, const T2 *inputData, const T1 *inputFilter, T2
 #else
 
 template<typename T1, typename T2>
-int selectValuesVectorized(int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold) {
+int selectValuesVectorized(int endIndex, const T2 *inputData, const T1 *inputFilter, T2 *selection,
+                           T1 threshold, int startIndex) {
     auto k = 0;
 
     // Process unaligned tuples
-    auto unalignedCount = 0;
-    for (auto i = 0; !arrayIsSimd128Aligned(inputFilter + i); ++i) {
+    auto misalignedCount = 0;
+    for (auto i = startIndex; !arrayIsSimd128Aligned(inputFilter + i); ++i) {
         selection[k] = inputData[i];
         k += (inputFilter[i] <= threshold);
-        ++unalignedCount;
+        ++misalignedCount;
     }
 
     // Vectorize the loop for aligned tuples
     int simdWidth = sizeof(__m128i) / sizeof(int);
-    int simdIterations = (n - unalignedCount) / simdWidth;
+    int simdIterations = (endIndex - startIndex - misalignedCount) / simdWidth;
     __m128i thresholdVector = _mm_set1_epi32(threshold);
 
-    for (auto i = unalignedCount; i < unalignedCount + (simdIterations * simdWidth); i += simdWidth) {
+    for (auto i = startIndex + misalignedCount; i < startIndex + misalignedCount + (simdIterations * simdWidth); i += simdWidth) {
         __m128i filterVector = _mm_load_si128((__m128i *)(inputFilter + i));
 
         // Compare filterVector <= thresholdVector
@@ -413,7 +417,7 @@ int selectValuesVectorized(int n, const T2 *inputData, const T1 *inputFilter, T2
     }
 
     // Process any remaining tuples
-    for (auto i = unalignedCount + simdIterations * simdWidth; i < n; ++i) {
+    for (auto i = startIndex + misalignedCount + simdIterations * simdWidth; i < endIndex; ++i) {
         selection[k] = inputData[i];
         k += (inputFilter[i] <= threshold);
     }
@@ -426,9 +430,10 @@ int selectValuesVectorized(int n, const T2 *inputData, const T1 *inputFilter, T2
 template<typename T1, typename T2>
 inline int runSelectValuesChunk(SelectValuesChoice selectValuesChoice,
                                 int tuplesToProcess,
+                                int &startIndex,
                                 int &n,
-                                const T2 *&inputData,
-                                const T1 *&inputFilter,
+                                const T2 *inputData,
+                                const T1 *inputFilter,
                                 T2 *&selection,
                                 T1 threshold,
                                 int &k,
@@ -436,16 +441,17 @@ inline int runSelectValuesChunk(SelectValuesChoice selectValuesChoice,
     int selected;
     if (selectValuesChoice == SelectValuesChoice::ValuesBranch) {
         Counters::getInstance().readSharedEventSet();
-        selected = selectValuesBranch(tuplesToProcess, inputData, inputFilter, selection, threshold);
+        selected = selectValuesBranch(startIndex + tuplesToProcess, inputData, inputFilter,
+                                      selection, threshold, startIndex);
         Counters::getInstance().readSharedEventSet();
     } else {
         Counters::getInstance().readSharedEventSet();
-        selected = selectValuesVectorized(tuplesToProcess, inputData, inputFilter, selection, threshold);
+        selected = selectValuesVectorized(startIndex + tuplesToProcess, inputData, inputFilter,
+                                          selection, threshold, startIndex);
         Counters::getInstance().readSharedEventSet();
     }
     n -= tuplesToProcess;
-    inputData += tuplesToProcess;
-    inputFilter += tuplesToProcess;
+    startIndex += tuplesToProcess;
     selection += selected;
     k += selected;
     consecutivePredications += (selectValuesChoice == SelectValuesChoice::ValuesVectorized);
@@ -485,8 +491,9 @@ int selectValuesAdaptive(int n, const T2 *inputData, const T1 *inputFilter, T2 *
     // Modified values for short branch burst chunks
     float branchCrossoverBranchMisses_BranchBurst = crossoverSelectivity * static_cast<float>(tuplesInBranchBurst);
 
-    auto k = 0;
-    auto consecutiveVectorized = 0;
+    int startIndex = 0;
+    int k = 0;
+    int consecutiveVectorized = 0;
     int tuplesToProcess;
     int selected;
     SelectValuesChoice selectValuesChoice = SelectValuesChoice::ValuesBranch;
@@ -500,16 +507,18 @@ int selectValuesAdaptive(int n, const T2 *inputData, const T1 *inputFilter, T2 *
             selectValuesChoice = SelectValuesChoice::ValuesVectorized;
             consecutiveVectorized = 0;
             tuplesToProcess = std::min(n, tuplesInBranchBurst);
-            selected = runSelectValuesChunk<T1,T2>(selectValuesChoice, tuplesToProcess, n,
-                                            inputData, inputFilter, selection, threshold, k, consecutiveVectorized);
+            selected = runSelectValuesChunk<T1,T2>(selectValuesChoice, tuplesToProcess, startIndex, n,
+                                            inputData, inputFilter, selection, threshold, k,
+                                            consecutiveVectorized);
             performSelectValuesAdaption(selectValuesChoice, counterValues, crossoverSelectivity,
                                         branchCrossoverBranchMisses_BranchBurst,
                                         static_cast<float>(selected) / static_cast<float>(tuplesInBranchBurst),
                                         consecutiveVectorized);
         } else {
             tuplesToProcess = std::min(n, tuplesPerAdaption);
-            selected = runSelectValuesChunk<T1,T2>(selectValuesChoice, tuplesToProcess, n,
-                                            inputData, inputFilter, selection, threshold, k, consecutiveVectorized);
+            selected = runSelectValuesChunk<T1,T2>(selectValuesChoice, tuplesToProcess, startIndex,n,
+                                            inputData, inputFilter, selection, threshold, k,
+                                            consecutiveVectorized);
             performSelectValuesAdaption(selectValuesChoice, counterValues, crossoverSelectivity,
                                         branchCrossoverBranchMisses,
                                         static_cast<float>(selected) / static_cast<float>(tuplesPerAdaption),

@@ -48,13 +48,16 @@ int selectIndexesAdaptiveParallel(int n, const T *inputFilter, int *selection, T
 
 
 template<typename T1, typename T2>
-int selectValuesBranch(int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold);
+int selectValuesBranch(int endIndex, const T2 *inputData, const T1 *inputFilter, T2 *selection,
+                       T1 threshold, int startIndex = 0);
 
 template<typename T1, typename T2>
-int selectValuesPredication(int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold);
+int selectValuesPredication(int endIndex, const T2 *inputData, const T1 *inputFilter, T2 *selection,
+                            T1 threshold, int startIndex = 0);
 
 template<typename T1, typename T2>
-int selectValuesVectorized(int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold);
+int selectValuesVectorized(int endIndex, const T2 *inputData, const T1 *inputFilter, T2 *selection,
+                           T1 threshold, int startIndex = 0);
 
 template<typename T1, typename T2>
 int selectValuesAdaptive(int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold);

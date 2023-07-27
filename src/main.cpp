@@ -701,9 +701,9 @@ void allGroupByParallelTests() {
 
 int main() {
 
-    selectValuesCompareResultsTest(DataFiles::uniformIntDistribution25kValuesMax100,
+    selectValuesCompareResultsTest(DataFiles::bestCaseIndexesTunedUnequalLowerStep50IntDistribution250mValues,
                                    Select::ImplementationValuesVectorized,
-                                   Select::ImplementationValuesBranch);
+                                   Select::ImplementationValuesAdaptive);
 
 
     return 0;
