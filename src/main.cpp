@@ -340,28 +340,28 @@ void allSelectIndexesParallelTests() {
     selectWallTimeInputSweepBenchmark(DataFiles::uniformIntDistribution250mValuesMax10000,
                                       {Select::ImplementationIndexesAdaptive},
                                       inputThresholdDistribution,
-                                      5, "7-DOP-1-SelectivitySweepSingle");
+                                      5, "7-DOP-1-Indexes-SelectivitySweepSingle");
 
     selectWallTimeDopAndInputSweepBenchmarkCalcDopRange(DataFiles::uniformIntDistribution250mValuesMax10000,
                                                         Select::ImplementationIndexesAdaptiveParallel,
                                                         inputThresholdDistribution,
-                                                        5, "7-DOP-1-SelectivitySweepParallel");
+                                                        5, "7-DOP-1-Indexes-SelectivitySweepParallel");
 
     selectWallTimeSweepBenchmark(DataSweeps::lowerStep50IntDistribution250mValuesSweep,
                                  {Select::ImplementationIndexesAdaptive},
-                                 50, 5, "7-DOP-2-StepPeriodSweepSingle");
+                                 50, 5, "7-DOP-2-Indexes-StepPeriodSweepSingle");
 
     selectWallTimeDopSweepBenchmarkCalcDopRange(DataSweeps::lowerStep50IntDistribution250mValuesSweep,
                                                 Select::ImplementationIndexesAdaptiveParallel,
-                                                50, 5, "7-DOP-2-StepPeriodSweepParallel");
+                                                50, 5, "7-DOP-2-Indexes-StepPeriodSweepParallel");
 
     selectWallTimeSweepBenchmark(DataSweeps::lowerStep50IntDistribution250mValuesPercentageStepSweep,
                                  {Select::ImplementationIndexesAdaptive},
-                                 50, 5, "7-DOP-3-StepPercentageSweepSingle");
+                                 50, 5, "7-DOP-3-Indexes-StepPercentageSweepSingle");
 
     selectWallTimeDopSweepBenchmarkCalcDopRange(DataSweeps::lowerStep50IntDistribution250mValuesPercentageStepSweep,
                                                 Select::ImplementationIndexesAdaptiveParallel,
-                                                50, 5, "7-DOP-3-StepPercentageSweepParallel");
+                                                50, 5, "7-DOP-3-Indexes-StepPercentageSweepParallel");
 }
 
 void allSelectValuesParallelTests() {
@@ -370,28 +370,28 @@ void allSelectValuesParallelTests() {
     selectWallTimeInputSweepBenchmark(DataFiles::uniformIntDistribution250mValuesMax10000,
                                       {Select::ImplementationValuesAdaptive},
                                       inputThresholdDistribution,
-                                      5, "7-DOP-1-SelectivitySweepSingle");
+                                      5, "7-DOP-1-Values-SelectivitySweepSingle");
 
     selectWallTimeDopAndInputSweepBenchmarkCalcDopRange(DataFiles::uniformIntDistribution250mValuesMax10000,
                                                         Select::ImplementationValuesAdaptiveParallel,
                                                         inputThresholdDistribution,
-                                                        5, "7-DOP-1-SelectivitySweepParallel");
+                                                        5, "7-DOP-1-Values-SelectivitySweepParallel");
 
     selectWallTimeSweepBenchmark(DataSweeps::lowerStep50IntDistribution250mValuesSweep,
                                  {Select::ImplementationValuesAdaptive},
-                                 50, 5, "7-DOP-2-StepPeriodSweepSingle");
+                                 50, 5, "7-DOP-2-Values-StepPeriodSweepSingle");
 
     selectWallTimeDopSweepBenchmarkCalcDopRange(DataSweeps::lowerStep50IntDistribution250mValuesSweep,
                                                 Select::ImplementationValuesAdaptiveParallel,
-                                                50, 5, "7-DOP-2-StepPeriodSweepParallel");
+                                                50, 5, "7-DOP-2-Values-StepPeriodSweepParallel");
 
     selectWallTimeSweepBenchmark(DataSweeps::lowerStep50IntDistribution250mValuesPercentageStepSweep,
                                  {Select::ImplementationValuesAdaptive},
-                                 50, 5, "7-DOP-3-StepPercentageSweepSingle");
+                                 50, 5, "7-DOP-3-Values-StepPercentageSweepSingle");
 
     selectWallTimeDopSweepBenchmarkCalcDopRange(DataSweeps::lowerStep50IntDistribution250mValuesPercentageStepSweep,
                                                 Select::ImplementationValuesAdaptiveParallel,
-                                                50, 5, "7-DOP-3-StepPercentageSweepParallel");
+                                                50, 5, "7-DOP-3-Values-StepPercentageSweepParallel");
 }
 
 void groupByCompareResultsTest(const DataFile& dataFile, GroupBy groupByImpOne, GroupBy groupByImpTwo) {
@@ -701,13 +701,9 @@ void allGroupByParallelTests() {
 
 int main() {
 
-    selectWallTimeSweepBenchmark(DataSweeps::lowerStep50IntDistribution250mValuesSweep,
-                                 {Select::ImplementationIndexesAdaptive},
-                                 50, 1, "7-DOP-2-StepPeriodSweepSingle");
+    allSelectIndexesParallelTests();
 
-    selectWallTimeDopSweepBenchmarkCalcDopRange(DataSweeps::lowerStep50IntDistribution250mValuesSweep,
-                                                Select::ImplementationIndexesAdaptiveParallel,
-                                                50, 1, "7-DOP-2-StepPeriodSweepParallel");
+    allSelectValuesParallelTests();
 
     return 0;
 }
