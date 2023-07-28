@@ -702,9 +702,9 @@ void allGroupByParallelTests() {
 
 int main() {
 
-    selectWallTimeDopSweepBenchmarkCalcDopRange(DataSweeps::lowerStep50IntDistribution250mValuesSweep,
-                                                Select::ImplementationValuesAdaptiveParallel,
-                                                50, 2, "ThreadChunks-7-DOP-2-Values-StepPeriodSweepParallel");
+    allSelectIndexesParallelTests();
+
+    allSelectValuesParallelTests();
 
     return 0;
 }
