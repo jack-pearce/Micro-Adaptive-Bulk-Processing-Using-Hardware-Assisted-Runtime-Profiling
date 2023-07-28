@@ -303,7 +303,7 @@ int selectIndexesAdaptiveParallel(int n, const T *inputFilter, int *selection, T
 
     int adaptivePeriod = 50000;
     int tuplesPerChunk = std::max(adaptivePeriod * 20, n / (dop * 20));
-    if ((n / tuplesPerChunk) < (2 * dop)) {
+    if ((n / tuplesPerChunk) < (4 * dop)) {
         tuplesPerChunk = n / dop;
     }
 
@@ -694,7 +694,7 @@ int selectValuesAdaptiveParallel(int n, const T2 *inputData, const T1 *inputFilt
 
     int adaptivePeriod = 50000;
     int tuplesPerChunk = std::max(adaptivePeriod * 20, n / (dop * 20));
-    if ((n / tuplesPerChunk) < (2 * dop)) {
+    if ((n / tuplesPerChunk) < (4 * dop)) {
         tuplesPerChunk = n / dop;
     }
 
