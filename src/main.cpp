@@ -166,6 +166,7 @@ void selectValuesCompareResultsTest(const DataFile& dataFile, Select selectImpOn
 
     if (resultOne != resultTwo) {
         std::cout << "Size of results are different" << std::endl;
+        std::cout << "Result one size: " << resultOne << ", Result two size: " << resultTwo << std::endl;
     }
 
 /*    for (auto i = 0; i < 400; i++) {
@@ -701,7 +702,9 @@ void allGroupByParallelTests() {
 
 int main() {
 
-
+    selectWallTimeDopSweepBenchmarkCalcDopRange(DataSweeps::lowerStep50IntDistribution250mValuesSweep,
+                                                Select::ImplementationValuesAdaptiveParallel,
+                                                50, 2, "ThreadChunks-7-DOP-2-Values-StepPeriodSweepParallel");
 
     return 0;
 }
