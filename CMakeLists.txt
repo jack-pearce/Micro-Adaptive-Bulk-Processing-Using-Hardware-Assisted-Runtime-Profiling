@@ -33,8 +33,6 @@ add_executable(${PROJECT_NAME}
         src/library/operators/select.cpp
         src/library/utilities/papi.cpp
         src/library/utilities/systemInformation.cpp
-        src/time_benchmarking/selectTimeBenchmark.cpp
-        src/time_benchmarking/timeBenchmarkHelpers.cpp
         src/main.cpp
         src/utilities/dataHelpers.cpp
         src/utilities/papiHelpers.cpp
@@ -42,7 +40,9 @@ add_executable(${PROJECT_NAME}
         src/library/operators/groupBy.cpp
         src/cycles_benchmarking/groupByCyclesBenchmark.cpp
         src/library/mabpl.h
-        src/library/machine_constants/machineConstants.cpp)
+        src/library/machine_constants/machineConstants.cpp
+        src/time_benchmarking/selectTimeBenchmark.cpp
+        src/time_benchmarking/timeBenchmarkHelpers.cpp)
 
 target_link_libraries(${PROJECT_NAME} benchmark::benchmark)
 

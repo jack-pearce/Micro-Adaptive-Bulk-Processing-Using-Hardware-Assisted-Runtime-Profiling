@@ -351,7 +351,7 @@ void groupByBenchmarkWithExtraCountersDuringRun(const DataFile &dataFile,
 
     auto inputGroupBy = new int[numElements];
     auto inputAggregate = new int[numElements];
-    copyArray<int>(LoadedData::getInstance(dataFile).getData(), inputGroupBy, dataFile.getNumElements());
+    copyArray<int>(LoadedData<int>::getInstance(dataFile).getData(), inputGroupBy, dataFile.getNumElements());
     generateUniformDistributionInMemory(inputAggregate, numElements, 10);
 
 

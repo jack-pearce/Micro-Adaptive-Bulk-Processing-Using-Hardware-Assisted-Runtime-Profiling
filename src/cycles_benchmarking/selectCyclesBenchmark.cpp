@@ -16,8 +16,8 @@ void selectSingleRunNoCounters(const DataFile &dataFile, Select selectImplementa
         auto inputData = new int[dataFile.getNumElements()];
         auto inputFilter = new int[dataFile.getNumElements()];
         auto selection = new int[dataFile.getNumElements()];
-        copyArray<int>(LoadedData::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
-        copyArray<int>(LoadedData::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
+        copyArray<int>(LoadedData<int>::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
+        copyArray<int>(LoadedData<int>::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
 
         std::cout << "Running threshold " << threshold << ", iteration " << j + 1 << "... ";
 
@@ -46,8 +46,8 @@ void selectCpuCyclesSingleInputBenchmark(const DataFile &dataFile,
             auto inputData = new int[dataFile.getNumElements()];
             auto inputFilter = new int[dataFile.getNumElements()];
             auto selection = new int[dataFile.getNumElements()];
-            copyArray<int>(LoadedData::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
-            copyArray<int>(LoadedData::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
+            copyArray<int>(LoadedData<int>::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
+            copyArray<int>(LoadedData<int>::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
 
             std::cout << "Running " << getSelectName(selectImplementations[j]) << ", iteration " << i + 1 << "... ";
 
@@ -101,8 +101,8 @@ void selectCpuCyclesMultipleInputBenchmark(const DataFile &dataFile,
                 auto inputData = new int[dataFile.getNumElements()];
                 auto inputFilter = new int[dataFile.getNumElements()];
                 auto selection = new int[dataFile.getNumElements()];
-                copyArray<int>(LoadedData::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
-                copyArray<int>(LoadedData::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
+                copyArray<int>(LoadedData<int>::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
+                copyArray<int>(LoadedData<int>::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
 
                 std::cout << "Running " << getSelectName(selectImplementations[i]) << ", threshold ";
                 std::cout << j << ", iteration " << k + 1 << "... ";
@@ -164,8 +164,8 @@ void selectBenchmarkWithExtraCounters(const DataFile &dataFile, Select selectImp
             auto inputData = new int[dataFile.getNumElements()];
             auto inputFilter = new int[dataFile.getNumElements()];
             auto selection = new int[dataFile.getNumElements()];
-            copyArray<int>(LoadedData::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
-            copyArray<int>(LoadedData::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
+            copyArray<int>(LoadedData<int>::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
+            copyArray<int>(LoadedData<int>::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
 
             std::cout << "Running threshold " << static_cast<int>(thresholds[i]) << ", iteration " << j + 1 << "... ";
 
@@ -411,8 +411,8 @@ void selectCpuCyclesInputSweepBenchmark(const DataFile &dataFile,
                 auto inputData = new int[dataFile.getNumElements()];
                 auto inputFilter = new int[dataFile.getNumElements()];
                 auto selection = new int[dataFile.getNumElements()];
-                copyArray<int>(LoadedData::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
-                copyArray<int>(LoadedData::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
+                copyArray<int>(LoadedData<int>::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
+                copyArray<int>(LoadedData<int>::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
 
                 std::cout << "Running " << getSelectName(selectImplementations[j]) << " for threshold ";
                 std::cout << std::to_string(static_cast<int>(thresholds[k])) << "... ";
@@ -464,8 +464,8 @@ void selectWallTimeInputSweepBenchmark(const DataFile &dataFile,
                 auto inputData = new int[dataFile.getNumElements()];
                 auto inputFilter = new int[dataFile.getNumElements()];
                 auto selection = new int[dataFile.getNumElements()];
-                copyArray<int>(LoadedData::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
-                copyArray<int>(LoadedData::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
+                copyArray<int>(LoadedData<int>::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
+                copyArray<int>(LoadedData<int>::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
 
                 std::cout << "Running " << getSelectName(selectImplementations[j]) << " for threshold ";
                 std::cout << std::to_string(static_cast<int>(thresholds[k])) << "... ";
@@ -518,8 +518,8 @@ void selectWallTimeDopAndInputSweepBenchmark(const DataFile &dataFile,
                 auto inputData = new int[dataFile.getNumElements()];
                 auto inputFilter = new int[dataFile.getNumElements()];
                 auto selection = new int[dataFile.getNumElements()];
-                copyArray<int>(LoadedData::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
-                copyArray<int>(LoadedData::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
+                copyArray<int>(LoadedData<int>::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
+                copyArray<int>(LoadedData<int>::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
 
                 std::cout << "Running dop of " << dop[j] << " for input ";
                 std::cout << std::to_string(static_cast<int>(thresholds[k])) << "... ";

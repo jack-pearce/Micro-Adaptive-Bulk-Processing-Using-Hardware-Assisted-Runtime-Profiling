@@ -5,6 +5,7 @@
 #include "../utilities/dataHelpers.h"
 #include "../../libs/benchmark/include/benchmark/benchmark.h"
 
+/*
 LoadedData* loadedDataFile;
 
 static void selectTimeBenchmarker(benchmark::State& state) {
@@ -18,25 +19,25 @@ static void selectTimeBenchmarker(benchmark::State& state) {
 
     for (auto _: state) {
         MABPL::runSelectFunction<int>(selectImplementation, numElements, inputData,
-                          inputFilter, selection.get(), selectivity);
+                                      inputFilter, selection.get(), selectivity);
     }
 }
 
 void selectTimeBenchmark(const DataFile &dataFile, Select selectImplementation, int selectivityStride) {
     loadedDataFile = &LoadedData::getInstance(dataFile);
     BENCHMARK(selectTimeBenchmarker)
-    ->Name(getSelectName(selectImplementation))
-    ->ArgsProduct({benchmark::CreateDenseRange(0, 100, selectivityStride),
-                   {selectImplementation}});
+            ->Name(getSelectName(selectImplementation))
+            ->ArgsProduct({benchmark::CreateDenseRange(0, 100, selectivityStride),
+                           {selectImplementation}});
 }
 
 void selectTimeBenchmarkSetIterations(const DataFile &dataFile, Select selectImplementation,
                                       int selectivityStride, int iterations) {
     loadedDataFile = &LoadedData::getInstance(dataFile);
     BENCHMARK(selectTimeBenchmarker)
-    ->Name(getSelectName(selectImplementation))
-    ->Iterations(iterations)
-    ->ArgsProduct({benchmark::CreateDenseRange(0, 100, selectivityStride),
-                   {selectImplementation}});
+            ->Name(getSelectName(selectImplementation))
+            ->Iterations(iterations)
+            ->ArgsProduct({benchmark::CreateDenseRange(0, 100, selectivityStride),
+                           {selectImplementation}});
 }
-
+*/

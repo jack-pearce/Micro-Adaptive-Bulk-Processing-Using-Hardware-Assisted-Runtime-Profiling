@@ -20,9 +20,9 @@ using MABPL::SumAggregation;
 using MABPL::CountAggregation;
 
 void dataDistributionTest(const DataFile& dataFile) {
-    LoadedData::getInstance(dataFile);
+    LoadedData<int>::getInstance(dataFile);
     std::cout << dataFile.getNumElements() << " elements" << std::endl;
-    displayDistribution(dataFile);
+    displayDistribution<int>(dataFile);
 }
 
 void selectFunctionalityTest(const DataFile& dataFile, Select selectImplementation) {
@@ -31,8 +31,8 @@ void selectFunctionalityTest(const DataFile& dataFile, Select selectImplementati
         auto inputData = new int[dataFile.getNumElements()];
         auto inputFilter = new int[dataFile.getNumElements()];
         auto selection = new int[dataFile.getNumElements()];
-        copyArray<int>(LoadedData::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
-        copyArray<int>(LoadedData::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
+        copyArray<int>(LoadedData<int>::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
+        copyArray<int>(LoadedData<int>::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
 
         auto selected = MABPL::runSelectFunction(selectImplementation,
                                          dataFile.getNumElements(), inputData, inputFilter, selection, i);
@@ -45,15 +45,15 @@ void selectFunctionalityTest(const DataFile& dataFile, Select selectImplementati
     }
 }
 
-void runSelectTimeBenchmark(const DataFile& dataFile, Select selectImplementation, int selectivityStride) {
-    selectTimeBenchmark(dataFile, selectImplementation, selectivityStride);
-    runTimeBenchmark(0, nullptr);
-}
-
-void runSelectTimeBenchmarkSetIterations(const DataFile& dataFile, Select selectImplementation, int selectivityStride, int iterations) {
-    selectTimeBenchmarkSetIterations(dataFile, selectImplementation, selectivityStride, iterations);
-    runTimeBenchmark(0, nullptr);
-}
+//void runSelectTimeBenchmark(const DataFile& dataFile, Select selectImplementation, int selectivityStride) {
+//    selectTimeBenchmark(dataFile, selectImplementation, selectivityStride);
+//    runTimeBenchmark(0, nullptr);
+//}
+//
+//void runSelectTimeBenchmarkSetIterations(const DataFile& dataFile, Select selectImplementation, int selectivityStride, int iterations) {
+//    selectTimeBenchmarkSetIterations(dataFile, selectImplementation, selectivityStride, iterations);
+//    runTimeBenchmark(0, nullptr);
+//}
 
 void selectBenchmarkWithExtraCountersConfigurations(const DataFile &dataFile, Select selectImplementation, int iterations) {
     // HPC set 1
@@ -93,7 +93,7 @@ void selectIndexesCompareResultsTest(const DataFile& dataFile, Select selectImpO
     int threshold = 3;
     auto inputFilter = new int[dataFile.getNumElements()];
     auto selectionOne = new int[dataFile.getNumElements()];
-    copyArray<int>(LoadedData::getInstance(dataFile).getData(), inputFilter,
+    copyArray<int>(LoadedData<int>::getInstance(dataFile).getData(), inputFilter,
               dataFile.getNumElements());
 
     std::cout << "Running " << getSelectName(selectImpOne) << "..." << std::endl;
@@ -145,9 +145,9 @@ void selectValuesCompareResultsTest(const DataFile& dataFile, Select selectImpOn
     auto inputFilter = new int[dataFile.getNumElements()];
     auto inputData = new int[dataFile.getNumElements()];
     auto selectionOne = new int[dataFile.getNumElements()];
-    copyArray<int>(LoadedData::getInstance(dataFile).getData(), inputFilter,
+    copyArray<int>(LoadedData<int>::getInstance(dataFile).getData(), inputFilter,
               dataFile.getNumElements());
-    copyArray<int>(LoadedData::getInstance(dataFile).getData(), inputData,
+    copyArray<int>(LoadedData<int>::getInstance(dataFile).getData(), inputData,
               dataFile.getNumElements());
 
     std::cout << "Running " << getSelectName(selectImpOne) << "..." << std::endl;
@@ -418,7 +418,7 @@ void allSelectValuesParallelTests() {
 void groupByCompareResultsTest(const DataFile& dataFile, GroupBy groupByImpOne, GroupBy groupByImpTwo) {
     auto inputGroupBy = new int[dataFile.getNumElements()];
     auto inputAggregate = new int[dataFile.getNumElements()];
-    copyArray<int>(LoadedData::getInstance(dataFile).getData(), inputGroupBy, dataFile.getNumElements());
+    copyArray<int>(LoadedData<int>::getInstance(dataFile).getData(), inputGroupBy, dataFile.getNumElements());
     generateUniformDistributionInMemory(inputAggregate, dataFile.getNumElements(), 10);
 
     auto resultOne = MABPL::runGroupByFunction<MaxAggregation>(groupByImpOne,
