@@ -42,6 +42,11 @@ const DataFile DataFiles::uniformIntDistribution250mValuesMax10000{
         "uniformIntDistribution250mValuesMax10000",
         "uniform distribution of 250m int values 1-10,000"};
 
+const DataFile DataFiles::uniformInt64Distribution250mValuesMax10000{
+        250 * 1000 * 1000,
+        "uniformInt64Distribution250mValuesMax10000",
+        "uniform distribution of 250m 64bit int values 1-10,000"};
+
 const DataFile DataFiles::uniformIntDistribution250mValuesMax1000000{
         250 * 1000 * 1000,
         "uniformIntDistribution250mValuesMax1000000",
@@ -213,6 +218,12 @@ void DataFile::loadDataIntoMemory(int *data) const {
         generateUniformDistributionInMemoryWithSetCardinality(data, getNumElements(), 20*1000*1000, 50*1000);
     } else if (getFileName() == "uniformIntDistribution20mValuesTwo10mCardinalitySections_100_10m_Max20m") {
         generateUniformDistributionInMemoryWithTwoCardinalitySections(data, getNumElements(), 20*1000*1000, 100, 10*1000*1000, 0.5);
+    }
+}
+
+void DataFile::loadDataIntoMemory(int64_t *data) const {
+    if (getFileName() == "uniformInt64Distribution250mValuesMax10000") {
+        generateUniformDistributionInMemory(data, getNumElements(), 10*1000);
     }
 }
 

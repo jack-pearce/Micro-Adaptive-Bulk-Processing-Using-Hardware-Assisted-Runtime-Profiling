@@ -35,6 +35,7 @@ public:
     [[nodiscard]] const std::string& getFileName() const;
     [[nodiscard]] const std::string& getLongDescription() const;
     void loadDataIntoMemory(int *data) const;
+    void loadDataIntoMemory(int64_t *data) const;
 
 private:
     int numElements;
@@ -47,6 +48,7 @@ public:
     static const DataFile uniformIntDistribution25kValuesMax100;
     static const DataFile uniformIntDistribution250mValuesMax100;
     static const DataFile uniformIntDistribution250mValuesMax10000;
+    static const DataFile uniformInt64Distribution250mValuesMax10000;
     static const DataFile uniformIntDistribution250mValuesMax1000000;
 
     static const DataFile varyingIntDistribution25kValues;

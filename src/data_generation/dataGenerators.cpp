@@ -236,6 +236,29 @@ void generateUniformDistributionInMemory(int *data, int n, int upperBound) {
     std::cout << "Complete" << std::endl;
 }
 
+void generateUniformDistributionInMemory(int64_t *data, int n, int upperBound) {
+    std::cout << "Generating data in memory... ";
+    std::cout.flush();
+
+    if (upperBound == n) {
+        generateUniqueValuesRandomisedInMemory(data, n);
+        return;
+    }
+
+    unsigned int seed = 1;
+    std::mt19937 gen(seed);
+
+    auto lowerBound = 1;
+
+    std::uniform_int_distribution<int> distribution(lowerBound, upperBound);
+
+    for (auto i = 0; i < n; ++i) {
+        data[i] = distribution(gen);
+    }
+
+    std::cout << "Complete" << std::endl;
+}
+
 inline int scaleNumberLinearly(int number, int startingUpperBound, int targetUpperBound) {
     if (number == 1) {
         return 1;

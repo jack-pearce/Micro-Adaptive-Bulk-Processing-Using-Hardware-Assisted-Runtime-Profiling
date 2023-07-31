@@ -722,7 +722,7 @@ int main() {
 
     std::vector<float> inputThresholdDistribution;
     generateLogDistribution(30, 1, 10*1000, inputThresholdDistribution);
-    selectCpuCyclesInputSweepBenchmark(DataFiles::uniformIntDistribution250mValuesMax10000,
+    selectCpuCyclesInputSweepBenchmark(DataFiles::uniformInt64Distribution250mValuesMax10000,
                                        {Select::ImplementationIndexesBranch,
                                         Select::ImplementationIndexesPredication,
                                         Select::ImplementationIndexesAdaptive},
