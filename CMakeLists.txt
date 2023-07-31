@@ -27,7 +27,7 @@ pkg_check_modules(JSONCPP REQUIRED jsoncpp)
 include_directories(${JSONCPP_INCLUDE_DIRS})
 
 add_executable(${PROJECT_NAME}
-        src/data_generation/dataGenerators.cpp
+        src/data_generation/dataGenerators.h
         src/data_generation/dataFiles.cpp
         src/library/operators/select.cpp
         src/library/utilities/papi.cpp

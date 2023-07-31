@@ -1,12 +1,14 @@
+#ifndef MABPL_DATAGENERATORSIMPLEMENTATION_H
+#define MABPL_DATAGENERATORSIMPLEMENTATION_H
+
 #include <iostream>
 #include <random>
 #include <set>
 #include <cassert>
 
-#include "dataGenerators.h"
 
-
-void generateVaryingSelectivityInMemory(int *data, int n, int minimum, int numberOfDiscreteSections) {
+template <typename T>
+void generateVaryingSelectivityInMemory(T *data, int n, int minimum, int numberOfDiscreteSections) {
     std::cout << "Generating data in memory... ";
     std::cout.flush();
 
@@ -30,7 +32,7 @@ void generateVaryingSelectivityInMemory(int *data, int n, int minimum, int numbe
                 }
             }
 
-            std::uniform_int_distribution<int> distribution(lowerBound, upperBound);
+            std::uniform_int_distribution<T> distribution(lowerBound, upperBound);
             for (auto k = 0; k < elementsPerSection; ++k) {
                 data[index++] = distribution(gen);
             }
@@ -41,7 +43,8 @@ void generateVaryingSelectivityInMemory(int *data, int n, int minimum, int numbe
     std::cout << "Complete" << std::endl;
 }
 
-void generateUpperStepSelectivityInMemory(int *data, int n, int step, int numberOfDiscreteSections) {
+template <typename T>
+void generateUpperStepSelectivityInMemory(T *data, int n, int step, int numberOfDiscreteSections) {
     std::cout << "Generating data in memory... ";
     std::cout.flush();
 
@@ -62,7 +65,7 @@ void generateUpperStepSelectivityInMemory(int *data, int n, int step, int number
             upperBound = 100;
         }
 
-        std::uniform_int_distribution<int> distribution(lowerBound, upperBound);
+        std::uniform_int_distribution<T> distribution(lowerBound, upperBound);
         for (auto k = 0; k < elementsPerSection; ++k) {
             data[index++] = distribution(gen);
         }
@@ -73,8 +76,8 @@ void generateUpperStepSelectivityInMemory(int *data, int n, int step, int number
     std::cout << "Complete" << std::endl;
 }
 
-
-void generateLowerStepSelectivityInMemory(int *data, int n, int step, int numberOfDiscreteSections) {
+template <typename T>
+void generateLowerStepSelectivityInMemory(T *data, int n, int step, int numberOfDiscreteSections) {
     std::cout << "Generating data in memory... ";
     std::cout.flush();
 
@@ -95,7 +98,7 @@ void generateLowerStepSelectivityInMemory(int *data, int n, int step, int number
             lowerBound = 1;
         }
 
-        std::uniform_int_distribution<int> distribution(lowerBound, upperBound);
+        std::uniform_int_distribution<T> distribution(lowerBound, upperBound);
         for (auto k = 0; k < elementsPerSection; ++k) {
             data[index++] = distribution(gen);
         }
@@ -106,7 +109,8 @@ void generateLowerStepSelectivityInMemory(int *data, int n, int step, int number
     std::cout << "Complete" << std::endl;
 }
 
-void generateUnequalLowerStepSelectivityInMemory(int *data, int n, int step, int numberOfDiscreteSections,
+template <typename T>
+void generateUnequalLowerStepSelectivityInMemory(T *data, int n, int step, int numberOfDiscreteSections,
                                                  float percentStepSection) {
     std::cout << "Generating data in memory... ";
     std::cout.flush();
@@ -131,7 +135,7 @@ void generateUnequalLowerStepSelectivityInMemory(int *data, int n, int step, int
             lowerBound = 1;
         }
 
-        std::uniform_int_distribution<int> distribution(lowerBound, upperBound);
+        std::uniform_int_distribution<T> distribution(lowerBound, upperBound);
         if (onStep) {
             for (auto k = 0; k < elementsPerStepSection; ++k) {
                 data[index++] = distribution(gen);
@@ -149,7 +153,8 @@ void generateUnequalLowerStepSelectivityInMemory(int *data, int n, int step, int
     std::cout << "Complete" << std::endl;
 }
 
-void generatePartiallySortedInMemory(int *data, int n, int numRepeats, float percentageRandom) {
+template <typename T>
+void generatePartiallySortedInMemory(T *data, int n, int numRepeats, float percentageRandom) {
     std::cout << "Generating data in memory... ";
     std::cout.flush();
 
@@ -166,10 +171,10 @@ void generatePartiallySortedInMemory(int *data, int n, int numRepeats, float per
     std::mt19937 gen(seed);
 
     bool increasing = true;
-    auto lowerBound = 1;
-    auto upperBound = 100;
+    T lowerBound = 1;
+    T upperBound = 100;
 
-    int value;
+    T value;
     auto index = 0;
     for (auto i = 0; i < sections; ++i) {
         value = increasing ? lowerBound : upperBound;
@@ -213,7 +218,8 @@ void generatePartiallySortedInMemory(int *data, int n, int numRepeats, float per
     std::cout << "Complete" << std::endl;
 }
 
-void generateUniformDistributionInMemory(int *data, int n, int upperBound) {
+template <typename T>
+void generateUniformDistributionInMemory(T *data, int n, int upperBound) {
     std::cout << "Generating data in memory... ";
     std::cout.flush();
 
@@ -227,7 +233,7 @@ void generateUniformDistributionInMemory(int *data, int n, int upperBound) {
 
     auto lowerBound = 1;
 
-    std::uniform_int_distribution<int> distribution(lowerBound, upperBound);
+    std::uniform_int_distribution<T> distribution(lowerBound, upperBound);
 
     for (auto i = 0; i < n; ++i) {
         data[i] = distribution(gen);
@@ -236,46 +242,26 @@ void generateUniformDistributionInMemory(int *data, int n, int upperBound) {
     std::cout << "Complete" << std::endl;
 }
 
-void generateUniformDistributionInMemory(int64_t *data, int n, int upperBound) {
-    std::cout << "Generating data in memory... ";
-    std::cout.flush();
-
-    if (upperBound == n) {
-        generateUniqueValuesRandomisedInMemory(data, n);
-        return;
-    }
-
-    unsigned int seed = 1;
-    std::mt19937 gen(seed);
-
-    auto lowerBound = 1;
-
-    std::uniform_int_distribution<int> distribution(lowerBound, upperBound);
-
-    for (auto i = 0; i < n; ++i) {
-        data[i] = distribution(gen);
-    }
-
-    std::cout << "Complete" << std::endl;
-}
-
-inline int scaleNumberLinearly(int number, int startingUpperBound, int targetUpperBound) {
+template <typename T>
+inline T scaleNumberLinearly(int number, int startingUpperBound, int targetUpperBound) {
     if (number == 1) {
         return 1;
     }
     return 1 + (number - 1) * (static_cast<double>((targetUpperBound - 1)) / (startingUpperBound - 1));
 }
 
-inline int scaleNumberLogarithmically(int number, int startingUpperBound, int targetUpperBound) {
+template <typename T>
+inline T scaleNumberLogarithmically(T number, int startingUpperBound, int targetUpperBound) {
     double scaledValue = log(number) / log(startingUpperBound);
     double scaledNumber = pow(targetUpperBound, scaledValue);
     return std::round(scaledNumber);
 }
 
-void generateUniqueValuesRandomisedInMemory(int *data, int n) {
+template <typename T>
+void generateUniqueValuesRandomisedInMemory(T *data, int n) {
     // Fisher–Yates shuffle
 
-    for (int i = 1; i <= n; ++i) {
+    for (T i = 1; i <= n; ++i) {
         data[i - 1] = i;
     }
 
@@ -291,33 +277,15 @@ void generateUniqueValuesRandomisedInMemory(int *data, int n) {
     }
 }
 
-void generateUniqueValuesRandomisedInMemory(int64_t *data, int n) {
-    // Fisher–Yates shuffle
-
-    for (int i = 1; i <= n; ++i) {
-        data[i - 1] = i;
-    }
-
-    unsigned int seed = 1;
-    std::mt19937 gen(seed);
-    std::uniform_int_distribution<> dis(1, 1);
-    int j;
-
-    for (int i = n - 1; i >= 0; --i) {
-        dis = std::uniform_int_distribution<>(0, i);
-        j = dis(gen);
-        std::swap(data[i], data[j]);
-    }
-}
-
-void generateUniformDistributionInMemoryWithSetCardinality(int *data, int n, int upperBound, int cardinality) {
+template <typename T>
+void generateUniformDistributionInMemoryWithSetCardinality(T *data, int n, int upperBound, int cardinality) {
     assert(cardinality <= upperBound);
     std::cout << "Generating data in memory... ";
     std::cout.flush();
 
     if (cardinality == 1) {
         for (auto i = 0; i < n; ++i) {
-            data[i] = upperBound;
+            data[i] = static_cast<T>(upperBound);
         }
         std::cout << "Complete" << std::endl;
         return;
@@ -331,7 +299,7 @@ void generateUniformDistributionInMemoryWithSetCardinality(int *data, int n, int
     unsigned int seed = 1;
     std::mt19937 gen(seed);
 
-    std::uniform_int_distribution<int> distribution(1, cardinality);
+    std::uniform_int_distribution<T> distribution(1, cardinality);
 
     for (auto i = 0; i < n; ++i) {
         data[i] = scaleNumberLogarithmically(distribution(gen), cardinality, upperBound);
@@ -340,37 +308,8 @@ void generateUniformDistributionInMemoryWithSetCardinality(int *data, int n, int
     std::cout << "Complete" << std::endl;
 }
 
-void generateUniformDistributionInMemoryWithSetCardinality(int64_t *data, int n, int upperBound, int cardinality) {
-    assert(cardinality <= upperBound);
-    std::cout << "Generating data in memory... ";
-    std::cout.flush();
-
-    if (cardinality == 1) {
-        for (auto i = 0; i < n; ++i) {
-            data[i] = upperBound;
-        }
-        std::cout << "Complete" << std::endl;
-        return;
-    }
-
-    if (cardinality == n) {
-        generateUniqueValuesRandomisedInMemory(data, n);
-        return;
-    }
-
-    unsigned int seed = 1;
-    std::mt19937 gen(seed);
-
-    std::uniform_int_distribution<int> distribution(1, cardinality);
-
-    for (auto i = 0; i < n; ++i) {
-        data[i] = scaleNumberLogarithmically(distribution(gen), cardinality, upperBound);
-    }
-
-    std::cout << "Complete" << std::endl;
-}
-
-void generateUniformDistributionInMemoryWithSetCardinalityClustered(int *data, int n, int upperBound,
+template <typename T>
+void generateUniformDistributionInMemoryWithSetCardinalityClustered(T *data, int n, int upperBound,
                                                                     int cardinality, int spreadInCluster) {
     assert(cardinality <= upperBound);
     if (spreadInCluster >= cardinality) {
@@ -383,7 +322,7 @@ void generateUniformDistributionInMemoryWithSetCardinalityClustered(int *data, i
 
     if (cardinality == 1) {
         for (auto i = 0; i < n; ++i) {
-            data[i] = upperBound;
+            data[i] = static_cast<T>(upperBound);
         }
         std::cout << "Complete" << std::endl;
         return;
@@ -391,24 +330,27 @@ void generateUniformDistributionInMemoryWithSetCardinalityClustered(int *data, i
 
     unsigned int seed = 1;
     std::mt19937 gen(seed);
-    std::uniform_int_distribution<int> distribution(1, spreadInCluster);
+    std::uniform_int_distribution<T> distribution(1, spreadInCluster);
 
     int numberOfSections = 1 + cardinality - spreadInCluster;
     int elementsPerSection = n / numberOfSections;
     int index = 0;
     for (int i = 0; i < numberOfSections - 1; i++) {
         for (int j = 0; j < elementsPerSection; j++) {
-            data[index++] = scaleNumberLogarithmically(i + distribution(gen), cardinality, upperBound);
+            data[index++] = scaleNumberLogarithmically(static_cast<T>(i + distribution(gen)),
+                                                       cardinality, upperBound);
         }
     }
     while (index < n) {
-        data[index++] = scaleNumberLogarithmically(cardinality - spreadInCluster + distribution(gen), cardinality, upperBound);
+        data[index++] = scaleNumberLogarithmically(static_cast<T>(cardinality - spreadInCluster + distribution(gen)),
+                                                   cardinality, upperBound);
     }
 
     std::cout << "Complete" << std::endl;
 }
 
-void generateUniformDistributionInMemoryWithTwoCardinalitySections(int *data, int n, int upperBound,
+template <typename T>
+void generateUniformDistributionInMemoryWithTwoCardinalitySections(T *data, int n, int upperBound,
                                                                    int cardinalitySectionOne, int cardinalitySectionTwo,
                                                                    float fractionSectionTwo) {
     assert(cardinalitySectionOne <= upperBound && cardinalitySectionTwo <= upperBound);
@@ -422,10 +364,10 @@ void generateUniformDistributionInMemoryWithTwoCardinalitySections(int *data, in
 
     if (cardinalitySectionOne == 1) {
         for (auto i = 0; i < sizeSectionOne; ++i) {
-            data[i] = upperBound;
+            data[i] = static_cast<T>(upperBound);
         }
     } else {
-        std::uniform_int_distribution<int> distribution(1, cardinalitySectionOne);
+        std::uniform_int_distribution<T> distribution(1, cardinalitySectionOne);
 
         for (auto i = 0; i < sizeSectionOne; ++i) {
             data[i] = scaleNumberLogarithmically(distribution(gen), cardinalitySectionOne,
@@ -435,10 +377,10 @@ void generateUniformDistributionInMemoryWithTwoCardinalitySections(int *data, in
 
     if (cardinalitySectionTwo == 1) {
         for (auto i = sizeSectionOne; i < n; ++i) {
-            data[i] = upperBound;
+            data[i] = static_cast<T>(upperBound);
         }
     } else {
-        std::uniform_int_distribution<int> distribution(1, cardinalitySectionTwo);
+        std::uniform_int_distribution<T> distribution(1, cardinalitySectionTwo);
 
         for (auto i = sizeSectionOne; i < n; ++i) {
             data[i] = scaleNumberLogarithmically(distribution(gen), cardinalitySectionTwo,
@@ -449,7 +391,8 @@ void generateUniformDistributionInMemoryWithTwoCardinalitySections(int *data, in
     std::cout << "Complete" << std::endl;
 }
 
-void generateUniformDistributionInMemoryWithMultipleTwoCardinalitySections(int *data, int n, int upperBound,
+template <typename T>
+void generateUniformDistributionInMemoryWithMultipleTwoCardinalitySections(T *data, int n, int upperBound,
                                                                            int cardinalitySectionOne, int cardinalitySectionTwo,
                                                                            float fractionSectionTwo, int numSections) {
     assert(n % numSections == 0);
@@ -461,3 +404,5 @@ void generateUniformDistributionInMemoryWithMultipleTwoCardinalitySections(int *
         data += tuplesPerSection;
     }
 }
+
+#endif //MABPL_DATAGENERATORSIMPLEMENTATION_H

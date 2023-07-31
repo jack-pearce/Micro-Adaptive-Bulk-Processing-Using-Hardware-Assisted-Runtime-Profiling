@@ -58,7 +58,7 @@ void generateRandomisedUniqueValuesInMemory(T *data, int n) {
 }
 
 template <typename T>
-inline int scaleNumberLogarithmically(T number, int startingUpperBound, int targetUpperBound) {
+inline T scaleValueLogarithmically(T number, int startingUpperBound, int targetUpperBound) {
     static_assert(std::is_integral<T>::value, "Must be an integer type");
     double scaledValue = log(number) / log(startingUpperBound);
     double scaledNumber = pow(targetUpperBound, scaledValue);
@@ -88,7 +88,7 @@ void generateUniformDistributionWithSetCardinalityInMemory(T *data, int n, int u
     std::uniform_int_distribution<T> distribution(1, cardinality);
 
     for (auto i = 0; i < n; ++i) {
-        data[i] = scaleNumberLogarithmically(distribution(gen), cardinality, upperBound);
+        data[i] = scaleValueLogarithmically(distribution(gen), cardinality, upperBound);
     }
 }
 
