@@ -5,9 +5,6 @@
 #include <vector>
 #include <filesystem>
 
-//extern const std::string selectCyclesFolder;
-//extern const std::string groupByCyclesFolder;
-//extern const std::string dataFilesFolder;
 
 class FilePaths {
 public:

@@ -490,7 +490,7 @@ inline void performSelectValuesAdaption(SelectValuesChoice &selectValuesChoice,
                                         float selectivity,
                                         int &consecutiveVectorized) {
 
-    if (__builtin_expect(static_cast<float>(counterValues[0]) > branchCrossoverBranchMisses
+    if (__builtin_expect((static_cast<float>(counterValues[0]) > branchCrossoverBranchMisses || selectivity > 0.008)
                          && selectValuesChoice == SelectValuesChoice::ValuesBranch, false)) {
         selectValuesChoice = SelectValuesChoice::ValuesVectorized;
     }
