@@ -41,8 +41,8 @@ add_executable(${PROJECT_NAME}
         src/cycles_benchmarking/groupByCyclesBenchmark.cpp
         src/library/mabpl.h
         src/library/machine_constants/machineConstants.cpp
-        src/time_benchmarking/selectTimeBenchmark.cpp
-        src/time_benchmarking/timeBenchmarkHelpers.cpp)
+        src/time_benchmarking/timeBenchmarkHelpers.cpp
+        src/time_benchmarking/selectTimeBenchmark.h)
 
 target_link_libraries(${PROJECT_NAME} benchmark::benchmark)
 

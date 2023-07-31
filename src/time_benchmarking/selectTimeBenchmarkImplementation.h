@@ -1,3 +1,6 @@
+#ifndef MABPL_SELECTTIMEBENCHMARKIMPLEMENTATION_H
+#define MABPL_SELECTTIMEBENCHMARKIMPLEMENTATION_H
+
 #include <vector>
 #include <memory>
 
@@ -5,8 +8,7 @@
 #include "../utilities/dataHelpers.h"
 #include "../../libs/benchmark/include/benchmark/benchmark.h"
 
-/*
-LoadedData* loadedDataFile;
+LoadedData<int>* loadedDataFile;
 
 static void selectTimeBenchmarker(benchmark::State& state) {
     auto selectivity = static_cast<int>(state.range(0));
@@ -23,21 +25,27 @@ static void selectTimeBenchmarker(benchmark::State& state) {
     }
 }
 
+template <typename T>
 void selectTimeBenchmark(const DataFile &dataFile, Select selectImplementation, int selectivityStride) {
-    loadedDataFile = &LoadedData::getInstance(dataFile);
+    static_assert(std::is_same<T, int>::value);
+    loadedDataFile = &LoadedData<int>::getInstance(dataFile);
     BENCHMARK(selectTimeBenchmarker)
             ->Name(getSelectName(selectImplementation))
             ->ArgsProduct({benchmark::CreateDenseRange(0, 100, selectivityStride),
                            {selectImplementation}});
 }
 
+template <typename T>
 void selectTimeBenchmarkSetIterations(const DataFile &dataFile, Select selectImplementation,
                                       int selectivityStride, int iterations) {
-    loadedDataFile = &LoadedData::getInstance(dataFile);
+    static_assert(std::is_same<T, int>::value);
+    loadedDataFile = &LoadedData<int>::getInstance(dataFile);
     BENCHMARK(selectTimeBenchmarker)
             ->Name(getSelectName(selectImplementation))
             ->Iterations(iterations)
             ->ArgsProduct({benchmark::CreateDenseRange(0, 100, selectivityStride),
                            {selectImplementation}});
 }
-*/
+
+
+#endif //MABPL_SELECTTIMEBENCHMARKIMPLEMENTATION_H

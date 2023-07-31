@@ -45,15 +45,15 @@ void selectFunctionalityTest(const DataFile& dataFile, Select selectImplementati
     }
 }
 
-//void runSelectTimeBenchmark(const DataFile& dataFile, Select selectImplementation, int selectivityStride) {
-//    selectTimeBenchmark(dataFile, selectImplementation, selectivityStride);
-//    runTimeBenchmark(0, nullptr);
-//}
-//
-//void runSelectTimeBenchmarkSetIterations(const DataFile& dataFile, Select selectImplementation, int selectivityStride, int iterations) {
-//    selectTimeBenchmarkSetIterations(dataFile, selectImplementation, selectivityStride, iterations);
-//    runTimeBenchmark(0, nullptr);
-//}
+void runSelectTimeBenchmark(const DataFile& dataFile, Select selectImplementation, int selectivityStride) {
+    selectTimeBenchmark<int>(dataFile, selectImplementation, selectivityStride);
+    runTimeBenchmark(0, nullptr);
+}
+
+void runSelectTimeBenchmarkSetIterations(const DataFile& dataFile, Select selectImplementation, int selectivityStride, int iterations) {
+    selectTimeBenchmarkSetIterations<int>(dataFile, selectImplementation, selectivityStride, iterations);
+    runTimeBenchmark(0, nullptr);
+}
 
 void selectBenchmarkWithExtraCountersConfigurations(const DataFile &dataFile, Select selectImplementation, int iterations) {
     // HPC set 1
