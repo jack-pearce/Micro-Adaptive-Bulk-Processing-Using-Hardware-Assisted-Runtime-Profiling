@@ -29,6 +29,7 @@ include_directories(${JSONCPP_INCLUDE_DIRS})
 add_executable(${PROJECT_NAME}
         src/data_generation/dataGenerators.h
         src/data_generation/dataFiles.cpp
+        src/data_generation/dataFiles.h
         src/library/operators/select.cpp
         src/library/utilities/papi.cpp
         src/library/utilities/systemInformation.cpp

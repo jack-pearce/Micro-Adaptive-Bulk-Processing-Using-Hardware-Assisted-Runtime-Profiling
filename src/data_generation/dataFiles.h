@@ -25,6 +25,9 @@ private:
     const std::string dataFilesFolder = "/data/output/dataFiles/";
 };
 
+void generateEvenIntLogDistribution(int numPoints, double minValue, double maxValue, std::vector<float> &points);
+void generateLogDistribution(int numPoints, double minValue, double maxValue, std::vector<float> &points);
+void generateLinearDistribution(int numPoints, double minValue, double maxValue, std::vector<float> &points);
 
 class DataFile {
 public:
@@ -33,8 +36,9 @@ public:
     [[nodiscard]] int getNumElements() const;
     [[nodiscard]] const std::string& getFileName() const;
     [[nodiscard]] const std::string& getLongDescription() const;
-    void loadDataIntoMemory(int *data) const;
-    void loadDataIntoMemory(int64_t *data) const;
+
+    template <typename T>
+    void loadDataIntoMemory(T *data) const;
 
 private:
     int numElements;
@@ -47,7 +51,6 @@ public:
     static const DataFile uniformIntDistribution25kValuesMax100;
     static const DataFile uniformIntDistribution250mValuesMax100;
     static const DataFile uniformIntDistribution250mValuesMax10000;
-    static const DataFile uniformInt64Distribution250mValuesMax10000;
     static const DataFile uniformIntDistribution250mValuesMax1000000;
 
     static const DataFile varyingIntDistribution25kValues;
@@ -88,8 +91,10 @@ public:
     [[nodiscard]] const std::string& getLongDescription() const;
     [[nodiscard]] int getCardinality() const;
     [[nodiscard]] float getRunInput() const;
-    bool loadNextDataSetIntoMemory(int *data);
-    bool loadNextDataSetIntoMemory(int64_t *data);
+
+    template<typename T>
+    bool loadNextDataSetIntoMemory(T *data);
+
     void restartSweep();
 
 private:
@@ -121,7 +126,6 @@ public:
     static DataSweep linearUniformIntDistribution200mValuesCardinalitySweepFixedMaxCrossOverPoint;
 
     static DataSweep logUniformIntDistribution400mValuesCardinalitySweepFixedMax;
-    static DataSweep logUniformInt64Distribution200mValuesCardinalitySweepFixedMax;
 
     static DataSweep logUniformIntDistribution20mValuesCardinalitySweepVariableMax;
     static DataSweep logUniformIntDistribution20mValuesCardinalitySweepFixedMax;
@@ -130,7 +134,6 @@ public:
     static DataSweep logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered100k;
 
     static DataSweep logUniformIntDistribution40mValuesCardinalitySweepFixedMax;
-    static DataSweep logUniformInt64Distribution20mValuesCardinalitySweepFixedMax;
 
     static DataSweep linearUniformIntDistribution20mValuesCardinalitySections_100_10m_Max20m;
     static DataSweep linearUniformIntDistribution200mValuesCardinalitySections_100_10m_Max20m;
@@ -144,5 +147,7 @@ public:
     static DataSweep linearUniformIntDistribution200mValuesMultipleCardinalitySections_10m_100_Max100m;
 
 };
+
+#include "dataFilesImplementation.h"
 
 #endif //MABPL_DATAFILES_H

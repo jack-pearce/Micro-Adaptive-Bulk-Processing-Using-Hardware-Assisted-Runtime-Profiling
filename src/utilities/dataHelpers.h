@@ -23,9 +23,6 @@ public:
     void operator=(const LoadedData&) = delete;
 };
 
-void generateEvenIntLogDistribution(int numPoints, double minValue, double maxValue, std::vector<float> &points);
-void generateLogDistribution(int numPoints, double minValue, double maxValue, std::vector<float> &points);
-void generateLinearDistribution(int numPoints, double minValue, double maxValue, std::vector<float> &points);
 void displayDistribution(const DataFile &dataFile);
 void writeDataFileToCSV(const DataFile &dataFile);
 void writeHeadersAndTableToCSV(std::vector<std::string>& headers,
@@ -34,7 +31,6 @@ void writeHeadersAndTableToCSV(std::vector<std::string>& headers,
 void writeHeadersAndTableToCSV(std::vector<std::string>& headers,
                                std::vector<std::vector<double>>  values,
                                std::string& filePath);
-void copyArray(const int* source, int* destination, int size);
 
 template <typename T1, typename T2>
 void sortVectorOfPairs(MABPL::vectorOfPairs<T1, T2> &vectorOfPairs) {;

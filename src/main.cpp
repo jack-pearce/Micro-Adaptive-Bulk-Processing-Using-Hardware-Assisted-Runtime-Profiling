@@ -666,9 +666,9 @@ void allGroupBySingleThreadedTests() {
                                    {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                    10, "1-NoClustering-VariableUpperBound");
 
-    groupByCpuCyclesSweepBenchmark64(DataSweeps::logUniformInt64Distribution20mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                   10, "1-NoClustering-64bitInts");
+//    groupByCpuCyclesSweepBenchmark64(DataSweeps::logUniformInt64Distribution20mValuesCardinalitySweepFixedMax,
+//                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+//                                   10, "1-NoClustering-64bitInts");
 
     groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution40mValuesCardinalitySweepFixedMax,
                                      {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
@@ -722,7 +722,16 @@ void allGroupByParallelTests() {
 
 int main() {
 
-    MABPL::calculateMissingMachineConstants();
+//    MABPL::calculateMissingMachineConstants();
+
+    std::vector<float> inputThresholdDistribution;
+    generateLogDistribution(30, 1, 10*1000, inputThresholdDistribution);
+    selectCpuCyclesInputSweepBenchmark(DataFiles::uniformIntDistribution250mValuesMax10000,
+                                       {Select::ImplementationIndexesBranch,
+                                        Select::ImplementationIndexesPredication,
+                                        Select::ImplementationIndexesAdaptive},
+                                       inputThresholdDistribution,
+                                       1, "1-Indexes");
 
     return 0;
 }
