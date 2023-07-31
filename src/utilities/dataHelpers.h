@@ -7,6 +7,7 @@
 #include "../data_generation/dataFiles.h"
 #include "../library/mabpl.h"
 
+
 class LoadedData {
 private:
     int *data;

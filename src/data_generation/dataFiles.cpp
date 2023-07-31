@@ -5,9 +5,27 @@
 #include "../utilities/dataHelpers.h"
 
 
-const std::string selectCyclesFolder = "select_cycles_benchmark/";
-const std::string groupByCyclesFolder = "groupBy_cycles_benchmark/";
-const std::string dataFilesFolder = "dataFiles/";
+FilePaths& FilePaths::getInstance() {
+    static FilePaths instance;
+    return instance;
+}
+
+FilePaths::FilePaths() {
+    projectFilePath = std::filesystem::current_path();
+}
+
+std::string FilePaths::getSelectCyclesFolderPath() {
+    return (projectFilePath / std::filesystem::path(selectCyclesFolder)).string();
+}
+
+std::string FilePaths::getGroupByCyclesFolderPath() {
+    return (projectFilePath / std::filesystem::path(groupByCyclesFolder)).string();
+}
+
+std::string FilePaths::getDataFilesFolderPath() {
+    return (projectFilePath / std::filesystem::path(dataFilesFolder)).string();
+}
+
 
 const DataFile DataFiles::uniformIntDistribution25kValuesMax100{
     25 * 1000,

@@ -7,7 +7,6 @@
 #include "../utilities/dataHelpers.h"
 #include "../utilities/papiHelpers.h"
 #include "selectCyclesBenchmark.h"
-#include "../data_generation/machineConfiguration.h"
 
 using MABPL::Counters;
 
@@ -79,7 +78,7 @@ void selectCpuCyclesSingleInputBenchmark(const DataFile &dataFile,
             dataFile.getFileName() +
             "_threshold_" +
             std::to_string(threshold);
-    std::string fullFilePath = outputFilePath + selectCyclesFolder + fileName + ".csv";
+    std::string fullFilePath = FilePaths::getInstance().getSelectCyclesFolderPath() + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }
 
@@ -139,7 +138,7 @@ void selectCpuCyclesMultipleInputBenchmark(const DataFile &dataFile,
             dataFile.getFileName() +
             "_selectivityStride_" +
             std::to_string(selectivityStride);
-    std::string fullFilePath = outputFilePath + selectCyclesFolder + fileName + ".csv";
+    std::string fullFilePath = FilePaths::getInstance().getSelectCyclesFolderPath() + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }
 
@@ -205,7 +204,7 @@ void selectBenchmarkWithExtraCounters(const DataFile &dataFile, Select selectImp
             "ExtraCountersCyclesBM_" +
             getSelectName(selectImplementation) +
             dataFile.getFileName();
-    std::string fullFilePath = outputFilePath + selectCyclesFolder + fileName + ".csv";
+    std::string fullFilePath = FilePaths::getInstance().getSelectCyclesFolderPath() + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 
     shutdownPAPI(benchmarkEventSet, benchmarkCounterValues);
@@ -270,7 +269,7 @@ void selectCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<Selec
             dataSweep.getSweepName() +
             "_threshold_" +
             std::to_string(threshold);
-    std::string fullFilePath = outputFilePath + selectCyclesFolder + fileName + ".csv";
+    std::string fullFilePath = FilePaths::getInstance().getSelectCyclesFolderPath() + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }
 
@@ -327,7 +326,7 @@ void selectWallTimeSweepBenchmark(DataSweep &dataSweep, const std::vector<Select
             dataSweep.getSweepName() +
             "_threshold_" +
             std::to_string(threshold);
-    std::string fullFilePath = outputFilePath + selectCyclesFolder + fileName + ".csv";
+    std::string fullFilePath = FilePaths::getInstance().getSelectCyclesFolderPath() + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }
 
@@ -385,7 +384,7 @@ void selectWallTimeDopSweepBenchmark(DataSweep &dataSweep, Select selectImplemen
             dataSweep.getSweepName() +
             "_threshold_" +
             std::to_string(threshold);
-    std::string fullFilePath = outputFilePath + selectCyclesFolder + fileName + ".csv";
+    std::string fullFilePath = FilePaths::getInstance().getSelectCyclesFolderPath() + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }
 
@@ -443,7 +442,7 @@ void selectCpuCyclesInputSweepBenchmark(const DataFile &dataFile,
     }
 
     std::string fileName = fileNamePrefix + "InputSweepCyclesBM_" + dataFile.getFileName();
-    std::string fullFilePath = outputFilePath + selectCyclesFolder + fileName + ".csv";
+    std::string fullFilePath = FilePaths::getInstance().getSelectCyclesFolderPath() + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }
 
@@ -496,7 +495,7 @@ void selectWallTimeInputSweepBenchmark(const DataFile &dataFile,
     }
 
     std::string fileName = fileNamePrefix + "InputSweepWallTimeBM_" + dataFile.getFileName();
-    std::string fullFilePath = outputFilePath + selectCyclesFolder + fileName + ".csv";
+    std::string fullFilePath = FilePaths::getInstance().getSelectCyclesFolderPath() + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }
 
@@ -550,6 +549,6 @@ void selectWallTimeDopAndInputSweepBenchmark(const DataFile &dataFile,
     }
 
     std::string fileName = fileNamePrefix + "DopAndInputSweepWallTimeBM_" + dataFile.getFileName();
-    std::string fullFilePath = outputFilePath + selectCyclesFolder + fileName + ".csv";
+    std::string fullFilePath = FilePaths::getInstance().getSelectCyclesFolderPath() + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }

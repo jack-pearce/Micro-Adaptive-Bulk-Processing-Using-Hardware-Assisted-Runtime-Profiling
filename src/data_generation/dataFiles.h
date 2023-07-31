@@ -3,10 +3,31 @@
 
 #include <string>
 #include <vector>
+#include <filesystem>
 
-extern const std::string selectCyclesFolder;
-extern const std::string groupByCyclesFolder;
-extern const std::string dataFilesFolder;
+//extern const std::string selectCyclesFolder;
+//extern const std::string groupByCyclesFolder;
+//extern const std::string dataFilesFolder;
+
+class FilePaths {
+public:
+    static FilePaths& getInstance();
+    FilePaths(const FilePaths&) = delete;
+    void operator=(const FilePaths&) = delete;
+
+    std::string getSelectCyclesFolderPath();
+    std::string getGroupByCyclesFolderPath();
+    std::string getDataFilesFolderPath();
+
+private:
+    FilePaths();
+    ~FilePaths() = default;
+
+    std::filesystem::path projectFilePath;
+    const std::string selectCyclesFolder = "data/output/select_cycles_benchmark/";
+    const std::string groupByCyclesFolder = "data/output/groupBy_cycles_benchmark/";
+    const std::string dataFilesFolder = "data/output/dataFiles/";
+};
 
 
 class DataFile {

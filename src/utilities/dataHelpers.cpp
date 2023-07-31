@@ -1,13 +1,11 @@
 #include <iostream>
 #include <fstream>
-#include <sstream>
 #include <string>
 #include <vector>
 #include <cassert>
 #include <cmath>
 
 #include "dataHelpers.h"
-#include "../data_generation/machineConfiguration.h"
 
 LoadedData::LoadedData(const DataFile &dataFile) : data(nullptr), dataFile(&dataFile) {
     loadData();
@@ -88,7 +86,7 @@ void writeDataFileToCSV(const DataFile &dataFile) {
     auto data = LoadedData::getInstance(dataFile).getData();
     auto numElements = dataFile.getNumElements();
 
-    std::string fileName = outputFilePath + dataFilesFolder + dataFile.getFileName() + ".csv";
+    std::string fileName = FilePaths::getInstance().getDataFilesFolderPath() + dataFile.getFileName() + ".csv";
     std::ofstream file(fileName);
 
     if (file.is_open()) {

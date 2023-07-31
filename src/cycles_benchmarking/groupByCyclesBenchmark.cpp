@@ -5,7 +5,6 @@
 
 #include "groupByCyclesBenchmark.h"
 #include "../utilities/dataHelpers.h"
-#include "../data_generation/machineConfiguration.h"
 #include "../utilities/papiHelpers.h"
 #include "../data_generation/dataGenerators.h"
 
@@ -77,7 +76,7 @@ void groupByCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<Grou
     }
 
     std::string fileName = fileNamePrefix + "_GroupBy_SweepCyclesBM_" + dataSweep.getSweepName();
-    std::string fullFilePath = outputFilePath + groupByCyclesFolder + fileName + ".csv";
+    std::string fullFilePath = FilePaths::getInstance().getGroupByCyclesFolderPath() + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }
 
@@ -138,7 +137,7 @@ void groupByWallTimeSweepBenchmark(DataSweep &dataSweep, const std::vector<Group
     }
 
     std::string fileName = fileNamePrefix + "_GroupBy_SweepWallTimeBM_" + dataSweep.getSweepName();
-    std::string fullFilePath = outputFilePath + groupByCyclesFolder + fileName + ".csv";
+    std::string fullFilePath = FilePaths::getInstance().getGroupByCyclesFolderPath() + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }
 
@@ -198,7 +197,7 @@ void groupByWallTimeDopSweepBenchmark(DataSweep &dataSweep, int iterations, cons
     }
 
     std::string fileName = fileNamePrefix + "_GroupBy_DopSweepWallTimeBM_" + dataSweep.getSweepName();
-    std::string fullFilePath = outputFilePath + groupByCyclesFolder + fileName + ".csv";
+    std::string fullFilePath = FilePaths::getInstance().getGroupByCyclesFolderPath() + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }
 
@@ -264,7 +263,7 @@ void groupByCpuCyclesSweepBenchmark64(DataSweep &dataSweep, const std::vector<Gr
     }
 
     std::string fileName = fileNamePrefix + "_GroupBy_SweepCyclesBM_" + dataSweep.getSweepName();
-    std::string fullFilePath = outputFilePath + groupByCyclesFolder + fileName + ".csv";
+    std::string fullFilePath = FilePaths::getInstance().getGroupByCyclesFolderPath() + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }
 
@@ -331,7 +330,7 @@ void groupByBenchmarkWithExtraCounters(DataSweep &dataSweep, GroupBy groupByImpl
             "ExtraCountersCyclesBM_" +
             getGroupByName(groupByImplementation) +
             dataSweep.getSweepName();
-    std::string fullFilePath = outputFilePath + groupByCyclesFolder + fileName + ".csv";
+    std::string fullFilePath = FilePaths::getInstance().getGroupByCyclesFolderPath() + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 
     shutdownPAPI(benchmarkEventSet, benchmarkCounterValues);
@@ -403,7 +402,7 @@ void groupByBenchmarkWithExtraCountersDuringRun(const DataFile &dataFile,
             fileNamePrefix +
             "ExtraCountersDuringRun_" +
             dataFile.getFileName();
-    std::string fullFilePath = outputFilePath + groupByCyclesFolder + fileName + ".csv";
+    std::string fullFilePath = FilePaths::getInstance().getGroupByCyclesFolderPath() + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 
     shutdownPAPI(benchmarkEventSet, benchmarkCounterValues);
@@ -437,6 +436,6 @@ void tessilRobinMapInitialisationBenchmark(const std::string &fileNamePrefix) {
     headers [1] = "Cycles";
 
     std::string fileName = fileNamePrefix + "_tsl_robinMap_initialisationCostOnly_";
-    std::string fullFilePath = outputFilePath + groupByCyclesFolder + fileName + ".csv";
+    std::string fullFilePath = FilePaths::getInstance().getGroupByCyclesFolderPath() + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }
