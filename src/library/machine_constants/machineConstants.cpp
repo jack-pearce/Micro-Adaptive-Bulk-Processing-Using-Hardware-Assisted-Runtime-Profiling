@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <json/json.h>
 
 #include "../mabpl.h"
 
@@ -10,12 +11,9 @@ constexpr int NUMBER_OF_TESTS = 9;
 constexpr int SELECT_ITERATIONS = 12;
 constexpr int GROUPBY_ITERATIONS = 12;
 
-// TO BE UPDATED - UPDATE TO FASTEST FILE FORMAT WITH KEY VALUE PAIRS THAT WE CAN READ IN
+
 // TO WORK ON LAPTOP AND SERVER WITH NO CHANGES (RELATIVE FILE PATH?)
-// NEED TO ENSURE THAT WE ONLY UPDATE PART OF FILE THAT NEEDS UPDATE - NOT DELETE WHOLE FILE
-// NEED TO UPDATE ALL FUNCTIONS TO START BY READING VALUE FROM FILE AND THROWING AN ERROR IF NO VALUE IS SET
-// MAKE FUNCTION TO SIMPLY GET VALUE BASED ON NAME
-std::string MACHINE_CONSTANT_VALUES_FILE = "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/src/library/machine_constants/machineConstantValues.csv";
+// NEED TO UPDATE ALL FUNCTIONS TO START BY READING VALUE FROM FILE AND THROWING AN ERROR IF NO VALUE IS SET - SINGLETON
 
 
 int getThreshold(int n, double selectivity) {
@@ -151,14 +149,10 @@ void calculateSelectIndexesMachineConstants() {
     std::sort(upperCrossoverPoints.begin(), upperCrossoverPoints.end());
     std::cout << " Complete" << std::endl;
 
-    std::ofstream file(MACHINE_CONSTANT_VALUES_FILE);
-    if (file.is_open()) {
-        file << "SelectIndexesLower," << lowerCrossoverPoints[NUMBER_OF_TESTS / 2] << "\n";
-        file << "SelectIndexesUpper," << upperCrossoverPoints[NUMBER_OF_TESTS / 2] << "\n";
-    } else {
-        std::cerr << "Failed to open file: " << MACHINE_CONSTANT_VALUES_FILE << "\n";
-    }
-    file.close();
+    MachineConstants::getInstance().updateMachineConstant("SelectIndexesLower",
+                                                          lowerCrossoverPoints[NUMBER_OF_TESTS / 2]);
+    MachineConstants::getInstance().updateMachineConstant("SelectIndexesUpper",
+                                                          upperCrossoverPoints[NUMBER_OF_TESTS / 2]);
 }
 
 double calculateSelectValuesLowerMachineConstant() {
@@ -233,13 +227,8 @@ void calculateSelectValuesMachineConstants() {
     std::sort(lowerCrossoverPoints.begin(), lowerCrossoverPoints.end());
     std::cout << " Complete" << std::endl;
 
-    std::ofstream file(MACHINE_CONSTANT_VALUES_FILE);
-    if (file.is_open()) {
-        file << "SelectValuesLower," << lowerCrossoverPoints[NUMBER_OF_TESTS / 2] << "\n";
-    } else {
-        std::cerr << "Failed to open file: " << MACHINE_CONSTANT_VALUES_FILE << "\n";
-    }
-    file.close();
+    MachineConstants::getInstance().updateMachineConstant("SelectValuesLower",
+                                                          lowerCrossoverPoints[NUMBER_OF_TESTS / 2]);
 }
 
 
@@ -344,32 +333,110 @@ void calculateGroupByMachineConstants() {
     std::sort(groupByMachineConstants.begin(), groupByMachineConstants.end());
     std::cout << " Complete" << std::endl;
 
-    std::ofstream file(MACHINE_CONSTANT_VALUES_FILE);
-    if (file.is_open()) {
-        file << "GroupBy," << groupByMachineConstants[NUMBER_OF_TESTS / 2] << "\n";
-    } else {
-        std::cerr << "Failed to open file: " << MACHINE_CONSTANT_VALUES_FILE << "\n";
-    }
-    file.close();
+    MachineConstants::getInstance().updateMachineConstant("GroupBy",
+                                                          groupByMachineConstants[NUMBER_OF_TESTS / 2]);
 }
 
 void calculateMissingMachineConstants() {
-    // Read file in and go through each key value pair and only run function if key value pair is missing in file
-//    calculateSelectIndexesMachineConstants();
-//    calculateSelectValuesMachineConstants();
-    calculateGroupByMachineConstants();
+    MachineConstants::getInstance().calculateMissingMachineConstants();
 }
 
 void clearAndRecalculateMachineConstants() {
-    // Clear all machine constants
-    calculateSelectIndexesMachineConstants();
-    calculateSelectValuesMachineConstants();
-    calculateGroupByMachineConstants();
+    MachineConstants::getInstance().clearAndRecalculateMachineConstants();
 }
 
 void printMachineConstants() {
-    // PRINT CALL MACHINE CONSTANTS FROM FILE
-    std::cout << "Machine constants not calculated yet!" << std::endl;
+    MachineConstants::getInstance().printMachineConstants();
+}
+
+
+MachineConstants& MachineConstants::getInstance() {
+    static MachineConstants instance;
+    return instance;
+}
+
+MachineConstants::MachineConstants() {
+    loadMachineConstants(machineConstants);
+}
+
+double MachineConstants::getMachineConstant(std::string &key) {
+    if (machineConstants.count(key) == 0) {
+        std::cout << "Machine constant for " << key << " does not exist, calculating all missing values now. "
+                                                       "This may take a while." << std::endl;
+        calculateMissingMachineConstants();
+    }
+    return machineConstants[key];
+}
+
+void MachineConstants::updateMachineConstant(const std::string& key, double value) {
+    Json::Value jsonRoot;
+    std::ifstream inputFile(machineConstantsFilePath);
+    if (inputFile.is_open()) {
+        inputFile >> jsonRoot;
+        inputFile.close();
+    }
+
+    jsonRoot[key] = value;
+
+    std::ofstream outputFile(machineConstantsFilePath);
+    if (outputFile.is_open()) {
+        outputFile << jsonRoot;
+        outputFile.close();
+    } else {
+        std::cerr << "Error opening file: " << machineConstantsFilePath << std::endl;
+    }
+
+    loadMachineConstants(machineConstants);
+}
+
+void MachineConstants::loadMachineConstants(std::map<std::string, double> &map) {
+    map.clear();
+
+    std::ifstream file(machineConstantsFilePath);
+    if (file.is_open()) {
+        Json::Value jsonRoot;
+        file >> jsonRoot;
+        file.close();
+
+        for (const auto& key : jsonRoot.getMemberNames()) {
+            map[key] = jsonRoot[key].asDouble();
+        }
+    } else {
+        std::cerr << "Error opening file: " << machineConstantsFilePath << std::endl;
+    }
+}
+
+void MachineConstants::calculateMissingMachineConstants() {
+    if (machineConstants.count("SelectIndexesLower") == 0 || machineConstants.count("SelectIndexesUpper") == 0) {
+        calculateSelectIndexesMachineConstants();
+    }
+
+    if (machineConstants.count("SelectValuesLower") == 0) {
+        calculateSelectValuesMachineConstants();
+    }
+
+    if (machineConstants.count("GroupBy") == 0) {
+        calculateGroupByMachineConstants();
+    }
+}
+
+void MachineConstants::clearAndRecalculateMachineConstants() {
+    std::ofstream file(machineConstantsFilePath, std::ofstream::out | std::ofstream::trunc);
+    if (file.is_open()) {
+        file.close();
+    } else {
+        std::cerr << "Error opening file: " << machineConstantsFilePath << std::endl;
+    }
+
+    calculateMissingMachineConstants();
+}
+
+void MachineConstants::printMachineConstants() {
+    std::cout << "Machine Constants:" << std::endl;
+    for (const auto& machineConstant : machineConstants) {
+        std::cout << "Constant: '" << machineConstant.first << "', Value: " << machineConstant.second << std::endl;
+    }
+
 }
 
 

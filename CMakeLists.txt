@@ -22,6 +22,10 @@ add_subdirectory(libs/robin-map)
 
 add_subdirectory(libs/hopscotch-map)
 
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(JSONCPP REQUIRED jsoncpp)
+include_directories(${JSONCPP_INCLUDE_DIRS})
+
 add_executable(${PROJECT_NAME}
         src/data_generation/dataGenerators.cpp
         src/data_generation/dataFiles.cpp
@@ -51,6 +55,4 @@ target_link_libraries(${PROJECT_NAME} absl::base absl::hash absl::flat_hash_map)
 
 target_link_libraries(${PROJECT_NAME} tsl::robin_map)
 
-
-
-
+target_link_libraries(${PROJECT_NAME} ${JSONCPP_LIBRARIES})
