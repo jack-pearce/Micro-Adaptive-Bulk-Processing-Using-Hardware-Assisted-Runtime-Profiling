@@ -226,7 +226,7 @@ void groupByCpuCyclesSweepBenchmark64(DataSweep &dataSweep, const std::vector<Gr
                 }
 
                 auto inputGroupBy = new int64_t[dataSweep.getNumElements()];
-                auto inputAggregate = new int[dataSweep.getNumElements()];
+                auto inputAggregate = new int64_t[dataSweep.getNumElements()];
 
                 int cardinality = dataSweep.getCardinality();
 
@@ -234,7 +234,7 @@ void groupByCpuCyclesSweepBenchmark64(DataSweep &dataSweep, const std::vector<Gr
                 std::cout << static_cast<int>(dataSweep.getRunInput()) << "... ";
 
                 dataSweep.loadNextDataSetIntoMemory(inputGroupBy);
-                generateUniformDistributionInMemory(inputAggregate, dataSweep.getNumElements(), 10);
+                copyArray<int64_t>(inputGroupBy, inputAggregate, dataSweep.getNumElements());
 
                 cycles = *Counters::getInstance().readSharedEventSet();
 
@@ -352,7 +352,7 @@ void groupByBenchmarkWithExtraCountersDuringRun(const DataFile &dataFile,
 
     auto inputGroupBy = new int[numElements];
     auto inputAggregate = new int[numElements];
-    copyArray(LoadedData::getInstance(dataFile).getData(), inputGroupBy, dataFile.getNumElements());
+    copyArray<int>(LoadedData::getInstance(dataFile).getData(), inputGroupBy, dataFile.getNumElements());
     generateUniformDistributionInMemory(inputAggregate, numElements, 10);
 
 

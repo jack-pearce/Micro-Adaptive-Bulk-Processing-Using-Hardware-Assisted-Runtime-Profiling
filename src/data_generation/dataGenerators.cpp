@@ -261,8 +261,8 @@ void generateUniqueValuesRandomisedInMemory(int *data, int n) {
     std::uniform_int_distribution<> dis(1, 1);
     int j;
 
-    for (int i = n - 1; i > 0; --i) {
-        dis = std::uniform_int_distribution<>(1, i);
+    for (int i = n - 1; i >= 0; --i) {
+        dis = std::uniform_int_distribution<>(0, i);
         j = dis(gen);
         std::swap(data[i], data[j]);
     }
@@ -280,8 +280,8 @@ void generateUniqueValuesRandomisedInMemory(int64_t *data, int n) {
     std::uniform_int_distribution<> dis(1, 1);
     int j;
 
-    for (int i = n - 1; i > 0; --i) {
-        dis = std::uniform_int_distribution<>(1, i);
+    for (int i = n - 1; i >= 0; --i) {
+        dis = std::uniform_int_distribution<>(0, i);
         j = dis(gen);
         std::swap(data[i], data[j]);
     }

@@ -15,7 +15,8 @@
 namespace MABPL {
 
 constexpr int BITS_PER_GROUPBY_RADIX_PASS = 10;
-constexpr float GROUPBY_MACHINE_CONSTANT = 0.125;
+//constexpr float GROUPBY_MACHINE_CONSTANT = 0.125;
+constexpr float GROUPBY_MACHINE_CONSTANT = 0.63115;
 
 template<typename T>
 T MinAggregation<T>::operator()(T currentAggregate, T numberToInclude, bool firstAggregation) const {
@@ -320,7 +321,8 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
     long_long *counterValues = Counters::getInstance().getSharedEventSetEvents(counters);
 
     int hashTableEntryBytes = sizeof(T1) + sizeof(T2);
-    float tuplesPerLastLevelCacheMissThreshold = (GROUPBY_MACHINE_CONSTANT * bytesPerCacheLine()) / hashTableEntryBytes;
+//    float tuplesPerLastLevelCacheMissThreshold = (GROUPBY_MACHINE_CONSTANT * bytesPerCacheLine()) / hashTableEntryBytes;
+    float tuplesPerLastLevelCacheMissThreshold = GROUPBY_MACHINE_CONSTANT;
 
     int index = 0;
     int tuplesToProcess;

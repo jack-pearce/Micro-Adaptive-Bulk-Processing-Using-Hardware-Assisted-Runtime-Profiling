@@ -31,8 +31,8 @@ void selectFunctionalityTest(const DataFile& dataFile, Select selectImplementati
         auto inputData = new int[dataFile.getNumElements()];
         auto inputFilter = new int[dataFile.getNumElements()];
         auto selection = new int[dataFile.getNumElements()];
-        copyArray(LoadedData::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
-        copyArray(LoadedData::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
+        copyArray<int>(LoadedData::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
+        copyArray<int>(LoadedData::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
 
         auto selected = MABPL::runSelectFunction(selectImplementation,
                                          dataFile.getNumElements(), inputData, inputFilter, selection, i);
@@ -93,7 +93,7 @@ void selectIndexesCompareResultsTest(const DataFile& dataFile, Select selectImpO
     int threshold = 3;
     auto inputFilter = new int[dataFile.getNumElements()];
     auto selectionOne = new int[dataFile.getNumElements()];
-    copyArray(LoadedData::getInstance(dataFile).getData(), inputFilter,
+    copyArray<int>(LoadedData::getInstance(dataFile).getData(), inputFilter,
               dataFile.getNumElements());
 
     std::cout << "Running " << getSelectName(selectImpOne) << "..." << std::endl;
@@ -145,9 +145,9 @@ void selectValuesCompareResultsTest(const DataFile& dataFile, Select selectImpOn
     auto inputFilter = new int[dataFile.getNumElements()];
     auto inputData = new int[dataFile.getNumElements()];
     auto selectionOne = new int[dataFile.getNumElements()];
-    copyArray(LoadedData::getInstance(dataFile).getData(), inputFilter,
+    copyArray<int>(LoadedData::getInstance(dataFile).getData(), inputFilter,
               dataFile.getNumElements());
-    copyArray(LoadedData::getInstance(dataFile).getData(), inputData,
+    copyArray<int>(LoadedData::getInstance(dataFile).getData(), inputData,
               dataFile.getNumElements());
 
     std::cout << "Running " << getSelectName(selectImpOne) << "..." << std::endl;
@@ -398,7 +398,7 @@ void allSelectValuesParallelTests() {
 void groupByCompareResultsTest(const DataFile& dataFile, GroupBy groupByImpOne, GroupBy groupByImpTwo) {
     auto inputGroupBy = new int[dataFile.getNumElements()];
     auto inputAggregate = new int[dataFile.getNumElements()];
-    copyArray(LoadedData::getInstance(dataFile).getData(), inputGroupBy, dataFile.getNumElements());
+    copyArray<int>(LoadedData::getInstance(dataFile).getData(), inputGroupBy, dataFile.getNumElements());
     generateUniformDistributionInMemory(inputAggregate, dataFile.getNumElements(), 10);
 
     auto resultOne = MABPL::runGroupByFunction<MaxAggregation>(groupByImpOne,
@@ -702,9 +702,8 @@ void allGroupByParallelTests() {
 
 int main() {
 
-    allSelectIndexesParallelTests();
+//    MABPL::calculateMissingMachineConstants();
 
-    allSelectValuesParallelTests();
 
     return 0;
 }

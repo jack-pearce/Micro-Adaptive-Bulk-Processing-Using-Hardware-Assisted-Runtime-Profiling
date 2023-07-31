@@ -444,7 +444,7 @@ DataSweep::DataSweep(int _totalRuns, int _numElements, std::string _sweepName, s
         generateLogDistribution(getTotalRuns(), 1, getNumElements(), inputs);
     } else if (getSweepName() == "logUniformIntDistribution40mValuesCardinalitySweepFixedMax" ||
                getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweepFixedMax") {
-        generateLogDistribution(getTotalRuns(), 1, getNumElements(), inputs);
+        generateLogDistribution(getTotalRuns(), 1, getNumElements() / 2.0, inputs);
     }else if (getSweepName() == "linearUniformIntDistribution200mValuesCardinalitySweepFixedMaxCrossOverPoint") {
         generateLinearDistribution(getTotalRuns(), 150000, 1200000, inputs);
     } else if (getSweepName() == "logUniformIntDistribution400mValuesCardinalitySweepFixedMax") {

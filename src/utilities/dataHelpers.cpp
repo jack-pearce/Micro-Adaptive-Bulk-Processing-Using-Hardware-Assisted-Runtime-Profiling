@@ -169,10 +169,3 @@ void writeHeadersAndTableToCSV(std::vector<std::string>& headers,
         std::cerr << "Failed to open file: " << filePath << "\n";
     }
 }
-
-void copyArray(const int* source, int* destination, int size) {
-    for (auto i = 0; i < size; i++) {
-        destination[i] = source[i];
-    }
-}
-
