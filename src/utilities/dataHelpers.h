@@ -44,7 +44,7 @@ void sortVectorOfPairs(MABPL::vectorOfPairs<T1, T2> &vectorOfPairs) {;
 }
 
 template <typename T>
-void copyArray(const T* source, T* destination, int size) {
+void copyArray(T* source, T* destination, int size) {
     for (auto i = 0; i < size; i++) {
         destination[i] = source[i];
     }

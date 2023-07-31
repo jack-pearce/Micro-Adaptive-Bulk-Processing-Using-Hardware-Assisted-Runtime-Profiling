@@ -3,7 +3,6 @@
 
 #include <string>
 #include <map>
-#include <filesystem>
 
 
 namespace MABPL {
@@ -30,7 +29,7 @@ private:
     void loadMachineConstants(std::map<std::string, double> &map);
 
     std::map<std::string, double> machineConstants;
-    std::filesystem::path machineConstantsFilePath;
+    std::string machineConstantsFilePath;
 };
 
 }

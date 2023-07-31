@@ -1,16 +1,26 @@
 #ifndef MABPL_SYSTEMINFORMATION_H
 #define MABPL_SYSTEMINFORMATION_H
 
+#include <immintrin.h>
 
 namespace MABPL {
 
-bool arrayIsSimd128Aligned(const int *array);
-bool arrayIsSimd256Aligned(const int *array);
+template <typename T>
+bool arrayIsSimd128Aligned(const T *array) {
+    const size_t simdAlignment = sizeof(__m128i);
+    return reinterpret_cast<uintptr_t>(array) % simdAlignment == 0;
+}
+
+template <typename T>
+bool arrayIsSimd256Aligned(const T *array) {
+    const size_t simdAlignment = sizeof(__m256i);
+    return reinterpret_cast<uintptr_t>(array) % simdAlignment == 0;
+}
 
 long l3cacheSize();
 long bytesPerCacheLine();
-
 int maxDop();
+std::string getCurrentWorkingDirectory();
 
 }
 

@@ -11,19 +11,19 @@ FilePaths& FilePaths::getInstance() {
 }
 
 FilePaths::FilePaths() {
-    projectFilePath = std::filesystem::current_path();
+    projectFilePath = MABPL::getCurrentWorkingDirectory();
 }
 
 std::string FilePaths::getSelectCyclesFolderPath() {
-    return (projectFilePath / std::filesystem::path(selectCyclesFolder)).string();
+    return projectFilePath +selectCyclesFolder;
 }
 
 std::string FilePaths::getGroupByCyclesFolderPath() {
-    return (projectFilePath / std::filesystem::path(groupByCyclesFolder)).string();
+    return projectFilePath + groupByCyclesFolder;
 }
 
 std::string FilePaths::getDataFilesFolderPath() {
-    return (projectFilePath / std::filesystem::path(dataFilesFolder)).string();
+    return projectFilePath + dataFilesFolder;
 }
 
 

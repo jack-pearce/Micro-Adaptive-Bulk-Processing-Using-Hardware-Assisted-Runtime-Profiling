@@ -611,7 +611,7 @@ void *selectValuesAdaptiveParallelAux(void *arg) {
     T1 threshold = args->threshold;
     std::atomic<int> *selectedCount = args->selectedCount;
 
-    auto threadSelection = new int[maxSize];
+    auto threadSelection = new T2[maxSize];
     auto threadSelectionStart = threadSelection;
 
     auto tuplesPerAdaption = 50000;

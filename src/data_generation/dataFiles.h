@@ -3,7 +3,6 @@
 
 #include <string>
 #include <vector>
-#include <filesystem>
 
 
 class FilePaths {
@@ -20,10 +19,10 @@ private:
     FilePaths();
     ~FilePaths() = default;
 
-    std::filesystem::path projectFilePath;
-    const std::string selectCyclesFolder = "data/output/select_cycles_benchmark/";
-    const std::string groupByCyclesFolder = "data/output/groupBy_cycles_benchmark/";
-    const std::string dataFilesFolder = "data/output/dataFiles/";
+    std::string projectFilePath;
+    const std::string selectCyclesFolder = "/data/output/select_cycles_benchmark/";
+    const std::string groupByCyclesFolder = "/data/output/groupBy_cycles_benchmark/";
+    const std::string dataFilesFolder = "/data/output/dataFiles/";
 };
 
 
