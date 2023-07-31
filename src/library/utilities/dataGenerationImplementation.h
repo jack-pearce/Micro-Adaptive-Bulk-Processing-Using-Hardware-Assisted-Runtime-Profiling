@@ -94,6 +94,8 @@ void generateUniformDistributionWithSetCardinalityInMemory(T *data, int n, int u
 
 template <typename T>
 void generatePartiallySortedInMemory(T *data, int n, int numRepeats, float percentageRandom) {
+    static_assert(std::is_integral<T>::value, "Must be an integer type");
+
     int sectionSize = 100 * numRepeats;
     int sections = n / (sectionSize);
     int elementsToShufflePerSection = static_cast<int>(

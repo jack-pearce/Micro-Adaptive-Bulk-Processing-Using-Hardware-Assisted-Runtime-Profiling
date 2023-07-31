@@ -9,6 +9,8 @@
 
 template <typename T>
 void generateVaryingSelectivityInMemory(T *data, int n, int minimum, int numberOfDiscreteSections) {
+    static_assert(std::is_integral<T>::value, "Must be an integer type");
+
     std::cout << "Generating data in memory... ";
     std::cout.flush();
 
@@ -45,6 +47,8 @@ void generateVaryingSelectivityInMemory(T *data, int n, int minimum, int numberO
 
 template <typename T>
 void generateUpperStepSelectivityInMemory(T *data, int n, int step, int numberOfDiscreteSections) {
+    static_assert(std::is_integral<T>::value, "Must be an integer type");
+
     std::cout << "Generating data in memory... ";
     std::cout.flush();
 
@@ -78,6 +82,8 @@ void generateUpperStepSelectivityInMemory(T *data, int n, int step, int numberOf
 
 template <typename T>
 void generateLowerStepSelectivityInMemory(T *data, int n, int step, int numberOfDiscreteSections) {
+    static_assert(std::is_integral<T>::value, "Must be an integer type");
+
     std::cout << "Generating data in memory... ";
     std::cout.flush();
 
@@ -112,6 +118,8 @@ void generateLowerStepSelectivityInMemory(T *data, int n, int step, int numberOf
 template <typename T>
 void generateUnequalLowerStepSelectivityInMemory(T *data, int n, int step, int numberOfDiscreteSections,
                                                  float percentStepSection) {
+    static_assert(std::is_integral<T>::value, "Must be an integer type");
+
     std::cout << "Generating data in memory... ";
     std::cout.flush();
 
@@ -155,6 +163,8 @@ void generateUnequalLowerStepSelectivityInMemory(T *data, int n, int step, int n
 
 template <typename T>
 void generatePartiallySortedInMemory(T *data, int n, int numRepeats, float percentageRandom) {
+    static_assert(std::is_integral<T>::value, "Must be an integer type");
+
     std::cout << "Generating data in memory... ";
     std::cout.flush();
 
@@ -220,6 +230,8 @@ void generatePartiallySortedInMemory(T *data, int n, int numRepeats, float perce
 
 template <typename T>
 void generateUniformDistributionInMemory(T *data, int n, int upperBound) {
+    static_assert(std::is_integral<T>::value, "Must be an integer type");
+
     std::cout << "Generating data in memory... ";
     std::cout.flush();
 
@@ -259,6 +271,8 @@ inline T scaleNumberLogarithmically(T number, int startingUpperBound, int target
 
 template <typename T>
 void generateUniqueValuesRandomisedInMemory(T *data, int n) {
+    static_assert(std::is_integral<T>::value, "Must be an integer type");
+
     // Fisher–Yates shuffle
 
     for (T i = 1; i <= n; ++i) {
@@ -279,6 +293,7 @@ void generateUniqueValuesRandomisedInMemory(T *data, int n) {
 
 template <typename T>
 void generateUniformDistributionInMemoryWithSetCardinality(T *data, int n, int upperBound, int cardinality) {
+    static_assert(std::is_integral<T>::value, "Must be an integer type");
     assert(cardinality <= upperBound);
     std::cout << "Generating data in memory... ";
     std::cout.flush();
@@ -311,6 +326,7 @@ void generateUniformDistributionInMemoryWithSetCardinality(T *data, int n, int u
 template <typename T>
 void generateUniformDistributionInMemoryWithSetCardinalityClustered(T *data, int n, int upperBound,
                                                                     int cardinality, int spreadInCluster) {
+    static_assert(std::is_integral<T>::value, "Must be an integer type");
     assert(cardinality <= upperBound);
     if (spreadInCluster >= cardinality) {
         generateUniformDistributionInMemoryWithSetCardinality(data, n, upperBound ,cardinality);
@@ -353,6 +369,7 @@ template <typename T>
 void generateUniformDistributionInMemoryWithTwoCardinalitySections(T *data, int n, int upperBound,
                                                                    int cardinalitySectionOne, int cardinalitySectionTwo,
                                                                    float fractionSectionTwo) {
+    static_assert(std::is_integral<T>::value, "Must be an integer type");
     assert(cardinalitySectionOne <= upperBound && cardinalitySectionTwo <= upperBound);
     std::cout << "Generating data in memory... ";
     std::cout.flush();
@@ -395,6 +412,7 @@ template <typename T>
 void generateUniformDistributionInMemoryWithMultipleTwoCardinalitySections(T *data, int n, int upperBound,
                                                                            int cardinalitySectionOne, int cardinalitySectionTwo,
                                                                            float fractionSectionTwo, int numSections) {
+    static_assert(std::is_integral<T>::value, "Must be an integer type");
     assert(n % numSections == 0);
 
     int tuplesPerSection = n / numSections;
