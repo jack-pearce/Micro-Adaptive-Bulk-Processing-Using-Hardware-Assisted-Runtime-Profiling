@@ -429,6 +429,8 @@ void MachineConstants::clearAndRecalculateMachineConstants() {
         std::cerr << "Error opening file: " << machineConstantsFilePath << std::endl;
     }
 
+    loadMachineConstants(machineConstants);
+
     calculateMissingMachineConstants();
 }
 
