@@ -10,6 +10,7 @@
 #include "../utilities/papi.h"
 #include "../utilities/systemInformation.h"
 #include "../utilities/dataStructures.h"
+#include "../machine_constants/machineConstants.h"
 
 
 namespace MABPL {
@@ -96,8 +97,10 @@ int selectIndexesAdaptive(int n, const T *inputFilter, int *selection, T thresho
     int maxConsecutivePredications = 10;
     int tuplesInBranchBurst = 1000;
 
-    float lowerCrossoverSelectivity = 0.03; // Could use a tuning function to identify these cross-over points
-    float upperCrossoverSelectivity = 0.98; // Could use a tuning function to identify these cross-over points
+    std::string lowerMachineConstantName = "SelectIndexesLower_" + std::to_string(sizeof(T)) + "B_inputFilter";
+    std::string upperMachineConstantName = "SelectIndexesUpper_" + std::to_string(sizeof(T)) + "B_inputFilter";
+    float lowerCrossoverSelectivity = MachineConstants::getInstance().getMachineConstant(lowerMachineConstantName);
+    float upperCrossoverSelectivity = MachineConstants::getInstance().getMachineConstant(upperMachineConstantName);
 
     // Equations below are only valid at the extreme ends of selectivity
     // Y intercept of number of branch misses (at lower cross-over selectivity)
@@ -216,8 +219,10 @@ void *selectIndexesAdaptiveParallelAux(void *arg) {
     int maxConsecutivePredications = 10;
     int tuplesInBranchBurst = 1000;
 
-    float lowerCrossoverSelectivity = 0.03; // Could use a tuning function to identify these cross-over points
-    float upperCrossoverSelectivity = 0.98; // Could use a tuning function to identify these cross-over points
+    std::string lowerMachineConstantName = "SelectIndexesLower_" + std::to_string(sizeof(T)) + "B_inputFilter";
+    std::string upperMachineConstantName = "SelectIndexesUpper_" + std::to_string(sizeof(T)) + "B_inputFilter";
+    float lowerCrossoverSelectivity = MachineConstants::getInstance().getMachineConstant(lowerMachineConstantName);
+    float upperCrossoverSelectivity = MachineConstants::getInstance().getMachineConstant(upperMachineConstantName);
 
     // Equations below are only valid at the extreme ends of selectivity
     // Y intercept of number of branch misses (at lower cross-over selectivity)
@@ -299,6 +304,7 @@ int selectIndexesAdaptiveParallel(int n, const T *inputFilter, int *selection, T
     assert(1 < dop && dop <= maxDop());
 
     Counters::getInstance();
+    MachineConstants::getInstance();
     pthread_t threads[dop];
 
     int adaptivePeriod = 50000;
@@ -485,17 +491,18 @@ inline int runSelectValuesChunk(SelectValuesChoice selectValuesChoice,
 
 inline void performSelectValuesAdaption(SelectValuesChoice &selectValuesChoice,
                                         const long_long *counterValues,
-                                        float crossoverSelectivity,
+                                        float branchCrossoverSelectivity,
+                                        float vectorizationCrossoverSelectivity,
                                         float branchCrossoverBranchMisses,
                                         float selectivity,
                                         int &consecutiveVectorized) {
 
-    if (__builtin_expect((static_cast<float>(counterValues[0]) > branchCrossoverBranchMisses || selectivity > 0.008)
-                         && selectValuesChoice == SelectValuesChoice::ValuesBranch, false)) {
+    if (__builtin_expect((static_cast<float>(counterValues[0]) > branchCrossoverBranchMisses || selectivity >
+        vectorizationCrossoverSelectivity) && selectValuesChoice == SelectValuesChoice::ValuesBranch, false)) {
         selectValuesChoice = SelectValuesChoice::ValuesVectorized;
     }
 
-    if (__builtin_expect(selectivity < crossoverSelectivity
+    if (__builtin_expect(selectivity < branchCrossoverSelectivity
                          && selectValuesChoice == SelectValuesChoice::ValuesVectorized, false)) {
         selectValuesChoice = SelectValuesChoice::ValuesBranch;
         consecutiveVectorized = 0;
@@ -508,13 +515,18 @@ int selectValuesAdaptive(int n, const T2 *inputData, const T1 *inputFilter, T2 *
     auto maxConsecutiveVectorized = 10;
     auto tuplesInBranchBurst = 1000;
 
-    float crossoverSelectivity = 0.003; // Could use a tuning function to identify this cross-over point
+    std::string mispredictionsMachineConstantName = "SelectValuesLowerMispredictions_" + std::to_string(sizeof(T1)) +
+                                                    "B_inputFilter_" + std::to_string(sizeof(T2)) + "B_inputData";
+    std::string selectivityMachineConstantName = "SelectValuesLowerSelectivity_" + std::to_string(sizeof(T1)) +
+                                                 "B_inputFilter_" + std::to_string(sizeof(T2)) + "B_inputData";
+    float branchCrossoverSelectivity = MachineConstants::getInstance().getMachineConstant(mispredictionsMachineConstantName);
+    float vectorizationCrossoverSelectivity = MachineConstants::getInstance().getMachineConstant(selectivityMachineConstantName);
 
     // Equation below are only valid at the extreme ends of selectivity
-    float branchCrossoverBranchMisses = crossoverSelectivity * static_cast<float>(tuplesPerAdaption);
+    float branchCrossoverBranchMisses = branchCrossoverSelectivity * static_cast<float>(tuplesPerAdaption);
 
     // Modified values for short branch burst chunks
-    float branchCrossoverBranchMisses_BranchBurst = crossoverSelectivity * static_cast<float>(tuplesInBranchBurst);
+    float branchCrossoverBranchMisses_BranchBurst = branchCrossoverSelectivity * static_cast<float>(tuplesInBranchBurst);
 
     int startIndex = 0;
     int k = 0;
@@ -535,7 +547,8 @@ int selectValuesAdaptive(int n, const T2 *inputData, const T1 *inputFilter, T2 *
             selected = runSelectValuesChunk<T1,T2>(selectValuesChoice, tuplesToProcess, startIndex, n,
                                             inputData, inputFilter, selection, threshold, k,
                                             consecutiveVectorized);
-            performSelectValuesAdaption(selectValuesChoice, counterValues, crossoverSelectivity,
+            performSelectValuesAdaption(selectValuesChoice, counterValues, branchCrossoverSelectivity,
+                                        vectorizationCrossoverSelectivity,
                                         branchCrossoverBranchMisses_BranchBurst,
                                         static_cast<float>(selected) / static_cast<float>(tuplesInBranchBurst),
                                         consecutiveVectorized);
@@ -544,7 +557,8 @@ int selectValuesAdaptive(int n, const T2 *inputData, const T1 *inputFilter, T2 *
             selected = runSelectValuesChunk<T1,T2>(selectValuesChoice, tuplesToProcess, startIndex,n,
                                             inputData, inputFilter, selection, threshold, k,
                                             consecutiveVectorized);
-            performSelectValuesAdaption(selectValuesChoice, counterValues, crossoverSelectivity,
+            performSelectValuesAdaption(selectValuesChoice, counterValues, branchCrossoverSelectivity,
+                                        vectorizationCrossoverSelectivity,
                                         branchCrossoverBranchMisses,
                                         static_cast<float>(selected) / static_cast<float>(tuplesPerAdaption),
                                         consecutiveVectorized);
@@ -618,13 +632,18 @@ void *selectValuesAdaptiveParallelAux(void *arg) {
     auto maxConsecutiveVectorized = 10;
     auto tuplesInBranchBurst = 1000;
 
-    float crossoverSelectivity = 0.003; // Could use a tuning function to identify this cross-over point
+    std::string mispredictionsMachineConstantName = "SelectValuesLowerMispredictions_" + std::to_string(sizeof(T1)) +
+                                                    "B_inputFilter_" + std::to_string(sizeof(T2)) + "B_inputData";
+    std::string selectivityMachineConstantName = "SelectValuesLowerSelectivity_" + std::to_string(sizeof(T1)) +
+                                                 "B_inputFilter_" + std::to_string(sizeof(T2)) + "B_inputData";
+    float branchCrossoverSelectivity = MachineConstants::getInstance().getMachineConstant(mispredictionsMachineConstantName);
+    float vectorizationCrossoverSelectivity = MachineConstants::getInstance().getMachineConstant(selectivityMachineConstantName);
 
     // Equation below are only valid at the extreme ends of selectivity
-    float branchCrossoverBranchMisses = crossoverSelectivity * static_cast<float>(tuplesPerAdaption);
+    float branchCrossoverBranchMisses = branchCrossoverSelectivity * static_cast<float>(tuplesPerAdaption);
 
     // Modified values for short branch burst chunks
-    float branchCrossoverBranchMisses_BranchBurst = crossoverSelectivity * static_cast<float>(tuplesInBranchBurst);
+    float branchCrossoverBranchMisses_BranchBurst = branchCrossoverSelectivity * static_cast<float>(tuplesInBranchBurst);
 
     int eventSet = PAPI_NULL;
     std::vector<std::string> counters = {"PERF_COUNT_HW_BRANCH_MISSES"};
@@ -653,7 +672,8 @@ void *selectValuesAdaptiveParallelAux(void *arg) {
                                                                 startIndex, n, inputData, inputFilter,
                                                                 threadSelection, threshold, k,
                                                                 consecutiveVectorized, eventSet, counterValues);
-                performSelectValuesAdaption(selectValuesChoice, counterValues, crossoverSelectivity,
+                performSelectValuesAdaption(selectValuesChoice, counterValues, branchCrossoverSelectivity,
+                                            vectorizationCrossoverSelectivity,
                                             branchCrossoverBranchMisses_BranchBurst,
                                             static_cast<float>(selected) / static_cast<float>(tuplesInBranchBurst),
                                             consecutiveVectorized);
@@ -663,7 +683,8 @@ void *selectValuesAdaptiveParallelAux(void *arg) {
                                                                 startIndex, n, inputData, inputFilter,
                                                                 threadSelection, threshold, k,
                                                                 consecutiveVectorized, eventSet, counterValues);
-                performSelectValuesAdaption(selectValuesChoice, counterValues, crossoverSelectivity,
+                performSelectValuesAdaption(selectValuesChoice, counterValues, branchCrossoverSelectivity,
+                                            vectorizationCrossoverSelectivity,
                                             branchCrossoverBranchMisses,
                                             static_cast<float>(selected) / static_cast<float>(tuplesPerAdaption),
                                             consecutiveVectorized);
@@ -690,6 +711,7 @@ int selectValuesAdaptiveParallel(int n, const T2 *inputData, const T1 *inputFilt
     assert(1 < dop && dop <= maxDop());
 
     Counters::getInstance();
+    MachineConstants::getInstance();
     pthread_t threads[dop];
 
     int adaptivePeriod = 50000;
@@ -735,36 +757,61 @@ int selectValuesAdaptiveParallel(int n, const T2 *inputData, const T1 *inputFilt
 }
 
 template<typename T1, typename T2>
+struct runSelectFunctionStruct { static int run (Select selectImplementation,
+                                                 int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold, int dop) {
+        switch (selectImplementation) {
+            case Select::ImplementationValuesBranch:
+                return selectValuesBranch(n, inputData, inputFilter, selection, threshold);
+            case Select::ImplementationValuesPredication:
+                return selectValuesPredication(n, inputData, inputFilter, selection, threshold);
+            case Select::ImplementationValuesVectorized:
+                return selectValuesVectorized(n, inputData, inputFilter, selection, threshold);
+            case Select::ImplementationValuesAdaptive:
+                return selectValuesAdaptive(n, inputData, inputFilter, selection, threshold);
+            case Select::ImplementationValuesAdaptiveParallel:
+                return selectValuesAdaptiveParallel(n, inputData, inputFilter, selection, threshold, dop);
+            default:
+                std::cout << "Invalid selection of 'Select' implementation!" << std::endl;
+                exit(1);
+        }
+    }
+};
+
+template<typename T>
+struct runSelectFunctionStruct<T, int> { static int run (Select selectImplementation,
+                                                         int n, const int *inputData, const T *inputFilter, int *selection, T threshold, int dop) {
+        switch (selectImplementation) {
+            case Select::ImplementationIndexesBranch:
+                return selectIndexesBranch(n, inputFilter, selection, threshold);
+            case Select::ImplementationIndexesPredication:
+                return selectIndexesPredication(n, inputFilter, selection, threshold);
+            case Select::ImplementationIndexesAdaptive:
+                return selectIndexesAdaptive(n, inputFilter, selection, threshold);
+            case Select::ImplementationIndexesAdaptiveParallel:
+                return selectIndexesAdaptiveParallel(n, inputFilter, selection, threshold, dop);
+            case Select::ImplementationValuesBranch:
+                return selectValuesBranch(n, inputData, inputFilter, selection, threshold);
+            case Select::ImplementationValuesPredication:
+                return selectValuesPredication(n, inputData, inputFilter, selection, threshold);
+            case Select::ImplementationValuesVectorized:
+                return selectValuesVectorized(n, inputData, inputFilter, selection, threshold);
+            case Select::ImplementationValuesAdaptive:
+                return selectValuesAdaptive(n, inputData, inputFilter, selection, threshold);
+            case Select::ImplementationValuesAdaptiveParallel:
+                return selectValuesAdaptiveParallel(n, inputData, inputFilter, selection, threshold, dop);
+            default:
+                std::cout << "Invalid selection of 'Select' implementation!" << std::endl;
+                exit(1);
+        }
+    }
+};
+
+template<typename T1, typename T2>
 int runSelectFunction(Select selectImplementation,
                       int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold, int dop) {
-    switch(selectImplementation) {
-        case Select::ImplementationIndexesBranch:
-            static_assert(std::is_same<T2, int>::value, "selection array type must be int for select indexes function");
-            return selectIndexesBranch(n, inputFilter, selection, threshold);
-        case Select::ImplementationIndexesPredication:
-            static_assert(std::is_same<T2, int>::value, "selection array type must be int for select indexes function");
-            return selectIndexesPredication(n, inputFilter, selection, threshold);
-        case Select::ImplementationIndexesAdaptive:
-            static_assert(std::is_same<T2, int>::value, "selection array type must be int for select indexes function");
-            return selectIndexesAdaptive(n, inputFilter, selection, threshold);
-        case Select::ImplementationIndexesAdaptiveParallel:
-            static_assert(std::is_same<T2, int>::value, "selection array type must be int for select indexes function");
-            return selectIndexesAdaptiveParallel(n, inputFilter, selection, threshold, dop);
-        case Select::ImplementationValuesBranch:
-            return selectValuesBranch(n, inputData, inputFilter, selection, threshold);
-        case Select::ImplementationValuesPredication:
-            return selectValuesPredication(n, inputData, inputFilter, selection, threshold);
-        case Select::ImplementationValuesVectorized:
-            return selectValuesVectorized(n, inputData, inputFilter, selection, threshold);
-        case Select::ImplementationValuesAdaptive:
-            return selectValuesAdaptive(n, inputData, inputFilter, selection, threshold);
-        case Select::ImplementationValuesAdaptiveParallel:
-            return selectValuesAdaptiveParallel(n, inputData, inputFilter, selection, threshold, dop);
-        default:
-            std::cout << "Invalid selection of 'Select' implementation!" << std::endl;
-            exit(1);
-    }
+    return runSelectFunctionStruct<T1,T2>::run(selectImplementation, n, inputData, inputFilter, selection, threshold, dop);
 }
+
 
 }
 

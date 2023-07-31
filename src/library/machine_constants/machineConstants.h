@@ -35,4 +35,6 @@ private:
 
 }
 
+#include "machineConstantsImplementation.h"
+
 #endif //MABPL_MACHINECONSTANTS_H

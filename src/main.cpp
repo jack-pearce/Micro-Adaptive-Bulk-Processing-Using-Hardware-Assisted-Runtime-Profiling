@@ -243,12 +243,14 @@ void allSelectIndexesSingleThreadedTests() {
                                    50, 5, "2-Indexes");
 
     // Graph 2.5: Selectivity on fully sorted data
+    std::vector<float> inputThresholdDistribution2;
+    generateLogDistribution(30, 1, 100, inputThresholdDistribution2);
     selectCpuCyclesInputSweepBenchmark(DataFiles::fullySortedIntDistribution250mValues,
                                        {Select::ImplementationIndexesBranch,
                                         Select::ImplementationIndexesPredication,
                                         Select::ImplementationIndexesAdaptive},
                                        inputThresholdDistribution,
-                                       1, "2-5-Indexes");
+                                       5, "2-5-Indexes");
 
     // Graph 3: Period range on linearly varying selectivity
 /*    selectCpuCyclesSweepBenchmark(DataSweeps::varyingIntDistribution250mValuesSweep,
@@ -306,12 +308,14 @@ void allSelectValuesSingleThreadedTests() {
                                    50, 5, "2-Values");
 
     // Graph 2.5: Selectivity on fully sorted data
+    std::vector<float> inputThresholdDistribution2;
+    generateLogDistribution(30, 1, 100, inputThresholdDistribution2);
     selectCpuCyclesInputSweepBenchmark(DataFiles::fullySortedIntDistribution250mValues,
                                        {Select::ImplementationValuesBranch,
                                         Select::ImplementationValuesVectorized,
                                         Select::ImplementationValuesAdaptive},
                                        inputThresholdDistribution,
-                                       1, "2-5-Values");
+                                       5, "2-5-Values");
 
 
     // Graph 3: Period range on linearly varying selectivity
@@ -718,7 +722,22 @@ void allGroupByParallelTests() {
 
 int main() {
 
-    MABPL::clearAndRecalculateMachineConstants();
+    std::vector<float> inputThresholdDistribution;
+    generateLogDistribution(30, 1, 10*1000, inputThresholdDistribution);
+    selectCpuCyclesInputSweepBenchmark(DataFiles::uniformIntDistribution250mValuesMax10000,
+                                       {Select::ImplementationIndexesBranch,
+                                        Select::ImplementationIndexesPredication,
+                                        Select::ImplementationIndexesAdaptive},
+                                       inputThresholdDistribution,
+                                       1, "1-Indexes");
+
+
+    selectCpuCyclesInputSweepBenchmark(DataFiles::uniformIntDistribution250mValuesMax10000,
+                                       {Select::ImplementationValuesBranch,
+                                        Select::ImplementationValuesVectorized,
+                                        Select::ImplementationValuesAdaptive},
+                                       inputThresholdDistribution,
+                                       1, "1-Values");
 
     return 0;
 }

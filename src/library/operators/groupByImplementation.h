@@ -10,13 +10,12 @@
 
 #include "../utilities/systemInformation.h"
 #include "../utilities/papi.h"
+#include "../machine_constants/machineConstants.h"
 
 
 namespace MABPL {
 
 constexpr int BITS_PER_GROUPBY_RADIX_PASS = 10;
-//constexpr float GROUPBY_MACHINE_CONSTANT = 0.125;
-constexpr float GROUPBY_MACHINE_CONSTANT = 0.63115;
 
 template<typename T>
 T MinAggregation<T>::operator()(T currentAggregate, T numberToInclude, bool firstAggregation) const {
@@ -320,9 +319,9 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
     std::vector<std::string> counters = {"PERF_COUNT_HW_CACHE_MISSES"};
     long_long *counterValues = Counters::getInstance().getSharedEventSetEvents(counters);
 
-    int hashTableEntryBytes = sizeof(T1) + sizeof(T2);
-//    float tuplesPerLastLevelCacheMissThreshold = (GROUPBY_MACHINE_CONSTANT * bytesPerCacheLine()) / hashTableEntryBytes;
-    float tuplesPerLastLevelCacheMissThreshold = GROUPBY_MACHINE_CONSTANT;
+    std::string machineConstantName = "GroupBy_" + std::to_string(sizeof(T1)) + "B_inputFilter_" +
+            std::to_string(sizeof(T2)) + "B_inputAggregate";
+    float tuplesPerLastLevelCacheMissThreshold = MachineConstants::getInstance().getMachineConstant(machineConstantName);
 
     int index = 0;
     int tuplesToProcess;
@@ -522,8 +521,9 @@ void *groupByAdaptiveParallelAux(void *arg) {
     long_long counterValues[1] = {0};
     createThreadEventSet(&eventSet, counters);
 
-    int hashTableEntryBytes = sizeof(T1) + sizeof(T2);
-    float tuplesPerLastLevelCacheMissThreshold = (GROUPBY_MACHINE_CONSTANT * bytesPerCacheLine()) / hashTableEntryBytes;
+    std::string machineConstantName = "GroupBy_" + std::to_string(sizeof(T1)) + "B_inputFilter_" +
+                                      std::to_string(sizeof(T2)) + "B_inputAggregate";
+    float tuplesPerLastLevelCacheMissThreshold = MachineConstants::getInstance().getMachineConstant(machineConstantName);
 
     int index = 0;
     int tuplesToProcess;
@@ -577,6 +577,7 @@ vectorOfPairs<T1, T2> groupByAdaptiveParallel(int n, T1 *inputGroupBy, T2 *input
     int totalThreads = (dop * 2) - 1;
 
     Counters::getInstance();
+    MachineConstants::getInstance();
     pthread_t threads[totalThreads];
 
     pthread_attr_t attr;
