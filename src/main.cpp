@@ -702,7 +702,7 @@ void allGroupByParallelTests() {
 
 int main() {
 
-    MABPL::calculateMissingMachineConstants();
+    MABPL::printMachineConstants();
 
 
     return 0;

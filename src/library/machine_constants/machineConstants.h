@@ -3,6 +3,7 @@
 
 #include <string>
 #include <map>
+#include <filesystem>
 
 
 namespace MABPL {
@@ -29,7 +30,7 @@ private:
     void loadMachineConstants(std::map<std::string, double> &map);
 
     std::map<std::string, double> machineConstants;
-    const std::string machineConstantsFilePath = "/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/src/library/machine_constants/machineConstantValues.json";
+    std::filesystem::path machineConstantsFilePath;
 };
 
 }

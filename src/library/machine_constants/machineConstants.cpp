@@ -356,6 +356,8 @@ MachineConstants& MachineConstants::getInstance() {
 }
 
 MachineConstants::MachineConstants() {
+    machineConstantsFilePath = std::filesystem::current_path() /
+            std::filesystem::path("src/library/machine_constants") / "machineConstantValues.json";
     loadMachineConstants(machineConstants);
 }
 
