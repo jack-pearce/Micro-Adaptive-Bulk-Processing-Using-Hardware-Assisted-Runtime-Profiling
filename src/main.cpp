@@ -720,6 +720,5 @@ int main() {
 
     MABPL::clearAndRecalculateMachineConstants();
 
-
     return 0;
 }

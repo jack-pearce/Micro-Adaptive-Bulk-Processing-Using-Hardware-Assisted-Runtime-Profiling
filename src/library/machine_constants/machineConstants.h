@@ -27,6 +27,7 @@ private:
     MachineConstants();
     ~MachineConstants() = default;
     void loadMachineConstants(std::map<std::string, double> &map);
+    void writeEmptyFile();
 
     std::map<std::string, double> machineConstants;
     std::string machineConstantsFilePath;

@@ -403,6 +403,17 @@ void MachineConstants::loadMachineConstants(std::map<std::string, double> &map) 
             map[key] = jsonRoot[key].asDouble();
         }
     } else {
+        writeEmptyFile();
+        map = {};
+    }
+}
+
+void MachineConstants::writeEmptyFile() {
+    std::ofstream file(machineConstantsFilePath, std::ofstream::out | std::ofstream::trunc);
+    if (file.is_open()) {
+        file << "{}";
+        file.close();
+    } else {
         std::cerr << "Error opening file: " << machineConstantsFilePath << std::endl;
     }
 }
@@ -422,15 +433,8 @@ void MachineConstants::calculateMissingMachineConstants() {
 }
 
 void MachineConstants::clearAndRecalculateMachineConstants() {
-    std::ofstream file(machineConstantsFilePath, std::ofstream::out | std::ofstream::trunc);
-    if (file.is_open()) {
-        file.close();
-    } else {
-        std::cerr << "Error opening file: " << machineConstantsFilePath << std::endl;
-    }
-
+    writeEmptyFile();
     loadMachineConstants(machineConstants);
-
     calculateMissingMachineConstants();
 }
 
@@ -439,7 +443,6 @@ void MachineConstants::printMachineConstants() {
     for (const auto& machineConstant : machineConstants) {
         std::cout << "Constant: '" << machineConstant.first << "', Value: " << machineConstant.second << std::endl;
     }
-
 }
 
 
