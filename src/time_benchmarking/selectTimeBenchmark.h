@@ -6,7 +6,11 @@
 
 using MABPL::Select;
 
+
+template <typename T>
 void selectTimeBenchmark(const DataFile &dataFile, Select selectImplementation, int selectivityStride);
+
+template <typename T>
 void selectTimeBenchmarkSetIterations(const DataFile &dataFile, Select selectImplementation,
                                       int selectivityStride, int iterations);
 
