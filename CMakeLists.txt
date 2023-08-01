@@ -36,9 +36,9 @@ add_executable(${PROJECT_NAME}
         src/main.cpp
         src/utilities/dataHelpers.cpp
         src/utilities/papiHelpers.cpp
-        src/cycles_benchmarking/selectCyclesBenchmark.cpp
+        src/cycles_benchmarking/selectCyclesBenchmark.h
         src/library/operators/groupBy.cpp
-        src/cycles_benchmarking/groupByCyclesBenchmark.cpp
+        src/cycles_benchmarking/groupByCyclesBenchmark.h
         src/library/mabpl.h
         src/library/machine_constants/machineConstants.cpp
         src/time_benchmarking/timeBenchmarkHelpers.cpp

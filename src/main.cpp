@@ -722,16 +722,16 @@ void allGroupByParallelTests() {
 
 int main() {
 
-//    MABPL::calculateMissingMachineConstants();
+    MABPL::calculateMissingMachineConstants();
 
-    std::vector<float> inputThresholdDistribution;
-    generateLogDistribution(30, 1, 10*1000, inputThresholdDistribution);
-    selectCpuCyclesInputSweepBenchmark(DataFiles::uniformIntDistribution250mValuesMax10000,
-                                       {Select::ImplementationIndexesBranch,
-                                        Select::ImplementationIndexesPredication,
-                                        Select::ImplementationIndexesAdaptive},
-                                       inputThresholdDistribution,
-                                       1, "1-Indexes");
+//    std::vector<float> inputThresholdDistribution;
+//    generateLogDistribution(30, 1, 10*1000, inputThresholdDistribution);
+//    selectCpuCyclesInputSweepBenchmark(DataFiles::uniformIntDistribution250mValuesMax10000,
+//                                       {Select::ImplementationIndexesBranch,
+//                                        Select::ImplementationIndexesPredication,
+//                                        Select::ImplementationIndexesAdaptive},
+//                                       inputThresholdDistribution,
+//                                       1, "1-Indexes");
 
     return 0;
 }

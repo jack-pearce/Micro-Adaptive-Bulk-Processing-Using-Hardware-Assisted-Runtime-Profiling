@@ -1,3 +1,7 @@
+#ifndef MABPL_SELECTCYCLESBENCHMARKIMPLEMENTATION_H
+#define MABPL_SELECTCYCLESBENCHMARKIMPLEMENTATION_H
+
+
 #include <iostream>
 #include <functional>
 #include <vector>
@@ -10,19 +14,20 @@
 
 using MABPL::Counters;
 
-void selectSingleRunNoCounters(const DataFile &dataFile, Select selectImplementation, int threshold,
+template<typename T1, typename T2>
+void selectSingleRunNoCounters(const DataFile &dataFile, Select selectImplementation, T1 threshold,
                                int iterations) {
     for (auto j = 0; j < iterations; ++j) {
-        auto inputData = new int[dataFile.getNumElements()];
-        auto inputFilter = new int[dataFile.getNumElements()];
-        auto selection = new int[dataFile.getNumElements()];
-        copyArray<int>(LoadedData<int>::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
-        copyArray<int>(LoadedData<int>::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
+        auto inputData = new T2[dataFile.getNumElements()];
+        auto inputFilter = new T1[dataFile.getNumElements()];
+        auto selection = new T2[dataFile.getNumElements()];
+        copyArray<T2>(LoadedData<T2>::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
+        copyArray<T1>(LoadedData<T1>::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
 
         std::cout << "Running threshold " << threshold << ", iteration " << j + 1 << "... ";
 
         MABPL::runSelectFunction(selectImplementation,
-                          dataFile.getNumElements(), inputData, inputFilter, selection, threshold);
+                                 dataFile.getNumElements(), inputData, inputFilter, selection, threshold);
 
         delete[] inputData;
         delete[] inputFilter;
@@ -32,8 +37,9 @@ void selectSingleRunNoCounters(const DataFile &dataFile, Select selectImplementa
     }
 }
 
+template<typename T1, typename T2>
 void selectCpuCyclesSingleInputBenchmark(const DataFile &dataFile,
-                                         const std::vector<Select> &selectImplementations, int threshold,
+                                         const std::vector<Select> &selectImplementations, T1 threshold,
                                          int iterations, const std::string &fileNamePrefix) {
     int numTests = static_cast<int>(selectImplementations.size());
     long_long cycles;
@@ -43,18 +49,18 @@ void selectCpuCyclesSingleInputBenchmark(const DataFile &dataFile,
         results[i][0] = static_cast<long_long>(threshold);
 
         for (auto j = 0; j < numTests; ++j) {
-            auto inputData = new int[dataFile.getNumElements()];
-            auto inputFilter = new int[dataFile.getNumElements()];
-            auto selection = new int[dataFile.getNumElements()];
-            copyArray<int>(LoadedData<int>::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
-            copyArray<int>(LoadedData<int>::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
+            auto inputData = new T2[dataFile.getNumElements()];
+            auto inputFilter = new T1[dataFile.getNumElements()];
+            auto selection = new T2[dataFile.getNumElements()];
+            copyArray<T2>(LoadedData<T2>::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
+            copyArray<T1>(LoadedData<T1>::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
 
             std::cout << "Running " << getSelectName(selectImplementations[j]) << ", iteration " << i + 1 << "... ";
 
             cycles = *Counters::getInstance().readSharedEventSet();
 
             MABPL::runSelectFunction(selectImplementations[j],
-                              dataFile.getNumElements(), inputData, inputFilter, selection, threshold);
+                                     dataFile.getNumElements(), inputData, inputFilter, selection, threshold);
 
             results[i][1 + j] = *Counters::getInstance().readSharedEventSet() - cycles;
 
@@ -82,6 +88,7 @@ void selectCpuCyclesSingleInputBenchmark(const DataFile &dataFile,
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }
 
+template<typename T1, typename T2>
 void selectCpuCyclesMultipleInputBenchmark(const DataFile &dataFile,
                                            const std::vector<Select> &selectImplementations,
                                            int selectivityStride, int iterations, const std::string &fileNamePrefix) {
@@ -98,11 +105,11 @@ void selectCpuCyclesMultipleInputBenchmark(const DataFile &dataFile,
             results[count][0] = static_cast<long_long>(j);
 
             for (auto k = 0; k < iterations; ++k) {
-                auto inputData = new int[dataFile.getNumElements()];
-                auto inputFilter = new int[dataFile.getNumElements()];
-                auto selection = new int[dataFile.getNumElements()];
-                copyArray<int>(LoadedData<int>::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
-                copyArray<int>(LoadedData<int>::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
+                auto inputData = new T2[dataFile.getNumElements()];
+                auto inputFilter = new T1[dataFile.getNumElements()];
+                auto selection = new T2[dataFile.getNumElements()];
+                copyArray<T2>(LoadedData<T2>::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
+                copyArray<T1>(LoadedData<T1>::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
 
                 std::cout << "Running " << getSelectName(selectImplementations[i]) << ", threshold ";
                 std::cout << j << ", iteration " << k + 1 << "... ";
@@ -110,7 +117,7 @@ void selectCpuCyclesMultipleInputBenchmark(const DataFile &dataFile,
                 cycles = *Counters::getInstance().readSharedEventSet();
 
                 MABPL::runSelectFunction(selectImplementations[j],
-                                  dataFile.getNumElements(), inputData, inputFilter, selection, j);
+                                         dataFile.getNumElements(), inputData, inputFilter, selection, j);
 
                 results[count][1 + (i * iterations) + k] = *Counters::getInstance().readSharedEventSet() - cycles;
 
@@ -142,6 +149,7 @@ void selectCpuCyclesMultipleInputBenchmark(const DataFile &dataFile,
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }
 
+template<typename T1, typename T2>
 void selectBenchmarkWithExtraCounters(const DataFile &dataFile, Select selectImplementation,
                                       std::vector<float> &thresholds, int iterations,
                                       std::vector<std::string> &benchmarkCounters, const std::string &fileNamePrefix) {
@@ -161,11 +169,11 @@ void selectBenchmarkWithExtraCounters(const DataFile &dataFile, Select selectImp
         results[count][0] = static_cast<long_long>(thresholds[i]);
 
         for (auto j = 0; j < iterations; ++j) {
-            auto inputData = new int[dataFile.getNumElements()];
-            auto inputFilter = new int[dataFile.getNumElements()];
-            auto selection = new int[dataFile.getNumElements()];
-            copyArray<int>(LoadedData<int>::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
-            copyArray<int>(LoadedData<int>::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
+            auto inputData = new T2[dataFile.getNumElements()];
+            auto inputFilter = new T1[dataFile.getNumElements()];
+            auto selection = new T2[dataFile.getNumElements()];
+            copyArray<T2>(LoadedData<T2>::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
+            copyArray<T1>(LoadedData<T1>::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
 
             std::cout << "Running threshold " << static_cast<int>(thresholds[i]) << ", iteration " << j + 1 << "... ";
 
@@ -173,8 +181,8 @@ void selectBenchmarkWithExtraCounters(const DataFile &dataFile, Select selectImp
                 exit(1);
 
             MABPL::runSelectFunction(selectImplementation,
-                              dataFile.getNumElements(), inputData, inputFilter, selection,
-                              static_cast<int>(thresholds[i]));
+                                     dataFile.getNumElements(), inputData, inputFilter, selection,
+                                     static_cast<T1>(thresholds[i]));
 
             if (PAPI_read(benchmarkEventSet, benchmarkCounterValues) != PAPI_OK)
                 exit(1);
@@ -210,8 +218,9 @@ void selectBenchmarkWithExtraCounters(const DataFile &dataFile, Select selectImp
     shutdownPAPI(benchmarkEventSet, benchmarkCounterValues);
 }
 
+template<typename T1, typename T2>
 void selectCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<Select> &selectImplementations,
-                                   int threshold, int iterations, const std::string &fileNamePrefix) {
+                                   T1 threshold, int iterations, const std::string &fileNamePrefix) {
     assert(!selectImplementations.empty());
     if (std::count(selectImplementations.begin(), selectImplementations.end(), Select::ImplementationIndexesAdaptiveParallel) ||
         std::count(selectImplementations.begin(), selectImplementations.end(), Select::ImplementationValuesAdaptiveParallel )) {
@@ -229,20 +238,20 @@ void selectCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<Selec
         for (auto j = 0; j < static_cast<int>(selectImplementations.size()); ++j) {
             for (auto k = 0; k < dataSweep.getTotalRuns(); ++k) {
                 results[k][0] = static_cast<double>(dataSweep.getRunInput());
-                auto inputData = new int[dataSweep.getNumElements()];
-                auto inputFilter = new int[dataSweep.getNumElements()];
-                auto selection = new int[dataSweep.getNumElements()];
+                auto inputData = new T2[dataSweep.getNumElements()];
+                auto inputFilter = new T1[dataSweep.getNumElements()];
+                auto selection = new T2[dataSweep.getNumElements()];
 
                 std::cout << "Running " << getSelectName(selectImplementations[j]) << " for input ";
                 std::cout << dataSweep.getRunInput() << "... ";
 
-                dataSweep.loadNextDataSetIntoMemory(inputData);
-                copyArray<int>(inputData, inputFilter, dataSweep.getNumElements());
+                dataSweep.loadNextDataSetIntoMemory<T1>(inputFilter);
+                generateUniformDistributionInMemory<T2>(inputData, dataSweep.getNumElements(), 10);
 
                 cycles = *Counters::getInstance().readSharedEventSet();
 
                 MABPL::runSelectFunction(selectImplementations[j],
-                                  dataSweep.getNumElements(), inputData, inputFilter, selection, threshold);
+                                         dataSweep.getNumElements(), inputData, inputFilter, selection, threshold);
 
                 results[k][1 + (i * selectImplementations.size()) + j] =
                         static_cast<double>(*Counters::getInstance().readSharedEventSet() - cycles);
@@ -273,8 +282,9 @@ void selectCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<Selec
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }
 
+template <typename T1, typename T2>
 void selectWallTimeSweepBenchmark(DataSweep &dataSweep, const std::vector<Select> &selectImplementations,
-                                   int threshold, int iterations, const std::string &fileNamePrefix) {
+                                  T1 threshold, int iterations, const std::string &fileNamePrefix) {
     assert(!selectImplementations.empty());
 
     int dataCols = iterations * static_cast<int>(selectImplementations.size());
@@ -286,15 +296,15 @@ void selectWallTimeSweepBenchmark(DataSweep &dataSweep, const std::vector<Select
         for (auto j = 0; j < static_cast<int>(selectImplementations.size()); ++j) {
             for (auto k = 0; k < dataSweep.getTotalRuns(); ++k) {
                 results[k][0] = static_cast<double>(dataSweep.getRunInput());
-                auto inputData = new int[dataSweep.getNumElements()];
-                auto inputFilter = new int[dataSweep.getNumElements()];
-                auto selection = new int[dataSweep.getNumElements()];
+                auto inputData = new T2[dataSweep.getNumElements()];
+                auto inputFilter = new T1[dataSweep.getNumElements()];
+                auto selection = new T2[dataSweep.getNumElements()];
 
                 std::cout << "Running " << getSelectName(selectImplementations[j]) << " for input ";
                 std::cout << dataSweep.getRunInput() << "... ";
 
-                dataSweep.loadNextDataSetIntoMemory(inputData);
-                copyArray<int>(inputData, inputFilter, dataSweep.getNumElements());
+                dataSweep.loadNextDataSetIntoMemory<T1>(inputFilter);
+                generateUniformDistributionInMemory<T2>(inputData, dataSweep.getNumElements(), 10);
 
                 wallTime = PAPI_get_real_usec();
 
@@ -330,7 +340,8 @@ void selectWallTimeSweepBenchmark(DataSweep &dataSweep, const std::vector<Select
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }
 
-void selectWallTimeDopSweepBenchmark(DataSweep &dataSweep, Select selectImplementation, int threshold,
+template <typename T1, typename T2>
+void selectWallTimeDopSweepBenchmark(DataSweep &dataSweep, Select selectImplementation, T1 threshold,
                                      int iterations, const std::string &fileNamePrefix, std::vector<int> dop) {
     assert(selectImplementation == Select::ImplementationValuesAdaptiveParallel ||
            selectImplementation == Select::ImplementationIndexesAdaptiveParallel);
@@ -344,15 +355,15 @@ void selectWallTimeDopSweepBenchmark(DataSweep &dataSweep, Select selectImplemen
         for (auto j = 0; j < static_cast<int>(dop.size()); ++j) {
             for (auto k = 0; k < dataSweep.getTotalRuns(); ++k) {
                 results[k][0] = static_cast<double>(dataSweep.getRunInput());
-                auto inputData = new int[dataSweep.getNumElements()];
-                auto inputFilter = new int[dataSweep.getNumElements()];
-                auto selection = new int[dataSweep.getNumElements()];
+                auto inputData = new T2[dataSweep.getNumElements()];
+                auto inputFilter = new T1[dataSweep.getNumElements()];
+                auto selection = new T2[dataSweep.getNumElements()];
 
                 std::cout << "Running dop of " << dop[j] << " for input ";
                 std::cout << dataSweep.getRunInput() << "... ";
 
-                dataSweep.loadNextDataSetIntoMemory(inputData);
-                copyArray<int>(inputData, inputFilter, dataSweep.getNumElements());
+                dataSweep.loadNextDataSetIntoMemory<T1>(inputFilter);
+                generateUniformDistributionInMemory<T2>(inputData, dataSweep.getNumElements(), 10);
 
                 wallTime = PAPI_get_real_usec();
 
@@ -388,6 +399,7 @@ void selectWallTimeDopSweepBenchmark(DataSweep &dataSweep, Select selectImplemen
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }
 
+template <typename T1, typename T2>
 void selectCpuCyclesInputSweepBenchmark(const DataFile &dataFile,
                                         const std::vector<Select> &selectImplementations,
                                         std::vector<float> &thresholds, int iterations,
@@ -408,11 +420,11 @@ void selectCpuCyclesInputSweepBenchmark(const DataFile &dataFile,
         for (auto j = 0; j < static_cast<int>(selectImplementations.size()); ++j) {
             for (auto k = 0; k < static_cast<int>(thresholds.size()); ++k) {
                 results[k][0] = static_cast<int>(thresholds[k]);
-                auto inputData = new int[dataFile.getNumElements()];
-                auto inputFilter = new int[dataFile.getNumElements()];
-                auto selection = new int[dataFile.getNumElements()];
-                copyArray<int>(LoadedData<int>::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
-                copyArray<int>(LoadedData<int>::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
+                auto inputData = new T2[dataFile.getNumElements()];
+                auto inputFilter = new T1[dataFile.getNumElements()];
+                auto selection = new T2[dataFile.getNumElements()];
+                copyArray<T2>(LoadedData<T2>::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
+                copyArray<T1>(LoadedData<T1>::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
 
                 std::cout << "Running " << getSelectName(selectImplementations[j]) << " for threshold ";
                 std::cout << std::to_string(static_cast<int>(thresholds[k])) << "... ";
@@ -420,8 +432,8 @@ void selectCpuCyclesInputSweepBenchmark(const DataFile &dataFile,
                 cycles = *Counters::getInstance().readSharedEventSet();
 
                 MABPL::runSelectFunction(selectImplementations[j],
-                                  dataFile.getNumElements(), inputData, inputFilter,
-                                  selection, static_cast<int>(thresholds[k]));
+                                         dataFile.getNumElements(), inputData, inputFilter,
+                                         selection, static_cast<T1>(thresholds[k]));
 
                 results[k][1 + (i * selectImplementations.size()) + j] =
                         static_cast<double>(*Counters::getInstance().readSharedEventSet() - cycles);
@@ -446,10 +458,11 @@ void selectCpuCyclesInputSweepBenchmark(const DataFile &dataFile,
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }
 
+template <typename T1, typename T2>
 void selectWallTimeInputSweepBenchmark(const DataFile &dataFile,
-                                        const std::vector<Select> &selectImplementations,
-                                        std::vector<float> &thresholds, int iterations,
-                                        const std::string &fileNamePrefix) {
+                                       const std::vector<Select> &selectImplementations,
+                                       std::vector<float> &thresholds, int iterations,
+                                       const std::string &fileNamePrefix) {
     assert(!selectImplementations.empty());
 
     int dataCols = iterations * static_cast<int>(selectImplementations.size());
@@ -461,11 +474,11 @@ void selectWallTimeInputSweepBenchmark(const DataFile &dataFile,
         for (auto j = 0; j < static_cast<int>(selectImplementations.size()); ++j) {
             for (auto k = 0; k < static_cast<int>(thresholds.size()); ++k) {
                 results[k][0] = static_cast<int>(thresholds[k]);
-                auto inputData = new int[dataFile.getNumElements()];
-                auto inputFilter = new int[dataFile.getNumElements()];
-                auto selection = new int[dataFile.getNumElements()];
-                copyArray<int>(LoadedData<int>::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
-                copyArray<int>(LoadedData<int>::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
+                auto inputData = new T2[dataFile.getNumElements()];
+                auto inputFilter = new T1[dataFile.getNumElements()];
+                auto selection = new T2[dataFile.getNumElements()];
+                copyArray<T2>(LoadedData<T2>::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
+                copyArray<T1>(LoadedData<T1>::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
 
                 std::cout << "Running " << getSelectName(selectImplementations[j]) << " for threshold ";
                 std::cout << std::to_string(static_cast<int>(thresholds[k])) << "... ";
@@ -474,7 +487,7 @@ void selectWallTimeInputSweepBenchmark(const DataFile &dataFile,
 
                 MABPL::runSelectFunction(selectImplementations[j],
                                          dataFile.getNumElements(), inputData, inputFilter,
-                                         selection, static_cast<int>(thresholds[k]));
+                                         selection, static_cast<T1>(thresholds[k]));
 
                 results[k][1 + (i * selectImplementations.size()) + j] =
                         static_cast<double>(PAPI_get_real_usec() - wallTime);
@@ -499,6 +512,7 @@ void selectWallTimeInputSweepBenchmark(const DataFile &dataFile,
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }
 
+template <typename T1, typename T2>
 void selectWallTimeDopAndInputSweepBenchmark(const DataFile &dataFile,
                                              Select selectImplementation,
                                              std::vector<float> &thresholds, int iterations,
@@ -515,11 +529,11 @@ void selectWallTimeDopAndInputSweepBenchmark(const DataFile &dataFile,
         for (auto j = 0; j < static_cast<int>(dop.size()); ++j) {
             for (auto k = 0; k < static_cast<int>(thresholds.size()); ++k) {
                 results[k][0] = static_cast<int>(thresholds[k]);
-                auto inputData = new int[dataFile.getNumElements()];
-                auto inputFilter = new int[dataFile.getNumElements()];
-                auto selection = new int[dataFile.getNumElements()];
-                copyArray<int>(LoadedData<int>::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
-                copyArray<int>(LoadedData<int>::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
+                auto inputData = new T2[dataFile.getNumElements()];
+                auto inputFilter = new T1[dataFile.getNumElements()];
+                auto selection = new T2[dataFile.getNumElements()];
+                copyArray<T2>(LoadedData<T2>::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
+                copyArray<T1>(LoadedData<T1>::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
 
                 std::cout << "Running dop of " << dop[j] << " for input ";
                 std::cout << std::to_string(static_cast<int>(thresholds[k])) << "... ";
@@ -528,7 +542,7 @@ void selectWallTimeDopAndInputSweepBenchmark(const DataFile &dataFile,
 
                 MABPL::runSelectFunction(selectImplementation,
                                          dataFile.getNumElements(), inputData, inputFilter,
-                                         selection, static_cast<int>(thresholds[k]), dop[j]);
+                                         selection, static_cast<T1>(thresholds[k]), dop[j]);
 
                 results[k][1 + (i * dop.size()) + j] =
                         static_cast<double>(PAPI_get_real_usec() - wallTime);
@@ -552,3 +566,6 @@ void selectWallTimeDopAndInputSweepBenchmark(const DataFile &dataFile,
     std::string fullFilePath = FilePaths::getInstance().getSelectCyclesFolderPath() + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }
+
+
+#endif //MABPL_SELECTCYCLESBENCHMARKIMPLEMENTATION_H

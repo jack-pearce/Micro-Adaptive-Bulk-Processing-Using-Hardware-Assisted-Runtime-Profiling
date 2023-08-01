@@ -6,24 +6,33 @@
 
 using MABPL::GroupBy;
 
-void groupByCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<GroupBy> &groupByImplementations,
-                                     int iterations, const std::string &fileNamePrefix);
 
+template <typename T1, typename T2>
+void groupByCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<GroupBy> &groupByImplementations,
+                                    int iterations, const std::string &fileNamePrefix);
+
+template <typename T1, typename T2>
 void groupByWallTimeSweepBenchmark(DataSweep &dataSweep, const std::vector<GroupBy> &groupByImplementations,
                                    int iterations, const std::string &fileNamePrefix);
 
+template <typename T1, typename T2>
 void groupByWallTimeDopSweepBenchmark(DataSweep &dataSweep, int iterations, const std::string &fileNamePrefix,
                                       std::vector<int> dop);
 
-void groupByCpuCyclesSweepBenchmark64(DataSweep &dataSweep, const std::vector<GroupBy> &groupByImplementations,
-                                      int iterations, const std::string &fileNamePrefix);
-
+template <typename T1, typename T2>
 void groupByBenchmarkWithExtraCounters(DataSweep &dataSweep, GroupBy groupByImplementation, int iterations,
                                        std::vector<std::string> &benchmarkCounters, const std::string &fileNamePrefix);
 
-void groupByBenchmarkWithExtraCountersDuringRun(const DataFile &dataFile, std::vector<std::string> &benchmarkCounters,
+template <typename T1, typename T2>
+void groupByBenchmarkWithExtraCountersDuringRun(const DataFile &dataFile,
+                                                std::vector<std::string> &benchmarkCounters,
                                                 const std::string &fileNamePrefix);
 
+template <typename T1, typename T2>
 void tessilRobinMapInitialisationBenchmark(const std::string &fileNamePrefix);
+
+
+#include "groupByCyclesBenchmarkImplementation.h"
+
 
 #endif //MABPL_GROUPBYCYCLESBENCHMARK_H

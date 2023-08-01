@@ -1,3 +1,6 @@
+#ifndef MABPL_GROUPBYCYCLESBENCHMARKIMPLEMENTATION_H
+#define MABPL_GROUPBYCYCLESBENCHMARKIMPLEMENTATION_H
+
 #include <cassert>
 #include <iostream>
 #include <cmath>
@@ -15,6 +18,7 @@ using MABPL::SumAggregation;
 using MABPL::CountAggregation;
 
 
+template <typename T1, typename T2>
 void groupByCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<GroupBy> &groupByImplementations,
                                     int iterations, const std::string &fileNamePrefix) {
     assert(!groupByImplementations.empty());
@@ -37,16 +41,16 @@ void groupByCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<Grou
                     results[k][0] = dataSweep.getRunInput();
                 }
 
-                auto inputGroupBy = new int[dataSweep.getNumElements()];
-                auto inputAggregate = new int[dataSweep.getNumElements()];
+                auto inputGroupBy = new T1[dataSweep.getNumElements()];
+                auto inputAggregate = new T2[dataSweep.getNumElements()];
 
                 int cardinality = dataSweep.getCardinality();
 
                 std::cout << "Running " << getGroupByName(groupByImplementations[j]) << " for input ";
                 std::cout << static_cast<int>(dataSweep.getRunInput()) << "... ";
 
-                dataSweep.loadNextDataSetIntoMemory(inputGroupBy);
-                generateUniformDistributionInMemory(inputAggregate, dataSweep.getNumElements(), 10);
+                dataSweep.loadNextDataSetIntoMemory<T1>(inputGroupBy);
+                generateUniformDistributionInMemory<T2>(inputAggregate, dataSweep.getNumElements(), 10);
 
                 cycles = *Counters::getInstance().readSharedEventSet();
 
@@ -80,8 +84,9 @@ void groupByCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<Grou
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }
 
+template <typename T1, typename T2>
 void groupByWallTimeSweepBenchmark(DataSweep &dataSweep, const std::vector<GroupBy> &groupByImplementations,
-                                    int iterations, const std::string &fileNamePrefix) {
+                                   int iterations, const std::string &fileNamePrefix) {
     assert(!groupByImplementations.empty());
 
     int dataCols = iterations * static_cast<int>(groupByImplementations.size());
@@ -99,16 +104,16 @@ void groupByWallTimeSweepBenchmark(DataSweep &dataSweep, const std::vector<Group
                     results[k][0] = dataSweep.getRunInput();
                 }
 
-                auto inputGroupBy = new int[dataSweep.getNumElements()];
-                auto inputAggregate = new int[dataSweep.getNumElements()];
+                auto inputGroupBy = new T1[dataSweep.getNumElements()];
+                auto inputAggregate = new T2[dataSweep.getNumElements()];
 
                 int cardinality = dataSweep.getCardinality();
 
                 std::cout << "Running " << getGroupByName(groupByImplementations[j]) << " for input ";
                 std::cout << static_cast<int>(dataSweep.getRunInput()) << "... ";
 
-                dataSweep.loadNextDataSetIntoMemory(inputGroupBy);
-                generateUniformDistributionInMemory(inputAggregate, dataSweep.getNumElements(), 10);
+                dataSweep.loadNextDataSetIntoMemory<T1>(inputGroupBy);
+                generateUniformDistributionInMemory<T2>(inputAggregate, dataSweep.getNumElements(), 10);
 
                 wallTime = PAPI_get_real_usec();
 
@@ -141,6 +146,7 @@ void groupByWallTimeSweepBenchmark(DataSweep &dataSweep, const std::vector<Group
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }
 
+template <typename T1, typename T2>
 void groupByWallTimeDopSweepBenchmark(DataSweep &dataSweep, int iterations, const std::string &fileNamePrefix,
                                       std::vector<int> dop) {
 
@@ -159,16 +165,16 @@ void groupByWallTimeDopSweepBenchmark(DataSweep &dataSweep, int iterations, cons
                     results[k][0] = dataSweep.getRunInput();
                 }
 
-                auto inputGroupBy = new int[dataSweep.getNumElements()];
-                auto inputAggregate = new int[dataSweep.getNumElements()];
+                auto inputGroupBy = new T1[dataSweep.getNumElements()];
+                auto inputAggregate = new T2[dataSweep.getNumElements()];
 
                 int cardinality = dataSweep.getCardinality();
 
                 std::cout << "Running dop of " << dop[j] << " for input ";
                 std::cout << static_cast<int>(dataSweep.getRunInput()) << "... ";
 
-                dataSweep.loadNextDataSetIntoMemory(inputGroupBy);
-                generateUniformDistributionInMemory(inputAggregate, dataSweep.getNumElements(), 10);
+                dataSweep.loadNextDataSetIntoMemory<T1>(inputGroupBy);
+                generateUniformDistributionInMemory<T2>(inputAggregate, dataSweep.getNumElements(), 10);
 
                 wallTime = PAPI_get_real_usec();
 
@@ -201,72 +207,7 @@ void groupByWallTimeDopSweepBenchmark(DataSweep &dataSweep, int iterations, cons
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }
 
-void groupByCpuCyclesSweepBenchmark64(DataSweep &dataSweep, const std::vector<GroupBy> &groupByImplementations,
-                                    int iterations, const std::string &fileNamePrefix) {
-    assert(!groupByImplementations.empty());
-    if (std::count(groupByImplementations.begin(), groupByImplementations.end(), GroupBy::AdaptiveParallel)) {
-        std::cout << "Cannot use cpu cycles to time multi-threaded programs, use wall time instead" << std::endl;
-        exit(1);
-    }
-
-    int dataCols = iterations * static_cast<int>(groupByImplementations.size());
-    long_long cycles;
-    std::vector<std::vector<double>> results(dataSweep.getTotalRuns(),
-                                             std::vector<double>(dataCols + 1, 0));
-
-    for (auto i = 0; i < iterations; ++i) {
-        for (auto j = 0; j < static_cast<int>(groupByImplementations.size()); ++j) {
-            for (auto k = 0; k < dataSweep.getTotalRuns(); ++k) {
-
-                if (dataSweep.getSweepName().find("CardinalitySweep") != std::string::npos) {
-                    results[k][0] = static_cast<int>(dataSweep.getRunInput());
-                } else {
-                    results[k][0] = dataSweep.getRunInput();
-                }
-
-                auto inputGroupBy = new int64_t[dataSweep.getNumElements()];
-                auto inputAggregate = new int64_t[dataSweep.getNumElements()];
-
-                int cardinality = dataSweep.getCardinality();
-
-                std::cout << "Running " << getGroupByName(groupByImplementations[j]) << " for input ";
-                std::cout << static_cast<int>(dataSweep.getRunInput()) << "... ";
-
-                dataSweep.loadNextDataSetIntoMemory(inputGroupBy);
-                copyArray<int64_t>(inputGroupBy, inputAggregate, dataSweep.getNumElements());
-
-                cycles = *Counters::getInstance().readSharedEventSet();
-
-                auto result = MABPL::runGroupByFunction<MaxAggregation>(groupByImplementations[j],
-                                                                        dataSweep.getNumElements(), inputGroupBy,
-                                                                        inputAggregate, cardinality);
-
-                results[k][1 + (i * groupByImplementations.size()) + j] =
-                        static_cast<double>(*Counters::getInstance().readSharedEventSet() - cycles);
-
-                delete[] inputGroupBy;
-                delete []inputAggregate;
-
-                std::cout << "Completed" << std::endl;
-
-                std::cout << "Result vector length: " << result.size() << std::endl;
-
-            }
-            dataSweep.restartSweep();
-        }
-    }
-
-    std::vector<std::string> headers(1 + dataCols);
-    headers [0] = "Input";
-    for (auto i = 0; i < dataCols; ++i) {
-        headers[1 + i] = getGroupByName(groupByImplementations[i % groupByImplementations.size()]);
-    }
-
-    std::string fileName = fileNamePrefix + "_GroupBy_SweepCyclesBM_" + dataSweep.getSweepName();
-    std::string fullFilePath = FilePaths::getInstance().getGroupByCyclesFolderPath() + fileName + ".csv";
-    writeHeadersAndTableToCSV(headers, results, fullFilePath);
-}
-
+template <typename T1, typename T2>
 void groupByBenchmarkWithExtraCounters(DataSweep &dataSweep, GroupBy groupByImplementation, int iterations,
                                        std::vector<std::string> &benchmarkCounters, const std::string &fileNamePrefix) {
     if (groupByImplementation == GroupBy::Adaptive)
@@ -285,8 +226,8 @@ void groupByBenchmarkWithExtraCounters(DataSweep &dataSweep, GroupBy groupByImpl
             results[j][0] = static_cast<long_long>(dataSweep.getRunInput());
 
             int numElements = static_cast<int>(dataSweep.getNumElements());
-            auto inputGroupBy = new int[numElements];
-            auto inputAggregate = new int[numElements];
+            auto inputGroupBy = new T1[numElements];
+            auto inputAggregate = new T2[numElements];
 
             int cardinality = static_cast<int>(dataSweep.getRunInput());
 
@@ -294,8 +235,8 @@ void groupByBenchmarkWithExtraCounters(DataSweep &dataSweep, GroupBy groupByImpl
             std::cout << static_cast<int>(dataSweep.getRunInput()) << ", iteration ";
             std::cout << i + 1 << "... ";
 
-            dataSweep.loadNextDataSetIntoMemory(inputGroupBy);
-            generateUniformDistributionInMemory(inputAggregate, numElements, 10);
+            dataSweep.loadNextDataSetIntoMemory<T1>(inputGroupBy);
+            generateUniformDistributionInMemory<T2>(inputAggregate, numElements, 10);
 
 
             if (PAPI_reset(benchmarkEventSet) != PAPI_OK)
@@ -336,6 +277,7 @@ void groupByBenchmarkWithExtraCounters(DataSweep &dataSweep, GroupBy groupByImpl
     shutdownPAPI(benchmarkEventSet, benchmarkCounterValues);
 }
 
+template <typename T1, typename T2>
 void groupByBenchmarkWithExtraCountersDuringRun(const DataFile &dataFile,
                                                 std::vector<std::string> &benchmarkCounters,
                                                 const std::string &fileNamePrefix) {
@@ -349,10 +291,10 @@ void groupByBenchmarkWithExtraCountersDuringRun(const DataFile &dataFile,
 
     std::vector<std::vector<long_long>> results(numMeasurements, std::vector<long_long>(benchmarkCounters.size() + 1, 0));
 
-    auto inputGroupBy = new int[numElements];
-    auto inputAggregate = new int[numElements];
-    copyArray<int>(LoadedData<int>::getInstance(dataFile).getData(), inputGroupBy, dataFile.getNumElements());
-    generateUniformDistributionInMemory(inputAggregate, numElements, 10);
+    auto inputGroupBy = new T1[numElements];
+    auto inputAggregate = new T2[numElements];
+    copyArray<T1>(LoadedData<T1>::getInstance(dataFile).getData(), inputGroupBy, dataFile.getNumElements());
+    generateUniformDistributionInMemory<T2>(inputAggregate, numElements, 10);
 
 
     int index = 0;
@@ -362,9 +304,9 @@ void groupByBenchmarkWithExtraCountersDuringRun(const DataFile &dataFile,
     int cardinality = 50*1000; /////////////////////// NEED TO UPDATE TO MATCH RUN ///////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    tsl::robin_map<int, int> map(std::max(static_cast<int>(2.5 * cardinality), 400000));
+    tsl::robin_map<T1, T2> map(std::max(static_cast<int>(2.5 * cardinality), 400000));
 
-    tsl::robin_map<int, int>::iterator it;
+    typename tsl::robin_map<T1, T2>::iterator it;
     for (auto j = 0; j < numMeasurements; ++j) {
         tuplesToProcess = std::min(tuplesPerMeasurement, numElements - index);
 
@@ -374,9 +316,9 @@ void groupByBenchmarkWithExtraCountersDuringRun(const DataFile &dataFile,
         for (auto _ = 0; _ < tuplesToProcess; ++_) {
             it = map.find(inputGroupBy[index]);
             if (it != map.end()) {
-                it.value() = MaxAggregation<int>()(it->second, inputAggregate[index], false);
+                it.value() = MaxAggregation<T2>()(it->second, inputAggregate[index], false);
             } else {
-                map.insert({inputGroupBy[index], MaxAggregation<int>()(0, inputAggregate[index], true)});
+                map.insert({inputGroupBy[index], MaxAggregation<T2>()(0, inputAggregate[index], true)});
             }
             ++index;
         }
@@ -408,6 +350,7 @@ void groupByBenchmarkWithExtraCountersDuringRun(const DataFile &dataFile,
     shutdownPAPI(benchmarkEventSet, benchmarkCounterValues);
 }
 
+template <typename T1, typename T2>
 void tessilRobinMapInitialisationBenchmark(const std::string &fileNamePrefix) {
 
     int totalPoints = 100;
@@ -425,7 +368,7 @@ void tessilRobinMapInitialisationBenchmark(const std::string &fileNamePrefix) {
         cycles = *Counters::getInstance().readSharedEventSet();
 
         int initialSize = std::max(static_cast<int>(2.5 * points[i]), 400000);
-        tsl::robin_map<int, int> map(initialSize);
+        tsl::robin_map<T1, T2> map(initialSize);
 
         results[i][1] = static_cast<double>(*Counters::getInstance().readSharedEventSet() - cycles);
 
@@ -439,3 +382,6 @@ void tessilRobinMapInitialisationBenchmark(const std::string &fileNamePrefix) {
     std::string fullFilePath = FilePaths::getInstance().getGroupByCyclesFolderPath() + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }
+
+
+#endif //MABPL_GROUPBYCYCLESBENCHMARKIMPLEMENTATION_H
