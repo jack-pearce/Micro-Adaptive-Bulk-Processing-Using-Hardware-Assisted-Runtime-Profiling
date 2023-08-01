@@ -1,13 +1,6 @@
-#include <string>
 #include <vector>
-#include <iostream>
 
 #include "main.h"
-#include "time_benchmarking/selectTimeBenchmark.h"
-#include "time_benchmarking/timeBenchmarkHelpers.h"
-#include "data_generation/dataGenerators.h"
-#include "utilities/dataHelpers.h"
-#include "cycles_benchmarking//selectCyclesBenchmark.h"
 #include "cycles_benchmarking/groupByCyclesBenchmark.h"
 #include "data_generation/dataFiles.h"
 #include "library/mabpl.h"
@@ -444,14 +437,71 @@ void allGroupByParallelTests() {
 
 int main() {
 
-//    std::vector<float> inputThresholdDistribution;
-//    generateLogDistribution(30, 1, 10*1000, inputThresholdDistribution);
-//    selectCpuCyclesInputSweepBenchmark(DataFiles::uniformIntDistribution250mValuesMax10000,
-//                                       {Select::ImplementationIndexesBranch,
-//                                        Select::ImplementationIndexesPredication,
-//                                        Select::ImplementationIndexesAdaptive},
-//                                       inputThresholdDistribution,
-//                                       1, "1-Indexes");
+    std::vector<float> inputThresholdDistribution;
+    generateLogDistribution(30, 1, 10*1000, inputThresholdDistribution);
+    selectCpuCyclesInputSweepBenchmark<int,int>(DataFiles::uniformIntDistribution250mValuesMax10000,
+                                                {Select::ImplementationIndexesBranch,
+                                                 Select::ImplementationIndexesPredication,
+                                                 Select::ImplementationIndexesAdaptive},
+                                                inputThresholdDistribution,
+                                                5, "1-SelectIndexes-32");
+
+    selectCpuCyclesInputSweepBenchmark<int64_t,int64_t>(DataFiles::uniformIntDistribution250mValuesMax10000,
+                                                {Select::ImplementationIndexesBranch,
+                                                 Select::ImplementationIndexesPredication,
+                                                 Select::ImplementationIndexesAdaptive},
+                                                inputThresholdDistribution,
+                                                5, "1-SelectIndexes-64");
+
+    selectCpuCyclesInputSweepBenchmark<int,int>(DataFiles::uniformIntDistribution250mValuesMax10000,
+                                                {Select::ImplementationValuesBranch,
+                                                 Select::ImplementationValuesVectorized,
+                                                 Select::ImplementationValuesPredication,
+                                                 Select::ImplementationValuesAdaptive},
+                                                inputThresholdDistribution,
+                                                5, "1-SelectValues-32-32");
+
+    selectCpuCyclesInputSweepBenchmark<int64_t,int>(DataFiles::uniformIntDistribution250mValuesMax10000,
+                                                {Select::ImplementationValuesBranch,
+                                                 Select::ImplementationValuesVectorized,
+                                                 Select::ImplementationValuesPredication,
+                                                 Select::ImplementationValuesAdaptive},
+                                                inputThresholdDistribution,
+                                                5, "1-SelectValues-64-32");
+
+    selectCpuCyclesInputSweepBenchmark<int,int64_t>(DataFiles::uniformIntDistribution250mValuesMax10000,
+                                                {Select::ImplementationValuesBranch,
+                                                 Select::ImplementationValuesVectorized,
+                                                 Select::ImplementationValuesPredication,
+                                                 Select::ImplementationValuesAdaptive},
+                                                inputThresholdDistribution,
+                                                5, "1-SelectValues-32-64");
+
+    selectCpuCyclesInputSweepBenchmark<int64_t,int64_t>(DataFiles::uniformIntDistribution250mValuesMax10000,
+                                                {Select::ImplementationValuesBranch,
+                                                 Select::ImplementationValuesVectorized,
+                                                 Select::ImplementationValuesPredication,
+                                                 Select::ImplementationValuesAdaptive},
+                                                inputThresholdDistribution,
+                                                5, "1-SelectValues-64-64");
+
+    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                            5, "1-GroupBy-32-32");
+
+    groupByCpuCyclesSweepBenchmark<int64_t,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                            5, "1-GroupBy-64-32");
+
+    groupByCpuCyclesSweepBenchmark<int,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                            5, "1-GroupBy-32-64");
+
+    groupByCpuCyclesSweepBenchmark<int64_t,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                            5, "1-GroupBy-64-64");
+
+
 
     return 0;
 }
