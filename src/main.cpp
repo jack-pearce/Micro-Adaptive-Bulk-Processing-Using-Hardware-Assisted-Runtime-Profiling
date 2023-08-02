@@ -509,7 +509,7 @@ void allParallelDataSizeTests() {
     selectWallTimeInputSweepBenchmark<int,int>(DataFiles::uniformIntDistribution250mValuesMax10000,
                                                {Select::ImplementationIndexesAdaptive},
                                                inputThresholdDistribution,
-                                               5, "7-DOP-1-SelectIndexes-SelectivitySweepSingle-32-32");
+                                               5, "7-DOP-1-SelectIndexes-SelectivitySweepSingle-32");
 
     selectWallTimeDopAndInputSweepBenchmarkCalcDopRange<int,int>(DataFiles::uniformIntDistribution250mValuesMax10000,
                                                                  Select::ImplementationIndexesAdaptiveParallel,
@@ -599,7 +599,35 @@ void allParallelDataSizeTests() {
 
 int main() {
 
-    allSingleThreadedDataSizeTests();
+//    allSingleThreadedDataSizeTests();
+//    allParallelDataSizeTests();
+
+//    groupByWallTimeDopSweepBenchmarkCalcDopRange<int,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+//                                                              5, "5-DOP-1-GroupBy-CardinalitySweepParallel-32-64");
+//
+//    groupByWallTimeSweepBenchmark<int64_t,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+//                                                   {GroupBy::Adaptive},
+//                                                   5, "5-DOP-1-GroupBy-CardinalitySweepSingle-64-64");
+//
+//    groupByWallTimeDopSweepBenchmarkCalcDopRange<int64_t,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+//                                                                  5, "5-DOP-1-GroupBy-CardinalitySweepParallel-64-64");
+
+
+    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                            5, "1-GroupBy-32-32");
+
+    groupByCpuCyclesSweepBenchmark<int64_t,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                                {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                                5, "1-GroupBy-64-32");
+
+    groupByCpuCyclesSweepBenchmark<int,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                                {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                                5, "1-GroupBy-32-64");
+
+    groupByCpuCyclesSweepBenchmark<int64_t,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                                    {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                                    5, "1-GroupBy-64-64");
 
     allParallelDataSizeTests();
 
