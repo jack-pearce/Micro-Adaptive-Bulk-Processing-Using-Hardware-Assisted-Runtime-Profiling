@@ -666,20 +666,7 @@ int main() {
                                                                          3, "7-DOP-1-SelectValues-SelectivitySweepParallel-64-64");*/
 
 
-    selectValuesCompareResultsTest<int,int>(DataFiles::uniformIntDistribution250mValuesMax10000, Select::ImplementationValuesBranch,
-                                                Select::ImplementationValuesVectorized);
-
-    selectValuesCompareResultsTest<int,int64_t>(DataFiles::uniformIntDistribution250mValuesMax10000, Select::ImplementationValuesBranch,
-                                                Select::ImplementationValuesVectorized);
-
-    selectValuesCompareResultsTest<int64_t,int>(DataFiles::uniformIntDistribution250mValuesMax10000, Select::ImplementationValuesBranch,
-                                                Select::ImplementationValuesVectorized);
-
-    selectValuesCompareResultsTest<int64_t,int64_t>(DataFiles::uniformIntDistribution250mValuesMax10000, Select::ImplementationValuesBranch,
-                                            Select::ImplementationValuesVectorized);
-
-    selectValuesCompareResultsTest<int8_t,int64_t>(DataFiles::uniformIntDistribution250mValuesMax10000, Select::ImplementationValuesBranch,
-                                                    Select::ImplementationValuesVectorized);
+    MABPL::calculateMissingMachineConstants();
 
 
     return 0;
