@@ -599,37 +599,88 @@ void allParallelDataSizeTests() {
 
 int main() {
 
-//    allSingleThreadedDataSizeTests();
-//    allParallelDataSizeTests();
+/*    groupByWallTimeSweepBenchmark<int64_t,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                               {GroupBy::Adaptive},
+                                               5, "5-DOP-1-GroupBy-CardinalitySweepSingle-64-32");
 
-//    groupByWallTimeDopSweepBenchmarkCalcDopRange<int,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-//                                                              5, "5-DOP-1-GroupBy-CardinalitySweepParallel-32-64");
-//
-//    groupByWallTimeSweepBenchmark<int64_t,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-//                                                   {GroupBy::Adaptive},
-//                                                   5, "5-DOP-1-GroupBy-CardinalitySweepSingle-64-64");
-//
-//    groupByWallTimeDopSweepBenchmarkCalcDopRange<int64_t,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-//                                                                  5, "5-DOP-1-GroupBy-CardinalitySweepParallel-64-64");
+    groupByWallTimeDopSweepBenchmarkCalcDopRange<int64_t,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                                              5, "5-DOP-1-GroupBy-CardinalitySweepParallel-64-32");
+
+    groupByWallTimeSweepBenchmark<int,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                               {GroupBy::Adaptive},
+                                               5, "5-DOP-1-GroupBy-CardinalitySweepSingle-32-64");
+
+    groupByWallTimeDopSweepBenchmarkCalcDopRange<int,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                                              5, "5-DOP-1-GroupBy-CardinalitySweepParallel-32-64");
+
+    groupByWallTimeSweepBenchmark<int64_t,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                                   {GroupBy::Adaptive},
+                                                   5, "5-DOP-1-GroupBy-CardinalitySweepSingle-64-64");
+
+    groupByWallTimeDopSweepBenchmarkCalcDopRange<int64_t,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                                                  5, "5-DOP-1-GroupBy-CardinalitySweepParallel-64-64");*/
 
 
-    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                            5, "1-GroupBy-32-32");
+   /* MABPL::calculateMissingMachineConstants();
 
-    groupByCpuCyclesSweepBenchmark<int64_t,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                                {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                                5, "1-GroupBy-64-32");
+    std::vector<float> inputThresholdDistribution;
+    generateLogDistribution(30, 1, 10*1000, inputThresholdDistribution);
 
-    groupByCpuCyclesSweepBenchmark<int,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                                {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                                5, "1-GroupBy-32-64");
+    selectCpuCyclesInputSweepBenchmark<int64_t,int>(DataFiles::uniformIntDistribution250mValuesMax10000,
+                                                    {Select::ImplementationValuesBranch,
+                                                     Select::ImplementationValuesVectorized,
+                                                     Select::ImplementationValuesPredication,
+                                                     Select::ImplementationValuesAdaptive},
+                                                    inputThresholdDistribution,
+                                                    5, "1-SelectValues-64-32");
 
-    groupByCpuCyclesSweepBenchmark<int64_t,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                                    {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                                    5, "1-GroupBy-64-64");
+    selectCpuCyclesInputSweepBenchmark<int64_t,int64_t>(DataFiles::uniformIntDistribution250mValuesMax10000,
+                                                        {Select::ImplementationValuesBranch,
+                                                         Select::ImplementationValuesVectorized,
+                                                         Select::ImplementationValuesPredication,
+                                                         Select::ImplementationValuesAdaptive},
+                                                        inputThresholdDistribution,
+                                                        5, "1-SelectValues-64-64");*/
 
-    allParallelDataSizeTests();
+/*    std::vector<float> inputThresholdDistribution;
+    generateLogDistribution(30, 1, 10*1000, inputThresholdDistribution);
+
+    selectWallTimeInputSweepBenchmark<int64_t,int>(DataFiles::uniformIntDistribution250mValuesMax10000,
+                                                   {Select::ImplementationValuesAdaptive},
+                                                   inputThresholdDistribution,
+                                                   3, "7-DOP-1-SelectValues-SelectivitySweepSingle-64-32");
+
+    selectWallTimeDopAndInputSweepBenchmarkCalcDopRange<int64_t,int>(DataFiles::uniformIntDistribution250mValuesMax10000,
+                                                                     Select::ImplementationValuesAdaptiveParallel,
+                                                                     inputThresholdDistribution,
+                                                                     3, "7-DOP-1-SelectValues-SelectivitySweepParallel-64-32");
+
+    selectWallTimeInputSweepBenchmark<int64_t,int64_t>(DataFiles::uniformIntDistribution250mValuesMax10000,
+                                                       {Select::ImplementationValuesAdaptive},
+                                                       inputThresholdDistribution,
+                                                       3, "7-DOP-1-SelectValues-SelectivitySweepSingle-64-64");
+
+    selectWallTimeDopAndInputSweepBenchmarkCalcDopRange<int64_t,int64_t>(DataFiles::uniformIntDistribution250mValuesMax10000,
+                                                                         Select::ImplementationValuesAdaptiveParallel,
+                                                                         inputThresholdDistribution,
+                                                                         3, "7-DOP-1-SelectValues-SelectivitySweepParallel-64-64");*/
+
+
+    selectValuesCompareResultsTest<int,int>(DataFiles::uniformIntDistribution250mValuesMax10000, Select::ImplementationValuesBranch,
+                                                Select::ImplementationValuesVectorized);
+
+    selectValuesCompareResultsTest<int,int64_t>(DataFiles::uniformIntDistribution250mValuesMax10000, Select::ImplementationValuesBranch,
+                                                Select::ImplementationValuesVectorized);
+
+    selectValuesCompareResultsTest<int64_t,int>(DataFiles::uniformIntDistribution250mValuesMax10000, Select::ImplementationValuesBranch,
+                                                Select::ImplementationValuesVectorized);
+
+    selectValuesCompareResultsTest<int64_t,int64_t>(DataFiles::uniformIntDistribution250mValuesMax10000, Select::ImplementationValuesBranch,
+                                            Select::ImplementationValuesVectorized);
+
+    selectValuesCompareResultsTest<int8_t,int64_t>(DataFiles::uniformIntDistribution250mValuesMax10000, Select::ImplementationValuesBranch,
+                                                    Select::ImplementationValuesVectorized);
+
 
     return 0;
 }

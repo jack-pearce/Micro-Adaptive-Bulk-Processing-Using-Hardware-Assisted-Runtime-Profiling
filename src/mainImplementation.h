@@ -153,7 +153,7 @@ void selectIndexesCompareResultsTest(const DataFile& dataFile, Select selectImpO
 
 template <typename T1, typename T2>
 void selectValuesCompareResultsTest(const DataFile& dataFile, Select selectImpOne, Select selectImpTwo) {
-    int threshold = 3;
+    T1 threshold = 3;
     auto inputFilter = new T1[dataFile.getNumElements()];
     auto inputData = new T2[dataFile.getNumElements()];
     auto selectionOne = new T2[dataFile.getNumElements()];
