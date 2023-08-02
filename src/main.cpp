@@ -621,7 +621,7 @@ int main() {
                                                                   5, "5-DOP-1-GroupBy-CardinalitySweepParallel-64-64");*/
 
 
-   /* MABPL::calculateMissingMachineConstants();
+    MABPL::calculateMissingMachineConstants();
 
     std::vector<float> inputThresholdDistribution;
     generateLogDistribution(30, 1, 10*1000, inputThresholdDistribution);
@@ -640,33 +640,8 @@ int main() {
                                                          Select::ImplementationValuesPredication,
                                                          Select::ImplementationValuesAdaptive},
                                                         inputThresholdDistribution,
-                                                        5, "1-SelectValues-64-64");*/
+                                                        5, "1-SelectValues-64-64");
 
-/*    std::vector<float> inputThresholdDistribution;
-    generateLogDistribution(30, 1, 10*1000, inputThresholdDistribution);
-
-    selectWallTimeInputSweepBenchmark<int64_t,int>(DataFiles::uniformIntDistribution250mValuesMax10000,
-                                                   {Select::ImplementationValuesAdaptive},
-                                                   inputThresholdDistribution,
-                                                   3, "7-DOP-1-SelectValues-SelectivitySweepSingle-64-32");
-
-    selectWallTimeDopAndInputSweepBenchmarkCalcDopRange<int64_t,int>(DataFiles::uniformIntDistribution250mValuesMax10000,
-                                                                     Select::ImplementationValuesAdaptiveParallel,
-                                                                     inputThresholdDistribution,
-                                                                     3, "7-DOP-1-SelectValues-SelectivitySweepParallel-64-32");
-
-    selectWallTimeInputSweepBenchmark<int64_t,int64_t>(DataFiles::uniformIntDistribution250mValuesMax10000,
-                                                       {Select::ImplementationValuesAdaptive},
-                                                       inputThresholdDistribution,
-                                                       3, "7-DOP-1-SelectValues-SelectivitySweepSingle-64-64");
-
-    selectWallTimeDopAndInputSweepBenchmarkCalcDopRange<int64_t,int64_t>(DataFiles::uniformIntDistribution250mValuesMax10000,
-                                                                         Select::ImplementationValuesAdaptiveParallel,
-                                                                         inputThresholdDistribution,
-                                                                         3, "7-DOP-1-SelectValues-SelectivitySweepParallel-64-64");*/
-
-
-    MABPL::calculateMissingMachineConstants();
 
 
     return 0;
