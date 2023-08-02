@@ -621,27 +621,23 @@ int main() {
                                                                   5, "5-DOP-1-GroupBy-CardinalitySweepParallel-64-64");*/
 
 
-    MABPL::calculateMissingMachineConstants();
+    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                            1, "1-GroupBy-32-32");
 
-    std::vector<float> inputThresholdDistribution;
-    generateLogDistribution(30, 1, 10*1000, inputThresholdDistribution);
+    groupByCpuCyclesSweepBenchmark<int64_t,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                                {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                                1, "1-GroupBy-64-32");
 
-    selectCpuCyclesInputSweepBenchmark<int64_t,int>(DataFiles::uniformIntDistribution250mValuesMax10000,
-                                                    {Select::ImplementationValuesBranch,
-                                                     Select::ImplementationValuesVectorized,
-                                                     Select::ImplementationValuesPredication,
-                                                     Select::ImplementationValuesAdaptive},
-                                                    inputThresholdDistribution,
-                                                    5, "1-SelectValues-64-32");
+    groupByCpuCyclesSweepBenchmark<int,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                                {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                                1, "1-GroupBy-32-64");
 
-    selectCpuCyclesInputSweepBenchmark<int64_t,int64_t>(DataFiles::uniformIntDistribution250mValuesMax10000,
-                                                        {Select::ImplementationValuesBranch,
-                                                         Select::ImplementationValuesVectorized,
-                                                         Select::ImplementationValuesPredication,
-                                                         Select::ImplementationValuesAdaptive},
-                                                        inputThresholdDistribution,
-                                                        5, "1-SelectValues-64-64");
+    groupByCpuCyclesSweepBenchmark<int64_t,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                                    {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                                    1, "1-GroupBy-64-64");
 
+    allParallelDataSizeTests();
 
 
     return 0;
