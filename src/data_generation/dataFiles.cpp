@@ -255,6 +255,13 @@ DataSweep DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMa
         "Log distribution of cardinality for 200m ints from 1 to 100m. The max value is fixed at 200m, "
         "so the distribution is sparse i.e. there are gaps."};
 
+DataSweep DataSweeps::logUniformIntDistribution200mValuesCardinalityUpTo10mSweepFixedMax {
+        30,
+        200*1000*1000,
+        "logUniformIntDistribution200mValuesCardinalityUpTo10mSweepFixedMax",
+        "Log distribution of cardinality for 200m ints from 1 to 10m. The max value is fixed at 200m, "
+        "so the distribution is sparse i.e. there are gaps."};
+
 DataSweep DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered1 {
         30,
         200*1000*1000,
@@ -424,7 +431,9 @@ DataSweep::DataSweep(int _totalRuns, int _numElements, std::string _sweepName, s
     } else if (getSweepName() == "logUniformIntDistribution40mValuesCardinalitySweepFixedMax" ||
                getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweepFixedMax") {
         generateLogDistribution(getTotalRuns(), 1, getNumElements() / 2.0, inputs);
-    }else if (getSweepName() == "linearUniformIntDistribution200mValuesCardinalitySweepFixedMaxCrossOverPoint") {
+    } else if (getSweepName() == "logUniformIntDistribution200mValuesCardinalityUpTo10mSweepFixedMax") {
+        generateLogDistribution(getTotalRuns(), 1, 10*1000*1000, inputs);
+    } else if (getSweepName() == "linearUniformIntDistribution200mValuesCardinalitySweepFixedMaxCrossOverPoint") {
         generateLinearDistribution(getTotalRuns(), 150000, 1200000, inputs);
     } else if (getSweepName() == "logUniformIntDistribution400mValuesCardinalitySweepFixedMax") {
         generateLogDistribution(getTotalRuns(), 1, 100000000, inputs);
@@ -447,6 +456,7 @@ DataSweep::DataSweep(int _totalRuns, int _numElements, std::string _sweepName, s
 int DataSweep::getCardinality() const {
     if (getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweepVariableMax" ||
         getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweepFixedMax" ||
+        getSweepName() == "logUniformIntDistribution200mValuesCardinalityUpTo10mSweepFixedMax" ||
         getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered1" ||
         getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered1k" ||
         getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered100k" ||

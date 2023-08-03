@@ -568,155 +568,66 @@ void allParallelDataSizeTests(int iterations) {
                                                                          iterations, "7-DOP-1-SelectValues-SelectivitySweepParallel-64-64");
 
 
-    groupByWallTimeSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+    groupByWallTimeSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalityUpTo10mSweepFixedMax,
                                            {GroupBy::Adaptive},
                                            iterations, "5-DOP-1-GroupBy-CardinalitySweepSingle-32-32");
 
-    groupByWallTimeDopSweepBenchmarkCalcDopRange<int,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+    groupByWallTimeDopSweepBenchmarkCalcDopRange<int,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalityUpTo10mSweepFixedMax,
                                                           iterations, "5-DOP-1-GroupBy-CardinalitySweepParallel-32-32");
 
-    groupByWallTimeSweepBenchmark<int64_t,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+    groupByWallTimeSweepBenchmark<int64_t,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalityUpTo10mSweepFixedMax,
                                                {GroupBy::Adaptive},
                                                iterations, "5-DOP-1-GroupBy-CardinalitySweepSingle-64-32");
 
-    groupByWallTimeDopSweepBenchmarkCalcDopRange<int64_t,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+    groupByWallTimeDopSweepBenchmarkCalcDopRange<int64_t,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalityUpTo10mSweepFixedMax,
                                                               iterations, "5-DOP-1-GroupBy-CardinalitySweepParallel-64-32");
 
-    groupByWallTimeSweepBenchmark<int,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+    groupByWallTimeSweepBenchmark<int,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalityUpTo10mSweepFixedMax,
                                                {GroupBy::Adaptive},
                                                iterations, "5-DOP-1-GroupBy-CardinalitySweepSingle-32-64");
 
-    groupByWallTimeDopSweepBenchmarkCalcDopRange<int,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+    groupByWallTimeDopSweepBenchmarkCalcDopRange<int,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalityUpTo10mSweepFixedMax,
                                                               iterations, "5-DOP-1-GroupBy-CardinalitySweepParallel-32-64");
 
-    groupByWallTimeSweepBenchmark<int64_t,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+    groupByWallTimeSweepBenchmark<int64_t,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalityUpTo10mSweepFixedMax,
                                                    {GroupBy::Adaptive},
                                                    iterations, "5-DOP-1-GroupBy-CardinalitySweepSingle-64-64");
 
-    groupByWallTimeDopSweepBenchmarkCalcDopRange<int64_t,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+    groupByWallTimeDopSweepBenchmarkCalcDopRange<int64_t,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalityUpTo10mSweepFixedMax,
                                                                   iterations, "5-DOP-1-GroupBy-CardinalitySweepParallel-64-64");
 }
 
 int main() {
 
-/*    groupByWallTimeSweepBenchmark<int64_t,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                               {GroupBy::Adaptive},
-                                               5, "5-DOP-1-GroupBy-CardinalitySweepSingle-64-32");
+    int iterations = 1;
 
-    groupByWallTimeDopSweepBenchmarkCalcDopRange<int64_t,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                                              5, "5-DOP-1-GroupBy-CardinalitySweepParallel-64-32");
-
-    groupByWallTimeSweepBenchmark<int,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                               {GroupBy::Adaptive},
-                                               5, "5-DOP-1-GroupBy-CardinalitySweepSingle-32-64");
-
-    groupByWallTimeDopSweepBenchmarkCalcDopRange<int,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                                              5, "5-DOP-1-GroupBy-CardinalitySweepParallel-32-64");
-
-    groupByWallTimeSweepBenchmark<int64_t,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                                   {GroupBy::Adaptive},
-                                                   5, "5-DOP-1-GroupBy-CardinalitySweepSingle-64-64");
-
-    groupByWallTimeDopSweepBenchmarkCalcDopRange<int64_t,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                                                  5, "5-DOP-1-GroupBy-CardinalitySweepParallel-64-64");*/
-
-
-    int iterations = 5;
-
-    std::vector<float> inputThresholdDistribution;
-    generateLogDistribution(30, 1, 10*1000, inputThresholdDistribution);
-    selectWallTimeInputSweepBenchmark<int,int>(DataFiles::uniformIntDistribution250mValuesMax10000,
-                                               {Select::ImplementationIndexesAdaptive},
-                                               inputThresholdDistribution,
-                                               iterations, "7-DOP-1-SelectIndexes-SelectivitySweepSingle-32");
-
-    selectWallTimeDopAndInputSweepBenchmarkCalcDopRange<int,int>(DataFiles::uniformIntDistribution250mValuesMax10000,
-                                                                 Select::ImplementationIndexesAdaptiveParallel,
-                                                                 inputThresholdDistribution,
-                                                                 iterations, "7-DOP-1-SelectIndexes-SelectivitySweepParallel-32");
-
-    selectWallTimeInputSweepBenchmark<int64_t,int>(DataFiles::uniformIntDistribution250mValuesMax10000,
-                                                   {Select::ImplementationIndexesAdaptive},
-                                                   inputThresholdDistribution,
-                                                   iterations, "7-DOP-1-SelectIndexes-SelectivitySweepSingle-64");
-
-    selectWallTimeDopAndInputSweepBenchmarkCalcDopRange<int64_t,int>(DataFiles::uniformIntDistribution250mValuesMax10000,
-                                                                     Select::ImplementationIndexesAdaptiveParallel,
-                                                                     inputThresholdDistribution,
-                                                                     iterations, "7-DOP-1-SelectIndexes-SelectivitySweepParallel-64");
-
-
-    selectWallTimeInputSweepBenchmark<int,int>(DataFiles::uniformIntDistribution250mValuesMax10000,
-                                               {Select::ImplementationValuesAdaptive},
-                                               inputThresholdDistribution,
-                                               iterations, "7-DOP-1-SelectValues-SelectivitySweepSingle-32-32");
-
-    selectWallTimeDopAndInputSweepBenchmarkCalcDopRange<int,int>(DataFiles::uniformIntDistribution250mValuesMax10000,
-                                                                 Select::ImplementationValuesAdaptiveParallel,
-                                                                 inputThresholdDistribution,
-                                                                 iterations, "7-DOP-1-SelectValues-SelectivitySweepParallel-32-32");
-
-    selectWallTimeInputSweepBenchmark<int64_t,int>(DataFiles::uniformIntDistribution250mValuesMax10000,
-                                                   {Select::ImplementationValuesAdaptive},
-                                                   inputThresholdDistribution,
-                                                   iterations, "7-DOP-1-SelectValues-SelectivitySweepSingle-64-32");
-
-    selectWallTimeDopAndInputSweepBenchmarkCalcDopRange<int64_t,int>(DataFiles::uniformIntDistribution250mValuesMax10000,
-                                                                     Select::ImplementationValuesAdaptiveParallel,
-                                                                     inputThresholdDistribution,
-                                                                     iterations, "7-DOP-1-SelectValues-SelectivitySweepParallel-64-32");
-
-    selectWallTimeInputSweepBenchmark<int,int64_t>(DataFiles::uniformIntDistribution250mValuesMax10000,
-                                                   {Select::ImplementationValuesAdaptive},
-                                                   inputThresholdDistribution,
-                                                   iterations, "7-DOP-1-SelectValues-SelectivitySweepSingle-32-64");
-
-    selectWallTimeDopAndInputSweepBenchmarkCalcDopRange<int,int64_t>(DataFiles::uniformIntDistribution250mValuesMax10000,
-                                                                     Select::ImplementationValuesAdaptiveParallel,
-                                                                     inputThresholdDistribution,
-                                                                     iterations, "7-DOP-1-SelectValues-SelectivitySweepParallel-32-64");
-
-    selectWallTimeInputSweepBenchmark<int64_t,int64_t>(DataFiles::uniformIntDistribution250mValuesMax10000,
-                                                       {Select::ImplementationValuesAdaptive},
-                                                       inputThresholdDistribution,
-                                                       iterations, "7-DOP-1-SelectValues-SelectivitySweepSingle-64-64");
-
-    selectWallTimeDopAndInputSweepBenchmarkCalcDopRange<int64_t,int64_t>(DataFiles::uniformIntDistribution250mValuesMax10000,
-                                                                         Select::ImplementationValuesAdaptiveParallel,
-                                                                         inputThresholdDistribution,
-                                                                         iterations, "7-DOP-1-SelectValues-SelectivitySweepParallel-64-64");
-
-
-    iterations = 1;
-
-    groupByWallTimeSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+    groupByWallTimeSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalityUpTo10mSweepFixedMax,
                                            {GroupBy::Adaptive},
                                            iterations, "5-DOP-1-GroupBy-CardinalitySweepSingle-32-32");
 
-    groupByWallTimeDopSweepBenchmarkCalcDopRange<int,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+    groupByWallTimeDopSweepBenchmarkCalcDopRange<int,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalityUpTo10mSweepFixedMax,
                                                           iterations, "5-DOP-1-GroupBy-CardinalitySweepParallel-32-32");
 
-    groupByWallTimeSweepBenchmark<int64_t,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+    groupByWallTimeSweepBenchmark<int64_t,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalityUpTo10mSweepFixedMax,
                                                {GroupBy::Adaptive},
                                                iterations, "5-DOP-1-GroupBy-CardinalitySweepSingle-64-32");
 
-    groupByWallTimeDopSweepBenchmarkCalcDopRange<int64_t,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+    groupByWallTimeDopSweepBenchmarkCalcDopRange<int64_t,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalityUpTo10mSweepFixedMax,
                                                               iterations, "5-DOP-1-GroupBy-CardinalitySweepParallel-64-32");
 
-    groupByWallTimeSweepBenchmark<int,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+    groupByWallTimeSweepBenchmark<int,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalityUpTo10mSweepFixedMax,
                                                {GroupBy::Adaptive},
                                                iterations, "5-DOP-1-GroupBy-CardinalitySweepSingle-32-64");
 
-    groupByWallTimeDopSweepBenchmarkCalcDopRange<int,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+    groupByWallTimeDopSweepBenchmarkCalcDopRange<int,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalityUpTo10mSweepFixedMax,
                                                               iterations, "5-DOP-1-GroupBy-CardinalitySweepParallel-32-64");
 
-    groupByWallTimeSweepBenchmark<int64_t,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+    groupByWallTimeSweepBenchmark<int64_t,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalityUpTo10mSweepFixedMax,
                                                    {GroupBy::Adaptive},
                                                    iterations, "5-DOP-1-GroupBy-CardinalitySweepSingle-64-64");
 
-    groupByWallTimeDopSweepBenchmarkCalcDopRange<int64_t,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+    groupByWallTimeDopSweepBenchmarkCalcDopRange<int64_t,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalityUpTo10mSweepFixedMax,
                                                                   iterations, "5-DOP-1-GroupBy-CardinalitySweepParallel-64-64");
-
 
 
     return 0;
