@@ -634,8 +634,19 @@ int main() {
 
     MABPL::calculateMissingMachineConstants();
 
+    int iterations = 5;
+
+    groupByWallTimeDopSweepBenchmarkCalcDopRange<int,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalityUpTo10mSweepFixedMax,
+                                                          iterations, "5-DOP-1-GroupBy-CardinalitySweepParallel-32-32");
+
+    groupByWallTimeDopSweepBenchmarkCalcDopRange<int64_t,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalityUpTo10mSweepFixedMax,
+                                                              iterations, "5-DOP-1-GroupBy-CardinalitySweepParallel-64-32");
+
+    groupByWallTimeDopSweepBenchmarkCalcDopRange<int,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalityUpTo10mSweepFixedMax,
+                                                              iterations, "5-DOP-1-GroupBy-CardinalitySweepParallel-32-64");
+
     groupByWallTimeDopSweepBenchmarkCalcDopRange<int64_t,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalityUpTo10mSweepFixedMax,
-                                                                  1, "TEST-5-DOP-1-GroupBy-CardinalitySweepParallel-64-64");
+                                                                  iterations, "5-DOP-1-GroupBy-CardinalitySweepParallel-64-64");
 
     return 0;
 }

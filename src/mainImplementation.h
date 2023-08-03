@@ -311,7 +311,7 @@ void groupByWallTimeDopSweepBenchmarkCalcDopRange(DataSweep &dataSweep, int iter
     std::vector<int> dopValues;
     while (dop <= MABPL::maxDop()) {
         dopValues.push_back(dop);
-        dop *= 20; /////////////////////////////////////////////////////////////////////////////////
+        dop *= 2;
     }
 
     groupByWallTimeDopSweepBenchmark<T1,T2>(dataSweep, iterations, fileNamePrefix, dopValues);

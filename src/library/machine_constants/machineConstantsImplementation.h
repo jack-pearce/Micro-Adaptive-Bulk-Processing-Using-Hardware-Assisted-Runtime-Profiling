@@ -477,7 +477,7 @@ double calculateGroupByCrossoverCardinality(int dop) {
             lowerCardinality = midCardinality;
         }
 
-        std::cout << "Cardinality: " << (lowerCardinality + upperCardinality) / 2 << ", hash cycles: " << hashCycles << ", sort cycles: " << sortCycles << std::endl;
+//        std::cout << "Cardinality: " << (lowerCardinality + upperCardinality) / 2 << ", hash cycles: " << hashCycles << ", sort cycles: " << sortCycles << std::endl;
     }
 
     std::cout << ".";
@@ -577,7 +577,7 @@ double calculateGroupByMachineConstantsAuxParallel(int cardinality, int dop) {
     std::cout << ".";
     std::cout.flush();
 
-    std::cout << "Tuples per last level cache miss: " << n / static_cast<double>(totalLastLevelCacheMisses) << std::endl;
+//    std::cout << "Tuples per last level cache miss: " << n / static_cast<double>(totalLastLevelCacheMisses) << std::endl;
 
     return  n / static_cast<double>(totalLastLevelCacheMisses);
 }

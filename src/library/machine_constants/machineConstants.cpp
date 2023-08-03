@@ -91,7 +91,6 @@ void MachineConstants::writeEmptyFile() {
 }
 
 void MachineConstants::calculateMissingMachineConstants() {
-/*
     int dop = 1;
     while (dop <= maxDop()) {
         std::string dopStr = std::to_string(dop);
@@ -122,27 +121,20 @@ void MachineConstants::calculateMissingMachineConstants() {
             calculateSelectValuesMachineConstants<int64_t, int64_t>(dop);
         }
 
-        dop *= 2;
-    }
-*/
+        if (machineConstants.count("GroupBy_4B_inputFilter_4B_inputAggregate_" + dopStr + "_dop") == 0) {
+            calculateGroupByMachineConstants<int, int>(dop);
+        }
+        if (machineConstants.count("GroupBy_8B_inputFilter_4B_inputAggregate_" + dopStr + "_dop") == 0) {
+            calculateGroupByMachineConstants<int64_t, int>(dop);
+        }
+        if (machineConstants.count("GroupBy_4B_inputFilter_8B_inputAggregate_" + dopStr + "_dop") == 0) {
+            calculateGroupByMachineConstants<int, int64_t>(dop);
+        }
+        if (machineConstants.count("GroupBy_8B_inputFilter_8B_inputAggregate_" + dopStr + "_dop") == 0) {
+            calculateGroupByMachineConstants<int64_t, int64_t>(dop);
+        }
 
-    if (machineConstants.count("GroupBy_4B_inputFilter_4B_inputAggregate_1_dop") == 0) {
-        calculateGroupByMachineConstants<int, int>(1);
-    }
-    if (machineConstants.count("GroupBy_8B_inputFilter_4B_inputAggregate_1_dop") == 0) {
-        calculateGroupByMachineConstants<int64_t, int>(1);
-    }
-    if (machineConstants.count("GroupBy_4B_inputFilter_8B_inputAggregate_1_dop") == 0) {
-        calculateGroupByMachineConstants<int, int64_t>(1);
-    }
-    if (machineConstants.count("GroupBy_8B_inputFilter_8B_inputAggregate_1_dop") == 0) {
-        calculateGroupByMachineConstants<int64_t, int64_t>(1);
-    }
-    if (machineConstants.count("GroupBy_8B_inputFilter_8B_inputAggregate_2_dop") == 0) {
-        calculateGroupByMachineConstants<int64_t, int64_t>(2);
-    }
-    if (machineConstants.count("GroupBy_8B_inputFilter_8B_inputAggregate_4_dop") == 0) {
-        calculateGroupByMachineConstants<int64_t, int64_t>(4);
+        dop *= 2;
     }
 }
 
