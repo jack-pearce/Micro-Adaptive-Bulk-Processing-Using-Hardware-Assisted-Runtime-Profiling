@@ -632,18 +632,7 @@ int main() {
                                                                          inputThresholdDistribution,
                                                                          3, "TEST-7-DOP-1-SelectValues-SelectivitySweepParallel-64-64");*/
 
-    std::vector<float> inputThresholdDistribution;
-    generateLogDistribution(30, 1, 10*1000, inputThresholdDistribution);
-    int iterations = 3;
-    selectWallTimeInputSweepBenchmark<int64_t,int64_t>(DataFiles::uniformIntDistribution250mValuesMax10000,
-                                                       {Select::ImplementationValuesAdaptive},
-                                                       inputThresholdDistribution,
-                                                       iterations, "7-DOP-1-SelectValues-SelectivitySweepSingle-64-64");
-
-    selectWallTimeDopAndInputSweepBenchmarkCalcDopRange<int64_t,int64_t>(DataFiles::uniformIntDistribution250mValuesMax10000,
-                                                                         Select::ImplementationValuesAdaptiveParallel,
-                                                                         inputThresholdDistribution,
-                                                                         iterations, "7-DOP-1-SelectValues-SelectivitySweepParallel-64-64");
+    MABPL::calculateMissingMachineConstants();
 
     return 0;
 }
