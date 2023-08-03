@@ -124,17 +124,20 @@ void MachineConstants::calculateMissingMachineConstants() {
         dop *= 2;
     }
 
-    if (machineConstants.count("GroupBy_4B_inputFilter_4B_inputAggregate") == 0) {
-        calculateGroupByMachineConstants<int,int>();
+    if (machineConstants.count("GroupBy_4B_inputFilter_4B_inputAggregate_1_dop") == 0) {
+        calculateGroupByMachineConstants<int, int>(1);
     }
-    if (machineConstants.count("GroupBy_8B_inputFilter_4B_inputAggregate") == 0) {
-        calculateGroupByMachineConstants<int64_t,int>();
+    if (machineConstants.count("GroupBy_8B_inputFilter_4B_inputAggregate_1_dop") == 0) {
+        calculateGroupByMachineConstants<int64_t, int>(1);
     }
-    if (machineConstants.count("GroupBy_4B_inputFilter_8B_inputAggregate") == 0) {
-        calculateGroupByMachineConstants<int,int64_t>();
+    if (machineConstants.count("GroupBy_4B_inputFilter_8B_inputAggregate_1_dop") == 0) {
+        calculateGroupByMachineConstants<int, int64_t>(1);
     }
-    if (machineConstants.count("GroupBy_8B_inputFilter_8B_inputAggregate") == 0) {
-        calculateGroupByMachineConstants<int64_t,int64_t>();
+    if (machineConstants.count("GroupBy_8B_inputFilter_8B_inputAggregate_1_dop") == 0) {
+        calculateGroupByMachineConstants<int64_t, int64_t>(1);
+    }
+    if (machineConstants.count("GroupBy_8B_inputFilter_8B_inputAggregate_4_dop") == 0) {
+        calculateGroupByMachineConstants<int64_t, int64_t>(4);
     }
 }
 

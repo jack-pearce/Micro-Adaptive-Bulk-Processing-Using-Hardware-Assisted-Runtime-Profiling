@@ -307,11 +307,11 @@ void groupByBenchmarkWithExtraCountersDuringRunConfigurations(const DataFile &da
 template <typename T1, typename T2>
 void groupByWallTimeDopSweepBenchmarkCalcDopRange(DataSweep &dataSweep, int iterations,
                                                   const std::string &fileNamePrefix) {
-    int dop = 2;
+    int dop = 4; //////////////////////////////////////////////////////////////////////////////////////////////////
     std::vector<int> dopValues;
     while (dop <= MABPL::maxDop()) {
         dopValues.push_back(dop);
-        dop *= 2;
+        dop *= 10; //////////////////////////////////////////////////////////////////////////////////////////////////
     }
 
     groupByWallTimeDopSweepBenchmark<T1,T2>(dataSweep, iterations, fileNamePrefix, dopValues);

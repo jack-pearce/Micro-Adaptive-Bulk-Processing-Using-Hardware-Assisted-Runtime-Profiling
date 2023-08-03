@@ -414,13 +414,16 @@ void calculateSelectValuesMachineConstants(int dop) {
 }
 
 template <typename T1, typename T2>
-double calculateGroupByCrossoverCardinality() {
+double calculateGroupByCrossoverCardinality(int dop) {
     int n = 40*1000*1000;
 
     long_long hashCycles, sortCycles;
     double upperCardinality = n;
     double lowerCardinality = 1;
     double midCardinality;
+
+    std::string machineConstantName = "GroupBy_" + std::to_string(sizeof(T1)) + "B_inputFilter_" +
+                                      std::to_string(sizeof(T2)) + "B_inputAggregate_" + std::to_string(dop) + "_dop";
 
     for (int i = 0; i < GROUPBY_ITERATIONS; ++i) {
 
@@ -431,10 +434,18 @@ double calculateGroupByCrossoverCardinality() {
         generateUniformDistributionWithSetCardinalityInMemory(inputGroupBy, n, n, static_cast<int>(midCardinality));
         generateUniformDistributionInMemory(inputAggregate, n, 10);
 
-        hashCycles = *Counters::getInstance().readSharedEventSet();
-        runGroupByFunction<MaxAggregation>(GroupBy::Hash, n, inputGroupBy, inputAggregate,
-                                           static_cast<int>(midCardinality));
-        hashCycles = *Counters::getInstance().readSharedEventSet() - hashCycles;
+        if (dop == 1) {
+            hashCycles = *Counters::getInstance().readSharedEventSet();
+            runGroupByFunction<MaxAggregation>(GroupBy::Hash, n, inputGroupBy, inputAggregate,
+                                               static_cast<int>(midCardinality));
+            hashCycles = *Counters::getInstance().readSharedEventSet() - hashCycles;
+        } else {
+            MachineConstants::getInstance().updateMachineConstant(machineConstantName, 0);
+            hashCycles = PAPI_get_real_usec();
+            runGroupByFunction<MaxAggregation>(GroupBy::AdaptiveParallel, n, inputGroupBy, inputAggregate,
+                                               static_cast<int>(midCardinality), dop);
+            hashCycles = PAPI_get_real_usec() - hashCycles;
+        }
 
         delete[] inputGroupBy;
         delete[] inputAggregate;
@@ -444,10 +455,18 @@ double calculateGroupByCrossoverCardinality() {
         generateUniformDistributionWithSetCardinalityInMemory(inputGroupBy, n, n, static_cast<int>(midCardinality));
         generateUniformDistributionInMemory(inputAggregate, n, 10);
 
-        sortCycles = *Counters::getInstance().readSharedEventSet();
-        runGroupByFunction<MaxAggregation>(GroupBy::Sort, n, inputGroupBy, inputAggregate,
-                                           static_cast<int>(midCardinality));
-        sortCycles = *Counters::getInstance().readSharedEventSet() - sortCycles;
+        if (dop == 1) {
+            sortCycles = *Counters::getInstance().readSharedEventSet();
+            runGroupByFunction<MaxAggregation>(GroupBy::Sort, n, inputGroupBy, inputAggregate,
+                                               static_cast<int>(midCardinality));
+            sortCycles = *Counters::getInstance().readSharedEventSet() - sortCycles;
+        } else {
+            MachineConstants::getInstance().updateMachineConstant(machineConstantName, 1000000);
+            sortCycles = PAPI_get_real_usec();
+            runGroupByFunction<MaxAggregation>(GroupBy::AdaptiveParallel, n, inputGroupBy, inputAggregate,
+                                               static_cast<int>(midCardinality), dop);
+            sortCycles = PAPI_get_real_usec() - sortCycles;
+        }
 
         delete[] inputGroupBy;
         delete[] inputAggregate;
@@ -458,13 +477,107 @@ double calculateGroupByCrossoverCardinality() {
             lowerCardinality = midCardinality;
         }
 
-//        std::cout << "Cardinality: " << (lowerCardinality + upperCardinality) / 2 << ", hash cycles: " << hashCycles << ", sort cycles: " << sortCycles << std::endl;
+        std::cout << "Cardinality: " << (lowerCardinality + upperCardinality) / 2 << ", hash cycles: " << hashCycles << ", sort cycles: " << sortCycles << std::endl;
     }
 
     std::cout << ".";
     std::cout.flush();
 
     return (lowerCardinality + upperCardinality) / 2;
+}
+
+template<typename T1, typename T2>
+struct GroupByHashCountLastLevelCacheMissesThreadArgs {
+    int n;
+    T1* inputGroupBy;
+    T2* inputAggregate;
+    int cardinality;
+    long_long lastLevelCacheMisses;
+};
+
+template<typename T1, typename T2>
+void *groupByHashCountLastLevelCacheMisses(void *arg) {
+    auto* args = static_cast<GroupByHashCountLastLevelCacheMissesThreadArgs<T1, T2>*>(arg);
+    int n = args->n;
+    T1 *inputGroupBy = args->inputGroupBy;
+    T2 *inputAggregate = args->inputAggregate;
+    int cardinality = args->cardinality;
+
+    tsl::robin_map<T1, T2> map(std::max(static_cast<int>(2.5 * cardinality), 400000));
+    typename tsl::robin_map<T1, T2>::iterator it;
+
+    int eventSet = PAPI_NULL;
+    std::vector<std::string> counters = {"PERF_COUNT_HW_CACHE_MISSES"};
+    long_long counterValues[1] = {0};
+    createThreadEventSet(&eventSet, counters);
+
+    readThreadEventSet(eventSet, 1, counterValues);
+    for (int index = 0; index < n; ++index) {
+        it = map.find(inputGroupBy[index]);
+        if (it != map.end()) {
+            it.value() = MaxAggregation<T2>()(it->second, inputAggregate[index], false);
+        } else {
+            map.insert({inputGroupBy[index], MaxAggregation<T2>()(0, inputAggregate[index], true)});
+        }
+    }
+    readThreadEventSet(eventSet, 1, counterValues);
+    args->lastLevelCacheMisses = counterValues[0];
+
+    destroyThreadEventSet(eventSet, counterValues);
+    return nullptr;
+}
+
+
+template <typename T1, typename T2>
+double calculateGroupByMachineConstantsAuxParallel(int cardinality, int dop) {
+    int n = 40*1000*1000;
+
+    auto inputGroupBy = new T1[n];
+    auto inputAggregate = new T2[n];
+    generateUniformDistributionWithSetCardinalityInMemory(inputGroupBy, n, n, cardinality);
+    generateUniformDistributionInMemory(inputAggregate, n, 10);
+
+    Counters::getInstance();
+    pthread_t threads[dop];
+    std::vector<GroupByHashCountLastLevelCacheMissesThreadArgs<T1,T2>*> threadArgs(dop);
+
+    std::vector<int> elementsPerThread(dop, n / dop);
+    elementsPerThread[dop - 1] = n - ((dop - 1) * (n / dop));
+
+    T1 *threadInputGroupBy = inputGroupBy;
+    T2 *threadInputAggregate = inputAggregate;
+
+    for (int i = 0; i < dop; ++i) {
+        threadArgs[i]->n = elementsPerThread[i];
+        threadArgs[i]->inputGroupBy = threadInputGroupBy;
+        threadArgs[i]->inputAggregate = threadInputAggregate;
+        threadArgs[i]->cardinality = cardinality;
+
+        pthread_create(&threads[i], NULL, groupByHashCountLastLevelCacheMisses<T1,T2>,
+                       threadArgs[i]);
+
+        threadInputGroupBy += elementsPerThread[i];
+        threadInputAggregate += elementsPerThread[i];
+    }
+
+    for (int i = 0; i < dop; ++i) {
+        pthread_join(threads[i], nullptr);
+    }
+
+    long_long totalLastLevelCacheMisses = 0;
+    for (int i = 0; i < dop; ++i) {
+        totalLastLevelCacheMisses += threadArgs[i]->lastLevelCacheMisses;
+    }
+
+    delete[] inputGroupBy;
+    delete[] inputAggregate;
+
+    std::cout << ".";
+    std::cout.flush();
+
+    std::cout << "Tuples per last level cache miss: " << n / static_cast<double>(totalLastLevelCacheMisses) << std::endl;
+
+    return  n / static_cast<double>(totalLastLevelCacheMisses);
 }
 
 template <typename T1, typename T2>
@@ -495,16 +608,16 @@ double calculateGroupByMachineConstantsAux(int cardinality) {
 }
 
 template <typename T1, typename T2>
-void calculateGroupByMachineConstants() {
+void calculateGroupByMachineConstants(int dop) {
     std::string machineConstantName = "GroupBy_" + std::to_string(sizeof(T1)) + "B_inputFilter_" +
-            std::to_string(sizeof(T2)) + "B_inputAggregate";
+            std::to_string(sizeof(T2)) + "B_inputAggregate_" + std::to_string(dop) + "_dop";
     std::cout << "Calculating machine constants for " << machineConstantName << std::endl;
     std::cout << " - Running tests for crossover point";
     std::cout.flush();
 
     std::vector<double> crossoverPoints;
     for (int i = 0; i < NUMBER_OF_TESTS; ++i) {
-        crossoverPoints.push_back(calculateGroupByCrossoverCardinality<T1,T2>());
+        crossoverPoints.push_back(calculateGroupByCrossoverCardinality<T1, T2>(dop));
     }
     std::sort(crossoverPoints.begin(), crossoverPoints.end());
     int crossoverCardinality = static_cast<int>(crossoverPoints[NUMBER_OF_TESTS / 2]);
@@ -512,8 +625,15 @@ void calculateGroupByMachineConstants() {
 
     std::cout << " - Running tests for last level cache misses";
     std::vector<double> groupByMachineConstants;
-    for (int i = 0; i < NUMBER_OF_TESTS; ++i) {
-        groupByMachineConstants.push_back(calculateGroupByMachineConstantsAux<T1,T2>(crossoverCardinality));
+    if (dop == 1) {
+        for (int i = 0; i < NUMBER_OF_TESTS; ++i) {
+            groupByMachineConstants.push_back(calculateGroupByMachineConstantsAux<T1, T2>(crossoverCardinality));
+        }
+    } else {
+        for (int i = 0; i < NUMBER_OF_TESTS; ++i) {
+            groupByMachineConstants.push_back(
+                    calculateGroupByMachineConstantsAuxParallel<T1, T2>(crossoverCardinality, dop));
+        }
     }
     std::sort(groupByMachineConstants.begin(), groupByMachineConstants.end());
     std::cout << " Complete" << std::endl;

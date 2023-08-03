@@ -320,7 +320,7 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
     long_long *counterValues = Counters::getInstance().getSharedEventSetEvents(counters);
 
     std::string machineConstantName = "GroupBy_" + std::to_string(sizeof(T1)) + "B_inputFilter_" +
-            std::to_string(sizeof(T2)) + "B_inputAggregate";
+            std::to_string(sizeof(T2)) + "B_inputAggregate_1_dop";
     float tuplesPerLastLevelCacheMissThreshold = MachineConstants::getInstance().getMachineConstant(machineConstantName);
 
     int index = 0;
@@ -372,6 +372,7 @@ struct GroupByThreadArgs {
     std::condition_variable *cv;
     GroupByThreadArgs *mergeThread1;
     GroupByThreadArgs *mergeThread2;
+    int dop;
 
     ~GroupByThreadArgs() {
         delete result;
@@ -507,6 +508,7 @@ void *groupByAdaptiveParallelAux(void *arg) {
     std::vector<bool> *threadFinishedAndWaitingFlags = args->threadFinishedAndWaitingFlags;
     std::atomic<int> *numFinishedThreads = args->numFinishedThreads;
     std::condition_variable *cv = args->cv;
+    int dop = args->dop;
 
     constexpr int tuplesPerChunk = 75 * 1000;
     constexpr int tuplesBetweenHashing = 2*1000*1000;
@@ -522,7 +524,7 @@ void *groupByAdaptiveParallelAux(void *arg) {
     createThreadEventSet(&eventSet, counters);
 
     std::string machineConstantName = "GroupBy_" + std::to_string(sizeof(T1)) + "B_inputFilter_" +
-                                      std::to_string(sizeof(T2)) + "B_inputAggregate";
+                              std::to_string(sizeof(T2)) + "B_inputAggregate_" + std::to_string(dop) + "_dop";
     float tuplesPerLastLevelCacheMissThreshold = MachineConstants::getInstance().getMachineConstant(machineConstantName);
 
     int index = 0;
@@ -607,6 +609,7 @@ vectorOfPairs<T1, T2> groupByAdaptiveParallel(int n, T1 *inputGroupBy, T2 *input
         threadArgs[i]->numFinishedThreads = &numFinishedThreads;
         threadArgs[i]->threadFinishedAndWaitingFlags = &threadFinishedAndWaitingFlags;
         threadArgs[i]->cv = &cv;
+        threadArgs[i]->dop = dop;
 
         pthread_create(&threads[i], &attr, groupByAdaptiveParallelAux<Aggregator, T1, T2>,
                        threadArgs[i]);
