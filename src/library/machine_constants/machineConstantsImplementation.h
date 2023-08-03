@@ -619,8 +619,7 @@ void calculateGroupByMachineConstants(int dop) {
 
     std::vector<double> crossoverPoints;
     for (int i = 0; i < NUMBER_OF_TESTS; ++i) {
-//        crossoverPoints.push_back(calculateGroupByCrossoverCardinality<T1, T2>(dop));
-        crossoverPoints.push_back(43946.3); ////////////////////////////////////////////////////////////
+        crossoverPoints.push_back(calculateGroupByCrossoverCardinality<T1, T2>(dop));
     }
     std::sort(crossoverPoints.begin(), crossoverPoints.end());
     int crossoverCardinality = static_cast<int>(crossoverPoints[NUMBER_OF_TESTS / 2]);

@@ -138,6 +138,9 @@ void MachineConstants::calculateMissingMachineConstants() {
     if (machineConstants.count("GroupBy_8B_inputFilter_8B_inputAggregate_1_dop") == 0) {
         calculateGroupByMachineConstants<int64_t, int64_t>(1);
     }
+    if (machineConstants.count("GroupBy_8B_inputFilter_8B_inputAggregate_2_dop") == 0) {
+        calculateGroupByMachineConstants<int64_t, int64_t>(2);
+    }
     if (machineConstants.count("GroupBy_8B_inputFilter_8B_inputAggregate_4_dop") == 0) {
         calculateGroupByMachineConstants<int64_t, int64_t>(4);
     }

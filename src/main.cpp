@@ -635,7 +635,7 @@ int main() {
     MABPL::calculateMissingMachineConstants();
 
     groupByWallTimeDopSweepBenchmarkCalcDopRange<int64_t,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalityUpTo10mSweepFixedMax,
-                                                                  1, "5-DOP-1-GroupBy-CardinalitySweepParallel-64-64");
+                                                                  1, "TEST-5-DOP-1-GroupBy-CardinalitySweepParallel-64-64");
 
     return 0;
 }
