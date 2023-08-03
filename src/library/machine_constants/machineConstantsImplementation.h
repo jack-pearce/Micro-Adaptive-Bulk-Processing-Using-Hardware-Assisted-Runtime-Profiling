@@ -395,8 +395,6 @@ void calculateSelectValuesMachineConstants(int dop) {
     std::sort(lowerMisPredictionsCrossoverPoints.begin(), lowerMisPredictionsCrossoverPoints.end());
     std::cout << " Complete" << std::endl;
 
-    std::cout << "Value: " << lowerMisPredictionsCrossoverPoints[NUMBER_OF_TESTS / 2] << std::endl;
-
     std::cout << " - Running tests for lower selectivity crossover point";
     std::vector<double> lowerSelectivityCrossoverPoints;
     for (int i = 0; i < NUMBER_OF_TESTS; ++i) {
@@ -511,8 +509,6 @@ void calculateGroupByMachineConstants() {
     std::sort(crossoverPoints.begin(), crossoverPoints.end());
     int crossoverCardinality = static_cast<int>(crossoverPoints[NUMBER_OF_TESTS / 2]);
     std::cout << " Complete" << std::endl;
-
-//    int crossoverCardinality = 629884;
 
     std::cout << " - Running tests for last level cache misses";
     std::vector<double> groupByMachineConstants;
