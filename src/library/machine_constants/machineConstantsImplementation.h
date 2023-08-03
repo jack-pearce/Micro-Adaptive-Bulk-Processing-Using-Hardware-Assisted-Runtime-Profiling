@@ -415,8 +415,7 @@ void calculateSelectValuesMachineConstants(int dop) {
 
 template <typename T1, typename T2>
 double calculateGroupByCrossoverCardinality(int dop) {
-//    int n = 40*1000*1000;
-    int n = 10000;
+    int n = 40*1000*1000;
 
     long_long hashCycles, sortCycles;
     double upperCardinality = n;
@@ -531,8 +530,7 @@ void *groupByHashCountLastLevelCacheMisses(void *arg) {
 
 template <typename T1, typename T2>
 double calculateGroupByMachineConstantsAuxParallel(int cardinality, int dop) {
-//    int n = 40*1000*1000;
-    int n = 100000;
+    int n = 40*1000*1000;
 
     auto inputGroupBy = new T1[n];
     auto inputAggregate = new T2[n];
