@@ -91,30 +91,37 @@ void MachineConstants::writeEmptyFile() {
 }
 
 void MachineConstants::calculateMissingMachineConstants() {
-    if (machineConstants.count("SelectIndexesLower_4B_inputFilter") == 0 ||
-        machineConstants.count("SelectIndexesUpper_4B_inputFilter") == 0) {
-        calculateSelectIndexesMachineConstants<int>();
-    }
-    if (machineConstants.count("SelectIndexesLower_8B_inputFilter") == 0 ||
-        machineConstants.count("SelectIndexesUpper_8B_inputFilter") == 0) {
-        calculateSelectIndexesMachineConstants<int64_t>();
-    }
+    int dop = 1;
+    while (dop <= maxDop()) {
+        std::string dopStr = std::to_string(dop);
 
-    if (machineConstants.count("SelectValuesLowerMispredictions_4B_inputFilter_4B_inputData") == 0 ||
-        machineConstants.count("SelectValuesLowerSelectivity_4B_inputFilter_4B_inputData") == 0) {
-        calculateSelectValuesMachineConstants<int,int>();
-    }
-    if (machineConstants.count("SelectValuesLowerMispredictions_8B_inputFilter_4B_inputData") == 0 ||
-        machineConstants.count("SelectValuesLowerSelectivity_8B_inputFilter_4B_inputData") == 0) {
-        calculateSelectValuesMachineConstants<int64_t,int>();
-    }
-    if (machineConstants.count("SelectValuesLowerMispredictions_4B_inputFilter_8B_inputData") == 0 ||
-        machineConstants.count("SelectValuesLowerSelectivity_4B_inputFilter_8B_inputData") == 0) {
-        calculateSelectValuesMachineConstants<int,int64_t>();
-    }
-    if (machineConstants.count("SelectValuesLowerMispredictions_8B_inputFilter_8B_inputData") == 0 ||
-        machineConstants.count("SelectValuesLowerSelectivity_8B_inputFilter_8B_inputData") == 0) {
-        calculateSelectValuesMachineConstants<int64_t,int64_t>();
+        if (machineConstants.count("SelectIndexesLower_4B_inputFilter_" + dopStr + "_dop") == 0 ||
+            machineConstants.count("SelectIndexesUpper_4B_inputFilter_" + dopStr + "_dop") == 0) {
+            calculateSelectIndexesMachineConstants<int>(dop);
+        }
+        if (machineConstants.count("SelectIndexesLower_8B_inputFilter_" + dopStr + "_dop") == 0 ||
+            machineConstants.count("SelectIndexesUpper_8B_inputFilter_" + dopStr + "_dop") == 0) {
+            calculateSelectIndexesMachineConstants<int64_t>(dop);
+        }
+
+        if (machineConstants.count("SelectValuesLowerMispredictions_4B_inputFilter_4B_inputData_" + dopStr + "_dop") == 0 ||
+            machineConstants.count("SelectValuesLowerSelectivity_4B_inputFilter_4B_inputData_" + dopStr + "_dop") == 0) {
+            calculateSelectValuesMachineConstants<int, int>(dop);
+        }
+        if (machineConstants.count("SelectValuesLowerMispredictions_8B_inputFilter_4B_inputData_" + dopStr + "_dop") == 0 ||
+            machineConstants.count("SelectValuesLowerSelectivity_8B_inputFilter_4B_inputData_" + dopStr + "_dop") == 0) {
+            calculateSelectValuesMachineConstants<int64_t, int>(dop);
+        }
+        if (machineConstants.count("SelectValuesLowerMispredictions_4B_inputFilter_8B_inputData_" + dopStr + "_dop") == 0 ||
+            machineConstants.count("SelectValuesLowerSelectivity_4B_inputFilter_8B_inputData_" + dopStr + "_dop") == 0) {
+            calculateSelectValuesMachineConstants<int, int64_t>(dop);
+        }
+        if (machineConstants.count("SelectValuesLowerMispredictions_8B_inputFilter_8B_inputData_" + dopStr + "_dop") == 0 ||
+            machineConstants.count("SelectValuesLowerSelectivity_8B_inputFilter_8B_inputData_" + dopStr + "_dop") == 0) {
+            calculateSelectValuesMachineConstants<int64_t, int64_t>(dop);
+        }
+
+        dop *= 2;
     }
 
     if (machineConstants.count("GroupBy_4B_inputFilter_4B_inputAggregate") == 0) {

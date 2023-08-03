@@ -21,7 +21,7 @@ T getThreshold(int n, double selectivity) {
 }
 
 template <typename T>
-double calculateSelectIndexesLowerMachineConstant() {
+double calculateSelectIndexesLowerMachineConstant(int dop) {
     int n = 250*1000*1000;
     auto data = new T[n];
     generateRandomisedUniqueValuesInMemory(data, n);
@@ -30,6 +30,9 @@ double calculateSelectIndexesLowerMachineConstant() {
     double upperSelectivity = 0.5;
     double lowerSelectivity = 0;
     double midSelectivity;
+
+    std::string machineConstantLowerName = "SelectIndexesLower_" + std::to_string(sizeof(T)) + "B_inputFilter_" + std::to_string(dop) + "_dop";
+    std::string machineConstantUpperName = "SelectIndexesUpper_" + std::to_string(sizeof(T)) + "B_inputFilter_" + std::to_string(dop) + "_dop";
 
     for (int i = 0; i < SELECT_ITERATIONS; ++i) {
 
@@ -40,10 +43,19 @@ double calculateSelectIndexesLowerMachineConstant() {
         int* inputData;
         copyArray(data, inputFilter, n);
 
-        branchCycles = *Counters::getInstance().readSharedEventSet();
-        runSelectFunction(Select::ImplementationIndexesBranch, n, inputData, inputFilter,
-                          selection, getThreshold<T>(n, midSelectivity));
-        branchCycles = *Counters::getInstance().readSharedEventSet() - branchCycles;
+        if (dop == 1) {
+            branchCycles = *Counters::getInstance().readSharedEventSet();
+            runSelectFunction(Select::ImplementationIndexesBranch, n, inputData, inputFilter,
+                              selection, getThreshold<T>(n, midSelectivity));
+            branchCycles = *Counters::getInstance().readSharedEventSet() - branchCycles;
+        } else {
+            MachineConstants::getInstance().updateMachineConstant(machineConstantLowerName, 1);
+            MachineConstants::getInstance().updateMachineConstant(machineConstantUpperName, 0);
+            branchCycles = PAPI_get_real_usec();
+            runSelectFunction(Select::ImplementationIndexesAdaptiveParallel, n, inputData, inputFilter,
+                              selection, getThreshold<T>(n, midSelectivity), dop);
+            branchCycles = PAPI_get_real_usec() - branchCycles;
+        }
 
         delete[] inputFilter;
         delete[] selection;
@@ -52,10 +64,19 @@ double calculateSelectIndexesLowerMachineConstant() {
         selection = new int[n];
         copyArray(data, inputFilter, n);
 
-        predicationCycles = *Counters::getInstance().readSharedEventSet();
-        runSelectFunction(Select::ImplementationIndexesPredication, n, inputData, inputFilter,
-                          selection, getThreshold<T>(n, midSelectivity));
-        predicationCycles = *Counters::getInstance().readSharedEventSet() - predicationCycles;
+        if (dop == 1) {
+            predicationCycles = *Counters::getInstance().readSharedEventSet();
+            runSelectFunction(Select::ImplementationIndexesPredication, n, inputData, inputFilter,
+                              selection, getThreshold<T>(n, midSelectivity));
+            predicationCycles = *Counters::getInstance().readSharedEventSet() - predicationCycles;
+        } else {
+            MachineConstants::getInstance().updateMachineConstant(machineConstantLowerName, 0);
+            MachineConstants::getInstance().updateMachineConstant(machineConstantUpperName, 1);
+            predicationCycles = PAPI_get_real_usec();
+            runSelectFunction(Select::ImplementationIndexesAdaptiveParallel, n, inputData, inputFilter,
+                              selection, getThreshold<T>(n, midSelectivity), dop);
+            predicationCycles = PAPI_get_real_usec() - predicationCycles;
+        }
 
         delete[] inputFilter;
         delete[] selection;
@@ -78,7 +99,7 @@ double calculateSelectIndexesLowerMachineConstant() {
 }
 
 template <typename T>
-double calculateSelectIndexesUpperMachineConstant() {
+double calculateSelectIndexesUpperMachineConstant(int dop) {
     int n = 250*1000*1000;
     auto data = new T[n];
     generateRandomisedUniqueValuesInMemory(data, n);
@@ -87,6 +108,9 @@ double calculateSelectIndexesUpperMachineConstant() {
     double upperSelectivity = 1.0;
     double lowerSelectivity = 0.5;
     double midSelectivity;
+
+    std::string machineConstantLowerName = "SelectIndexesLower_" + std::to_string(sizeof(T)) + "B_inputFilter_" + std::to_string(dop) + "_dop";
+    std::string machineConstantUpperName = "SelectIndexesUpper_" + std::to_string(sizeof(T)) + "B_inputFilter_" + std::to_string(dop) + "_dop";
 
     for (int i = 0; i < SELECT_ITERATIONS; ++i) {
 
@@ -97,10 +121,19 @@ double calculateSelectIndexesUpperMachineConstant() {
         int* inputData;
         copyArray(data, inputFilter, n);
 
-        branchCycles = *Counters::getInstance().readSharedEventSet();
-        runSelectFunction(Select::ImplementationIndexesBranch, n, inputData, inputFilter,
-                          selection, getThreshold<T>(n, midSelectivity));
-        branchCycles = *Counters::getInstance().readSharedEventSet() - branchCycles;
+        if (dop == 1) {
+            branchCycles = *Counters::getInstance().readSharedEventSet();
+            runSelectFunction(Select::ImplementationIndexesBranch, n, inputData, inputFilter,
+                              selection, getThreshold<T>(n, midSelectivity));
+            branchCycles = *Counters::getInstance().readSharedEventSet() - branchCycles;
+        } else {
+            MachineConstants::getInstance().updateMachineConstant(machineConstantLowerName, 1);
+            MachineConstants::getInstance().updateMachineConstant(machineConstantUpperName, 0);
+            branchCycles = PAPI_get_real_usec();
+            runSelectFunction(Select::ImplementationIndexesAdaptiveParallel, n, inputData, inputFilter,
+                              selection, getThreshold<T>(n, midSelectivity), dop);
+            branchCycles = PAPI_get_real_usec() - branchCycles;
+        }
 
         delete[] inputFilter;
         delete[] selection;
@@ -109,10 +142,19 @@ double calculateSelectIndexesUpperMachineConstant() {
         selection = new int[n];
         copyArray(data, inputFilter, n);
 
-        predicationCycles = *Counters::getInstance().readSharedEventSet();
-        runSelectFunction(Select::ImplementationIndexesPredication, n, inputData, inputFilter,
-                          selection, getThreshold<T>(n, midSelectivity));
-        predicationCycles = *Counters::getInstance().readSharedEventSet() - predicationCycles;
+        if (dop == 1) {
+            predicationCycles = *Counters::getInstance().readSharedEventSet();
+            runSelectFunction(Select::ImplementationIndexesPredication, n, inputData, inputFilter,
+                              selection, getThreshold<T>(n, midSelectivity));
+            predicationCycles = *Counters::getInstance().readSharedEventSet() - predicationCycles;
+        } else {
+            MachineConstants::getInstance().updateMachineConstant(machineConstantLowerName, 0);
+            MachineConstants::getInstance().updateMachineConstant(machineConstantUpperName, 1);
+            predicationCycles = PAPI_get_real_usec();
+            runSelectFunction(Select::ImplementationIndexesAdaptiveParallel, n, inputData, inputFilter,
+                              selection, getThreshold<T>(n, midSelectivity), dop);
+            predicationCycles = PAPI_get_real_usec() - predicationCycles;
+        }
 
         delete[] inputFilter;
         delete[] selection;
@@ -135,13 +177,13 @@ double calculateSelectIndexesUpperMachineConstant() {
 }
 
 template <typename T>
-void calculateSelectIndexesMachineConstants() {
-    std::cout << "Calculating machine constants for SelectIndexes_" << sizeof(T) << "B_inputFilter" << std::endl;
+void calculateSelectIndexesMachineConstants(int dop) {
+    std::cout << "Calculating machine constants for SelectIndexes_" << sizeof(T) << "B_inputFilter_" << std::to_string(dop) << "_dop" << std::endl;
     std::cout << " - Running tests for lower crossover point";
 
     std::vector<double> lowerCrossoverPoints;
     for (int i = 0; i < NUMBER_OF_TESTS; ++i) {
-        lowerCrossoverPoints.push_back(calculateSelectIndexesLowerMachineConstant<T>());
+        lowerCrossoverPoints.push_back(calculateSelectIndexesLowerMachineConstant<T>(dop));
     }
     std::sort(lowerCrossoverPoints.begin(), lowerCrossoverPoints.end());
     std::cout << " Complete" << std::endl;
@@ -149,13 +191,13 @@ void calculateSelectIndexesMachineConstants() {
     std::cout << " - Running tests for upper crossover point";
     std::vector<double> upperCrossoverPoints;
     for (int i = 0; i < NUMBER_OF_TESTS; ++i) {
-        upperCrossoverPoints.push_back(calculateSelectIndexesUpperMachineConstant<T>());
+        upperCrossoverPoints.push_back(calculateSelectIndexesUpperMachineConstant<T>(dop));
     }
     std::sort(upperCrossoverPoints.begin(), upperCrossoverPoints.end());
     std::cout << " Complete" << std::endl;
 
-    std::string machineConstantLowerName = "SelectIndexesLower_" + std::to_string(sizeof(T)) + "B_inputFilter";
-    std::string machineConstantUpperName = "SelectIndexesUpper_" + std::to_string(sizeof(T)) + "B_inputFilter";
+    std::string machineConstantLowerName = "SelectIndexesLower_" + std::to_string(sizeof(T)) + "B_inputFilter_" + std::to_string(dop) + "_dop";
+    std::string machineConstantUpperName = "SelectIndexesUpper_" + std::to_string(sizeof(T)) + "B_inputFilter_" + std::to_string(dop) + "_dop";
 
     MachineConstants::getInstance().updateMachineConstant(machineConstantLowerName,
                                                           lowerCrossoverPoints[NUMBER_OF_TESTS / 2]);
@@ -164,7 +206,7 @@ void calculateSelectIndexesMachineConstants() {
 }
 
 template <typename T1, typename T2>
-double calculateSelectValuesLowerMispredictionsMachineConstant() {
+double calculateSelectValuesLowerMispredictionsMachineConstant(int dop) {
     int n = 250*1000*1000;
     auto inputFilterData = new T1[n];
     auto inputDataData = new T2[n];
@@ -176,6 +218,11 @@ double calculateSelectValuesLowerMispredictionsMachineConstant() {
     double lowerSelectivity = 0;
     double midSelectivity;
 
+    std::string machineConstantMispredictionsName = "SelectValuesLowerMispredictions_" + std::to_string(sizeof(T1))
+                + "B_inputFilter_" + std::to_string(sizeof(T2)) + "B_inputData_" + std::to_string(dop) + "_dop";
+    std::string machineConstantSelectivityName = "SelectValuesLowerSelectivity_" + std::to_string(sizeof(T1))
+                + "B_inputFilter_" + std::to_string(sizeof(T2)) + "B_inputData_" + std::to_string(dop) + "_dop";
+
     for (int i = 0; i < SELECT_ITERATIONS; ++i) {
 
         midSelectivity = (lowerSelectivity + upperSelectivity) / 2;
@@ -186,10 +233,19 @@ double calculateSelectValuesLowerMispredictionsMachineConstant() {
         copyArray(inputFilterData, inputFilter, n);
         copyArray(inputDataData, inputData, n);
 
-        branchCycles = *Counters::getInstance().readSharedEventSet();
-        runSelectFunction(Select::ImplementationValuesBranch, n, inputData, inputFilter,
-                          selection, getThreshold<T1>(n, midSelectivity));
-        branchCycles = *Counters::getInstance().readSharedEventSet() - branchCycles;
+        if (dop == 1) {
+            branchCycles = *Counters::getInstance().readSharedEventSet();
+            runSelectFunction(Select::ImplementationValuesBranch, n, inputData, inputFilter,
+                              selection, getThreshold<T1>(n, midSelectivity));
+            branchCycles = *Counters::getInstance().readSharedEventSet() - branchCycles;
+        } else {
+            MachineConstants::getInstance().updateMachineConstant(machineConstantMispredictionsName, 1);
+            MachineConstants::getInstance().updateMachineConstant(machineConstantSelectivityName, 1);
+            branchCycles = PAPI_get_real_usec();
+            runSelectFunction(Select::ImplementationValuesAdaptiveParallel, n, inputData, inputFilter,
+                              selection, getThreshold<T1>(n, midSelectivity), dop);
+            branchCycles = PAPI_get_real_usec() - branchCycles;
+        }
 
         delete[] inputFilter;
         delete[] inputData;
@@ -201,10 +257,19 @@ double calculateSelectValuesLowerMispredictionsMachineConstant() {
         copyArray(inputFilterData, inputFilter, n);
         copyArray(inputDataData, inputData, n);
 
-        vectorizationCycles = *Counters::getInstance().readSharedEventSet();
-        runSelectFunction(Select::ImplementationValuesVectorized, n, inputData, inputFilter,
-                          selection, getThreshold<T1>(n, midSelectivity));
-        vectorizationCycles = *Counters::getInstance().readSharedEventSet() - vectorizationCycles;
+        if (dop == 1) {
+            vectorizationCycles = *Counters::getInstance().readSharedEventSet();
+            runSelectFunction(Select::ImplementationValuesVectorized, n, inputData, inputFilter,
+                              selection, getThreshold<T1>(n, midSelectivity));
+            vectorizationCycles = *Counters::getInstance().readSharedEventSet() - vectorizationCycles;
+        } else {
+            MachineConstants::getInstance().updateMachineConstant(machineConstantMispredictionsName, 0);
+            MachineConstants::getInstance().updateMachineConstant(machineConstantSelectivityName, 0);
+            vectorizationCycles = PAPI_get_real_usec();
+            runSelectFunction(Select::ImplementationValuesAdaptiveParallel, n, inputData, inputFilter,
+                              selection, getThreshold<T1>(n, midSelectivity), dop);
+            vectorizationCycles = PAPI_get_real_usec() - vectorizationCycles;
+        }
 
         delete[] inputFilter;
         delete[] inputData;
@@ -229,7 +294,7 @@ double calculateSelectValuesLowerMispredictionsMachineConstant() {
 }
 
 template <typename T1, typename T2>
-double calculateSelectValuesLowerSelectivityMachineConstant() {
+double calculateSelectValuesLowerSelectivityMachineConstant(int dop) {
     int n = 250*1000*1000;
     int upperBound = 100;
     auto inputFilterData = new T1[n];
@@ -242,6 +307,11 @@ double calculateSelectValuesLowerSelectivityMachineConstant() {
     double lowerSelectivity = 0;
     double midSelectivity;
 
+    std::string machineConstantMispredictionsName = "SelectValuesLowerMispredictions_" + std::to_string(sizeof(T1))
+                + "B_inputFilter_" + std::to_string(sizeof(T2)) + "B_inputData_" + std::to_string(dop) + "_dop";
+    std::string machineConstantSelectivityName = "SelectValuesLowerSelectivity_" + std::to_string(sizeof(T1))
+                + "B_inputFilter_" + std::to_string(sizeof(T2)) + "B_inputData_" + std::to_string(dop) + "_dop";
+
     for (int i = 0; i < SELECT_ITERATIONS; ++i) {
 
         midSelectivity = (lowerSelectivity + upperSelectivity) / 2;
@@ -252,10 +322,19 @@ double calculateSelectValuesLowerSelectivityMachineConstant() {
         copyArray(inputFilterData, inputFilter, n);
         copyArray(inputDataData, inputData, n);
 
-        branchCycles = *Counters::getInstance().readSharedEventSet();
-        runSelectFunction(Select::ImplementationValuesBranch, n, inputData, inputFilter,
-                          selection, getThreshold<T1>(upperBound, midSelectivity));
-        branchCycles = *Counters::getInstance().readSharedEventSet() - branchCycles;
+        if (dop == 1) {
+            branchCycles = *Counters::getInstance().readSharedEventSet();
+            runSelectFunction(Select::ImplementationValuesBranch, n, inputData, inputFilter,
+                              selection, getThreshold<T1>(upperBound, midSelectivity));
+            branchCycles = *Counters::getInstance().readSharedEventSet() - branchCycles;
+        } else {
+            MachineConstants::getInstance().updateMachineConstant(machineConstantMispredictionsName, 1);
+            MachineConstants::getInstance().updateMachineConstant(machineConstantSelectivityName, 1);
+            branchCycles = PAPI_get_real_usec();
+            runSelectFunction(Select::ImplementationValuesAdaptiveParallel, n, inputData, inputFilter,
+                              selection, getThreshold<T1>(upperBound, midSelectivity), dop);
+            branchCycles = PAPI_get_real_usec() - branchCycles;
+        }
 
         delete[] inputFilter;
         delete[] inputData;
@@ -267,10 +346,19 @@ double calculateSelectValuesLowerSelectivityMachineConstant() {
         copyArray(inputFilterData, inputFilter, n);
         copyArray(inputDataData, inputData, n);
 
-        vectorizationCycles = *Counters::getInstance().readSharedEventSet();
-        runSelectFunction(Select::ImplementationValuesVectorized, n, inputData, inputFilter,
-                          selection, getThreshold<T1>(upperBound, midSelectivity));
-        vectorizationCycles = *Counters::getInstance().readSharedEventSet() - vectorizationCycles;
+        if (dop == 1) {
+            vectorizationCycles = *Counters::getInstance().readSharedEventSet();
+            runSelectFunction(Select::ImplementationValuesVectorized, n, inputData, inputFilter,
+                              selection, getThreshold<T1>(upperBound, midSelectivity));
+            vectorizationCycles = *Counters::getInstance().readSharedEventSet() - vectorizationCycles;
+        } else {
+            MachineConstants::getInstance().updateMachineConstant(machineConstantMispredictionsName, 0);
+            MachineConstants::getInstance().updateMachineConstant(machineConstantSelectivityName, 0);
+            vectorizationCycles = PAPI_get_real_usec();
+            runSelectFunction(Select::ImplementationValuesAdaptiveParallel, n, inputData, inputFilter,
+                              selection, getThreshold<T1>(upperBound, midSelectivity), dop);
+            vectorizationCycles = PAPI_get_real_usec() - vectorizationCycles;
+        }
 
         delete[] inputFilter;
         delete[] inputData;
@@ -295,30 +383,32 @@ double calculateSelectValuesLowerSelectivityMachineConstant() {
 }
 
 template <typename T1, typename T2>
-void calculateSelectValuesMachineConstants() {
+void calculateSelectValuesMachineConstants(int dop) {
     std::cout << "Calculating machine constants for SelectValues_" << sizeof(T1) << "B_inputFilter_";
-    std::cout << sizeof(T2) << "B_inputAggregate" << std::endl;
+    std::cout << sizeof(T2) << "B_inputAggregate_" << std::to_string(dop) << "_dop" << std::endl;
     std::cout << " - Running tests for lower branch mispredictions crossover point";
 
     std::vector<double> lowerMisPredictionsCrossoverPoints;
     for (int i = 0; i < NUMBER_OF_TESTS; ++i) {
-        lowerMisPredictionsCrossoverPoints.push_back(calculateSelectValuesLowerMispredictionsMachineConstant<T1, T2>());
+        lowerMisPredictionsCrossoverPoints.push_back(calculateSelectValuesLowerMispredictionsMachineConstant<T1, T2>(dop));
     }
     std::sort(lowerMisPredictionsCrossoverPoints.begin(), lowerMisPredictionsCrossoverPoints.end());
     std::cout << " Complete" << std::endl;
 
+    std::cout << "Value: " << lowerMisPredictionsCrossoverPoints[NUMBER_OF_TESTS / 2] << std::endl;
+
     std::cout << " - Running tests for lower selectivity crossover point";
     std::vector<double> lowerSelectivityCrossoverPoints;
     for (int i = 0; i < NUMBER_OF_TESTS; ++i) {
-        lowerSelectivityCrossoverPoints.push_back(calculateSelectValuesLowerSelectivityMachineConstant<T1, T2>());
+        lowerSelectivityCrossoverPoints.push_back(calculateSelectValuesLowerSelectivityMachineConstant<T1, T2>(dop));
     }
     std::sort(lowerSelectivityCrossoverPoints.begin(), lowerSelectivityCrossoverPoints.end());
     std::cout << " Complete" << std::endl;
 
     std::string machineConstantMispredictionsName = "SelectValuesLowerMispredictions_" + std::to_string(sizeof(T1))
-            + "B_inputFilter_" + std::to_string(sizeof(T2)) + "B_inputData";
+            + "B_inputFilter_" + std::to_string(sizeof(T2)) + "B_inputData_" + std::to_string(dop) + "_dop";
     std::string machineConstantSelectivityName = "SelectValuesLowerSelectivity_" + std::to_string(sizeof(T1))
-                                                    + "B_inputFilter_" + std::to_string(sizeof(T2)) + "B_inputData";
+            + "B_inputFilter_" + std::to_string(sizeof(T2)) + "B_inputData_" + std::to_string(dop) + "_dop";
     MachineConstants::getInstance().updateMachineConstant(machineConstantMispredictionsName,
                                                           lowerMisPredictionsCrossoverPoints[NUMBER_OF_TESTS / 2]);
     MachineConstants::getInstance().updateMachineConstant(machineConstantSelectivityName,

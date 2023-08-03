@@ -97,8 +97,8 @@ int selectIndexesAdaptive(int n, const T *inputFilter, int *selection, T thresho
     int maxConsecutivePredications = 10;
     int tuplesInBranchBurst = 1000;
 
-    std::string lowerMachineConstantName = "SelectIndexesLower_" + std::to_string(sizeof(T)) + "B_inputFilter";
-    std::string upperMachineConstantName = "SelectIndexesUpper_" + std::to_string(sizeof(T)) + "B_inputFilter";
+    std::string lowerMachineConstantName = "SelectIndexesLower_" + std::to_string(sizeof(T)) + "B_inputFilter_1_dop";
+    std::string upperMachineConstantName = "SelectIndexesUpper_" + std::to_string(sizeof(T)) + "B_inputFilter_1_dop";
     float lowerCrossoverSelectivity = MachineConstants::getInstance().getMachineConstant(lowerMachineConstantName);
     float upperCrossoverSelectivity = MachineConstants::getInstance().getMachineConstant(upperMachineConstantName);
 
@@ -167,6 +167,7 @@ struct SelectIndexesThreadArgs {
     int *selection;
     T threshold;
     std::atomic<int> *selectedCount;
+    int dop;
 };
 
 template<typename T>
@@ -211,6 +212,7 @@ void *selectIndexesAdaptiveParallelAux(void *arg) {
     int *overallSelection = args->selection;
     T threshold = args->threshold;
     std::atomic<int> *selectedCount = args->selectedCount;
+    int dop = args->dop;
 
     auto threadSelection = new int[maxSize];
     auto threadSelectionStart = threadSelection;
@@ -219,8 +221,10 @@ void *selectIndexesAdaptiveParallelAux(void *arg) {
     int maxConsecutivePredications = 10;
     int tuplesInBranchBurst = 1000;
 
-    std::string lowerMachineConstantName = "SelectIndexesLower_" + std::to_string(sizeof(T)) + "B_inputFilter";
-    std::string upperMachineConstantName = "SelectIndexesUpper_" + std::to_string(sizeof(T)) + "B_inputFilter";
+    std::string lowerMachineConstantName = "SelectIndexesLower_" + std::to_string(sizeof(T)) + "B_inputFilter_" +
+            std::to_string(dop) + "_dop";
+    std::string upperMachineConstantName = "SelectIndexesUpper_" + std::to_string(sizeof(T)) + "B_inputFilter_" +
+            std::to_string(dop) + "_dop";
     float lowerCrossoverSelectivity = MachineConstants::getInstance().getMachineConstant(lowerMachineConstantName);
     float upperCrossoverSelectivity = MachineConstants::getInstance().getMachineConstant(upperMachineConstantName);
 
@@ -336,6 +340,7 @@ int selectIndexesAdaptiveParallel(int n, const T *inputFilter, int *selection, T
         threadArgs[i]->selection = selection;
         threadArgs[i]->threshold = threshold;
         threadArgs[i]->selectedCount = &selectedCount;
+        threadArgs[i]->dop = dop;
 
         pthread_create(&threads[i], NULL, selectIndexesAdaptiveParallelAux<T>,
                        threadArgs[i]);
@@ -639,9 +644,9 @@ int selectValuesAdaptive(int n, const T2 *inputData, const T1 *inputFilter, T2 *
     auto tuplesInBranchBurst = 1000;
 
     std::string mispredictionsMachineConstantName = "SelectValuesLowerMispredictions_" + std::to_string(sizeof(T1)) +
-                                                    "B_inputFilter_" + std::to_string(sizeof(T2)) + "B_inputData";
+                                                    "B_inputFilter_" + std::to_string(sizeof(T2)) + "B_inputData_1_dop";
     std::string selectivityMachineConstantName = "SelectValuesLowerSelectivity_" + std::to_string(sizeof(T1)) +
-                                                 "B_inputFilter_" + std::to_string(sizeof(T2)) + "B_inputData";
+                                                 "B_inputFilter_" + std::to_string(sizeof(T2)) + "B_inputData_1_dop";
     float branchCrossoverSelectivity = MachineConstants::getInstance().getMachineConstant(mispredictionsMachineConstantName);
     float vectorizationCrossoverSelectivity = MachineConstants::getInstance().getMachineConstant(selectivityMachineConstantName);
 
@@ -701,6 +706,7 @@ struct SelectValuesThreadArgs {
     T2 *selection;
     T1 threshold;
     std::atomic<int> *selectedCount;
+    int dop;
 };
 
 template<typename T1, typename T2>
@@ -747,6 +753,7 @@ void *selectValuesAdaptiveParallelAux(void *arg) {
     T2 *overallSelection = args->selection;
     T1 threshold = args->threshold;
     std::atomic<int> *selectedCount = args->selectedCount;
+    int dop = args->dop;
 
     auto threadSelection = new T2[maxSize];
     auto threadSelectionStart = threadSelection;
@@ -756,9 +763,9 @@ void *selectValuesAdaptiveParallelAux(void *arg) {
     auto tuplesInBranchBurst = 1000;
 
     std::string mispredictionsMachineConstantName = "SelectValuesLowerMispredictions_" + std::to_string(sizeof(T1)) +
-                                                    "B_inputFilter_" + std::to_string(sizeof(T2)) + "B_inputData";
+                 "B_inputFilter_" + std::to_string(sizeof(T2)) + "B_inputData_" + std::to_string(dop) + "_dop";
     std::string selectivityMachineConstantName = "SelectValuesLowerSelectivity_" + std::to_string(sizeof(T1)) +
-                                                 "B_inputFilter_" + std::to_string(sizeof(T2)) + "B_inputData";
+                 "B_inputFilter_" + std::to_string(sizeof(T2)) + "B_inputData_" + std::to_string(dop) + "_dop";
     float branchCrossoverSelectivity = MachineConstants::getInstance().getMachineConstant(mispredictionsMachineConstantName);
     float vectorizationCrossoverSelectivity = MachineConstants::getInstance().getMachineConstant(selectivityMachineConstantName);
 
@@ -867,6 +874,7 @@ int selectValuesAdaptiveParallel(int n, const T2 *inputData, const T1 *inputFilt
         threadArgs[i]->selection = selection;
         threadArgs[i]->threshold = threshold;
         threadArgs[i]->selectedCount = &selectedCount;
+        threadArgs[i]->dop = dop;
 
         pthread_create(&threads[i], NULL, selectValuesAdaptiveParallelAux<T1, T2>,
                        threadArgs[i]);

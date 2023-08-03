@@ -599,11 +599,7 @@ void allParallelDataSizeTests(int iterations) {
 
 int main() {
 
-    int iterations = 1;
-
-    groupByWallTimeSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalityUpTo10mSweepFixedMax,
-                                           {GroupBy::Adaptive},
-                                           iterations, "5-DOP-1-GroupBy-CardinalitySweepSingle-32-32");
+/*    int iterations = 1;
 
     groupByWallTimeDopSweepBenchmarkCalcDopRange<int,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalityUpTo10mSweepFixedMax,
                                                           iterations, "5-DOP-1-GroupBy-CardinalitySweepParallel-32-32");
@@ -627,8 +623,27 @@ int main() {
                                                    iterations, "5-DOP-1-GroupBy-CardinalitySweepSingle-64-64");
 
     groupByWallTimeDopSweepBenchmarkCalcDopRange<int64_t,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalityUpTo10mSweepFixedMax,
-                                                                  iterations, "5-DOP-1-GroupBy-CardinalitySweepParallel-64-64");
+                                                                  iterations, "5-DOP-1-GroupBy-CardinalitySweepParallel-64-64");*/
 
+    /*std::vector<float> inputThresholdDistribution;
+    generateLogDistribution(30, 1, 10*1000, inputThresholdDistribution);
+    selectWallTimeDopAndInputSweepBenchmarkCalcDopRange<int64_t,int64_t>(DataFiles::uniformIntDistribution250mValuesMax10000,
+                                                                         Select::ImplementationValuesAdaptiveParallel,
+                                                                         inputThresholdDistribution,
+                                                                         3, "TEST-7-DOP-1-SelectValues-SelectivitySweepParallel-64-64");*/
+
+    std::vector<float> inputThresholdDistribution;
+    generateLogDistribution(30, 1, 10*1000, inputThresholdDistribution);
+    int iterations = 3;
+    selectWallTimeInputSweepBenchmark<int64_t,int64_t>(DataFiles::uniformIntDistribution250mValuesMax10000,
+                                                       {Select::ImplementationValuesAdaptive},
+                                                       inputThresholdDistribution,
+                                                       iterations, "7-DOP-1-SelectValues-SelectivitySweepSingle-64-64");
+
+    selectWallTimeDopAndInputSweepBenchmarkCalcDopRange<int64_t,int64_t>(DataFiles::uniformIntDistribution250mValuesMax10000,
+                                                                         Select::ImplementationValuesAdaptiveParallel,
+                                                                         inputThresholdDistribution,
+                                                                         iterations, "7-DOP-1-SelectValues-SelectivitySweepParallel-64-64");
 
     return 0;
 }
