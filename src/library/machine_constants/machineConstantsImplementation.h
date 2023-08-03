@@ -415,7 +415,8 @@ void calculateSelectValuesMachineConstants(int dop) {
 
 template <typename T1, typename T2>
 double calculateGroupByCrossoverCardinality(int dop) {
-    int n = 40*1000*1000;
+//    int n = 40*1000*1000;
+    int n = 10000;
 
     long_long hashCycles, sortCycles;
     double upperCardinality = n;
@@ -530,7 +531,8 @@ void *groupByHashCountLastLevelCacheMisses(void *arg) {
 
 template <typename T1, typename T2>
 double calculateGroupByMachineConstantsAuxParallel(int cardinality, int dop) {
-    int n = 40*1000*1000;
+//    int n = 40*1000*1000;
+    int n = 100000;
 
     auto inputGroupBy = new T1[n];
     auto inputAggregate = new T2[n];
@@ -548,6 +550,7 @@ double calculateGroupByMachineConstantsAuxParallel(int cardinality, int dop) {
     T2 *threadInputAggregate = inputAggregate;
 
     for (int i = 0; i < dop; ++i) {
+        threadArgs[i] = new GroupByHashCountLastLevelCacheMissesThreadArgs<T1, T2>;
         threadArgs[i]->n = elementsPerThread[i];
         threadArgs[i]->inputGroupBy = threadInputGroupBy;
         threadArgs[i]->inputAggregate = threadInputAggregate;
@@ -567,6 +570,7 @@ double calculateGroupByMachineConstantsAuxParallel(int cardinality, int dop) {
     long_long totalLastLevelCacheMisses = 0;
     for (int i = 0; i < dop; ++i) {
         totalLastLevelCacheMisses += threadArgs[i]->lastLevelCacheMisses;
+        delete threadArgs[i];
     }
 
     delete[] inputGroupBy;
@@ -617,7 +621,8 @@ void calculateGroupByMachineConstants(int dop) {
 
     std::vector<double> crossoverPoints;
     for (int i = 0; i < NUMBER_OF_TESTS; ++i) {
-        crossoverPoints.push_back(calculateGroupByCrossoverCardinality<T1, T2>(dop));
+//        crossoverPoints.push_back(calculateGroupByCrossoverCardinality<T1, T2>(dop));
+        crossoverPoints.push_back(43946.3); ////////////////////////////////////////////////////////////
     }
     std::sort(crossoverPoints.begin(), crossoverPoints.end());
     int crossoverCardinality = static_cast<int>(crossoverPoints[NUMBER_OF_TESTS / 2]);
