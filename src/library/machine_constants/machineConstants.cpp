@@ -91,6 +91,7 @@ void MachineConstants::writeEmptyFile() {
 }
 
 void MachineConstants::calculateMissingMachineConstants() {
+/*
     int dop = 1;
     while (dop <= maxDop()) {
         std::string dopStr = std::to_string(dop);
@@ -123,6 +124,7 @@ void MachineConstants::calculateMissingMachineConstants() {
 
         dop *= 2;
     }
+*/
 
     if (machineConstants.count("GroupBy_4B_inputFilter_4B_inputAggregate_1_dop") == 0) {
         calculateGroupByMachineConstants<int, int>(1);
