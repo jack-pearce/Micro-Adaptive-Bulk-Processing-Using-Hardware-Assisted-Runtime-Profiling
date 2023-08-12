@@ -599,14 +599,6 @@ void allParallelDataSizeTests(int iterations) {
 
 int main() {
 
-    int iterations = 1;
-
-    groupByWallTimeSweepBenchmark<int,int64_t>(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
-                                               {GroupBy::Adaptive},
-                                               iterations, "5-DOP-1-GroupBy-CardinalitySweep20mSingle-32-64");
-
-    groupByWallTimeDopSweepBenchmarkCalcDopRange<int,int64_t>(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
-                                                              iterations, "5-DOP-1-GroupBy-CardinalitySweep20mParallel-32-64");
 
     return 0;
 }
