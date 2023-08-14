@@ -599,6 +599,14 @@ void allParallelDataSizeTests(int iterations) {
 
 int main() {
 
+    std::vector<float> inputThresholdDistribution;
+    generateLogDistribution(100, 1, 10*1000, inputThresholdDistribution);
+    selectCpuCyclesInputSweepBenchmark<int,int>(DataFiles::uniformIntDistribution250mValuesMax10000,
+                                                {Select::ImplementationIndexesBranch,
+                                                 Select::ImplementationIndexesPredication,
+                                                 Select::ImplementationIndexesAdaptive},
+                                                inputThresholdDistribution,
+                                                5, "1-IndexesOverhead");
 
     return 0;
 }
