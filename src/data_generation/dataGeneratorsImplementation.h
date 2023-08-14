@@ -116,6 +116,41 @@ void generateLowerStepSelectivityInMemory(T *data, int n, int step, int numberOf
 }
 
 template <typename T>
+void generateLowerStepSelectivityInMemoryLengthOfSection(T *data, int n, int step, int sectionLength) {
+    static_assert(std::is_integral<T>::value, "Must be an integer type");
+
+    std::cout << "Generating data in memory... ";
+    std::cout.flush();
+
+    unsigned int seed = 1;
+    std::mt19937 gen(seed);
+
+    bool onStep = false;
+    int lowerBound;
+    auto upperBound = 100;
+
+    auto index = 0;
+    int tuplesToAdd;
+    while (index < n) {
+        if (onStep) {
+            lowerBound = step;
+        } else {
+            lowerBound = 1;
+        }
+
+        std::uniform_int_distribution<T> distribution(lowerBound, upperBound);
+        tuplesToAdd = std::min(sectionLength, n - index);
+        for (auto _ = 0; _ < tuplesToAdd; ++_) {
+            data[index++] = distribution(gen);
+        }
+
+        onStep = !onStep;
+    }
+
+    std::cout << "Complete" << std::endl;
+}
+
+template <typename T>
 void generateUnequalLowerStepSelectivityInMemory(T *data, int n, int step, int numberOfDiscreteSections,
                                                  float percentStepSection) {
     static_assert(std::is_integral<T>::value, "Must be an integer type");

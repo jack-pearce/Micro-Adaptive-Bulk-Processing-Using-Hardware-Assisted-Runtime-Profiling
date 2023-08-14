@@ -232,7 +232,21 @@ DataSweep DataSweeps::lowerStep50IntDistribution250mValuesSweep {
         250*1000*1000,
         "lowerStep50IntDistribution250mValuesSweep",
         "250m int values where max value is 100 and min value is either 1 or 51"
-        "Linear input of number of discrete sections from 2 to 10,000"};
+        "Log input of number of discrete sections from 2 to 10,000"};
+
+DataSweep DataSweeps::lowerStep50IntDistribution250mValuesSweepSectionLength_1 {
+        30,
+        250*1000*1000,
+        "lowerStep50IntDistribution250mValuesSweepSectionLength_1",
+        "250m int values where max value is 100 and min value is either 1 or 51"
+        "Log input of discrete section length"};
+
+DataSweep DataSweeps::lowerStep50IntDistribution250mValuesSweepSectionLength_2 {
+        30,
+        250*1000*1000,
+        "lowerStep50IntDistribution250mValuesSweepSectionLength_2",
+        "250m int values where max value is 100 and min value is either 1 or 51"
+        "Log input of discrete section length"};
 
 DataSweep DataSweeps::lowerStep50IntDistribution250mValuesPercentageStepSweep {
         101,
@@ -414,6 +428,11 @@ DataSweep::DataSweep(int _totalRuns, int _numElements, std::string _sweepName, s
     } else if (getSweepName() == "varyingIntDistribution250mValuesSweep" ||
                getSweepName() == "lowerStep50IntDistribution250mValuesSweep") {
         generateEvenIntLogDistribution(getTotalRuns(), 2, 10000, inputs);
+    }  else if (getSweepName() == "lowerStep50IntDistribution250mValuesSweepSectionLength_1") {
+        generateEvenIntLogDistribution(getTotalRuns(), 30000, 10000000, inputs);
+    } else if (getSweepName() == "lowerStep50IntDistribution250mValuesSweepSectionLength_2") {
+        generateLinearDistribution(getTotalRuns(), 1000, 30000, inputs);
+//        inputs.push_back(50000.0);
     } else if (getSweepName() == "lowerStep50IntDistribution250mValuesPercentageStepSweep") {
         generateLinearDistribution(getTotalRuns(), 0, 1, inputs);
     } else if (getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweepVariableMax" ||

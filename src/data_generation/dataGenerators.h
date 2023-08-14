@@ -12,6 +12,9 @@ template <typename T>
 void generateLowerStepSelectivityInMemory(T *data, int n, int step, int numberOfDiscreteSections);
 
 template <typename T>
+void generateLowerStepSelectivityInMemoryLengthOfSection(T *data, int n, int step, int sectionLength);
+
+template <typename T>
 void generateUnequalLowerStepSelectivityInMemory(T *data, int n, int step, int numberOfDiscreteSections,
                                                  float percentStepSection);
 

@@ -50,11 +50,17 @@ void allSelectIndexesSingleThreadedTests(int iterations) {
                                    50, iterations, "Indexes");*/
 
     // Graph 4: Period range on step varying selectivity
-    selectCpuCyclesSweepBenchmark<int,int>(DataSweeps::lowerStep50IntDistribution250mValuesSweep,
-                                  {Select::ImplementationIndexesBranch,
-                                   Select::ImplementationIndexesPredication,
-                                   Select::ImplementationIndexesAdaptive},
-                                   50, iterations, "4-Indexes");
+    selectCpuCyclesSweepBenchmark<int,int>(DataSweeps::lowerStep50IntDistribution250mValuesSweepSectionLength_1,
+                                           {Select::ImplementationIndexesBranch,
+                                            Select::ImplementationIndexesPredication,
+                                            Select::ImplementationIndexesAdaptive},
+                                           50, 5, "4_1-Indexes");
+
+    selectCpuCyclesSweepBenchmark<int,int>(DataSweeps::lowerStep50IntDistribution250mValuesSweepSectionLength_2,
+                                           {Select::ImplementationIndexesBranch,
+                                            Select::ImplementationIndexesPredication,
+                                            Select::ImplementationIndexesAdaptive},
+                                           50, 5, "4_2-Indexes");
 
     // Graph 5: Best case - tuned unequal step varying selectivity
     selectCpuCyclesSweepBenchmark<int,int>(DataSweeps::lowerStep50IntDistribution250mValuesPercentageStepSweep,
@@ -599,15 +605,11 @@ void allParallelDataSizeTests(int iterations) {
 
 int main() {
 
-//    selectCpuCyclesSweepBenchmark<int,int>(DataSweeps::lowerStep50IntDistribution250mValuesSweep,
-//                                           {Select::ImplementationIndexesBranch,
-//                                            Select::ImplementationIndexesAdaptive},
-//                                           50, 3, "4-Indexes");
-
     selectCpuCyclesSweepBenchmark<int,int>(DataSweeps::lowerStep50IntDistribution250mValuesPercentageStepSweep,
-                                           {Select::ImplementationIndexesBranch,
-                                            Select::ImplementationIndexesPredication,
-                                            Select::ImplementationIndexesAdaptive},
-                                           50, 5, "5-Indexes");
+                                           {Select::ImplementationValuesBranch,
+                                            Select::ImplementationValuesVectorized,
+                                            Select::ImplementationValuesAdaptive},
+                                           50, 1, "5-Values");
+
     return 0;
 }
