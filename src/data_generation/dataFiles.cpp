@@ -228,7 +228,7 @@ DataSweep DataSweeps::varyingIntDistribution250mValuesSweep {
         "Linear input of number of discrete sections from 2 to 10,000"};
 
 DataSweep DataSweeps::lowerStep50IntDistribution250mValuesSweep {
-        50,
+        30,
         250*1000*1000,
         "lowerStep50IntDistribution250mValuesSweep",
         "250m int values where max value is 100 and min value is either 1 or 51"
