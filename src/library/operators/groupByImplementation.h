@@ -72,6 +72,12 @@ vectorOfPairs<T1, T2> groupByHash(int n, T1 *inputGroupBy, T2 *inputAggregate, i
 
     int index = 0;
     groupByHashAux<Aggregator>(n, inputGroupBy, inputAggregate, map, index);
+/*    int tuplesToProcess;
+
+    while (index < n) {
+        tuplesToProcess = std::min(75000, n - index);
+        groupByHashAux<Aggregator>(tuplesToProcess, inputGroupBy, inputAggregate, map, index);
+    }*/
 
     return {map.begin(), map.end()};
 }

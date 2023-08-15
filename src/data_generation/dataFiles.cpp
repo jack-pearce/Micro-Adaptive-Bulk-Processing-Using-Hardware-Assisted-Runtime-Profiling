@@ -324,7 +324,7 @@ DataSweep DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepVariable
         "value, so the distribution is dense i.e. there are no gaps."};
 
 DataSweep DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax {
-        30,
+        10,
         20*1000*1000,
         "logUniformIntDistribution20mValuesCardinalitySweepFixedMax",
         "Log distribution of cardinality for 20m ints from 1 to 100m. The max value is fixed at 200m, "
@@ -446,7 +446,7 @@ DataSweep::DataSweep(int _totalRuns, int _numElements, std::string _sweepName, s
         generateLogDistribution(getTotalRuns(), 1, getNumElements(), inputs);
     } else if (getSweepName() == "logUniformIntDistribution20mValuesCardinalitySweepVariableMax" ||
                getSweepName() == "logUniformIntDistribution20mValuesCardinalitySweepFixedMax") {
-        generateLogDistribution(getTotalRuns(), 1, getNumElements(), inputs);
+        generateLogDistribution(getTotalRuns(), 1, getNumElements() / 2.0, inputs);
     } else if (getSweepName() == "logUniformIntDistribution40mValuesCardinalitySweepFixedMax" ||
                getSweepName() == "logUniformIntDistribution200mValuesCardinalitySweepFixedMax") {
         generateLogDistribution(getTotalRuns(), 1, getNumElements(), inputs);
