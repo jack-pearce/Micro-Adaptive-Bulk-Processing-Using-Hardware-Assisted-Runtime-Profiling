@@ -324,7 +324,7 @@ DataSweep DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepVariable
         "value, so the distribution is dense i.e. there are no gaps."};
 
 DataSweep DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax {
-        10,
+        30,
         20*1000*1000,
         "logUniformIntDistribution20mValuesCardinalitySweepFixedMax",
         "Log distribution of cardinality for 20m ints from 1 to 100m. The max value is fixed at 200m, "
@@ -418,6 +418,12 @@ DataSweep DataSweeps::linearUniformIntDistribution200mValuesMultipleCardinalityS
         "linearUniformIntDistribution200mValuesMultipleCardinalitySections_10m_100_Max100m",
         ""};
 
+DataSweep DataSweeps::logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1m {
+        30,
+        20*1000*1000,
+        "logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1m",
+        ""};
+
 
 DataSweep::DataSweep(int _totalRuns, int _numElements, std::string _sweepName, std::string _longDescription)
         : totalRuns(_totalRuns), numElements(_numElements), runsCompleted(0), sweepName(std::move(_sweepName)),
@@ -468,6 +474,8 @@ DataSweep::DataSweep(int _totalRuns, int _numElements, std::string _sweepName, s
                getSweepName() == "linearUniformIntDistribution200mValuesMultipleCardinalitySections_100_10m_Max100m" ||
                getSweepName() == "linearUniformIntDistribution200mValuesMultipleCardinalitySections_10m_100_Max100m") {
         generateLinearDistribution(getTotalRuns(), 0, 1, inputs);
+    } else if (getSweepName() == "logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1m") {
+        generateLogDistribution(getTotalRuns(), 1, 1000000, inputs);
     }
 }
 
@@ -497,9 +505,11 @@ int DataSweep::getCardinality() const {
     } else if (getSweepName() == "linearUniformIntDistribution20mValuesCardinalitySections_100_3m_Max20m" ||
                getSweepName() == "linearUniformIntDistribution20mValuesCardinalitySections_3m_100_Max20m") {
         return 3*1000*1000;
-    }  else if (getSweepName() == "linearUniformIntDistribution200mValuesMultipleCardinalitySections_100_10m_Max100m"  ||
+    } else if (getSweepName() == "linearUniformIntDistribution200mValuesMultipleCardinalitySections_100_10m_Max100m"  ||
                 getSweepName() == "linearUniformIntDistribution200mValuesMultipleCardinalitySections_10m_100_Max100m") {
         return 10*1000*1000;
+    } else if (getSweepName() == "logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1m") {
+        return 1*1000*1000;
     } else {
         return -1;
     }

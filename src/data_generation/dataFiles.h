@@ -149,6 +149,8 @@ public:
     static DataSweep linearUniformIntDistribution200mValuesMultipleCardinalitySections_100_10m_Max100m;
     static DataSweep linearUniformIntDistribution200mValuesMultipleCardinalitySections_10m_100_Max100m;
 
+    static DataSweep logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1m;
+
 };
 
 #include "dataFilesImplementation.h"

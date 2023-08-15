@@ -605,11 +605,9 @@ void allParallelDataSizeTests(int iterations) {
 
 int main() {
 
-//    groupByCompareResultsTest<int,int>(DataFiles::uniformIntDistribution200mValuesCardinality400kMax200m, GroupBy::Hash, GroupBy::Sort);
-
-    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
-                                            {GroupBy::Hash, GroupBy::Adaptive},
-                                            3, "1-O0-NoClustering");
+    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::linearUniformIntDistribution200mValuesMultipleCardinalitySections_100_10m_Max100m,
+                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                            5, "3-MultipleSection_100_10m");
 
     return 0;
 }
