@@ -605,11 +605,12 @@ void allParallelDataSizeTests(int iterations) {
 
 int main() {
 
-    selectCpuCyclesSweepBenchmark<int,int>(DataSweeps::lowerStep50IntDistribution250mValuesPercentageStepSweep,
-                                           {Select::ImplementationValuesBranch,
-                                            Select::ImplementationValuesVectorized,
-                                            Select::ImplementationValuesAdaptive},
-                                           50, 1, "5-Values");
+    std::vector<float> inputThresholdDistribution;
+    generateLogDistribution(30, 1, 10*1000, inputThresholdDistribution);
+    selectWallTimeDopAndInputSweepBenchmarkCalcDopRange<int,int>(DataFiles::uniformIntDistribution250mValuesMax10000,
+                                                                 Select::ImplementationValuesAdaptiveParallel,
+                                                                 inputThresholdDistribution,
+                                                                 1, "7-DOP-1-Values-SelectivitySweepParallel");
 
     return 0;
 }
