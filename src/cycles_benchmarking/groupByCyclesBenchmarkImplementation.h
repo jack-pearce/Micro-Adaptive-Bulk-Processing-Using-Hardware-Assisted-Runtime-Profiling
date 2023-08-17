@@ -355,7 +355,7 @@ void tessilRobinMapInitialisationBenchmark(const std::string &fileNamePrefix) {
 
     int totalPoints = 100;
     std::vector<float> points;
-    generateLogDistribution(30, 1, 20*1000*1000, points);
+    generateLogDistribution(30, 1, 200*1000*1000, points);
 
     long_long cycles;
     std::vector<std::vector<double>> results(totalPoints,

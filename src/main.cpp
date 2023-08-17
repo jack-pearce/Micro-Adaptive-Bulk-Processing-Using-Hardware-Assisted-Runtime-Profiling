@@ -605,9 +605,5 @@ void allParallelDataSizeTests(int iterations) {
 
 int main() {
 
-    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::linearUniformIntDistribution200mValuesMultipleCardinalitySections_100_10m_Max100m,
-                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                            5, "3-MultipleSection_100_10m");
-
     return 0;
 }
