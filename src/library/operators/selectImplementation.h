@@ -474,6 +474,48 @@ struct selectValuesVectorizedStruct<int64_t, T> {
     }
 };
 
+template<typename T>
+struct selectValuesVectorizedStruct<float, T> {
+    static int run(int endIndex, const T *inputData, const float *inputFilter, T *selection,
+                   float threshold, int startIndex) {
+        auto k = 0;
+
+        // Process unaligned tuples
+        auto misalignedCount = 0;
+        for (auto i = startIndex; !arrayIsSimd256Aligned(inputFilter + i); ++i) {
+            selection[k] = inputData[i];
+            k += (inputFilter[i] <= threshold);
+            ++misalignedCount;
+        }
+
+        // Vectorize the loop for aligned tuples
+        int simdWidth = sizeof(__m256) / sizeof(float);
+        int simdIterations = (endIndex - startIndex - misalignedCount) / simdWidth;
+        __m256 thresholdVector = _mm256_set1_ps(threshold);
+
+        for (auto i = startIndex + misalignedCount;
+             i < startIndex + misalignedCount + (simdIterations * simdWidth); i += simdWidth) {
+            __m256 filterVector = _mm256_load_ps(inputFilter + i);
+
+            // Compare filterVector <= thresholdVector
+            __mmask8 mask = _mm256_cmp_ps_mask(filterVector, thresholdVector, _CMP_LE_OQ);
+
+            for (auto j = 0; j < simdWidth; ++j) {
+                selection[k] = inputData[i + j];
+                k += (mask >> j) & 1;
+            }
+        }
+
+        // Process any remaining tuples
+        for (auto i = startIndex + misalignedCount + simdIterations * simdWidth; i < endIndex; ++i) {
+            selection[k] = inputData[i];
+            k += (inputFilter[i] <= threshold);
+        }
+
+        return k;
+    }
+};
+
 template<typename T1, typename T2>
 int selectValuesVectorized(int endIndex, const T2 *inputData, const T1 *inputFilter, T2 *selection,
                            T1 threshold, int startIndex) {

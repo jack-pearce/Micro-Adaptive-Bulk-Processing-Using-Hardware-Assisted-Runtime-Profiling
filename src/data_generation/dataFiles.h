@@ -14,6 +14,10 @@ public:
     std::string getSelectCyclesFolderPath();
     std::string getGroupByCyclesFolderPath();
     std::string getDataFilesFolderPath();
+    std::string getOisstInputFolderPath();
+    std::string getOisstOutputFolderPath();
+    std::string getImdbInputFolderPath();
+    std::string getImdbOutputFolderPath();
 
 private:
     FilePaths();
@@ -23,6 +27,10 @@ private:
     const std::string selectCyclesFolder = "/data/output/select_cycles_benchmark/";
     const std::string groupByCyclesFolder = "/data/output/groupBy_cycles_benchmark/";
     const std::string dataFilesFolder = "/data/output/dataFiles/";
+    const std::string oisstInputFolder = "/data/input/oisst_dataset_csv/";
+    const std::string oisstOnputFolder = "/data/output/oisst_benchmark/";
+    const std::string imdbInputFolder = "/data/input/imdb/";
+    const std::string imdbOutputFolder = "/data/output/imdb/";
 };
 
 void generateEvenIntLogDistribution(int numPoints, double minValue, double maxValue, std::vector<float> &points);

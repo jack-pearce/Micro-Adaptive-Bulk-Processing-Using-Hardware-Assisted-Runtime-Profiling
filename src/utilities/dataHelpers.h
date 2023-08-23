@@ -16,6 +16,21 @@ void writeHeadersAndTableToCSV(std::vector<std::string>& headers,
                                std::vector<std::vector<double>>  values,
                                std::string& filePath);
 
+int getLengthOfCsv(const std::string &filePath);
+
+int getLengthOfTsv(const std::string& filePath);
+
+void readOisstDataFromCsv(std::string& filePath, int n, std::string *yearLatLong, std::string *monthDay, float *sst);
+
+void writeOisstDataToCsv(std::string& filePath, int n, std::string *yearLatLong, float *sst);
+
+void readImdbStartYearColumn(const std::string& filePath, int* data);
+
+void readImdbParentTvSeriesAndSeasonColumn(const std::string& filePath, int64_t* data);
+
+void readImdbPrincipalsColumn(const std::string& filePath, int* data);
+
+void readImdbFilmColumn(const std::string& filePath, int64_t* data);
 
 template <typename T>
 class LoadedData {
@@ -44,6 +59,9 @@ void sortVectorOfPairs(MABPL::vectorOfPairs<T1, T2> &vectorOfPairs);
 
 template <typename T>
 void copyArray(T* source, T* destination, int size);
+
+template <typename T>
+void projectIndexesOnToArray(const int* indexes, int n, T* array);
 
 #include "dataHelpersImplementation.h"
 

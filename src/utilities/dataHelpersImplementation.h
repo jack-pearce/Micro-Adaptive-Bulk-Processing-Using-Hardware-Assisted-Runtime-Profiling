@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include <string>
+#include <sstream>
 
 
 template <typename T>
@@ -89,5 +90,13 @@ void copyArray(T* source, T* destination, int size) {
         destination[i] = source[i];
     }
 }
+
+template <typename T>
+void projectIndexesOnToArray(const int* indexes, int n, T* array) {
+    for (int i = 0; i < n; i++) {
+        array[i] = array[indexes[i]];
+    }
+}
+
 
 #endif //MABPL_DATAHELPERSIMPLEMENTATION_H

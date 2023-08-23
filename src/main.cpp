@@ -3,6 +3,7 @@
 #include "main.h"
 #include "cycles_benchmarking/groupByCyclesBenchmark.h"
 #include "data_generation/dataFiles.h"
+#include "utilities/dataHelpers.h"
 #include "library/mabpl.h"
 
 using MABPL::Select;
@@ -210,161 +211,6 @@ void allSelectValuesParallelTests(int iterations) {
                                                 Select::ImplementationValuesAdaptiveParallel,
                                                 50, iterations, "7-DOP-3-Values-StepPercentageSweepParallel");
 }
-
-//void allGroupByTestsOLD() {
-/*
-// SET ONE - BITS_PER_PASS = 10
-    // Graph 1: Cardinality range on uniform data (variable max) for different hashmaps - compile with -march=native removed
-*//*    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepVariableMax,
-                                   {GroupBy::HashGoogleDenseHashMap,
-//                                    GroupBy::HashFollyF14FastMap,   // Need to turn off -march=native for this one
-                                    GroupBy::HashAbseilFlatHashMap,
-                                    GroupBy::HashTessilRobinMap,
-                                    GroupBy::HashTessilHopscotchMap}, countAggregation,
-                                   1, "1-MapCompare");*//*
-
-    // Graph 2: Cardinality range (variable max) for simple radix sort - manually run with BITS_PER_PASS of 8, 10, 12
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepVariableMax,
-                                   {GroupBy::SortRadix}, countAggregation,
-                                   1, "2-RadixSimple10");
-
-    // Graph 3: Cardinality range (variable max) for optimised radix sort - manually run with BITS_PER_PASS of 8, 10, 12
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepVariableMax,
-                                   {GroupBy::SortRadixOpt}, countAggregation,
-                                   1, "3-RadixOpt10");
-
-    // Graph 5: Cardinality range on uniform data (fixed max) for different hashmaps - compile with -march=native removed
-*//*    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::HashGoogleDenseHashMap,
-//                                    GroupBy::HashFollyF14FastMap,   // Need to turn off -march=native for this one
-                                    GroupBy::HashAbseilFlatHashMap,
-                                    GroupBy::HashTessilRobinMap,
-                                    GroupBy::HashTessilHopscotchMap}, countAggregation,
-                                   1, "5-MapCompare");*//*
-
-    // Graph 6: Cardinality range (fixed max) for simple radix sort - manually run with BITS_PER_PASS of 8, 10, 12
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::SortRadix}, countAggregation,
-                                   1, "6-RadixSimple10");
-
-    // Graph 7: Cardinality range (fixed max) for optimised radix sort - manually run with BITS_PER_PASS of 8, 10, 12
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::SortRadixOpt}, countAggregation,
-                                   1, "7-RadixOpt10");
-
-    // Graph 9: Cardinality range (fixed max) for single / double radix10 pass
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::SingleRadixPassThenHash,
-                                    GroupBy::DoubleRadixPassThenHash}, countAggregation,
-                                   1, "9-SingleDoubleRadix10PassThenHash");
-
-    // Graph 10: Cardinality range (fixed max) for levels of clustering
-
-    // Graph 2: Cardinality range (variable max) for simple radix sort - manually run with BITS_PER_PASS of 8, 10, 12
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::Hash,GroupBy::SortRadixOpt,
-                                    GroupBy::Adaptive}, countAggregation,
-                                   1, "10-NoClustering");
-
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered1,
-                                   {GroupBy::Hash,GroupBy::SortRadixOpt,
-                                    GroupBy::Adaptive}, countAggregation,
-                                   1, "10-Clustered1");
-
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered1k,
-                                   {GroupBy::Hash,GroupBy::SortRadixOpt,
-                                    GroupBy::Adaptive}, countAggregation,
-                                   1, "10-Clustered1k");
-
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered100k,
-                                   {GroupBy::Hash,GroupBy::SortRadixOpt,
-                                    GroupBy::Adaptive}, countAggregation,
-                                   1, "10-Clustered100k");
-
-// HPC CHARTS
-
-    groupByBenchmarkWithExtraCountersConfigurations(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                                    GroupBy::Hash, countAggregation, 1,
-                                                    "1HPC-HashCounters");
-
-    groupByBenchmarkWithExtraCountersConfigurations(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered1,
-                                                    GroupBy::Hash, countAggregation, 1,
-                                                    "2-1HPC-HashCounters");
-
-    groupByBenchmarkWithExtraCountersConfigurations(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered1k,
-                                                    GroupBy::Hash, countAggregation, 1,
-                                                    "2-1kHPC-HashCounters");
-
-    groupByBenchmarkWithExtraCountersConfigurations(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMaxClustered100k,
-                                                    GroupBy::Hash, countAggregation, 1,
-                                                    "2-100kHPC-HashCounters");
-
-    groupByBenchmarkWithExtraCountersConfigurations(DataSweeps::linearUniformIntDistribution200mValuesCardinalitySweepFixedMaxCrossOverPoint,
-                                                    GroupBy::Hash, countAggregation, 1,
-                                                    "4HPC-HashCounters");
-
-    groupByBenchmarkWithExtraCountersDuringRunConfigurations(DataFiles::uniformIntDistribution200mValuesCardinality400kMax200m,
-                                                             countAggregation,
-                                                             "5HPC-HashCounters");
-
-
-    // SET TWO - BITS_PER_PASS = 8
-*//*    // Graph 2: Cardinality range (variable max) for simple radix sort - manually run with BITS_PER_PASS of 8, 10, 12
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepVariableMax,
-                                   {GroupBy::SortRadix}, countAggregation,
-                                   1, "2-RadixSimple8");
-
-    // Graph 3: Cardinality range (variable max) for optimised radix sort - manually run with BITS_PER_PASS of 8, 10, 12
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepVariableMax,
-                                   {GroupBy::SortRadixOpt}, countAggregation,
-                                   1, "3-RadixOpt8");
-
-
-    // Graph 6: Cardinality range (fixed max) for simple radix sort - manually run with BITS_PER_PASS of 8, 10, 12
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::SortRadix}, countAggregation,
-                                   1, "6-RadixSimple8");
-
-    // Graph 7: Cardinality range (fixed max) for optimised radix sort - manually run with BITS_PER_PASS of 8, 10, 12
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::SortRadixOpt}, countAggregation,
-                                   1, "7-RadixOpt8");
-
-    // Graph 9: Cardinality range (fixed max) for single / double radix10 pass
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::SingleRadixPassThenHash,
-                                    GroupBy::DoubleRadixPassThenHash}, countAggregation,
-                                   1, "9-SingleDoubleRadix8PassThenHash");*//*
-
-
-    // SET THREE - BITS_PER_PASS = 12
- *//*   // Graph 2: Cardinality range (variable max) for simple radix sort - manually run with BITS_PER_PASS of 8, 10, 12
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepVariableMax,
-                                   {GroupBy::SortRadix}, countAggregation,
-                                   1, "2-RadixSimple12");
-
-    // Graph 3: Cardinality range (variable max) for optimised radix sort - manually run with BITS_PER_PASS of 8, 10, 12
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepVariableMax,
-                                   {GroupBy::SortRadixOpt}, countAggregation,
-                                   1, "3-RadixOpt12");
-
-
-    // Graph 6: Cardinality range (fixed max) for simple radix sort - manually run with BITS_PER_PASS of 8, 10, 12
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::SortRadix}, countAggregation,
-                                   1, "6-RadixSimple12");
-
-    // Graph 7: Cardinality range (fixed max) for optimised radix sort - manually run with BITS_PER_PASS of 8, 10, 12
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::SortRadixOpt}, countAggregation,
-                                   1, "7-RadixOpt12");
-
-    // Graph 9: Cardinality range (fixed max) for single / double radix10 pass
-    groupByCpuCyclesSweepBenchmark(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::SingleRadixPassThenHash,
-                                    GroupBy::DoubleRadixPassThenHash}, countAggregation,
-                                   1, "9-SingleDoubleRadix8PassThenHash");*/
-//}
 
 void allGroupBySingleThreadedTests(int iterations) {
     groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
@@ -602,6 +448,170 @@ void allParallelDataSizeTests(int iterations) {
     groupByWallTimeDopSweepBenchmarkCalcDopRange<int64_t,int64_t>(DataSweeps::logUniformIntDistribution200mValuesCardinalityUpTo10mSweepFixedMax,
                                                                   iterations, "5-DOP-1-GroupBy-CardinalitySweepParallel-64-64");
 }
+
+void runOisstMacroBenchmark() {
+//    std::string inputDataFilePathOne = FilePaths::getInstance().getOisstInputFolderPath() + "1_month_(06-07)/" + "1982.csv";
+//    std::string inputDataFilePathTwo = FilePaths::getInstance().getOisstInputFolderPath() + "1_month_(06-07)/" + "2023.csv";
+//    std::string outputDataFilePath = FilePaths::getInstance().getOisstOutputFolderPath() + "1982.csv";
+//    const int n = getLengthOfCsv(inputDataFilePathOne);
+
+/*    auto *yearLatLong = new std::string[n];
+    auto *monthDay = new std::string[n];
+    auto *sst1982 = new float[n];
+    readOisstDataFromCsv(inputDataFilePathOne, n, yearLatLong, monthDay, sst1982);
+
+    auto *sstDiff= new float[n];
+    readOisstDataFromCsv(inputDataFilePathOne, n, yearLatLong, monthDay, sstDiff);
+    delete[] monthDay;
+
+    for (int i = 0; i < n; i++) {
+        if (!std::isnan(sst1982[i])) {
+            sstDiff[i] -= sst1982[i];
+        }
+    }
+    delete[] sst1982;*/
+
+
+/*    std::string inputDataFilePath = FilePaths::getInstance().getOisstInputFolderPath() + "1_month_(06-07)/" + "1982.csv";
+    const int n = getLengthOfCsv(inputDataFilePath);
+
+    auto *yearLatLong = new std::string[n];
+    auto *monthDay = new std::string[n];
+    auto *sst = new float[n];
+    readOisstDataFromCsv(inputDataFilePath, n, yearLatLong, monthDay, sst);
+
+    auto sst2 = new float[n];
+    copyArray<float>(sst, sst2, n);
+
+    long_long cycles, cyclesCount;
+    auto *selectedValues= new float[n];
+
+    cycles = *Counters::getInstance().readSharedEventSet();
+    int selectedCount = MABPL::selectValuesVectorized<float,float>(n, sst, sst, sst2,15);
+    cyclesCount = *Counters::getInstance().readSharedEventSet() - cycles;
+
+    std::cout << "Selected " << selectedCount << " / " << n << ", Cycles: " << cyclesCount << std::endl;
+
+//    projectIndexesOnToArray(selectedIndexes, selectedCount, yearLatLong);
+//    projectIndexesOnToArray(selectedIndexes, selectedCount, sst);
+
+//    writeOisstDataToCsv(outputDataFilePath, selectedCount, yearLatLong, sst);
+
+    delete[] yearLatLong;
+    delete[] monthDay;
+//    delete[] sstDiff;
+    delete[] sst;
+    delete[] selectedValues;*/
+
+    std::string inputDataFilePath = FilePaths::getInstance().getOisstInputFolderPath() + "1_month_(06-07)/" + "1982.csv";
+    const int n = getLengthOfCsv(inputDataFilePath);
+
+    auto *yearLatLong = new std::string[n];
+    auto *monthDay = new std::string[n];
+    auto *sst = new float[n];
+    readOisstDataFromCsv(inputDataFilePath, n, yearLatLong, monthDay, sst);
+    delete[] monthDay;
+
+    auto sst2 = new float[n];
+    copyArray<float>(sst, sst2, n);
+
+    long_long cycles, cyclesCount;
+    auto *selectedValues= new float[n];
+
+    cycles = *Counters::getInstance().readSharedEventSet();
+    int selectedCount = MABPL::selectValuesAdaptive<float,float>(n, sst2, sst, selectedValues,-1);
+    cyclesCount = *Counters::getInstance().readSharedEventSet() - cycles;
+
+    std::cout << "Selected " << selectedCount << " / " << n << ", Cycles: " << cyclesCount << std::endl;
+
+    delete[] yearLatLong;
+    delete[] sst;
+    delete[] selectedValues;
+
+
+}
+
+void runImdbSelectMacroBenchmark() {
+    std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.basics.tsv";
+    int n = getLengthOfTsv(filePath);
+    auto inputData = new int[n];
+    readImdbStartYearColumn(filePath, inputData);
+
+    long_long cycles;
+    auto *selectedIndexes = new int[n];
+
+    cycles = *Counters::getInstance().readSharedEventSet();
+    int selectedCount = MABPL::selectIndexesAdaptive(n, inputData, selectedIndexes, 1960);
+    cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+
+    std::cout << "Selected " << selectedCount << " / " << n << ", Cycles: " << cycles << std::endl;
+
+    delete[] inputData;
+}
+
+void runImdbGroupByMacroBenchmark1() {
+    std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.episode.tsv";
+    int n = getLengthOfTsv(filePath);
+    auto inputGroupBy = new int64_t[n];
+    readImdbParentTvSeriesAndSeasonColumn(filePath, inputGroupBy);
+
+    auto inputAggregate = new int64_t[n];
+    copyArray(inputGroupBy, inputAggregate, n);
+
+    long_long cycles;
+
+    cycles = *Counters::getInstance().readSharedEventSet();
+    auto results = MABPL::groupByHash<CountAggregation>(n, inputGroupBy, inputAggregate, 325000);
+    cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+
+    std::cout << "Cardinality: " << results.size() << ", Total input size: " << n << ", Cycles: " << cycles << std::endl;
+
+    delete[] inputGroupBy;
+    delete[] inputAggregate;
+}
+
+void runImdbGroupByMacroBenchmark2() {
+    std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.principals.tsv";
+    int n = getLengthOfTsv(filePath);
+    auto inputGroupBy = new int[n];
+    readImdbPrincipalsColumn(filePath, inputGroupBy);
+
+    auto inputAggregate = new int[n];
+    copyArray(inputGroupBy, inputAggregate, n);
+
+    long_long cycles;
+
+    cycles = *Counters::getInstance().readSharedEventSet();
+    auto results = MABPL::groupBySort<CountAggregation>(n, inputGroupBy, inputAggregate);
+    cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+
+    std::cout << "Cardinality: " << results.size() << ", Total input size: " << n << ", Cycles: " << cycles << std::endl;
+
+    delete[] inputGroupBy;
+    delete[] inputAggregate;
+}
+
+void runImdbGroupByMacroBenchmark3() {
+    std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.akas.tsv";
+    int n = getLengthOfTsv(filePath);
+    auto inputGroupBy = new int64_t [n];
+    readImdbFilmColumn(filePath, inputGroupBy);
+
+    auto inputAggregate = new int64_t[n];
+    copyArray(inputGroupBy, inputAggregate, n);
+
+    long_long cycles;
+
+    cycles = *Counters::getInstance().readSharedEventSet();
+    auto results = MABPL::groupByAdaptive<CountAggregation>(n, inputGroupBy, inputAggregate, 7250000);
+    cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+
+    std::cout << "Cardinality: " << results.size() << ", Total input size: " << n << ", Cycles: " << cycles << std::endl;
+
+    delete[] inputGroupBy;
+    delete[] inputAggregate;
+}
+
 
 int main() {
 

@@ -23,6 +23,22 @@ std::string FilePaths::getDataFilesFolderPath() {
     return projectFilePath + dataFilesFolder;
 }
 
+std::string FilePaths::getOisstInputFolderPath() {
+    return projectFilePath + oisstInputFolder;
+}
+
+std::string FilePaths::getOisstOutputFolderPath() {
+    return projectFilePath + oisstOnputFolder;
+}
+
+std::string FilePaths::getImdbInputFolderPath() {
+    return projectFilePath + imdbInputFolder;
+}
+
+std::string FilePaths::getImdbOutputFolderPath() {
+    return projectFilePath + imdbOutputFolder;
+}
+
 void generateEvenIntLogDistribution(int numPoints, double minValue, double maxValue, std::vector<float> &points) {
     for (auto i = 0; i < numPoints; ++i) {
         auto t = i / static_cast<double>(numPoints - 1); // Normalized parameter between 0 and 1
