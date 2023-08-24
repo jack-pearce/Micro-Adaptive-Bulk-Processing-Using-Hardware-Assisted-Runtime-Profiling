@@ -464,7 +464,7 @@ void runOisstMacroBenchmark() {
     readOisstDataFromCsv(inputDataFilePathTwo, n2, yearLatLong + n1, monthDay + n1, sst + n1);
     delete[] monthDay;
 
-    float thresholdTemperature = 15;
+    float thresholdTemperature = 0;
     auto *selectedIndexes = new int[n];
     int selectedCount = MABPL::selectIndexesAdaptive<float>(n,sst, selectedIndexes, thresholdTemperature);
 
@@ -674,6 +674,11 @@ void runImdbGroupByMacroBenchmark3() {
 
 
 int main() {
+
+/*    runImdbSelectSweepMacroBenchmark(1874, 2023, 5,
+                    {Select::ImplementationIndexesBranch,
+                                         Select::ImplementationIndexesPredication,
+                                         Select::ImplementationIndexesAdaptive});*/
 
 //    radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations<int,int>(DataFiles::uniformIntDistribution250mValuesMax250m,
 //                                                                             4, 20,"4-20_Random_RadixSort_",1);
