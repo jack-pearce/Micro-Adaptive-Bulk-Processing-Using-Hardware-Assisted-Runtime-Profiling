@@ -43,7 +43,9 @@ add_executable(${PROJECT_NAME}
         src/library/machine_constants/machineConstants.cpp
         src/time_benchmarking/timeBenchmarkHelpers.cpp
         src/time_benchmarking/selectTimeBenchmark.h
-        src/main.h)
+        src/main.h
+        src/library/operators/radixPartition.cpp
+        src/cycles_benchmarking/radixPartitionCyclesBenchmark.h)
 
 target_link_libraries(${PROJECT_NAME} benchmark::benchmark)
 

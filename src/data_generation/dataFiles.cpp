@@ -19,6 +19,10 @@ std::string FilePaths::getGroupByCyclesFolderPath() {
     return projectFilePath + groupByCyclesFolder;
 }
 
+std::string FilePaths::getRadixPartitionCyclesFolderPath() {
+    return projectFilePath + radixPartitionCyclesFolder;
+}
+
 std::string FilePaths::getDataFilesFolderPath() {
     return projectFilePath + dataFilesFolder;
 }
@@ -201,6 +205,16 @@ const DataFile DataFiles::uniformIntDistribution20mValuesCardinality50kMax20m{
 const DataFile DataFiles::uniformIntDistribution20mValuesTwo10mCardinalitySections_100_10m_Max20m{
         20 * 1000 * 1000,
         "uniformIntDistribution20mValuesTwo10mCardinalitySections_100_10m_Max20m",
+        ""};
+
+const DataFile DataFiles::uniformIntDistribution250mValuesMax250m{
+        250 * 1000 * 1000,
+        "uniformIntDistribution250mValuesMax250m",
+        ""};
+
+const DataFile DataFiles::fullySortedIntDistribution250mValuesMax250m{
+        250 * 1000 * 1000,
+        "fullySortedIntDistribution250mValuesMax250m",
         ""};
 
 

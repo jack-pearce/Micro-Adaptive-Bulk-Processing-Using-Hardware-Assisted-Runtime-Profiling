@@ -5,6 +5,7 @@
 #include "machine_constants/machineConstants.h"
 #include "operators/select.h"
 #include "operators/groupBy.h"
+#include "operators/radixPartition.h"
 
 // API for auxiliary functions
 #include "utilities/dataStructures.h"

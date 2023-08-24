@@ -107,7 +107,16 @@ int getLengthOfTsv(const std::string& filePath) {
     return rowCount - 1; // Assumes that the first row is used for column headers
 }
 
-void readOisstDataFromCsv(std::string& filePath, int n, std::string *yearLatLong, std::string *monthDay, float *sst) {
+void addLeadingZeros(std::string& input, size_t desiredLength) {
+    if (input.length() >= desiredLength) {
+        return;
+    }
+
+    size_t zerosToAdd = desiredLength - input.length();
+    input.insert(0, zerosToAdd, '0');
+}
+
+void readOisstDataFromCsv(std::string& filePath, int n, int64_t *yearLatLong, int* monthDay, float *sst) {
     std::ifstream file(filePath);
     if (!file.is_open()) {
         std::cerr << "Error opening file: " << filePath << std::endl;
@@ -126,10 +135,27 @@ void readOisstDataFromCsv(std::string& filePath, int n, std::string *yearLatLong
         std::string temp;
 
         std::getline(ss, temp, ','); // Read yearLatLong
-        yearLatLong[i] = temp;
+        std::istringstream iss(temp);
+
+        std::string yearStr, latitudeStr, longitudeStr;
+        std::getline(iss, yearStr, ':');
+        std::getline(iss, latitudeStr, ':');
+        std::getline(iss, longitudeStr, ':');
+
+/*        int64_t year = std::stoi(yearStr);
+        float latitudeFloat = std::stof(latitudeStr);
+        float longitudeFloat = std::stof(longitudeStr);
+
+        int latitude = static_cast<int>(((latitudeFloat - 0.125) /0.25) + 360);
+        int longitude = static_cast<int>((longitudeFloat - 0.125) /0.25);
+
+        yearLatLong[i] = (year * 10000 * 10000) + (latitude * 10000) + longitude;*/
+
+        std::hash<std::string> hashFunc;
+        yearLatLong[i] = hashFunc(yearStr + latitudeStr + longitudeStr);
 
         std::getline(ss, temp, ','); // Read monthDay
-        monthDay[i] = temp;
+        monthDay[i] = stoi(temp);
 
         std::getline(ss, temp, ','); // Read sst
         try {
@@ -185,21 +211,12 @@ void readImdbStartYearColumn(const std::string& filePath, int* data) {
 
         try {
             data[index++] = std::stoi(value);
-        } catch (const std::invalid_argument& e) {
+        } catch (const std::invalid_argument &e) {
             data[index++] = 9999;
         }
     }
 
     file.close();
-}
-
-void addLeadingZeros(std::string& input, size_t desiredLength) {
-    if (input.length() >= desiredLength) {
-        return;
-    }
-
-    size_t zerosToAdd = desiredLength - input.length();
-    input.insert(0, zerosToAdd, '0');
 }
 
 bool isNumber(const std::string& str) {

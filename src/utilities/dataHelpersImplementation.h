@@ -92,9 +92,9 @@ void copyArray(T* source, T* destination, int size) {
 }
 
 template <typename T>
-void projectIndexesOnToArray(const int* indexes, int n, T* array) {
+void projectIndexesOnToArray(const int* indexes, int n, T* source, T* destination) {
     for (int i = 0; i < n; i++) {
-        array[i] = array[indexes[i]];
+        destination[i] = source[indexes[i]];
     }
 }
 

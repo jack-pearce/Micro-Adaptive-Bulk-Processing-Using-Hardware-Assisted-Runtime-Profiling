@@ -11,6 +11,7 @@
 #include "utilities/dataHelpers.h"
 #include "cycles_benchmarking/selectCyclesBenchmark.h"
 #include "cycles_benchmarking/groupByCyclesBenchmark.h"
+#include "cycles_benchmarking/radixPartitionCyclesBenchmark.h"
 #include "data_generation/dataFiles.h"
 #include "library/mabpl.h"
 
@@ -316,6 +317,28 @@ void groupByWallTimeDopSweepBenchmarkCalcDopRange(DataSweep &dataSweep, int iter
 
     groupByWallTimeDopSweepBenchmark<T1,T2>(dataSweep, iterations, fileNamePrefix, dopValues);
 }
+template<typename T1, typename T2>
+void radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations(const DataFile &dataFile, int startBits,
+                                                                     int endBits, const std::string &fileNamePrefix,
+                                                                     int iterations) {
+    std::vector<std::string> benchmarkCounters = {"PERF_COUNT_HW_CPU_CYCLES",
+                                                  "INSTRUCTION_RETIRED",
+                                                  "PERF_COUNT_HW_CACHE_L1D",
+                                                  "PERF_COUNT_HW_CACHE_REFERENCES",
+                                                  "PERF_COUNT_HW_CACHE_MISSES",
+                                                  "PERF_COUNT_HW_CACHE_DTLB",
+                                                  "DTLB-LOADS",
+                                                  "DTLB-STORES"};
+
+/*    std::vector<std::string> benchmarkCounters = {"PERF_COUNT_HW_CPU_CYCLES",
+                                                  "DTLB-STORE-MISSES",
+                                                  "DTLB-PREFETCHES",
+                                                  "DTLB-PREFETCH-MISSES"};*/
+
+    radixPartitionBitsSweepBenchmarkWithExtraCounters<T1, T2>(dataFile, startBits, endBits, benchmarkCounters,
+                                                              fileNamePrefix, iterations);
+}
+
 
 
 #endif //MABPL_MAINIMPLEMENTATION_H

@@ -21,6 +21,8 @@ void generateUnequalLowerStepSelectivityInMemory(T *data, int n, int step, int n
 template <typename T>
 void generatePartiallySortedInMemory(T *data, int n, int numRepeats, float percentageRandom);
 
+template <typename T>
+void generateFullySortedInMemory(T *data, int n);
 
 template <typename T>
 void generateUniformDistributionInMemory(T *data, int n, int upperBound);

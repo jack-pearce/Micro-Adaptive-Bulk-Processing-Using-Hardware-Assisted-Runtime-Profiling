@@ -57,6 +57,11 @@ template <typename T1, typename T2>
 void groupByWallTimeDopSweepBenchmarkCalcDopRange(DataSweep &dataSweep, int iterations,
                                                   const std::string &fileNamePrefix);
 
+template<typename T1, typename T2>
+void radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations(const DataFile &dataFile, int startBits,
+                                                                     int endBits, const std::string &fileNamePrefix,
+                                                                     int iterations);
+
 
 #include "mainImplementation.h"
 

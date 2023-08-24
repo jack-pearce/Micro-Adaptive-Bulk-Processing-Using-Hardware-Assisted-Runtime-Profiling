@@ -170,7 +170,7 @@ vectorOfPairs<T1, T2> groupBySort(int n, T1 *inputGroupBy, T2 *inputAggregate) {
     int i;
     int numBuckets = 1 << BITS_PER_GROUPBY_RADIX_PASS;
     int mask = numBuckets - 1;
-    int largest = 0;
+    T1 largest = 0;
 
     for (i = 0; i < n; i++) {
         if (inputGroupBy[i] > largest) {

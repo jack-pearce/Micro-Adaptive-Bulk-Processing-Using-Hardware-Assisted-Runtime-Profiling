@@ -59,6 +59,10 @@ void DataFile::loadDataIntoMemory(T *data) const {
         generateUniformDistributionInMemoryWithSetCardinality(data, getNumElements(), 20*1000*1000, 50*1000);
     } else if (getFileName() == "uniformIntDistribution20mValuesTwo10mCardinalitySections_100_10m_Max20m") {
         generateUniformDistributionInMemoryWithTwoCardinalitySections(data, getNumElements(), 20*1000*1000, 100, 10*1000*1000, 0.5);
+    } else if (getFileName() == "uniformIntDistribution250mValuesMax250m") {
+        generateUniformDistributionInMemory(data, getNumElements(), 250*1000*1000);
+    } else if (getFileName() == "fullySortedIntDistribution250mValuesMax250m") {
+        generateFullySortedInMemory(data, getNumElements());
     }
 }
 

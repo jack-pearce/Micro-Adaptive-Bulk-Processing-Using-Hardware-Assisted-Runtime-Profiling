@@ -20,7 +20,7 @@ int getLengthOfCsv(const std::string &filePath);
 
 int getLengthOfTsv(const std::string& filePath);
 
-void readOisstDataFromCsv(std::string& filePath, int n, std::string *yearLatLong, std::string *monthDay, float *sst);
+void readOisstDataFromCsv(std::string& filePath, int n, int64_t *yearLatLong, int* monthDay, float *sst);
 
 void writeOisstDataToCsv(std::string& filePath, int n, std::string *yearLatLong, float *sst);
 
@@ -61,7 +61,7 @@ template <typename T>
 void copyArray(T* source, T* destination, int size);
 
 template <typename T>
-void projectIndexesOnToArray(const int* indexes, int n, T* array);
+void projectIndexesOnToArray(const int* indexes, int n, T* source, T* destination);
 
 #include "dataHelpersImplementation.h"
 

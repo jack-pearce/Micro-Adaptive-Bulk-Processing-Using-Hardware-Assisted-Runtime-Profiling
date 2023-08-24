@@ -264,6 +264,18 @@ void generatePartiallySortedInMemory(T *data, int n, int numRepeats, float perce
 }
 
 template <typename T>
+void generateFullySortedInMemory(T *data, int n) {
+    std::cout << "Generating data in memory... ";
+    std::cout.flush();
+
+    for (auto i = 0; i < n; ++i) {
+        data[i] = i;
+    }
+
+    std::cout << "Complete" << std::endl;
+}
+
+template <typename T>
 void generateUniformDistributionInMemory(T *data, int n, int upperBound) {
     static_assert(std::is_integral<T>::value, "Must be an integer type");
 

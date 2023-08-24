@@ -450,85 +450,95 @@ void allParallelDataSizeTests(int iterations) {
 }
 
 void runOisstMacroBenchmark() {
-//    std::string inputDataFilePathOne = FilePaths::getInstance().getOisstInputFolderPath() + "1_month_(06-07)/" + "1982.csv";
-//    std::string inputDataFilePathTwo = FilePaths::getInstance().getOisstInputFolderPath() + "1_month_(06-07)/" + "2023.csv";
-//    std::string outputDataFilePath = FilePaths::getInstance().getOisstOutputFolderPath() + "1982.csv";
-//    const int n = getLengthOfCsv(inputDataFilePathOne);
+    std::string inputDataFilePathOne = FilePaths::getInstance().getOisstInputFolderPath() + "1_month_(06-07)/" + "1982.csv";
+    const int n1 = getLengthOfCsv(inputDataFilePathOne);
+    std::string inputDataFilePathTwo = FilePaths::getInstance().getOisstInputFolderPath() + "1_month_(06-07)/" + "2023.csv";
+    const int n2 = getLengthOfCsv(inputDataFilePathTwo);
+    int n = n1 + n2;
 
-/*    auto *yearLatLong = new std::string[n];
-    auto *monthDay = new std::string[n];
-    auto *sst1982 = new float[n];
-    readOisstDataFromCsv(inputDataFilePathOne, n, yearLatLong, monthDay, sst1982);
+    auto *yearLatLong = new int64_t[n];
+    auto *monthDay = new int[n];
+    auto *sst = new float[n];
 
-    auto *sstDiff= new float[n];
-    readOisstDataFromCsv(inputDataFilePathOne, n, yearLatLong, monthDay, sstDiff);
+    readOisstDataFromCsv(inputDataFilePathOne, n1, yearLatLong, monthDay, sst);
+    readOisstDataFromCsv(inputDataFilePathTwo, n2, yearLatLong + n1, monthDay + n1, sst + n1);
     delete[] monthDay;
 
-    for (int i = 0; i < n; i++) {
-        if (!std::isnan(sst1982[i])) {
-            sstDiff[i] -= sst1982[i];
-        }
+    float thresholdTemperature = 15;
+    auto *selectedIndexes = new int[n];
+    int selectedCount = MABPL::selectIndexesAdaptive<float>(n,sst, selectedIndexes, thresholdTemperature);
+
+    auto *yearLatLong30 = new int64_t[selectedCount];
+    auto *sst30 = new float[selectedCount];
+
+    projectIndexesOnToArray(selectedIndexes, selectedCount, yearLatLong, yearLatLong30);
+    projectIndexesOnToArray(selectedIndexes, selectedCount, sst, sst30);
+
+    delete[] selectedIndexes;
+    delete[] yearLatLong;
+    delete[] sst;
+
+    n = selectedCount;
+
+    {
+        auto *inputGroupBy = new int64_t[n];
+        auto *inputAggregate = new float[n];
+
+        copyArray(yearLatLong30, inputGroupBy, n);
+        copyArray(sst30, inputAggregate, n);
+
+        long_long cycles;
+
+        cycles = *Counters::getInstance().readSharedEventSet();
+        auto results = MABPL::groupByAdaptive<MaxAggregation>(n, inputGroupBy, inputAggregate, 2 * 720 * 1440);
+        cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+
+        std::cout << "Adpt result size " << results.size() << " / " << n << ", Cycles: " << cycles << std::endl;
+
+        delete[] inputGroupBy;
+        delete[] inputAggregate;
     }
-    delete[] sst1982;*/
 
+    {
+        auto *inputGroupBy = new int64_t[n];
+        auto *inputAggregate = new float[n];
 
-/*    std::string inputDataFilePath = FilePaths::getInstance().getOisstInputFolderPath() + "1_month_(06-07)/" + "1982.csv";
-    const int n = getLengthOfCsv(inputDataFilePath);
+        copyArray(yearLatLong30, inputGroupBy, n);
+        copyArray(sst30, inputAggregate, n);
 
-    auto *yearLatLong = new std::string[n];
-    auto *monthDay = new std::string[n];
-    auto *sst = new float[n];
-    readOisstDataFromCsv(inputDataFilePath, n, yearLatLong, monthDay, sst);
+        long_long cycles;
 
-    auto sst2 = new float[n];
-    copyArray<float>(sst, sst2, n);
+        cycles = *Counters::getInstance().readSharedEventSet();
+        auto results = MABPL::groupByHash<MaxAggregation>(n, inputGroupBy, inputAggregate, 2 * 720 * 1440);
+        cycles = *Counters::getInstance().readSharedEventSet() - cycles;
 
-    long_long cycles, cyclesCount;
-    auto *selectedValues= new float[n];
+        std::cout << "Hash result size " << results.size() << " / " << n << ", Cycles: " << cycles << std::endl;
 
-    cycles = *Counters::getInstance().readSharedEventSet();
-    int selectedCount = MABPL::selectValuesVectorized<float,float>(n, sst, sst, sst2,15);
-    cyclesCount = *Counters::getInstance().readSharedEventSet() - cycles;
+        delete[] inputGroupBy;
+        delete[] inputAggregate;
+    }
 
-    std::cout << "Selected " << selectedCount << " / " << n << ", Cycles: " << cyclesCount << std::endl;
+    {
+        auto *inputGroupBy = new int64_t[n];
+        auto *inputAggregate = new float[n];
 
-//    projectIndexesOnToArray(selectedIndexes, selectedCount, yearLatLong);
-//    projectIndexesOnToArray(selectedIndexes, selectedCount, sst);
+        copyArray(yearLatLong30, inputGroupBy, n);
+        copyArray(sst30, inputAggregate, n);
 
-//    writeOisstDataToCsv(outputDataFilePath, selectedCount, yearLatLong, sst);
+        long_long cycles;
 
-    delete[] yearLatLong;
-    delete[] monthDay;
-//    delete[] sstDiff;
-    delete[] sst;
-    delete[] selectedValues;*/
+        cycles = *Counters::getInstance().readSharedEventSet();
+        auto results = MABPL::groupBySort<MaxAggregation>(n, inputGroupBy, inputAggregate);
+        cycles = *Counters::getInstance().readSharedEventSet() - cycles;
 
-    std::string inputDataFilePath = FilePaths::getInstance().getOisstInputFolderPath() + "1_month_(06-07)/" + "1982.csv";
-    const int n = getLengthOfCsv(inputDataFilePath);
+        std::cout << "Sort result size " << results.size() << " / " << n << ", Cycles: " << cycles << std::endl;
 
-    auto *yearLatLong = new std::string[n];
-    auto *monthDay = new std::string[n];
-    auto *sst = new float[n];
-    readOisstDataFromCsv(inputDataFilePath, n, yearLatLong, monthDay, sst);
-    delete[] monthDay;
+        delete[] inputGroupBy;
+        delete[] inputAggregate;
+    }
 
-    auto sst2 = new float[n];
-    copyArray<float>(sst, sst2, n);
-
-    long_long cycles, cyclesCount;
-    auto *selectedValues= new float[n];
-
-    cycles = *Counters::getInstance().readSharedEventSet();
-    int selectedCount = MABPL::selectValuesAdaptive<float,float>(n, sst2, sst, selectedValues,-1);
-    cyclesCount = *Counters::getInstance().readSharedEventSet() - cycles;
-
-    std::cout << "Selected " << selectedCount << " / " << n << ", Cycles: " << cyclesCount << std::endl;
-
-    delete[] yearLatLong;
-    delete[] sst;
-    delete[] selectedValues;
-
-
+    delete[] yearLatLong30;
+    delete[] sst30;
 }
 
 void runImdbSelectMacroBenchmark() {
@@ -547,6 +557,56 @@ void runImdbSelectMacroBenchmark() {
     std::cout << "Selected " << selectedCount << " / " << n << ", Cycles: " << cycles << std::endl;
 
     delete[] inputData;
+}
+
+void runImdbSelectSweepMacroBenchmark(int startYear, int endYear, int iterations,
+                                      const std::vector<Select> &selectImplementations) {
+    int numImplementations = static_cast<int>(selectImplementations.size());
+
+    std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.basics.tsv";
+    int n = getLengthOfTsv(filePath);
+    auto data = new int[n];
+    readImdbStartYearColumn(filePath, data);
+
+    long_long cycles;
+    std::vector<std::vector<long_long>> results(endYear - startYear + 1,
+                                                std::vector<long_long>((numImplementations * iterations) + 1, 0));
+
+    for (auto year = startYear; year <= endYear; ++year) {
+        results[year - startYear][0] = year;
+
+        for (auto i = 0; i < iterations; ++i) {
+            for (auto j = 0; j < numImplementations; ++j) {
+                auto inputFilter = new int[n];
+                copyArray<int>(data, inputFilter, n);
+                auto selectedIndexes = new int[n];
+
+                std::cout << "Running year " << year << ", iteration " << i + 1 << "... ";
+
+                cycles = *Counters::getInstance().readSharedEventSet();
+
+                MABPL::runSelectFunction(selectImplementations[j],
+                                         n, inputFilter, inputFilter, selectedIndexes,year);
+
+                results[year - startYear][1 + (i * numImplementations) + j] = *Counters::getInstance().readSharedEventSet() - cycles;
+
+                delete[] inputFilter;
+                delete[] selectedIndexes;
+
+                std::cout << "Completed" << std::endl;
+            }
+        }
+    }
+
+    std::vector<std::string> headers((numImplementations * iterations) + 1);
+    headers [0] = "Year";
+    for (auto i = 0; i < (numImplementations * iterations); ++i) {
+        headers[1 + i] = getSelectName(selectImplementations[i % numImplementations]);
+    }
+
+    std::string fileName = "IMDB_select_year_sweep";
+    std::string fullFilePath = FilePaths::getInstance().getImdbOutputFolderPath() + fileName + ".csv";
+    writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }
 
 void runImdbGroupByMacroBenchmark1() {
@@ -614,6 +674,49 @@ void runImdbGroupByMacroBenchmark3() {
 
 
 int main() {
+
+//    radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations<int,int>(DataFiles::uniformIntDistribution250mValuesMax250m,
+//                                                                             4, 20,"4-20_Random_RadixSort_",1);
+//    radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations<int,int>(DataFiles::fullySortedIntDistribution250mValuesMax250m,
+//                                                                             4, 20,"4-20_Random_RadixSort_",1);
+
+/*    unsigned int seed = 1;
+    std::mt19937 gen(seed);
+    std::uniform_int_distribution<int> distribution(1, 1000000);
+
+    int n = 50;
+    int *keys = new int[n];
+    int *payloads = new int[n];
+
+    for (auto i = 0; i < n; ++i) {
+        keys[i] = distribution(gen);
+        payloads[i] = distribution(gen);
+    }
+
+    std::cout << "Before: " << std::endl;
+    for (int i = 0; i < n; i++) {
+        std::cout << keys[i] << " ";
+    }
+    std::cout << std::endl;
+    for (int i = 0; i < n; i++) {
+        std::cout << payloads[i] << " ";
+    }
+    std::cout << std::endl << std::endl;
+
+    MABPL::radixPartition(n, keys, payloads);
+
+    std::cout << "After: " << std::endl;
+    for (int i = 0; i < n; i++) {
+        std::cout << keys[i] << " ";
+    }
+    std::cout << std::endl;
+    for (int i = 0; i < n; i++) {
+        std::cout << payloads[i] << " ";
+    }
+    std::cout << std::endl << std::endl;
+
+    delete[] keys;
+    delete[] payloads;*/
 
     return 0;
 }
