@@ -78,14 +78,14 @@ inline void performSelectIndexesAdaption(SelectIndexesChoice &selectIndexesChoic
     if (__builtin_expect(static_cast<float>(counterValues[0]) >
                          (((selectivity - lowerCrossoverSelectivity) * m) + lowerBranchCrossoverBranchMisses)
                          && selectIndexesChoice == SelectIndexesChoice::IndexesBranch, false)) {
-//        std::cout << "Switched to select predication" << std::endl;
+        std::cout << "Switched to select predication" << std::endl;
         selectIndexesChoice = SelectIndexesChoice::IndexesPredication;
     }
 
     if (__builtin_expect((selectivity < lowerCrossoverSelectivity
                           || selectivity > upperCrossoverSelectivity)
                          && selectIndexesChoice == SelectIndexesChoice::IndexesPredication, false)) {
-//        std::cout << "Switched to select branch" << std::endl;
+        std::cout << "Switched to select branch" << std::endl;
         selectIndexesChoice = SelectIndexesChoice::IndexesBranch;
         consecutivePredications = 0;
     }
@@ -129,7 +129,7 @@ int selectIndexesAdaptive(int n, const T *inputFilter, int *selection, T thresho
 
     while (n > 0) {
         if (__builtin_expect(consecutivePredications == maxConsecutivePredications, false)) {
-//            std::cout << "Running branch burst" << std::endl;
+            std::cout << "Running branch burst" << std::endl;
             selectIndexesChoice = SelectIndexesChoice::IndexesBranch;
             consecutivePredications = 0;
             tuplesToProcess = std::min(n, tuplesInBranchBurst);
