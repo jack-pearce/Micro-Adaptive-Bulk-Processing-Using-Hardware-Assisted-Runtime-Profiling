@@ -551,7 +551,7 @@ void runImdbSelectMacroBenchmark() {
     auto *selectedIndexes = new int[n];
 
     cycles = *Counters::getInstance().readSharedEventSet();
-    int selectedCount = MABPL::selectIndexesBranch(n, inputData, selectedIndexes, 1882);
+    int selectedCount = MABPL::selectIndexesBranch(n, inputData, selectedIndexes, 1960);
     cycles = *Counters::getInstance().readSharedEventSet() - cycles;
 
     std::cout << "Selected " << selectedCount << " / " << n << ", Cycles: " << cycles << std::endl;
@@ -674,12 +674,10 @@ void runImdbGroupByMacroBenchmark3() {
 
 
 int main() {
-    runImdbSelectMacroBenchmark();
-
-/*    runImdbSelectSweepMacroBenchmark(1874, 2023, 5,
+    runImdbSelectSweepMacroBenchmark(1874, 2023, 5,
                     {Select::ImplementationIndexesBranch,
                                          Select::ImplementationIndexesPredication,
-                                         Select::ImplementationIndexesAdaptive});*/
+                                         Select::ImplementationIndexesAdaptive});
 
 //    radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations<int,int>(DataFiles::uniformIntDistribution250mValuesMax250m,
 //                                                                             4, 20,"4-20_Random_RadixSort_",1);
