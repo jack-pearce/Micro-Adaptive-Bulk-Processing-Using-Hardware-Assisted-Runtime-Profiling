@@ -73,7 +73,8 @@ void radixPartition(int n, T1 *keys, T2 *payloads, int radixBits) {
         msbPosition++;
     }
 
-    int pass = static_cast<int>(std::ceil(static_cast<double>(msbPosition) / radixBits)) - 1;
+//    int pass = static_cast<int>(std::ceil(static_cast<double>(msbPosition) / radixBits)) - 1;
+    int pass = 0;
 
     std::vector<int> buckets(1 << radixBits, 0);
     T1 *bufferKeys = new T1[n];

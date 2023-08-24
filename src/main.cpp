@@ -674,15 +674,11 @@ void runImdbGroupByMacroBenchmark3() {
 
 
 int main() {
-    runImdbSelectSweepMacroBenchmark(1874, 2023, 5,
-                    {Select::ImplementationIndexesBranch,
-                                         Select::ImplementationIndexesPredication,
-                                         Select::ImplementationIndexesAdaptive});
 
-//    radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations<int,int>(DataFiles::uniformIntDistribution250mValuesMax250m,
-//                                                                             4, 20,"4-20_Random_RadixSort_",1);
-//    radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations<int,int>(DataFiles::fullySortedIntDistribution250mValuesMax250m,
-//                                                                             4, 20,"4-20_Random_RadixSort_",1);
+    radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations<int,int>(DataFiles::uniformIntDistribution250mValuesMax250m,
+                                                                             4, 22,"4-22_Random_SinglePassRadixPartition_",5);
+    radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations<int,int>(DataFiles::fullySortedIntDistribution250mValuesMax250m,
+                                                                             4, 22,"4-22_Sorted_SinglePassRadixPartition_",5);
 
 /*    unsigned int seed = 1;
     std::mt19937 gen(seed);
