@@ -675,10 +675,10 @@ void runImdbGroupByMacroBenchmark3() {
 
 int main() {
 
-/*    runImdbSelectSweepMacroBenchmark(1874, 2023, 5,
+    runImdbSelectSweepMacroBenchmark(1874, 2023, 5,
                     {Select::ImplementationIndexesBranch,
                                          Select::ImplementationIndexesPredication,
-                                         Select::ImplementationIndexesAdaptive});*/
+                                         Select::ImplementationIndexesAdaptive});
 
 //    radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations<int,int>(DataFiles::uniformIntDistribution250mValuesMax250m,
 //                                                                             4, 20,"4-20_Random_RadixSort_",1);
