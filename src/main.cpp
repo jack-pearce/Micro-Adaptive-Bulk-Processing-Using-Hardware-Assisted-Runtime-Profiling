@@ -551,7 +551,7 @@ void runImdbSelectMacroBenchmark() {
     auto *selectedIndexes = new int[n];
 
     cycles = *Counters::getInstance().readSharedEventSet();
-    int selectedCount = MABPL::selectIndexesAdaptive(n, inputData, selectedIndexes, 1882);
+    int selectedCount = MABPL::selectIndexesBranch(n, inputData, selectedIndexes, 1882);
     cycles = *Counters::getInstance().readSharedEventSet() - cycles;
 
     std::cout << "Selected " << selectedCount << " / " << n << ", Cycles: " << cycles << std::endl;
