@@ -684,7 +684,7 @@ int main() {
 
 
     radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations<int,int>(DataFiles::uniformIntDistribution250mValuesMax250m,
-                                                                             4, 20,"4-20_Random_SinglePassRadixPartition_",3);
+                                                                             4, 20,"4-20_Random_SinglePassRadixPartition_",1);
 //    radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations<int,int>(DataFiles::fullySortedIntDistribution250mValuesMax250m,
 //                                                                             4, 20,"4-20_Sorted_SinglePassRadixPartition_",3);
 
