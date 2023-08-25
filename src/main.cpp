@@ -675,10 +675,18 @@ void runImdbGroupByMacroBenchmark3() {
 
 int main() {
 
+//    for (int i = 2; i < 20; i ++) {
+//        testRadixPartition<int, int>(DataFiles::uniformIntDistribution250mValuesMax250m, i);
+//    }
+//    for (int i = 2; i < 20; i ++) {
+//        testRadixPartition<int, int>(DataFiles::fullySortedIntDistribution250mValuesMax250m, i);
+//    }
+
+
     radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations<int,int>(DataFiles::uniformIntDistribution250mValuesMax250m,
-                                                                             4, 22,"4-22_Random_SinglePassRadixPartition_",5);
-    radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations<int,int>(DataFiles::fullySortedIntDistribution250mValuesMax250m,
-                                                                             4, 22,"4-22_Sorted_SinglePassRadixPartition_",5);
+                                                                             4, 20,"4-20_Random_SinglePassRadixPartition_",3);
+//    radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations<int,int>(DataFiles::fullySortedIntDistribution250mValuesMax250m,
+//                                                                             4, 20,"4-20_Sorted_SinglePassRadixPartition_",3);
 
 /*    unsigned int seed = 1;
     std::mt19937 gen(seed);

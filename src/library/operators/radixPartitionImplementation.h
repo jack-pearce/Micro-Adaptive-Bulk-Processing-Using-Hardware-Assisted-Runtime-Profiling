@@ -14,21 +14,21 @@ inline void radixPartitionAux(int start, int end, T1 *keys, T2 *payloads, T1 *bu
     int i;
 
     for (i = start; i < end; i++) {
-        buckets[(keys[i] >> (pass * radixBits)) & mask]++;
+        buckets[1 + ((keys[i] >> (pass * radixBits)) & mask)]++;
     }
 
-    for (i = 1; i < numBuckets; i++) {
+    for (i = 2; i <= numBuckets; i++) {
         buckets[i] += buckets[i - 1];
     }
 
-//    std::vector<int> partitions(buckets.data(), buckets.data() + numBuckets);
+//    std::vector<int> partitions(buckets.data() + 1, buckets.data() + numBuckets + 1);
 //    for (i = 0; i < numBuckets; i++) {
 //        partitions[i] += start;
 //    }
 
-    for (i = end - 1; i >= start; i--) {
-        bufferKeys[start + --buckets[(keys[i] >> (pass * radixBits)) & mask]] = keys[i];
-//        bufferPayloads[start + buckets[(keys[i] >> (pass * radixBits)) & mask]] = payloads[i];
+    for (i = start; i < end; i++) {
+        bufferKeys[start + buckets[(keys[i] >> (pass * radixBits)) & mask]++] = keys[i]; /////////////////////////// ++ added
+//        bufferPayloads[start + buckets[(keys[i] >> (pass * radixBits)) & mask]++] = payloads[i];
     }
 
 //    std::fill(buckets.begin(), buckets.end(), 0);
@@ -76,7 +76,7 @@ void radixPartition(int n, T1 *keys, T2 *payloads, int radixBits) {
 //    int pass = static_cast<int>(std::ceil(static_cast<double>(msbPosition) / radixBits)) - 1;
     int pass = 0;
 
-    std::vector<int> buckets(1 << radixBits, 0);
+    std::vector<int> buckets(1 + numBuckets, 0);
     T1 *bufferKeys = new T1[n];
 //    T2 *bufferPayloads = new T2[n];
 
@@ -100,21 +100,21 @@ void radixPartitionAux(int start, int end, T1 *keys, T2 *payloads, T1 *bufferKey
     int i;
 
     for (i = start; i < end; i++) {
-        buckets[(keys[i] >> (pass * radixBits)) & mask]++;
+        buckets[1 + ((keys[i] >> (pass * radixBits)) & mask)]++;
     }
 
-    for (i = 1; i < numBuckets; i++) {
+    for (i = 2; i <= numBuckets; i++) {
         buckets[i] += buckets[i - 1];
     }
 
-    std::vector<int> partitions(buckets.data(), buckets.data() + numBuckets);
+    std::vector<int> partitions(buckets.data() + 1, buckets.data() + numBuckets + 1);
     for (i = 0; i < numBuckets; i++) {
         partitions[i] += start;
     }
 
-    for (i = end - 1; i >= start; i--) {
-        bufferKeys[start + --buckets[(keys[i] >> (pass * radixBits)) & mask]] = keys[i];
-        bufferPayloads[start + buckets[(keys[i] >> (pass * radixBits)) & mask]] = payloads[i];
+    for (i = start; i < end; i++) {
+        bufferKeys[start + buckets[(keys[i] >> (pass * radixBits)) & mask]] = keys[i];
+        bufferPayloads[start + buckets[(keys[i] >> (pass * radixBits)) & mask]++] = payloads[i];
     }
 
     std::fill(buckets.begin(), buckets.end(), 0);
@@ -159,21 +159,20 @@ void radixPartition(int n, T1 *keys, T2 *payloads, int radixBits) {
         msbPosition++;
     }
 
-//    int pass = static_cast<int>(std::ceil(static_cast<double>(msbPosition) / radixBits)) - 1;
-    int pass = 0;
+    int pass = static_cast<int>(std::ceil(static_cast<double>(msbPosition) / radixBits)) - 1;
+//    int pass = 0;
 
-    std::vector<int> buckets(1 << radixBits, 0);
+    std::vector<int> buckets(1 + numBuckets, 0);
     T1 *bufferKeys = new T1[n];
     T2 *bufferPayloads = new T2[n];
 
     radixPartitionAux(0, n, keys, payloads, bufferKeys, bufferPayloads, mask, numBuckets, buckets,
                       pass, radixBits);
 
-*/
-/*    if ((pass % 2) == 0) {
+    if ((pass % 2) == 0) {
         memcpy(keys, bufferKeys, n * sizeof(T1));
         memcpy(payloads, bufferPayloads, n * sizeof(T2));
-    }*//*
+    }
 
 
     delete[]bufferKeys;
