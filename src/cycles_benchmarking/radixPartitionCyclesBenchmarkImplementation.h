@@ -87,5 +87,71 @@ void radixPartitionBitsSweepBenchmarkWithExtraCounters(const DataFile &dataFile,
     shutdownPAPI(benchmarkEventSet, benchmarkCounterValues);
 }
 
+template<typename T1, typename T2>
+void radixPartitionSweepBenchmarkWithExtraCounters(DataSweep &dataSweep, int radixBits,
+                                                   std::vector<std::string> &benchmarkCounters,
+                                                   const std::string &fileNamePrefix, int iterations) {
+
+    long_long benchmarkCounterValues[benchmarkCounters.size()];
+    int benchmarkEventSet = initialisePAPIandCreateEventSet(benchmarkCounters);
+
+    std::vector<std::vector<double>> results(dataSweep.getTotalRuns(),
+                                                std::vector<double>((iterations * benchmarkCounters.size()) + 1, 0));
+
+    int n = dataSweep.getNumElements();
+
+    for (auto runNum = 0; runNum < dataSweep.getTotalRuns(); ++runNum) {
+        results[runNum][0] = static_cast<double>(dataSweep.getRunInput());
+        auto data = new T1[n];
+        dataSweep.loadNextDataSetIntoMemory<T1>(data);
+
+        for (auto iteration = 0; iteration < iterations; ++iteration) {
+            auto keys = new T1[n];
+            auto payloads = new T2[n];
+            copyArray<T1>(data, keys, n);
+            copyArray<T2>(data, payloads, n);
+
+            std::cout << "Running input " << results[runNum][0] << ", iteration " << iteration + 1 << "... ";
+
+            if (PAPI_reset(benchmarkEventSet) != PAPI_OK)
+                exit(1);
+
+            MABPL::radixPartition(n, keys, payloads, radixBits);
+
+            if (PAPI_read(benchmarkEventSet, benchmarkCounterValues) != PAPI_OK)
+                exit(1);
+
+            delete[] keys;
+            delete[] payloads;
+
+            for (int i = 0; i < static_cast<int>(benchmarkCounters.size()); ++i) {
+                results[runNum][1 + (iteration * benchmarkCounters.size()) + i] = benchmarkCounterValues[i];
+            }
+
+            std::cout << "Completed" << std::endl;
+        }
+
+        delete[] data;
+    }
+
+    dataSweep.restartSweep();
+
+    std::vector<std::string> headers(benchmarkCounters.size() * iterations);
+    for (auto i = 0; i < iterations; ++i) {
+        std::copy(benchmarkCounters.begin(), benchmarkCounters.end(), headers.begin() + i * benchmarkCounters.size());
+    }
+    headers.insert(headers.begin(), "Input");
+
+    std::string fileName =
+            fileNamePrefix +
+            "RadixPartitionSweep_" +
+            dataSweep.getSweepName();
+    std::string fullFilePath = FilePaths::getInstance().getRadixPartitionCyclesFolderPath() + fileName + ".csv";
+    writeHeadersAndTableToCSV(headers, results, fullFilePath);
+
+    shutdownPAPI(benchmarkEventSet, benchmarkCounterValues);
+}
+
+
 
 #endif //MABPL_RADIXPARTITIONCYCLESBENCHMARKIMPLEMENTATION_H

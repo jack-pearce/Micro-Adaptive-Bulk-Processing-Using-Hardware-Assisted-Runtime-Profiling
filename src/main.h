@@ -62,6 +62,11 @@ void radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations(const DataF
                                                                      int endBits, const std::string &fileNamePrefix,
                                                                      int iterations);
 
+template<typename T1, typename T2>
+void radixPartitionSweepBenchmarkWithExtraCountersConfigurations(DataSweep &dataSweep, int radixBits,
+                                                                 const std::string &fileNamePrefix,
+                                                                 int iterations);
+
 
 #include "mainImplementation.h"
 

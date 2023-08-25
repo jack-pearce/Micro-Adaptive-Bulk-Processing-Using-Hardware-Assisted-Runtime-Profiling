@@ -3,6 +3,22 @@
 
 
 template <typename T>
+class LoadedData {
+private:
+    T *data;
+    const DataFile *dataFile;
+    explicit LoadedData(const DataFile &dataFile);
+    void loadData();
+
+public:
+    static LoadedData &getInstance(const DataFile &requestedDataFile);
+    [[nodiscard]] T* getData() const;
+    [[nodiscard]] const DataFile& getDataFile() const;
+    LoadedData(const LoadedData&) = delete;
+    void operator=(const LoadedData&) = delete;
+};
+
+template <typename T>
 void generateVaryingSelectivityInMemory(T *data, int n, int minimum, int numberOfDiscreteSections);
 
 template <typename T>
@@ -19,10 +35,13 @@ void generateUnequalLowerStepSelectivityInMemory(T *data, int n, int step, int n
                                                  float percentStepSection);
 
 template <typename T>
-void generatePartiallySortedInMemory(T *data, int n, int numRepeats, float percentageRandom);
+void generatePartiallySortedInMemoryOneToOneHundred(T *data, int n, int numRepeats, float percentageRandom);
 
 template <typename T>
-void generateFullySortedInMemory(T *data, int n);
+void generateFullySortedUniqueInMemory(T *data, int n);
+
+template <typename T>
+void generatePartiallySortedUniqueInMemory(T *data, int n, float percentageRandom);
 
 template <typename T>
 void generateUniformDistributionInMemory(T *data, int n, int upperBound);

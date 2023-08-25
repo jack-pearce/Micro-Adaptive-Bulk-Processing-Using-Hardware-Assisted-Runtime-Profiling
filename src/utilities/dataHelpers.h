@@ -32,21 +32,6 @@ void readImdbPrincipalsColumn(const std::string& filePath, int* data);
 
 void readImdbFilmColumn(const std::string& filePath, int64_t* data);
 
-template <typename T>
-class LoadedData {
-private:
-    T *data;
-    const DataFile *dataFile;
-    explicit LoadedData(const DataFile &dataFile);
-    void loadData();
-
-public:
-    static LoadedData &getInstance(const DataFile &requestedDataFile);
-    [[nodiscard]] T* getData() const;
-    [[nodiscard]] const DataFile& getDataFile() const;
-    LoadedData(const LoadedData&) = delete;
-    void operator=(const LoadedData&) = delete;
-};
 
 template <typename T>
 void displayDistribution(const DataFile &dataFile);

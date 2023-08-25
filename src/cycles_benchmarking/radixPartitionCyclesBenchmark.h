@@ -13,6 +13,11 @@ void radixPartitionBitsSweepBenchmarkWithExtraCounters(const DataFile &dataFile,
                                                        std::vector<std::string> &benchmarkCounters,
                                                        const std::string &fileNamePrefix, int iterations);
 
+template<typename T1, typename T2>
+void radixPartitionSweepBenchmarkWithExtraCounters(DataSweep &dataSweep, int radixBits,
+                                                   std::vector<std::string> &benchmarkCounters,
+                                                   const std::string &fileNamePrefix, int iterations);
+
 
 #include "radixPartitionCyclesBenchmarkImplementation.h"
 

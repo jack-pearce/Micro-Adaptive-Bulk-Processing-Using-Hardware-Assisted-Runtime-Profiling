@@ -27,7 +27,6 @@ pkg_check_modules(JSONCPP REQUIRED jsoncpp)
 include_directories(${JSONCPP_INCLUDE_DIRS})
 
 add_executable(${PROJECT_NAME}
-        src/data_generation/dataGenerators.h
         src/data_generation/dataFiles.cpp
         src/data_generation/dataFiles.h
         src/library/operators/select.cpp
@@ -37,6 +36,7 @@ add_executable(${PROJECT_NAME}
         src/utilities/dataHelpers.cpp
         src/utilities/papiHelpers.cpp
         src/cycles_benchmarking/selectCyclesBenchmark.h
+        src/data_generation/dataGenerators.h
         src/library/operators/groupBy.cpp
         src/cycles_benchmarking/groupByCyclesBenchmark.h
         src/library/mabpl.h

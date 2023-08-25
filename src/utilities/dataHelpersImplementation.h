@@ -7,41 +7,6 @@
 
 
 template <typename T>
-LoadedData<T>::LoadedData(const DataFile &dataFile) : data(nullptr), dataFile(&dataFile) {
-    loadData();
-}
-
-template <typename T>
-void LoadedData<T>::loadData() {
-    data = new T[dataFile->getNumElements()];
-    dataFile->loadDataIntoMemory(data);
-}
-
-template <typename T>
-LoadedData<T> &LoadedData<T>::getInstance(const DataFile &requestedDataFile) {
-    static LoadedData instance(requestedDataFile);
-
-    if (requestedDataFile.getFileName() != instance.getDataFile().getFileName()) {
-        delete[] instance.data;
-        instance.dataFile = &requestedDataFile;
-        instance.loadData();
-    }
-
-    return instance;
-}
-
-template <typename T>
-T* LoadedData<T>::getData() const {
-    return data;
-}
-
-template <typename T>
-const DataFile& LoadedData<T>::getDataFile() const {
-    return *dataFile;
-}
-
-
-template <typename T>
 void displayDistribution(const DataFile &dataFile) {
     std::vector<int> counts(101, 0);
     auto numElements = dataFile.getNumElements();

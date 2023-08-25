@@ -217,6 +217,11 @@ const DataFile DataFiles::fullySortedIntDistribution250mValuesMax250m{
         "fullySortedIntDistribution250mValuesMax250m",
         ""};
 
+const DataFile DataFiles::uniqueRandom250mInt{
+        250 * 1000 * 1000,
+        "uniqueRandom250mInt",
+        ""};
+
 
 DataFile::DataFile(int _numElements, std::string _fileName, std::string _longDescription)
         : numElements(_numElements), fileName(std::move(_fileName)), longDescription(std::move(_longDescription)) {}
@@ -454,6 +459,25 @@ DataSweep DataSweeps::logUniformIntDistribution20mValuesClusteredSweepFixedCardi
         "logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1m",
         ""};
 
+DataSweep DataSweeps::linearUniqueIntDistribution250mValuesSortednessSweep {
+        26,
+        250*1000*1000,
+        "linearUniqueIntDistribution250mValuesSortednessSweep",
+        ""};
+
+DataSweep DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m {
+        30,
+        250*1000*1000,
+        "logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m",
+        ""};
+
+DataSweep DataSweeps::linearUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m {
+        100,
+        250*1000*1000,
+        "linearUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m",
+        ""};
+
+
 
 DataSweep::DataSweep(int _totalRuns, int _numElements, std::string _sweepName, std::string _longDescription)
         : totalRuns(_totalRuns), numElements(_numElements), runsCompleted(0), sweepName(std::move(_sweepName)),
@@ -506,6 +530,12 @@ DataSweep::DataSweep(int _totalRuns, int _numElements, std::string _sweepName, s
         generateLinearDistribution(getTotalRuns(), 0, 1, inputs);
     } else if (getSweepName() == "logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1m") {
         generateLogDistribution(getTotalRuns(), 1, 1000000, inputs);
+    } else if (getSweepName() == "linearUniqueIntDistribution250mValuesSortednessSweep") {
+        generateLinearDistribution(getTotalRuns(), 0, 100, inputs);
+    } else if (getSweepName() == "logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m") {
+        generateLogDistribution(getTotalRuns(), 1, 10*1000*1000, inputs);
+    } else if (getSweepName() == "linearUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m") {
+        generateLinearDistribution(getTotalRuns(), 1, 10*1000*1000, inputs);
     }
 }
 

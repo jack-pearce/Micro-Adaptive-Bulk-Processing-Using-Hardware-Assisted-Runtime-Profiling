@@ -34,15 +34,15 @@ void DataFile::loadDataIntoMemory(T *data) const {
     } else if (getFileName() == "bestCaseValuesTunedUnequalLowerStep50IntDistribution250mValues") {
         generateUnequalLowerStepSelectivityInMemory(data, getNumElements(), 51, 10, 0.94);
     } else if (getFileName() == "fullySortedIntDistribution250mValues") {
-        generatePartiallySortedInMemory(data, getNumElements(), 100, 0);
+        generatePartiallySortedInMemoryOneToOneHundred(data, getNumElements(), 100, 0);
     } else if (getFileName() == "veryNearlyFullySortedIntDistribution250mValues") {
-        generatePartiallySortedInMemory(data, getNumElements(), 100, 0.01);
+        generatePartiallySortedInMemoryOneToOneHundred(data, getNumElements(), 100, 0.01);
     } else if (getFileName() == "nearlyFullySortedIntDistribution250mValues") {
-        generatePartiallySortedInMemory(data, getNumElements(), 100, 1);
+        generatePartiallySortedInMemoryOneToOneHundred(data, getNumElements(), 100, 1);
     } else if (getFileName() == "partiallySortedIntDistribution250mValues") {
-        generatePartiallySortedInMemory(data, getNumElements(), 100, 5);
+        generatePartiallySortedInMemoryOneToOneHundred(data, getNumElements(), 100, 5);
     } else if (getFileName() == "slightlySortedIntDistribution250mValues") {
-        generatePartiallySortedInMemory(data, getNumElements(), 100, 25);
+        generatePartiallySortedInMemoryOneToOneHundred(data, getNumElements(), 100, 25);
     } else if (getFileName() == "uniformIntDistribution200mValuesCardinality400kMax200m") {
         generateUniformDistributionInMemoryWithSetCardinality(data, getNumElements(), getNumElements(), 400000);
     } else if (getFileName() == "uniformIntDistribution200mValuesCardinality4175320Max200mClustered1k") {
@@ -62,7 +62,9 @@ void DataFile::loadDataIntoMemory(T *data) const {
     } else if (getFileName() == "uniformIntDistribution250mValuesMax250m") {
         generateUniformDistributionInMemory(data, getNumElements(), 250*1000*1000);
     } else if (getFileName() == "fullySortedIntDistribution250mValuesMax250m") {
-        generateFullySortedInMemory(data, getNumElements());
+        generateFullySortedUniqueInMemory(data, getNumElements());
+    } else if (getFileName() == "uniqueRandom250mInt") {
+        generateUniqueValuesRandomisedInMemory(data, getNumElements());
     }
 }
 
@@ -73,10 +75,10 @@ bool DataSweep::loadNextDataSetIntoMemory(T *data) {
     }
 
     if (getSweepName() == "logSortedIntDistribution25kValuesRandomnessSweep") {
-        generatePartiallySortedInMemory(data, getNumElements(), 10, inputs[runsCompleted++]);
+        generatePartiallySortedInMemoryOneToOneHundred(data, getNumElements(), 10, inputs[runsCompleted++]);
         return true;
     } else if (getSweepName() == "logSortedIntDistribution250mValuesRandomnessSweep") {
-        generatePartiallySortedInMemory(data, getNumElements(), 10, inputs[runsCompleted++]);
+        generatePartiallySortedInMemoryOneToOneHundred(data, getNumElements(), 10, inputs[runsCompleted++]);
         return true;
     } else if (getSweepName() == "varyingIntDistribution250mValuesSweep") {
         generateVaryingSelectivityInMemory(data, getNumElements(), 51, static_cast<int>(inputs[runsCompleted++]));
@@ -164,6 +166,15 @@ bool DataSweep::loadNextDataSetIntoMemory(T *data) {
         return true;
     } else if (getSweepName() == "logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1m") {
         generateUniformDistributionInMemoryWithSetCardinalityClustered(data, getNumElements(), 20*1000*1000, 1*1000*1000, inputs[runsCompleted++]);
+        return true;
+    } else if (getSweepName() == "linearUniqueIntDistribution250mValuesSortednessSweep") {
+        generatePartiallySortedUniqueInMemory(data, getNumElements(), inputs[runsCompleted++]);
+        return true;
+    } else if (getSweepName() == "logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m") {
+        generateUniformDistributionInMemoryWithSetCardinalityClustered(data, getNumElements(), getNumElements(), 10*1000*1000, inputs[runsCompleted++]);
+        return true;
+    } else if (getSweepName() == "linearUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m") {
+        generateUniformDistributionInMemoryWithSetCardinalityClustered(data, getNumElements(), getNumElements(), 10*1000*1000, inputs[runsCompleted++]);
         return true;
     }
     return false;

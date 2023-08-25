@@ -8,6 +8,40 @@
 
 
 template <typename T>
+LoadedData<T>::LoadedData(const DataFile &dataFile) : data(nullptr), dataFile(&dataFile) {
+    loadData();
+}
+
+template <typename T>
+void LoadedData<T>::loadData() {
+    data = new T[dataFile->getNumElements()];
+    dataFile->loadDataIntoMemory(data);
+}
+
+template <typename T>
+LoadedData<T> &LoadedData<T>::getInstance(const DataFile &requestedDataFile) {
+    static LoadedData instance(requestedDataFile);
+
+    if (requestedDataFile.getFileName() != instance.getDataFile().getFileName()) {
+        delete[] instance.data;
+        instance.dataFile = &requestedDataFile;
+        instance.loadData();
+    }
+
+    return instance;
+}
+
+template <typename T>
+T* LoadedData<T>::getData() const {
+    return data;
+}
+
+template <typename T>
+const DataFile& LoadedData<T>::getDataFile() const {
+    return *dataFile;
+}
+
+template <typename T>
 void generateVaryingSelectivityInMemory(T *data, int n, int minimum, int numberOfDiscreteSections) {
     static_assert(std::is_integral<T>::value, "Must be an integer type");
 
@@ -197,7 +231,7 @@ void generateUnequalLowerStepSelectivityInMemory(T *data, int n, int step, int n
 }
 
 template <typename T>
-void generatePartiallySortedInMemory(T *data, int n, int numRepeats, float percentageRandom) {
+void generatePartiallySortedInMemoryOneToOneHundred(T *data, int n, int numRepeats, float percentageRandom) {
     static_assert(std::is_integral<T>::value, "Must be an integer type");
 
     std::cout << "Generating data in memory... ";
@@ -264,12 +298,47 @@ void generatePartiallySortedInMemory(T *data, int n, int numRepeats, float perce
 }
 
 template <typename T>
-void generateFullySortedInMemory(T *data, int n) {
+void generateFullySortedUniqueInMemory(T *data, int n) {
+    static_assert(std::is_integral<T>::value, "Must be an integer type");
     std::cout << "Generating data in memory... ";
     std::cout.flush();
 
     for (auto i = 0; i < n; ++i) {
         data[i] = i;
+    }
+
+    std::cout << "Complete" << std::endl;
+}
+
+template <typename T>
+void generatePartiallySortedUniqueInMemory(T *data, int n, float percentageRandom) {
+    static_assert(std::is_integral<T>::value, "Must be an integer type");
+    std::cout << "Generating data in memory... ";
+    std::cout.flush();
+
+    if (std::abs(percentageRandom - 1) < 1e-5) {
+        T *generatedData = LoadedData<T>::getInstance(DataFiles::uniqueRandom250mInt).getData();
+        for (auto i = 0; i < n; i++) {
+            data[i] = generatedData[i];
+        }
+       return;
+    }
+
+    for (auto i = 0; i < n; ++i) {
+        data[i] = i;
+    }
+
+    if (std::abs(percentageRandom - 0) < 1e-5) {
+        return;
+    }
+
+    int pairsToSwap = static_cast<int>(0.5 * (percentageRandom / 100.0) * n);
+
+    int index1, index2;
+    for (auto pairsSwapped = 0; pairsSwapped < pairsToSwap; ++pairsSwapped) {
+        index1 = LoadedData<T>::getInstance(DataFiles::uniqueRandom250mInt).getData()[pairsSwapped * 2];
+        index2 = LoadedData<T>::getInstance(DataFiles::uniqueRandom250mInt).getData()[(pairsSwapped * 2) + 1];
+        std::swap(data[index1], data[index2]);
     }
 
     std::cout << "Complete" << std::endl;
@@ -397,6 +466,7 @@ void generateUniformDistributionInMemoryWithSetCardinalityClustered(T *data, int
 
     int numberOfSections = 1 + cardinality - spreadInCluster;
     int elementsPerSection = n / numberOfSections;
+
     int index = 0;
     for (int i = 0; i < numberOfSections - 1; i++) {
         for (int j = 0; j < elementsPerSection; j++) {

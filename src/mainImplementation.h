@@ -317,19 +317,11 @@ void groupByWallTimeDopSweepBenchmarkCalcDopRange(DataSweep &dataSweep, int iter
 
     groupByWallTimeDopSweepBenchmark<T1,T2>(dataSweep, iterations, fileNamePrefix, dopValues);
 }
+
 template<typename T1, typename T2>
 void radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations(const DataFile &dataFile, int startBits,
                                                                      int endBits, const std::string &fileNamePrefix,
                                                                      int iterations) {
-//    std::vector<std::string> benchmarkCounters = {"PERF_COUNT_HW_CPU_CYCLES",
-//                                                  "INSTRUCTION_RETIRED",
-//                                                  "PERF_COUNT_HW_CACHE_L1D",
-//                                                  "PERF_COUNT_HW_CACHE_REFERENCES",
-//                                                  "PERF_COUNT_HW_CACHE_MISSES",
-//                                                  "PERF_COUNT_HW_CACHE_DTLB",
-//                                                  "DTLB-LOADS",
-//                                                  "DTLB-STORES"};
-
     {
         std::vector<std::string> benchmarkCounters = {"PERF_COUNT_HW_CPU_CYCLES",
                                                       "DTLB-STORES",
@@ -349,6 +341,33 @@ void radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations(const DataF
                                                       "PERF_COUNT_HW_CACHE_MISSES"};
 
         radixPartitionBitsSweepBenchmarkWithExtraCounters<T1, T2>(dataFile, startBits, endBits, benchmarkCounters,
+                                                                  fileNamePrefix + "2_", iterations);
+    }
+}
+
+template<typename T1, typename T2>
+void radixPartitionSweepBenchmarkWithExtraCountersConfigurations(DataSweep &dataSweep, int radixBits,
+                                                                 const std::string &fileNamePrefix,
+                                                                 int iterations) {
+    {
+        std::vector<std::string> benchmarkCounters = {"PERF_COUNT_HW_CPU_CYCLES",
+                                                      "DTLB-STORES",
+                                                      "DTLB-STORE-MISSES",
+                                                      "DTLB-LOADS",
+                                                      "DTLB-LOAD-MISSES"};
+
+        radixPartitionSweepBenchmarkWithExtraCounters<T1, T2>(dataSweep, radixBits, benchmarkCounters,
+                                                                  fileNamePrefix + "1_", iterations);
+    }
+
+    {
+        std::vector<std::string> benchmarkCounters = {"PERF_COUNT_HW_CPU_CYCLES",
+                                                      "INSTRUCTION_RETIRED",
+                                                      "PERF_COUNT_HW_CACHE_L1D",
+                                                      "PERF_COUNT_HW_CACHE_REFERENCES",
+                                                      "PERF_COUNT_HW_CACHE_MISSES"};
+
+        radixPartitionSweepBenchmarkWithExtraCounters<T1, T2>(dataSweep, radixBits, benchmarkCounters,
                                                                   fileNamePrefix + "2_", iterations);
     }
 }
