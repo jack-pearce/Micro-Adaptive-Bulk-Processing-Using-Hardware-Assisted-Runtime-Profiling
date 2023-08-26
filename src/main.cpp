@@ -969,9 +969,7 @@ void printTlbSpecifications() {
 
 int main() {
 
-    printTlbSpecifications();
-
-    return 0;
+//    printTlbSpecifications();
 
 //    for (int i = 2; i < 20; i ++) {
 //        testRadixPartition<int, int>(DataFiles::uniformIntDistribution250mValuesMax250m, i);
@@ -981,19 +979,19 @@ int main() {
 //    }
 
 
-//    radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations<int,int>(DataFiles::uniformIntDistribution250mValuesMax250m,
-//                                                                             4, 20,"4-20_Random_SinglePassRadixPartition_",1);
-//    radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations<int,int>(DataFiles::fullySortedIntDistribution250mValuesMax250m,
-//                                                                             4, 20,"4-20_Sorted_SinglePassRadixPartition_",1);
-//    radixPartitionSweepBenchmarkWithExtraCountersConfigurations<int,int>(DataSweeps::linearUniqueIntDistribution250mValuesSortednessSweep,
-//                                                                         16, "SortednessSweep_16", 1);
-//    radixPartitionSweepBenchmarkWithExtraCountersConfigurations<int,int>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
-//                                                                         16, "ClusterednessSweep_16", 1);
-//    radixPartitionSweepBenchmarkWithExtraCountersConfigurations<int,int>(DataSweeps::linearUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
-//                                                                         16, "ClusterednessSweep_16", 1);
+    radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations<int,int>(DataFiles::uniformIntDistribution250mValuesMax250m,
+                                                                             4, 20,"4-20_Random_SinglePassRadixPartition_",1);
+    radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations<int,int>(DataFiles::fullySortedIntDistribution250mValuesMax250m,
+                                                                             4, 20,"4-20_Sorted_SinglePassRadixPartition_",1);
+    radixPartitionSweepBenchmarkWithExtraCountersConfigurations<int,int>(DataSweeps::linearUniqueIntDistribution250mValuesSortednessSweep,
+                                                                         16, "SortednessSweep_16", 1);
+    radixPartitionSweepBenchmarkWithExtraCountersConfigurations<int,int>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
+                                                                         16, "ClusterednessSweep_16", 1);
+    radixPartitionSweepBenchmarkWithExtraCountersConfigurations<int,int>(DataSweeps::linearUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
+                                                                         16, "ClusterednessSweep_16", 1);
 
-//    radixPartitionSweepBenchmarkWithExtraCountersConfigurations<int,int>(DataSweeps::linearUniqueIntDistribution250mValuesSortednessSweep,
-//                                                                         6, "SortednessSweep_6", 1);
+    radixPartitionSweepBenchmarkWithExtraCountersConfigurations<int,int>(DataSweeps::linearUniqueIntDistribution250mValuesSortednessSweep,
+                                                                         6, "SortednessSweep_6", 1);
 
 /*    unsigned int seed = 1;
     std::mt19937 gen(seed);
