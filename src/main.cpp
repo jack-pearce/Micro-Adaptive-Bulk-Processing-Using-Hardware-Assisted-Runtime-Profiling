@@ -673,7 +673,7 @@ void runImdbGroupByMacroBenchmark3() {
     delete[] inputAggregate;
 }
 
-void printTlbSpecificationsFromSubLeaf0x18(unsigned int maxSubleaf) {
+void printTlbSpecificationsFromLeaf0x18(unsigned int maxSubleaf) {
     unsigned int leaf = 0x18;
     unsigned int eax, ebx, ecx, edx;
 
@@ -765,10 +765,10 @@ void printTlbSpecificationsFromSubLeaf0x18(unsigned int maxSubleaf) {
 void printByteDescriptorFromLeaf0x2(unsigned char value) {
     switch (value) {
         case 0x00: std::cout << "Null descriptor"; break;
-        case 0x01: std::cout << "Reserved (ignored)"; break;
-        case 0x02: std::cout << "Instruction TLB: 4K, 4-way, 32 entries"; break;
-        case 0x03: std::cout << "Instruction TLB: 4M, fully associative, 2 entries"; break;
-        case 0x04: std::cout << "Data TLB: 4K, 4-way, 64 entries"; break;
+        case 0x01: std::cout << "Instruction TLB: 4K, 4-way, 32 entries"; break;
+        case 0x02: std::cout << "Instruction TLB: 4M, fully associative, 2 entries"; break;
+        case 0x03: std::cout << "Data TLB: 4K, 4-way, 64 entries"; break;
+        case 0x04: std::cout << "Data TLB: 4M, 4-way, 8 entries"; break;
         case 0x05: std::cout << "Data TLB1: 4M, 4-way, 32 entries"; break;
         case 0x06: std::cout << "1st-level instruction cache: 8KB, 4-way, 32 byte line size"; break;
         case 0x08: std::cout << "1st-level instruction cache: 16KB, 4-way, 32 byte line size"; break;
@@ -884,8 +884,8 @@ void printByteDescriptorFromLeaf0x2(unsigned char value) {
 }
 
 void printTlbInformation(unsigned int eax, unsigned int ebx, unsigned int ecx, unsigned int edx) {
-    unsigned char descriptors[16] = {
-            static_cast<unsigned char>(eax & 0xFF), static_cast<unsigned char>((eax >> 8) & 0xFF),
+    unsigned char descriptors[15] = {
+            static_cast<unsigned char>((eax >> 8) & 0xFF),
             static_cast<unsigned char>((eax >> 16) & 0xFF), static_cast<unsigned char>((eax >> 24) & 0xFF),
             static_cast<unsigned char>(ebx & 0xFF), static_cast<unsigned char>((ebx >> 8) & 0xFF),
             static_cast<unsigned char>((ebx >> 16) & 0xFF), static_cast<unsigned char>((ebx >> 24) & 0xFF),
@@ -895,8 +895,9 @@ void printTlbInformation(unsigned int eax, unsigned int ebx, unsigned int ecx, u
             static_cast<unsigned char>((edx >> 16) & 0xFF), static_cast<unsigned char>((edx >> 24) & 0xFF)
     };
 
-    for (int i = 0; i < 16; i++) {
-        std::cout << "Byte " << i << ": ";
+    std::cout << "Byte 0: Reserved (ignored)" << std::endl;
+    for (int i = 0; i < 15; i++) {
+        std::cout << "Byte " << i + 1 << ": ";
         printByteDescriptorFromLeaf0x2(descriptors[i]);
     }
 }
@@ -934,7 +935,7 @@ void printTlbSpecifications() {
                 : "a" (eax), "c" (ecx)
                 );
 
-        printTlbSpecificationsFromSubLeaf0x18(eax);
+        printTlbSpecificationsFromLeaf0x18(eax);
         return;
     }
 
