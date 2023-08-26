@@ -472,7 +472,7 @@ DataSweep DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCard
         ""};
 
 DataSweep DataSweeps::linearUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m {
-        100,
+        30,
         250*1000*1000,
         "linearUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m",
         ""};

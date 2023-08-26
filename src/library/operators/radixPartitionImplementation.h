@@ -28,8 +28,8 @@ inline void radixPartitionAux(int start, int end, T1 *keys, T2 *payloads, T1 *bu
 //    }
 
     for (i = start; i < end; i++) {
-        bufferKeys[start + buckets[(keys[i] >> shifts) & mask]++] = keys[i]; /////////////////////////// ++ added
-//        bufferPayloads[start + buckets[(keys[i] >> shifts) & mask]++] = payloads[i];
+        bufferKeys[start + buckets[(keys[i] >> shifts) & mask]] = keys[i];
+        bufferPayloads[start + buckets[(keys[i] >> shifts) & mask]++] = payloads[i];
     }
 
 //    std::fill(buckets.begin(), buckets.end(), 0);
@@ -74,7 +74,7 @@ void radixPartition(int n, T1 *keys, T2 *payloads, int radixBits) {
 
     std::vector<int> buckets(1 + numBuckets, 0);
     T1 *bufferKeys = new T1[n];
-//    T2 *bufferPayloads = new T2[n];
+    T2 *bufferPayloads = new T2[n];
 
     radixPartitionAux(0, n, keys, payloads, bufferKeys, bufferKeys, mask, numBuckets, buckets,
                       msbPosition, radixBits);
@@ -85,7 +85,7 @@ void radixPartition(int n, T1 *keys, T2 *payloads, int radixBits) {
 }*/
 
     delete[]bufferKeys;
-//    delete[]bufferPayloads;
+    delete[]bufferPayloads;
 }
 
 

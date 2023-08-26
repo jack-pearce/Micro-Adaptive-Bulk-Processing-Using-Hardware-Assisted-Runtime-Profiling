@@ -1,4 +1,5 @@
 #include <vector>
+#include <bitset>
 
 #include "main.h"
 #include "cycles_benchmarking/groupByCyclesBenchmark.h"
@@ -675,6 +676,53 @@ void runImdbGroupByMacroBenchmark3() {
 
 int main() {
 
+    unsigned int leaf = 0x18;  // The desired CPUID leaf
+    unsigned int eax, ebx, ecx, edx;
+
+    // Iterate through subleafs and find the maximum valid subleaf
+    for (unsigned int subleaf = 0x0; subleaf <= 0x8; subleaf++) {
+        eax = leaf;
+        ecx = subleaf;
+
+        // Invoke the CPUID instruction
+        asm volatile (
+                "cpuid"
+                : "=a" (eax), "=b" (ebx), "=c" (ecx), "=d" (edx)
+                : "a" (eax), "c" (ecx)
+                );
+
+        // Output the retrieved values in binary format with spaces
+        std::string eax_binary = std::bitset<32>(eax).to_string();
+        std::string ebx_binary = std::bitset<32>(ebx).to_string();
+        std::string ecx_binary = std::bitset<32>(ecx).to_string();
+        std::string edx_binary = std::bitset<32>(edx).to_string();
+
+        // Insert spaces after every 4 bits
+        for (int i = 4; i < 39; i += 5) {
+            eax_binary.insert(i, " ");
+            ebx_binary.insert(i, " ");
+            ecx_binary.insert(i, " ");
+            edx_binary.insert(i, " ");
+        }
+
+        // Output the formatted binary values
+        std::cout << eax_binary << "-";
+        std::cout << ebx_binary << "-";
+        std::cout << ecx_binary << "-";
+        std::cout << edx_binary;
+        std::cout << " [SL 0" << subleaf << "]" << std::endl;
+
+/*        // Output the retrieved values
+        printf("0x%08x-", eax);
+        printf("0x%08x-", ebx);
+        printf("0x%08x-", ecx);
+        printf("0x%08x", edx);
+        std::cout << " [SL 0" << subleaf << "]" << std::endl;*/
+
+    }
+
+    return 0;
+
 //    for (int i = 2; i < 20; i ++) {
 //        testRadixPartition<int, int>(DataFiles::uniformIntDistribution250mValuesMax250m, i);
 //    }
@@ -687,12 +735,15 @@ int main() {
 //                                                                             4, 20,"4-20_Random_SinglePassRadixPartition_",1);
 //    radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations<int,int>(DataFiles::fullySortedIntDistribution250mValuesMax250m,
 //                                                                             4, 20,"4-20_Sorted_SinglePassRadixPartition_",1);
-    radixPartitionSweepBenchmarkWithExtraCountersConfigurations<int,int>(DataSweeps::linearUniqueIntDistribution250mValuesSortednessSweep,
-                                                                         16, "SortednessSweep_16", 1);
-    radixPartitionSweepBenchmarkWithExtraCountersConfigurations<int,int>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
-                                                                         16, "ClusterednessSweep_16", 1);
-    radixPartitionSweepBenchmarkWithExtraCountersConfigurations<int,int>(DataSweeps::linearUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
-                                                                         16, "ClusterednessSweep_16", 1);
+//    radixPartitionSweepBenchmarkWithExtraCountersConfigurations<int,int>(DataSweeps::linearUniqueIntDistribution250mValuesSortednessSweep,
+//                                                                         16, "SortednessSweep_16", 1);
+//    radixPartitionSweepBenchmarkWithExtraCountersConfigurations<int,int>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
+//                                                                         16, "ClusterednessSweep_16", 1);
+//    radixPartitionSweepBenchmarkWithExtraCountersConfigurations<int,int>(DataSweeps::linearUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
+//                                                                         16, "ClusterednessSweep_16", 1);
+
+//    radixPartitionSweepBenchmarkWithExtraCountersConfigurations<int,int>(DataSweeps::linearUniqueIntDistribution250mValuesSortednessSweep,
+//                                                                         6, "SortednessSweep_6", 1);
 
 /*    unsigned int seed = 1;
     std::mt19937 gen(seed);
