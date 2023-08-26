@@ -673,14 +673,31 @@ void runImdbGroupByMacroBenchmark3() {
     delete[] inputAggregate;
 }
 
-
-int main() {
-
+void printSubLeaf18TlbValues(unsigned int maxSubleaf) {
     unsigned int leaf = 0x18;  // The desired CPUID leaf
     unsigned int eax, ebx, ecx, edx;
 
-    // Iterate through subleafs and find the maximum valid subleaf
-    for (unsigned int subleaf = 0x0; subleaf <= 0x8; subleaf++) {
+    for (unsigned int subleaf = 0x1; subleaf <= maxSubleaf; subleaf++) {
+        eax = leaf;
+        ecx = subleaf;
+
+        // Invoke the CPUID instruction
+        asm volatile (
+                "cpuid"
+                : "=a" (eax), "=b" (ebx), "=c" (ecx), "=d" (edx)
+                : "a" (eax), "c" (ecx)
+                );
+
+        // Output the retrieved values
+        printf("0x%08x-", eax);
+        printf("0x%08x-", ebx);
+        printf("0x%08x-", ecx);
+        printf("0x%08x", edx);
+        std::cout << " [SL 0" << subleaf << "]" << std::endl;
+    }
+    std::cout << std::endl;
+
+    for (unsigned int subleaf = 0x1; subleaf <= maxSubleaf; subleaf++) {
         eax = leaf;
         ecx = subleaf;
 
@@ -706,20 +723,80 @@ int main() {
         }
 
         // Output the formatted binary values
-        std::cout << eax_binary << "-";
-        std::cout << ebx_binary << "-";
-        std::cout << ecx_binary << "-";
+        std::cout << eax_binary << "---";
+        std::cout << ebx_binary << "---";
+        std::cout << ecx_binary << "---";
         std::cout << edx_binary;
         std::cout << " [SL 0" << subleaf << "]" << std::endl;
-
-/*        // Output the retrieved values
-        printf("0x%08x-", eax);
-        printf("0x%08x-", ebx);
-        printf("0x%08x-", ecx);
-        printf("0x%08x", edx);
-        std::cout << " [SL 0" << subleaf << "]" << std::endl;*/
-
     }
+    std::cout << std::endl;
+
+    for (unsigned int subleaf = 0x1; subleaf <= maxSubleaf; subleaf++) {
+        eax = leaf;
+        ecx = subleaf;
+
+        // Invoke the CPUID instruction
+        asm volatile (
+                "cpuid"
+                : "=a" (eax), "=b" (ebx), "=c" (ecx), "=d" (edx)
+                : "a" (eax), "c" (ecx)
+                );
+
+        // Extract information from the registers
+        unsigned int translationCacheLevel = (edx >> 5) & 0x7;
+        unsigned int translationCacheType = edx & 0x1F;
+        unsigned int waysOfAssociativity = (ebx >> 16) & 0xFF;
+        unsigned int numberOfSets = ecx;
+        bool supports4KPage = ebx & 0x1;
+        bool supports2MBPage = (ebx >> 1) & 0x1;
+        bool supports4MBPage = (ebx >> 2) & 0x1;
+        bool supports1GBPage = (ebx >> 3) & 0x1;
+
+        // Output the retrieved values
+        std::cout << "L" << translationCacheLevel;
+        if (translationCacheType == 1) std::cout << " Data TLB, ";
+        if (translationCacheType == 2) std::cout << " Instruction TLB, ";
+        if (translationCacheType == 3) std::cout << " Unified TLB, ";
+        if (translationCacheType == 4) std::cout << " Load Only TLB, ";
+        if (translationCacheType == 5) std::cout << " Store Only TLB, ";
+        std::cout << waysOfAssociativity << " way associativity, ";
+        std::cout << numberOfSets << " sets, ";
+        std::cout << waysOfAssociativity * numberOfSets << " entries, ";
+        std::cout << "supports ";
+        if (supports4KPage) std::cout << "4K ";
+        if (supports2MBPage) std::cout << "2MB ";
+        if (supports4MBPage) std::cout << "4MB ";
+        if (supports1GBPage) std::cout << "1GB ";
+        std::cout << "page sizes" << std::endl;
+    }
+}
+
+void printTlbInformation() {
+    unsigned int leaf = 0x02;  // The desired CPUID leaf
+    unsigned int eax, ebx, ecx, edx;
+
+    eax = leaf;
+
+    // Invoke the CPUID instruction
+    asm volatile (
+            "cpuid"
+            : "=a" (eax), "=b" (ebx), "=c" (ecx), "=d" (edx)
+            : "a" (eax), "c" (ecx)
+            );
+
+    // Output the retrieved values
+    printf("0x%08x-", eax);
+    printf("0x%08x-", ebx);
+    printf("0x%08x-", ecx);
+    printf("0x%08x", edx);
+}
+
+int main() {
+
+
+
+    printTlbInformation();
+
 
     return 0;
 
