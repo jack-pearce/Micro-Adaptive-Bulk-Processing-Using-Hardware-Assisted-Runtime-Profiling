@@ -762,6 +762,146 @@ void printTlbSpecificationsFromSubLeaf0x18(unsigned int maxSubleaf) {
     }
 }
 
+void printByteDescriptorFromLeaf0x2(unsigned char value) {
+    switch (value) {
+        case 0x00: std::cout << "Null descriptor"; break;
+        case 0x01: std::cout << "Reserved (ignored)"; break;
+        case 0x02: std::cout << "Instruction TLB: 4K, 4-way, 32 entries"; break;
+        case 0x03: std::cout << "Instruction TLB: 4M, fully associative, 2 entries"; break;
+        case 0x04: std::cout << "Data TLB: 4K, 4-way, 64 entries"; break;
+        case 0x05: std::cout << "Data TLB1: 4M, 4-way, 32 entries"; break;
+        case 0x06: std::cout << "1st-level instruction cache: 8KB, 4-way, 32 byte line size"; break;
+        case 0x08: std::cout << "1st-level instruction cache: 16KB, 4-way, 32 byte line size"; break;
+        case 0x09: std::cout << "1st-level instruction cache: 32KB, 4-way, 64 byte line size"; break;
+        case 0x0A: std::cout << "1st-level data cache: 8KB, 2-way, 32 byte line size"; break;
+        case 0x0B: std::cout << "Instruction TLB: 4M, 4-way, 4 entries"; break;
+        case 0x0C: std::cout << "1st-level data cache: 16KB, 4-way, 32 byte line size"; break;
+        case 0x0D: std::cout << "1st-level data cache: 16KB, 4-way, 64 byte line size"; break;
+        case 0x0E: std::cout << "1st-level data cache: 24KB, 6-way, 64 byte line size"; break;
+        case 0x1D: std::cout << "2nd-level cache: 128KB, 2-way, 64 byte line size"; break;
+        case 0x21: std::cout << "2nd-level cache: 256KB, 8-way, 64 byte line size"; break;
+        case 0x22: std::cout << "3rd-level cache: 512KB, 4-way, 64 byte line size, 2 lines per sector"; break;
+        case 0x23: std::cout << "3rd-level cache: 1MB, 8-way, 64 byte line size, 2 lines per sector"; break;
+        case 0x24: std::cout << "2nd-level cache: 1MB, 16-way, 64 byte line size"; break;
+        case 0x25: std::cout << "3rd-level cache: 2MB, 8-way, 64 byte line size, 2 lines per sector"; break;
+        case 0x29: std::cout << "3rd-level cache: 4MB, 8-way, 64 byte line size, 2 lines per sector"; break;
+        case 0x2C: std::cout << "1st-level data cache: 32KB, 8-way, 64 byte line size"; break;
+        case 0x30: std::cout << "1st-level instruction cache: 32KB, 8-way, 64 byte line size"; break;
+        case 0x40: std::cout << "No 2nd-level cache or, if valid, no 3rd-level cache"; break;
+        case 0x41: std::cout << "2nd-level cache: 128KB, 4-way, 32 byte line size"; break;
+        case 0x42: std::cout << "2nd-level cache: 256KB, 4-way, 32 byte line size"; break;
+        case 0x43: std::cout << "2nd-level cache: 512KB, 4-way, 32 byte line size"; break;
+        case 0x44: std::cout << "2nd-level cache: 1MB, 4-way, 32 byte line size"; break;
+        case 0x45: std::cout << "2nd-level cache: 2MB, 4-way, 32 byte line size"; break;
+        case 0x46: std::cout << "3rd-level cache: 4MB, 4-way, 64 byte line size"; break;
+        case 0x47: std::cout << "3rd-level cache: 8MB, 8-way, 64 byte line size"; break;
+        case 0x48: std::cout << "2nd-level cache: 3MB, 12-way, 64 byte line size"; break;
+        case 0x49: std::cout << "3rd-level cache: 4MB, 16-way, 64 byte line size"; break;
+        case 0x4A: std::cout << "3rd-level cache: 6MB, 12-way, 64 byte line size"; break;
+        case 0x4B: std::cout << "3rd-level cache: 8MB, 16-way, 64 byte line size"; break;
+        case 0x4C: std::cout << "3rd-level cache: 12MB, 12-way, 64 byte line size"; break;
+        case 0x4D: std::cout << "3rd-level cache: 16MB, 16-way, 64 byte line size"; break;
+        case 0x4E: std::cout << "2nd-level cache: 6MB, 24-way, 64 byte line size"; break;
+        case 0x4F: std::cout << "Instruction TLB: 4K, 32 entries"; break;
+        case 0x50: std::cout << "Instruction TLB: 4K/2M pages, 64 entries"; break;
+        case 0x51: std::cout << "Instruction TLB: 4K/2M pages, 128 entries"; break;
+        case 0x52: std::cout << "Instruction TLB: 4K/2M pages, 256 entries"; break;
+        case 0x55: std::cout << "Instruction TLB: 2M/4M pages, fully associative, 7 entries"; break;
+        case 0x56: std::cout << "Data TLB0: 4M pages, 4-way, 16 entries"; break;
+        case 0x57: std::cout << "Data TLB0: 4K pages, 4-way, 16 entries"; break;
+        case 0x59: std::cout << "Data TLB0: 4K pages, fully associative, 16 entries"; break;
+        case 0x5A: std::cout << "Data TLB0: 2M/4M pages, 4-way, 32 entries"; break;
+        case 0x5B: std::cout << "Data TLB: 4K/4M pages, 64 entries"; break;
+        case 0x5C: std::cout << "Data TLB: 4K/4M pages, 128 entries"; break;
+        case 0x5D: std::cout << "Data TLB: 4K/4M pages, 256 entries"; break;
+        case 0x60: std::cout << "1st-level data cache: 16KB, 8-way, 64 byte line size"; break;
+        case 0x61: std::cout << "Instruction TLB: 4K pages, fully associative, 48 entries"; break;
+        case 0x63: std::cout << "Data TLB: 2M/4M pages, 4-way, 32 entries and 1GB pages, 4-way, 4 entries"; break;
+        case 0x64: std::cout << "Data TLB: 4K pages, 4-way, 512 entries"; break;
+        case 0x66: std::cout << "1st-level data cache: 8KB, 4-way, 64 byte line size"; break;
+        case 0x67: std::cout << "1st-level data cache: 16KB, 4-way, 64 byte line size"; break;
+        case 0x68: std::cout << "1st-level data cache: 32KB, 4-way, 64 byte line size"; break;
+        case 0x6A: std::cout << "uTLB: 4K pages, 8-way, 64 entries"; break;
+        case 0x6B: std::cout << "DTLB: 4K pages, 8-way, 256 entries"; break;
+        case 0x6C: std::cout << "DTLB: 2M/4M pages, 8-way, 128 entries"; break;
+        case 0x6D: std::cout << "DTLB: 1GB pages, fully associative, 16 entries"; break;
+        case 0x70: std::cout << "Trace cache: 12K-μop, 8-way"; break;
+        case 0x71: std::cout << "Trace cache: 16K-μop, 8-way"; break;
+        case 0x72: std::cout << "Trace cache: 32K-μop, 8-way"; break;
+        case 0x76: std::cout << "Instruction TLB: 2M/4M pages, fully associative, 8 entries"; break;
+        case 0x78: std::cout << "2nd-level cache: 1MB, 4-way, 64 byte line size"; break;
+        case 0x79: std::cout << "2nd-level cache: 128KB, 8-way, 64 byte line size, 2 lines per sector"; break;
+        case 0x7A: std::cout << "2nd-level cache: 256KB, 8-way, 64 byte line size, 2 lines per sector"; break;
+        case 0x7B: std::cout << "2nd-level cache: 512KB, 8-way, 64 byte line size, 2 lines per sector"; break;
+        case 0x7C: std::cout << "2nd-level cache: 1MB, 8-way, 64 byte line size, 2 lines per sector"; break;
+        case 0x7D: std::cout << "2nd-level cache: 2MB, 8-way, 64 byte line size"; break;
+        case 0x7F: std::cout << "2nd-level cache: 512KB, 2-way, 64 byte line size"; break;
+        case 0x80: std::cout << "2nd-level cache: 512KB, 8-way, 64 byte line size"; break;
+        case 0x82: std::cout << "2nd-level cache: 256KB, 8-way, 32 byte line size"; break;
+        case 0x83: std::cout << "2nd-level cache: 512KB, 8-way, 32 byte line size"; break;
+        case 0x84: std::cout << "2nd-level cache: 1MB, 8-way, 32 byte line size"; break;
+        case 0x85: std::cout << "2nd-level cache: 2MB, 8-way, 32 byte line size"; break;
+        case 0x86: std::cout << "2nd-level cache: 512KB, 4-way, 64 byte line size"; break;
+        case 0x87: std::cout << "2nd-level cache: 1MB, 8-way, 64 byte line size"; break;
+        case 0xA0: std::cout << "DTLB: 4k pages, fully associative, 32 entries"; break;
+        case 0xB0: std::cout << "Instruction TLB: 4 KByte pages, 4-way set associative, 128 entries"; break;
+        case 0xB1: std::cout << "Instruction TLB: 2M pages, 4-way, 8 entries or 4M pages, 4-way, 4 entries"; break;
+        case 0xB2: std::cout << "Instruction TLB: 4KByte pages, 4-way set associative, 64 entries"; break;
+        case 0xB3: std::cout << "Data TLB: 4 KByte pages, 4-way set associative, 128 entries"; break;
+        case 0xB4: std::cout << "Data TLB: 4M pages, 4-way set associative, 8 entries"; break;
+        case 0xB5: std::cout << "Data TLB1: 4M pages, 4-way associative, 256 entries"; break;
+        case 0xB6: std::cout << "Instruction TLB: 4KByte pages, 8-way set associative, 64 entries"; break;
+        case 0xB7: std::cout << "Instruction TLB: 2M pages, 8-way, 2 entries or 4M pages, 8-way, 1 entry"; break;
+        case 0xB8: std::cout << "Instruction TLB: 4KByte pages, 8-way set associative, 128 entries"; break;
+        case 0xBA: std::cout << "Data TLB1: 4 KByte pages, 4-way associative, 64 entries"; break;
+        case 0xC0: std::cout << "Data TLB: 4 KByte and 4 MByte pages, 4-way associative, 8 entries"; break;
+        case 0xC1: std::cout << "Shared 2nd-Level TLB: 4 KByte/2MByte pages, 8-way associative, 1024 entries"; break;
+        case 0xC2: std::cout << "DTLB: 4 KByte/2 MByte pages, 4-way associative, 16 entries"; break;
+        case 0xC3: std::cout << "Shared 2nd-Level TLB: 4 KByte/2 MByte pages, 6-way associative, 1536 entries"; break;
+        case 0xC4: std::cout << "DTLB: 2M/4M Byte pages, 4-way associative, 32 entries"; break;
+        case 0xCA: std::cout << "Shared 2nd-Level TLB: 4 KByte pages, 4-way associative, 512 entries"; break;
+        case 0xD0: std::cout << "3rd-level cache: 512 KByte, 4-way set associative, 64 byte line size"; break;
+        case 0xD1: std::cout << "3rd-level cache: 1 MByte, 4-way set associative, 64 byte line size"; break;
+        case 0xD2: std::cout << "3rd-level cache: 2 MByte, 4-way set associative, 64 byte line size"; break;
+        case 0xD6: std::cout << "3rd-level cache: 1 MByte, 8-way set associative, 64 byte line size"; break;
+        case 0xD7: std::cout << "3rd-level cache: 2 MByte, 8-way set associative, 64 byte line size"; break;
+        case 0xD8: std::cout << "3rd-level cache: 4 MByte, 8-way set associative, 64 byte line size"; break;
+        case 0xDC: std::cout << "3rd-level cache: 1.5 MByte, 12-way set associative, 64 byte line size"; break;
+        case 0xDD: std::cout << "3rd-level cache: 3 MByte, 12-way set associative, 64 byte line size"; break;
+        case 0xDE: std::cout << "3rd-level cache: 6 MByte, 12-way set associative, 64 byte line size"; break;
+        case 0xE2: std::cout << "3rd-level cache: 2 MByte, 16-way set associative, 64 byte line size"; break;
+        case 0xE3: std::cout << "3rd-level cache: 4 MByte, 16-way set associative, 64 byte line size"; break;
+        case 0xE4: std::cout << "3rd-level cache: 8 MByte, 16-way set associative, 64 byte line size"; break;
+        case 0xEA: std::cout << "3rd-level cache: 12 MByte, 24-way set associative, 64 byte line size"; break;
+        case 0xEB: std::cout << "3rd-level cache: 18 MByte, 24-way set associative, 64 byte line size"; break;
+        case 0xEC: std::cout << "3rd-level cache: 24 MByte, 24-way set associative, 64 byte line size"; break;
+        case 0xF0: std::cout << "Prefetch: 64-Byte prefetching"; break;
+        case 0xF1: std::cout << "Prefetch: 128-Byte prefetching"; break;
+        case 0xFE: std::cout << "CPUID leaf 2 does not report TLB descriptor information"; break;
+        default: std::cout << "Unknown descriptor"; break;
+    }
+    std::cout << std::endl;
+}
+
+void printTlbInformation(unsigned int eax, unsigned int ebx, unsigned int ecx, unsigned int edx) {
+    unsigned char descriptors[16] = {
+            static_cast<unsigned char>(eax & 0xFF), static_cast<unsigned char>((eax >> 8) & 0xFF),
+            static_cast<unsigned char>((eax >> 16) & 0xFF), static_cast<unsigned char>((eax >> 24) & 0xFF),
+            static_cast<unsigned char>(ebx & 0xFF), static_cast<unsigned char>((ebx >> 8) & 0xFF),
+            static_cast<unsigned char>((ebx >> 16) & 0xFF), static_cast<unsigned char>((ebx >> 24) & 0xFF),
+            static_cast<unsigned char>(ecx & 0xFF), static_cast<unsigned char>((ecx >> 8) & 0xFF),
+            static_cast<unsigned char>((ecx >> 16) & 0xFF), static_cast<unsigned char>((ecx >> 24) & 0xFF),
+            static_cast<unsigned char>(edx & 0xFF), static_cast<unsigned char>((edx >> 8) & 0xFF),
+            static_cast<unsigned char>((edx >> 16) & 0xFF), static_cast<unsigned char>((edx >> 24) & 0xFF)
+    };
+
+    for (int i = 0; i < 16; i++) {
+        std::cout << "Byte " << i << ": ";
+        printByteDescriptorFromLeaf0x2(descriptors[i]);
+        std::cout << std::endl;
+    }
+}
+
 bool has0xfeByteValue(unsigned int reg, unsigned char byteValue) {
     for (int i = 0; i < 4; i++) {
         if ((reg & 0xFF) == byteValue) {
@@ -779,7 +919,7 @@ void printTlbSpecifications() {
     asm volatile (
             "cpuid"
             : "=a" (eax), "=b" (ebx), "=c" (ecx), "=d" (edx)
-            : "a" (eax), "c" (ecx)
+            : "a" (eax)
             );
 
     unsigned char byteValue = 0xFE;
@@ -823,13 +963,12 @@ void printTlbSpecifications() {
     std::cout << ecx_binary << "---";
     std::cout << edx_binary << std::endl;
 
-    // Logic for 0x2 leaf values
+    printTlbInformation(eax, ebx, ecx, edx);
 }
 
 int main() {
 
     printTlbSpecifications();
-
 
     return 0;
 
