@@ -898,7 +898,6 @@ void printTlbInformation(unsigned int eax, unsigned int ebx, unsigned int ecx, u
     for (int i = 0; i < 16; i++) {
         std::cout << "Byte " << i << ": ";
         printByteDescriptorFromLeaf0x2(descriptors[i]);
-        std::cout << std::endl;
     }
 }
 
