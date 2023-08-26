@@ -673,22 +673,20 @@ void runImdbGroupByMacroBenchmark3() {
     delete[] inputAggregate;
 }
 
-void printSubLeaf18TlbValues(unsigned int maxSubleaf) {
-    unsigned int leaf = 0x18;  // The desired CPUID leaf
+void printTlbSpecificationsFromSubLeaf0x18(unsigned int maxSubleaf) {
+    unsigned int leaf = 0x18;
     unsigned int eax, ebx, ecx, edx;
 
     for (unsigned int subleaf = 0x1; subleaf <= maxSubleaf; subleaf++) {
         eax = leaf;
         ecx = subleaf;
 
-        // Invoke the CPUID instruction
         asm volatile (
                 "cpuid"
                 : "=a" (eax), "=b" (ebx), "=c" (ecx), "=d" (edx)
                 : "a" (eax), "c" (ecx)
                 );
 
-        // Output the retrieved values
         printf("0x%08x-", eax);
         printf("0x%08x-", ebx);
         printf("0x%08x-", ecx);
@@ -701,20 +699,17 @@ void printSubLeaf18TlbValues(unsigned int maxSubleaf) {
         eax = leaf;
         ecx = subleaf;
 
-        // Invoke the CPUID instruction
         asm volatile (
                 "cpuid"
                 : "=a" (eax), "=b" (ebx), "=c" (ecx), "=d" (edx)
                 : "a" (eax), "c" (ecx)
                 );
 
-        // Output the retrieved values in binary format with spaces
         std::string eax_binary = std::bitset<32>(eax).to_string();
         std::string ebx_binary = std::bitset<32>(ebx).to_string();
         std::string ecx_binary = std::bitset<32>(ecx).to_string();
         std::string edx_binary = std::bitset<32>(edx).to_string();
 
-        // Insert spaces after every 4 bits
         for (int i = 4; i < 39; i += 5) {
             eax_binary.insert(i, " ");
             ebx_binary.insert(i, " ");
@@ -722,7 +717,6 @@ void printSubLeaf18TlbValues(unsigned int maxSubleaf) {
             edx_binary.insert(i, " ");
         }
 
-        // Output the formatted binary values
         std::cout << eax_binary << "---";
         std::cout << ebx_binary << "---";
         std::cout << ecx_binary << "---";
@@ -735,14 +729,12 @@ void printSubLeaf18TlbValues(unsigned int maxSubleaf) {
         eax = leaf;
         ecx = subleaf;
 
-        // Invoke the CPUID instruction
         asm volatile (
                 "cpuid"
                 : "=a" (eax), "=b" (ebx), "=c" (ecx), "=d" (edx)
                 : "a" (eax), "c" (ecx)
                 );
 
-        // Extract information from the registers
         unsigned int translationCacheLevel = (edx >> 5) & 0x7;
         unsigned int translationCacheType = edx & 0x1F;
         unsigned int waysOfAssociativity = (ebx >> 16) & 0xFF;
@@ -752,7 +744,6 @@ void printSubLeaf18TlbValues(unsigned int maxSubleaf) {
         bool supports4MBPage = (ebx >> 2) & 0x1;
         bool supports1GBPage = (ebx >> 3) & 0x1;
 
-        // Output the retrieved values
         std::cout << "L" << translationCacheLevel;
         if (translationCacheType == 1) std::cout << " Data TLB, ";
         if (translationCacheType == 2) std::cout << " Instruction TLB, ";
@@ -771,31 +762,73 @@ void printSubLeaf18TlbValues(unsigned int maxSubleaf) {
     }
 }
 
-void printTlbInformation() {
-    unsigned int leaf = 0x02;  // The desired CPUID leaf
+bool has0xfeByteValue(unsigned int reg, unsigned char byteValue) {
+    for (int i = 0; i < 4; i++) {
+        if ((reg & 0xFF) == byteValue) {
+            return true;
+        }
+        reg >>= 8;
+    }
+    return false;
+}
+
+void printTlbSpecifications() {
     unsigned int eax, ebx, ecx, edx;
+    eax = 0x02;
 
-    eax = leaf;
-
-    // Invoke the CPUID instruction
     asm volatile (
             "cpuid"
             : "=a" (eax), "=b" (ebx), "=c" (ecx), "=d" (edx)
             : "a" (eax), "c" (ecx)
             );
 
-    // Output the retrieved values
+    unsigned char byteValue = 0xFE;
+    if (has0xfeByteValue(eax, byteValue) || has0xfeByteValue(ebx, byteValue) ||
+        has0xfeByteValue(ecx, byteValue) || has0xfeByteValue(edx, byteValue)) {
+
+        eax = 0x18;
+        ecx = 0x0;
+
+        asm volatile (
+                "cpuid"
+                : "=a" (eax), "=b" (ebx), "=c" (ecx), "=d" (edx)
+                : "a" (eax), "c" (ecx)
+                );
+
+        printTlbSpecificationsFromSubLeaf0x18(eax);
+        return;
+    }
+
     printf("0x%08x-", eax);
     printf("0x%08x-", ebx);
     printf("0x%08x-", ecx);
     printf("0x%08x", edx);
+
+    std::cout << std::endl;
+
+    std::string eax_binary = std::bitset<32>(eax).to_string();
+    std::string ebx_binary = std::bitset<32>(ebx).to_string();
+    std::string ecx_binary = std::bitset<32>(ecx).to_string();
+    std::string edx_binary = std::bitset<32>(edx).to_string();
+
+    for (int i = 4; i < 39; i += 5) {
+        eax_binary.insert(i, " ");
+        ebx_binary.insert(i, " ");
+        ecx_binary.insert(i, " ");
+        edx_binary.insert(i, " ");
+    }
+
+    std::cout << eax_binary << "---";
+    std::cout << ebx_binary << "---";
+    std::cout << ecx_binary << "---";
+    std::cout << edx_binary << std::endl;
+
+    // Logic for 0x2 leaf values
 }
 
 int main() {
 
-
-
-    printTlbInformation();
+    printTlbSpecifications();
 
 
     return 0;
