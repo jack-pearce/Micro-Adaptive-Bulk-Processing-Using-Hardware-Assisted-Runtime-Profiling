@@ -878,6 +878,7 @@ void printByteDescriptorFromLeaf0x2(unsigned char value) {
         case 0xF0: std::cout << "Prefetch: 64-Byte prefetching"; break;
         case 0xF1: std::cout << "Prefetch: 128-Byte prefetching"; break;
         case 0xFE: std::cout << "CPUID leaf 2 does not report TLB descriptor information"; break;
+        case 0xFF: std::cout << "CPUID leaf 2 does not report cache descriptor information"; break;
         default: std::cout << "Unknown descriptor"; break;
     }
     std::cout << std::endl;
