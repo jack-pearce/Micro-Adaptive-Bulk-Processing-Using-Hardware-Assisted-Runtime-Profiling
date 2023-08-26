@@ -581,7 +581,7 @@ template<template<typename> class Aggregator, typename T1, typename T2>
 vectorOfPairs<T1, T2> groupByAdaptiveParallel(int n, T1 *inputGroupBy, T2 *inputAggregate, int cardinality, int dop) {
     static_assert(std::is_integral<T1>::value, "GroupBy column must be an integer type");
     static_assert(std::is_arithmetic<T2>::value, "Payload column must be an numeric type");
-    assert(1 < dop && dop <= maxDop());
+    assert(1 < dop && dop <= logicalCoresCount());
     int totalThreads = (dop * 2) - 1;
 
     Counters::getInstance();

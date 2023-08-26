@@ -215,7 +215,7 @@ void selectWallTimeDopSweepBenchmarkCalcDopRange(DataSweep &dataSweep, Select se
                                                  const std::string &fileNamePrefix) {
     int dop = 2;
     std::vector<int> dopValues;
-    while (dop <= MABPL::maxDop()) {
+    while (dop <= MABPL::logicalCoresCount()) {
         dopValues.push_back(dop);
         dop *= 2;
     }
@@ -230,7 +230,7 @@ void selectWallTimeDopAndInputSweepBenchmarkCalcDopRange(const DataFile &dataFil
                                                          const std::string &fileNamePrefix) {
     int dop = 2;
     std::vector<int> dopValues;
-    while (dop <= MABPL::maxDop()) {
+    while (dop <= MABPL::logicalCoresCount()) {
         dopValues.push_back(dop);
         dop *= 2;
     }
@@ -310,7 +310,7 @@ void groupByWallTimeDopSweepBenchmarkCalcDopRange(DataSweep &dataSweep, int iter
                                                   const std::string &fileNamePrefix) {
     int dop = 2;
     std::vector<int> dopValues;
-    while (dop <= MABPL::maxDop()) {
+    while (dop <= MABPL::logicalCoresCount()) {
         dopValues.push_back(dop);
         dop *= 2;
     }

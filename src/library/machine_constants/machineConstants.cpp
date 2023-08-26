@@ -92,7 +92,7 @@ void MachineConstants::writeEmptyFile() {
 
 void MachineConstants::calculateMissingMachineConstants() {
     int dop = 1;
-    while (dop <= maxDop()) {
+    while (dop <= logicalCoresCount()) {
         std::string dopStr = std::to_string(dop);
 
         if (machineConstants.count("SelectIndexesLower_4B_inputFilter_" + dopStr + "_dop") == 0 ||

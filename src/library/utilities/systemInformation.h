@@ -19,8 +19,9 @@ bool arrayIsSimd256Aligned(const T *array) {
 
 long l3cacheSize();
 long bytesPerCacheLine();
-int maxDop();
+int logicalCoresCount();
 std::string getCurrentWorkingDirectory();
+void printIntelTlbSpecifications();
 
 }
 

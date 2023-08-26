@@ -305,7 +305,7 @@ void *selectIndexesAdaptiveParallelAux(void *arg) {
 
 template<typename T>
 int selectIndexesAdaptiveParallel(int n, const T *inputFilter, int *selection, T threshold, int dop) {
-    assert(1 < dop && dop <= maxDop());
+    assert(1 < dop && dop <= logicalCoresCount());
 
     Counters::getInstance();
     MachineConstants::getInstance();
@@ -880,7 +880,7 @@ void *selectValuesAdaptiveParallelAux(void *arg) {
 
 template<typename T1, typename T2>
 int selectValuesAdaptiveParallel(int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold, int dop) {
-    assert(1 < dop && dop <= maxDop());
+    assert(1 < dop && dop <= logicalCoresCount());
 
     Counters::getInstance();
     MachineConstants::getInstance();
