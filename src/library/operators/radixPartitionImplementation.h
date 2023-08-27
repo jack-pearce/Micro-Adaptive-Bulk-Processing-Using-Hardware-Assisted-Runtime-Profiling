@@ -62,7 +62,7 @@ void radixPartition(int n, T *keys, int radixBits) {
     int i;
     int numBuckets = 1 << radixBits;
     int mask = numBuckets - 1;
-    int largest = 0;
+    T largest = 0;
 
     for (i = 0; i < n; i++) {
         if (keys[i] > largest) {

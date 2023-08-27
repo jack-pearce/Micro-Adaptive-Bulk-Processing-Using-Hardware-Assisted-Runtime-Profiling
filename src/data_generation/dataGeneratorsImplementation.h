@@ -391,7 +391,7 @@ void generateUniqueValuesRandomisedInMemory(T *data, int n) {
 
     // Fisher–Yates shuffle
 
-    for (T i = 1; i <= n; ++i) {
+    for (T i = 1; i <= static_cast<T>(n); ++i) {
         data[i - 1] = i;
     }
 
