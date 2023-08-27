@@ -674,17 +674,26 @@ void runImdbGroupByMacroBenchmark3() {
 
 int main() {
 
-//    for (int i = 2; i < 20; i ++) {
-//        testRadixPartition<int32_t>(DataFiles::uniformIntDistribution250mValuesMax250m, i);
-//    }
-//    for (int i = 2; i < 20; i ++) {
-//        testRadixPartition<int32_t>(DataFiles::fullySortedIntDistribution250mValuesMax250m, i);
-//    }
+/*    for (int i = 2; i < 20; i ++) {
+        testRadixPartition<int32_t>(DataFiles::uniformIntDistribution20mValuesMax20m, i);
+    }
+    for (int i = 2; i < 20; i ++) {
+        testRadixPartition<int32_t>(DataFiles::fullySortedIntDistribution20mValuesMax20m, i);
+    }*/
 
+/*    radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations<uint32_t>(DataFiles::uniformIntDistribution20mValuesMax20m,
+                                                                              4, 18,"4-18_Random_SinglePassRadixPartition_",1);
+    radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations<uint32_t>(DataFiles::fullySortedIntDistribution20mValuesMax20m,
+                                                                              4, 18,"4-18_Sorted_SinglePassRadixPartition_",1);*/
+
+
+    radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations<uint32_t>(DataFiles::slightlyClusteredDistribution250mValuesCardinality10mMax250m,
+                                                                              4, 20,"4-20_SlightlyClustered_RadixPartition_",1);
     radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations<uint32_t>(DataFiles::uniformIntDistribution250mValuesMax250m,
-                                                                             4, 20,"4-20_Random_SinglePassRadixPartition_",1);
+                                                                             4, 20,"4-20_Random_RadixPartition_",1);
     radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations<uint32_t>(DataFiles::fullySortedIntDistribution250mValuesMax250m,
-                                                                             4, 20,"4-20_Sorted_SinglePassRadixPartition_",1);
+                                                                             4, 20,"4-20_Sorted_RadixPartition_",1);
+
     radixPartitionSweepBenchmarkWithExtraCountersConfigurations<uint32_t>(DataSweeps::linearUniqueIntDistribution250mValuesSortednessSweep,
                                                                          16, "SortednessSweep_16", 1);
     radixPartitionSweepBenchmarkWithExtraCountersConfigurations<uint32_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
@@ -697,41 +706,30 @@ int main() {
 
 /*    unsigned int seed = 1;
     std::mt19937 gen(seed);
-    std::uniform_int_distribution<int> distribution(1, 1000000);
+    std::uniform_int_distribution<uint32_t> distribution(1, 99);
 
-    int n = 50;
-    int *keys = new int[n];
-    int *payloads = new int[n];
+    int n = 61;
+    auto *keys = new uint32_t[n];
 
     for (auto i = 0; i < n; ++i) {
         keys[i] = distribution(gen);
-        payloads[i] = distribution(gen);
     }
 
     std::cout << "Before: " << std::endl;
     for (int i = 0; i < n; i++) {
         std::cout << keys[i] << " ";
     }
-    std::cout << std::endl;
-    for (int i = 0; i < n; i++) {
-        std::cout << payloads[i] << " ";
-    }
     std::cout << std::endl << std::endl;
 
-    MABPL::radixPartition(n, keys, payloads);
+    MABPL::radixPartition(n, keys, 2);
 
     std::cout << "After: " << std::endl;
     for (int i = 0; i < n; i++) {
         std::cout << keys[i] << " ";
     }
-    std::cout << std::endl;
-    for (int i = 0; i < n; i++) {
-        std::cout << payloads[i] << " ";
-    }
     std::cout << std::endl << std::endl;
 
-    delete[] keys;
-    delete[] payloads;*/
+    delete[] keys;*/
 
     return 0;
 }

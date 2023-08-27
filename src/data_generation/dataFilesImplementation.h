@@ -65,6 +65,12 @@ void DataFile::loadDataIntoMemory(T *data) const {
         generateFullySortedUniqueInMemory(data, getNumElements());
     } else if (getFileName() == "uniqueRandom250mInt") {
         generateUniqueValuesRandomisedInMemory(data, getNumElements());
+    } else if (getFileName() == "uniformIntDistribution20mValuesMax20m") {
+        generateUniformDistributionInMemory(data, getNumElements(), 33554431); // (2^25)-1
+    } else if (getFileName() == "fullySortedIntDistribution20mValuesMax20m") {
+        generateFullySortedUniqueInMemory(data, getNumElements());
+    } else if (getFileName() == "slightlyClusteredDistribution250mValuesCardinality10mMax250m") {
+        generateUniformDistributionInMemoryWithSetCardinalityClustered(data, getNumElements(), getNumElements(), 10*1000*1000, 1000);
     }
 }
 

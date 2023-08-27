@@ -222,6 +222,21 @@ const DataFile DataFiles::uniqueRandom250mInt{
         "uniqueRandom250mInt",
         ""};
 
+const DataFile DataFiles::uniformIntDistribution20mValuesMax20m{
+        20 * 1000 * 1000,
+        "uniformIntDistribution20mValuesMax20m",
+        ""};
+
+const DataFile DataFiles::fullySortedIntDistribution20mValuesMax20m{
+        20 * 1000 * 1000,
+        "fullySortedIntDistribution20mValuesMax20m",
+        ""};
+
+const DataFile DataFiles::slightlyClusteredDistribution250mValuesCardinality10mMax250m{
+        250 * 1000 * 1000,
+        "slightlyClusteredDistribution250mValuesCardinality10mMax250m",
+        ""};
+
 
 DataFile::DataFile(int _numElements, std::string _fileName, std::string _longDescription)
         : numElements(_numElements), fileName(std::move(_fileName)), longDescription(std::move(_longDescription)) {}

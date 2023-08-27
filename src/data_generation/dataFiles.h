@@ -93,6 +93,9 @@ public:
     static const DataFile uniformIntDistribution250mValuesMax250m;
     static const DataFile fullySortedIntDistribution250mValuesMax250m;
     static const DataFile uniqueRandom250mInt;
+    static const DataFile uniformIntDistribution20mValuesMax20m;
+    static const DataFile fullySortedIntDistribution20mValuesMax20m;
+    static const DataFile slightlyClusteredDistribution250mValuesCardinality10mMax250m;
 };
 
 class DataSweep {
