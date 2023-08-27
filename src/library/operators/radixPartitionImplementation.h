@@ -8,8 +8,8 @@
 
 namespace MABPL {
 
-template<typename T1, typename T2>
-inline void radixPartitionAux(int start, int end, T1 *keys, T2 *payloads, T1 *bufferKeys, T2 *bufferPayloads,
+template<typename T>
+inline void radixPartitionAux(int start, int end, T *keys, T *buffer,
                               int mask, int numBuckets, std::vector<int> &buckets, int pass, int &radixBits) {
     int i;
 
@@ -27,7 +27,7 @@ inline void radixPartitionAux(int start, int end, T1 *keys, T2 *payloads, T1 *bu
 //    }
 
     for (i = start; i < end; i++) {
-        bufferKeys[start + buckets[(keys[i] >> (pass * radixBits)) & mask]++] = keys[i]; /////////////////////////// ++ added
+        buffer[start + buckets[(keys[i] >> (pass * radixBits)) & mask]++] = keys[i]; /////////////////////////// ++ added
 //        bufferPayloads[start + buckets[(keys[i] >> (pass * radixBits)) & mask]++] = payloads[i];
     }
 
@@ -74,19 +74,12 @@ void radixPartition(int n, T *keys, int radixBits) {
     }
 
     std::vector<int> buckets(1 + numBuckets, 0);
-    T *bufferKeys = new T[n];
-//    T2 *bufferPayloads = new T2[n];
+    T *buffer = new T[n];
 
-    radixPartitionAux(0, n, keys, keys, bufferKeys, bufferKeys, mask, numBuckets, buckets,
+    radixPartitionAux(0, n, keys, buffer, mask, numBuckets, buckets,
                       0, radixBits);
 
-/*    if ((pass % 2) == 0) {
-memcpy(keys, bufferKeys, n * sizeof(T1));
-memcpy(payloads, bufferPayloads, n * sizeof(T2));
-}*/
-
-    delete[]bufferKeys;
-//    delete[]bufferPayloads;
+    delete[]buffer;
 }
 
 
