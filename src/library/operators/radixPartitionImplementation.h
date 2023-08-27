@@ -76,7 +76,7 @@ void radixPartition(int n, T1 *keys, T2 *payloads, int radixBits) {
     T1 *bufferKeys = new T1[n];
     T2 *bufferPayloads = new T2[n];
 
-    radixPartitionAux(0, n, keys, payloads, bufferKeys, bufferKeys, mask, numBuckets, buckets,
+    radixPartitionAux(0, n, keys, payloads, bufferKeys, bufferPayloads, mask, numBuckets, buckets,
                       msbPosition, radixBits);
 
 /*    if ((pass % 2) == 0) {
