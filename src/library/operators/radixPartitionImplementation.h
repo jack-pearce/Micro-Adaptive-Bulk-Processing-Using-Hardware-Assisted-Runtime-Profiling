@@ -8,10 +8,9 @@
 
 namespace MABPL {
 
-template<typename T1, typename T2>
-inline void radixPartitionAux(int start, int end, T1 *keys, T2 *payloads, T1 *bufferKeys, T2 *bufferPayloads,
-                       int mask, int numBuckets, std::vector<int> &buckets, int msbPosition, int &radixBits,
-                       bool copyRequired) {
+template<typename T>
+inline void radixPartitionAux(int start, int end, T *keys, T *buffer, int mask, int numBuckets,
+                              std::vector<int> &buckets, int msbPosition, int &radixBits, bool copyRequired) {
     int i;
     int shifts = msbPosition - radixBits;
 
@@ -30,13 +29,11 @@ inline void radixPartitionAux(int start, int end, T1 *keys, T2 *payloads, T1 *bu
 
     // ADAPTIVE CHECKS GO IN THIS FOR LOOP - CALL ANOTHER FUNCTION TO PERFORM CHECK AND ANOTHER TO PERFORM MERGE IF REQUIRED
     for (i = start; i < end; i++) {
-        bufferKeys[start + buckets[(keys[i] >> shifts) & mask]++] = keys[i];
-//        bufferPayloads[start + buckets[(keys[i] >> shifts) & mask]++] = payloads[i];
+        buffer[start + buckets[(keys[i] >> shifts) & mask]++] = keys[i];
     }
 
 //    std::fill(buckets.begin(), buckets.end(), 0);
 //    std::swap(keys, bufferKeys);
-//    std::swap(payloads, bufferPayloads);
 //    msbPosition -= radixBits;
 //
 //    Checks on partition size below
@@ -55,13 +52,12 @@ inline void radixPartitionAux(int start, int end, T1 *keys, T2 *payloads, T1 *bu
     // UNCOMMENT AT THE END
 /*    if (copyRequired) {
         memcpy(keys + start, bufferKeys + start, (end - start) * sizeof(T1));
-        memcpy(payloads + start, bufferPayloads + start, (end - start) * sizeof(T2));
     }*/
 }
 
-template<typename T1, typename T2>
-void radixPartition(int n, T1 *keys, T2 *payloads, int radixBits) {
-    static_assert(std::is_integral<T1>::value, "Partition column must be an integer type");
+template<typename T>
+void radixPartition(int n, T *keys, int radixBits) {
+    static_assert(std::is_integral<T>::value, "Partition column must be an integer type");
 
     int i;
     int numBuckets = 1 << radixBits;
@@ -81,14 +77,12 @@ void radixPartition(int n, T1 *keys, T2 *payloads, int radixBits) {
     }
 
     std::vector<int> buckets(1 + numBuckets, 0);
-    T1 *bufferKeys = new T1[n];
-//    T2 *bufferPayloads = new T2[n];
+    T *buffer = new T[n];
 
-    radixPartitionAux(0, n, keys, payloads, bufferKeys, bufferKeys, mask, numBuckets, buckets,
-                      msbPosition, radixBits, true);
+    radixPartitionAux(0, n, keys, buffer, mask, numBuckets, buckets, msbPosition, radixBits,
+                      true);
 
-    delete[]bufferKeys;
-//    delete[]bufferPayloads;
+    delete[]buffer;
 }
 
 

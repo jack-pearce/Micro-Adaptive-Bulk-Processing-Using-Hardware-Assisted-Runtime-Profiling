@@ -5,15 +5,15 @@
 #include "../data_generation/dataFiles.h"
 
 
-template<typename T1, typename T2>
+template<typename T>
 void testRadixPartition(const DataFile &dataFile, int radixBits = 10);
 
-template<typename T1, typename T2>
+template<typename T>
 void radixPartitionBitsSweepBenchmarkWithExtraCounters(const DataFile &dataFile, int startBits, int endBits,
                                                        std::vector<std::string> &benchmarkCounters,
                                                        const std::string &fileNamePrefix, int iterations);
 
-template<typename T1, typename T2>
+template<typename T>
 void radixPartitionSweepBenchmarkWithExtraCounters(DataSweep &dataSweep, int radixBits,
                                                    std::vector<std::string> &benchmarkCounters,
                                                    const std::string &fileNamePrefix, int iterations);

@@ -3,8 +3,8 @@
 
 namespace MABPL {
 
-template<typename T1, typename T2>
-void radixPartition(int n, T1 *keys, T2 *payloads, int radixBits = 10);
+template<typename T>
+void radixPartition(int n, T *keys, int radixBits = 10);
 
 }
 
