@@ -701,14 +701,10 @@ int main() {
     radixPartitionSweepBenchmarkWithExtraCountersConfigurations<uint32_t>(DataSweeps::linearUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
                                                                          16, "ClusterednessSweep_16", 1);*/
 
-    radixPartitionSweepBenchmarkWithExtraCountersConfigurations<uint32_t>(DataSweeps::linearUniqueIntDistribution250mValuesSortednessSweep,
-                                                                         6, "SortednessSweep_6", 1);
-    radixPartitionSweepBenchmarkWithExtraCountersConfigurations<uint32_t>(DataSweeps::linearUniqueIntDistribution250mValuesSortednessSweep,
-                                                                          7, "SortednessSweep_7", 1);
+//    radixPartitionSweepBenchmarkWithExtraCountersConfigurations<uint32_t>(DataSweeps::linearUniqueIntDistribution250mValuesSortednessSweep,
+//                                                                         6, "SortednessSweep_6", 1);
     radixPartitionSweepBenchmarkWithExtraCountersConfigurations<uint32_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
                                                                           6, "ClusterednessSweep_6", 1);
-    radixPartitionSweepBenchmarkWithExtraCountersConfigurations<uint32_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
-                                                                          7, "ClusterednessSweep_7", 1);
 
 /*    unsigned int seed = 1;
     std::mt19937 gen(seed);
