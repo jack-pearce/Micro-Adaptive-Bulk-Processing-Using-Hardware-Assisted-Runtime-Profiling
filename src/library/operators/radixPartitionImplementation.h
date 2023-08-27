@@ -12,8 +12,8 @@ template<typename T>
 inline void radixPartitionAux(int start, int end, T *keys, T *buffer,
                               int mask, int numBuckets, std::vector<int> &buckets, int msbPosition, int &radixBits) {
     int i;
-//    int shifts = msbPosition - radixBits;
-    int shifts = 8;
+    int shifts = msbPosition - radixBits;
+//    int shifts = 24;
 //    int shifts = 16;
 
     for (i = start; i < end; i++) {
