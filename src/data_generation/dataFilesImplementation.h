@@ -60,7 +60,7 @@ void DataFile::loadDataIntoMemory(T *data) const {
     } else if (getFileName() == "uniformIntDistribution20mValuesTwo10mCardinalitySections_100_10m_Max20m") {
         generateUniformDistributionInMemoryWithTwoCardinalitySections(data, getNumElements(), 20*1000*1000, 100, 10*1000*1000, 0.5);
     } else if (getFileName() == "uniformIntDistribution250mValuesMax250m") {
-        generateUniformDistributionInMemory(data, getNumElements(), 268435456);
+        generateUniformDistributionInMemory(data, getNumElements(), 268435455);
     } else if (getFileName() == "fullySortedIntDistribution250mValuesMax250m") {
         generateFullySortedUniqueInMemory(data, getNumElements());
     } else if (getFileName() == "uniqueRandom250mInt") {
