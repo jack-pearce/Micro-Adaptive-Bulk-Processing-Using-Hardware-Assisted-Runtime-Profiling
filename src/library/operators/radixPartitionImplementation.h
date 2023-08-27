@@ -10,11 +10,13 @@ namespace MABPL {
 
 template<typename T>
 inline void radixPartitionAux(int start, int end, T *keys, T *buffer,
-                              int mask, int numBuckets, std::vector<int> &buckets, int pass, int &radixBits) {
+                              int mask, int numBuckets, std::vector<int> &buckets, int msbPosition, int &radixBits) {
     int i;
+    int shifts = msbPosition - radixBits;
+    std::cout << shifts << std::endl;
 
     for (i = start; i < end; i++) {
-        buckets[1 + ((keys[i] >> (pass * radixBits)) & mask)]++;
+        buckets[1 + ((keys[i] >> shifts) & mask)]++;
     }
 
     for (i = 2; i <= numBuckets; i++) {
@@ -27,7 +29,7 @@ inline void radixPartitionAux(int start, int end, T *keys, T *buffer,
 //    }
 
     for (i = start; i < end; i++) {
-        buffer[start + buckets[(keys[i] >> (pass * radixBits)) & mask]++] = keys[i]; /////////////////////////// ++ added
+        buffer[start + buckets[(keys[i] >> shifts) & mask]++] = keys[i]; /////////////////////////// ++ added
 //        bufferPayloads[start + buckets[(keys[i] >> (pass * radixBits)) & mask]++] = payloads[i];
     }
 
@@ -72,12 +74,13 @@ void radixPartition(int n, T *keys, int radixBits) {
         largest >>= 1;
         msbPosition++;
     }
+    std::cout << msbPosition << std::endl;
 
     std::vector<int> buckets(1 + numBuckets, 0);
     T *buffer = new T[n];
 
     radixPartitionAux(0, n, keys, buffer, mask, numBuckets, buckets,
-                      0, radixBits);
+                      msbPosition, radixBits);
 
     delete[]buffer;
 }
