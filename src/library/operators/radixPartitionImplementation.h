@@ -9,12 +9,10 @@
 namespace MABPL {
 
 template<typename T>
-inline void radixPartitionAux(int start, int end, T *keys, T *buffer,
-                              int mask, int numBuckets, std::vector<int> &buckets, int msbPosition, int &radixBits) {
+inline void radixPartitionAux(int start, int end, T *keys, T *buffer, unsigned int mask, int numBuckets,
+                              std::vector<int> &buckets, int msbPosition, int &radixBits, bool copyRequired) {
     int i;
     int shifts = msbPosition - radixBits;
-//    int shifts = 24;
-//    int shifts = 16;
 
     for (i = start; i < end; i++) {
         buckets[1 + ((keys[i] >> shifts) & mask)]++;
@@ -29,19 +27,16 @@ inline void radixPartitionAux(int start, int end, T *keys, T *buffer,
 //        partitions[i] += start;
 //    }
 
+// ADAPTIVE CHECKS GO IN THIS FOR LOOP - CALL ANOTHER FUNCTION TO PERFORM CHECK AND ANOTHER TO PERFORM MERGE IF REQUIRED
     for (i = start; i < end; i++) {
-        buffer[start + buckets[(keys[i] >> shifts) & mask]++] = keys[i]; /////////////////////////// ++ added
-//        bufferPayloads[start + buckets[(keys[i] >> (pass * radixBits)) & mask]++] = payloads[i];
+        buffer[start + buckets[(keys[i] >> shifts) & mask]++] = keys[i];
     }
 
 //    std::fill(buckets.begin(), buckets.end(), 0);
-//    std::swap(keys, bufferKeys);
-//    std::swap(payloads, bufferPayloads);
-//    --pass;
+//    std::swap(keys, buffer);
+//    msbPosition -= radixBits;
 //
-//    if (pass < 0) {
-//        return;
-//    }
+//    Checks on partition size below
 //
 //    if (partitions[0] > start) {
 //        radixPartitionAux(start, partitions[0], keys, payloads, bufferKeys, bufferPayloads, mask, numBuckets,
@@ -53,6 +48,11 @@ inline void radixPartitionAux(int start, int end, T *keys, T *buffer,
 //                              mask, numBuckets, buckets, pass, radixBits);
 //        }
 //    }
+
+    // UNCOMMENT AT THE END
+/*    if (copyRequired) {
+        memcpy(keys + start, bufferKeys + start, (end - start) * sizeof(T1));
+    }*/
 }
 
 template<typename T>
@@ -61,7 +61,7 @@ void radixPartition(int n, T *keys, int radixBits) {
 
     int i;
     int numBuckets = 1 << radixBits;
-    int mask = numBuckets - 1;
+    unsigned int mask = numBuckets - 1;
     T largest = 0;
 
     for (i = 0; i < n; i++) {
@@ -75,96 +75,14 @@ void radixPartition(int n, T *keys, int radixBits) {
         largest >>= 1;
         msbPosition++;
     }
-    std::cout << msbPosition << std::endl;
 
     std::vector<int> buckets(1 + numBuckets, 0);
     T *buffer = new T[n];
 
-    radixPartitionAux(0, n, keys, buffer, mask, numBuckets, buckets,
-                      msbPosition, radixBits);
+    radixPartitionAux(0, n, keys, buffer, mask, numBuckets, buckets, msbPosition, radixBits, true);
 
     delete[]buffer;
 }
-
-
-
-
-//template<typename T>
-//inline void radixPartitionAux(int start, int end, T *keys, T *buffer, int mask, int numBuckets,
-//                              std::vector<int> &buckets, int msbPosition, int &radixBits, bool copyRequired) {
-//    int i;
-//    int shifts = msbPosition - radixBits;
-//
-//    for (i = start; i < end; i++) {
-//        buckets[1 + ((keys[i] >> shifts) & mask)]++;
-//    }
-//
-//    for (i = 2; i <= numBuckets; i++) {
-//        buckets[i] += buckets[i - 1];
-//    }
-//
-////    std::vector<int> partitions(buckets.data() + 1, buckets.data() + numBuckets + 1);
-////    for (i = 0; i < numBuckets; i++) {
-////        partitions[i] += start;
-////    }
-//
-//    // ADAPTIVE CHECKS GO IN THIS FOR LOOP - CALL ANOTHER FUNCTION TO PERFORM CHECK AND ANOTHER TO PERFORM MERGE IF REQUIRED
-//    for (i = start; i < end; i++) {
-//        buffer[start + buckets[(keys[i] >> shifts) & mask]++] = keys[i];
-//    }
-//
-////    std::fill(buckets.begin(), buckets.end(), 0);
-////    std::swap(keys, bufferKeys);
-////    msbPosition -= radixBits;
-////
-////    Checks on partition size below
-////
-////    if (partitions[0] > start) {
-////        radixPartitionAux(start, partitions[0], keys, payloads, bufferKeys, bufferPayloads, mask, numBuckets,
-////                          buckets, pass, radixBits);
-////    }
-////    for (i = 1; i < numBuckets; i++) {
-////        if (partitions[i] > partitions[i - 1]) {
-////            radixPartitionAux(partitions[i - 1], partitions[i], keys, payloads, bufferKeys, bufferPayloads,
-////                              mask, numBuckets, buckets, pass, radixBits);
-////        }
-////    }
-//
-//    // UNCOMMENT AT THE END
-///*    if (copyRequired) {
-//        memcpy(keys + start, bufferKeys + start, (end - start) * sizeof(T1));
-//    }*/
-//}
-//
-//template<typename T>
-//void radixPartition(int n, T *keys, int radixBits) {
-//    static_assert(std::is_integral<T>::value, "Partition column must be an integer type");
-//
-//    int i;
-//    int numBuckets = 1 << radixBits;
-//    int mask = numBuckets - 1;
-//    int largest = 0;
-//
-//    for (i = 0; i < n; i++) {
-//        if (keys[i] > largest) {
-//            largest = keys[i];
-//        }
-//    }
-//
-//    int msbPosition = 0;
-//    while (largest != 0) {
-//        largest >>= 1;
-//        msbPosition++;
-//    }
-//
-//    std::vector<int> buckets(1 + numBuckets, 0);
-//    T *buffer = new T[n];
-//
-//    radixPartitionAux(0, n, keys, buffer, mask, numBuckets, buckets, msbPosition, radixBits,
-//                      true);
-//
-//    delete[]buffer;
-//}
 
 
 /*
