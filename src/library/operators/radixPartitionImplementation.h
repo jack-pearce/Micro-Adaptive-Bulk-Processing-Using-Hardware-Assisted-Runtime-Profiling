@@ -64,7 +64,7 @@ void radixPartition(int n, T *keys, int radixBits) {
     int mask = numBuckets - 1;
     int largest = 0;
 
-    for (i = 0; i < n; i++) {
+/*    for (i = 0; i < n; i++) {
         if (keys[i] > largest) {
             largest = keys[i];
         }
@@ -74,7 +74,9 @@ void radixPartition(int n, T *keys, int radixBits) {
     while (largest != 0) {
         largest >>= 1;
         msbPosition++;
-    }
+    }*/
+
+    int msbPosition = 28;
 
     std::vector<int> buckets(1 + numBuckets, 0);
     T *buffer = new T[n];
