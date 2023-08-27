@@ -13,7 +13,7 @@ inline void radixPartitionAux(int start, int end, T *keys, T *buffer,
                               int mask, int numBuckets, std::vector<int> &buckets, int msbPosition, int &radixBits) {
     int i;
 //    int shifts = msbPosition - radixBits;
-    int shifts = 4;
+    int shifts = 14;
 
     for (i = start; i < end; i++) {
         buckets[1 + ((keys[i] >> shifts) & mask)]++;
