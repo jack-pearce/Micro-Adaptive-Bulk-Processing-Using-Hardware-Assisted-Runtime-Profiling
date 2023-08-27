@@ -56,32 +56,29 @@ template<typename T>
 void radixPartition(int n, T *keys, int radixBits) {
     static_assert(std::is_integral<T>::value, "Partition column must be an integer type");
 
-//    int i;
+    int i;
     int numBuckets = 1 << radixBits;
     int mask = numBuckets - 1;
-//    int largest = 0;
+    int largest = 0;
 
-/*    for (i = 0; i < n; i++) {
-    if (keys[i] > largest) {
-        largest = keys[i];
+    for (i = 0; i < n; i++) {
+        if (keys[i] > largest) {
+            largest = keys[i];
+        }
     }
-}*/
 
-/*    int msbPosition = 0;
-while (largest != 0) {
-    largest >>= 1;
-    msbPosition++;
-}*/
-
-//    int pass = static_cast<int>(std::ceil(static_cast<double>(msbPosition) / radixBits)) - 1;
-    int pass = 0;
+    int msbPosition = 0;
+    while (largest != 0) {
+        largest >>= 1;
+        msbPosition++;
+    }
 
     std::vector<int> buckets(1 + numBuckets, 0);
     T *bufferKeys = new T[n];
 //    T2 *bufferPayloads = new T2[n];
 
     radixPartitionAux(0, n, keys, keys, bufferKeys, bufferKeys, mask, numBuckets, buckets,
-                      pass, radixBits);
+                      0, radixBits);
 
 /*    if ((pass % 2) == 0) {
 memcpy(keys, bufferKeys, n * sizeof(T1));
