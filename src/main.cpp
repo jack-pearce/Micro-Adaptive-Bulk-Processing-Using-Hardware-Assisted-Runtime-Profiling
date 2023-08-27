@@ -674,17 +674,13 @@ void runImdbGroupByMacroBenchmark3() {
 
 int main() {
 
+    // Can test with a maximum partition size of 1 i.e. this will fully sort the data
 /*    for (int i = 2; i < 20; i ++) {
         testRadixPartition<int32_t>(DataFiles::uniformIntDistribution20mValuesMax20m, i);
     }
     for (int i = 2; i < 20; i ++) {
         testRadixPartition<int32_t>(DataFiles::fullySortedIntDistribution20mValuesMax20m, i);
     }*/
-
-/*    radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations<uint32_t>(DataFiles::uniformIntDistribution20mValuesMax20m,
-                                                                              4, 18,"4-18_Random_SinglePassRadixPartition_",1);
-    radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations<uint32_t>(DataFiles::fullySortedIntDistribution20mValuesMax20m,
-                                                                              4, 18,"4-18_Sorted_SinglePassRadixPartition_",1);*/
 
 
 /*    radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations<uint32_t>(DataFiles::slightlyClusteredDistribution250mValuesCardinality10mMax250m,
@@ -700,6 +696,7 @@ int main() {
                                                                          16, "ClusterednessSweep_16", 1);
     radixPartitionSweepBenchmarkWithExtraCountersConfigurations<uint32_t>(DataSweeps::linearUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
                                                                          16, "ClusterednessSweep_16", 1);*/
+
     radixPartitionSweepBenchmarkWithExtraCountersConfigurations<uint32_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
                                                                           6, "ClusterednessSweep_6", 1);
 
