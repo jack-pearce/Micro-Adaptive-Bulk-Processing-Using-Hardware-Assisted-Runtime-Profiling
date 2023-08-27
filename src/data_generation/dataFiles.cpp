@@ -481,7 +481,7 @@ DataSweep DataSweeps::linearUniqueIntDistribution250mValuesSortednessSweep {
         ""};
 
 DataSweep DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m {
-        10,
+        30,
         250*1000*1000,
         "logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m",
         ""};

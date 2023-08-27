@@ -700,9 +700,6 @@ int main() {
                                                                          16, "ClusterednessSweep_16", 1);
     radixPartitionSweepBenchmarkWithExtraCountersConfigurations<uint32_t>(DataSweeps::linearUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
                                                                          16, "ClusterednessSweep_16", 1);*/
-
-//    radixPartitionSweepBenchmarkWithExtraCountersConfigurations<uint32_t>(DataSweeps::linearUniqueIntDistribution250mValuesSortednessSweep,
-//                                                                         6, "SortednessSweep_6", 1);
     radixPartitionSweepBenchmarkWithExtraCountersConfigurations<uint32_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
                                                                           6, "ClusterednessSweep_6", 1);
 
