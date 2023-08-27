@@ -16,7 +16,7 @@ inline void radixPartitionAux(int start, int end, T *keys, T *buffer,
     int shifts = 14;
 
     for (i = start; i < end; i++) {
-        buckets[1 + ((keys[i] >> shifts) & mask)]++;
+        buckets[1 + (keys[i] & (mask << shifts))]++;
     }
 
     for (i = 2; i <= numBuckets; i++) {
