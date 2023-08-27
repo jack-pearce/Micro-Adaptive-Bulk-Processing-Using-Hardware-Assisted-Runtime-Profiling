@@ -10,7 +10,8 @@ namespace MABPL {
 
 template<typename T1, typename T2>
 inline void radixPartitionAux(int start, int end, T1 *keys, T2 *payloads, T1 *bufferKeys, T2 *bufferPayloads,
-                       int mask, int numBuckets, std::vector<int> &buckets, int msbPosition, int &radixBits) {
+                       int mask, int numBuckets, std::vector<int> &buckets, int msbPosition, int &radixBits,
+                       bool copyRequired) {
     int i;
     int shifts = msbPosition - radixBits;
 
@@ -27,9 +28,10 @@ inline void radixPartitionAux(int start, int end, T1 *keys, T2 *payloads, T1 *bu
 //        partitions[i] += start;
 //    }
 
+    // ADAPTIVE CHECKS GO IN THIS FOR LOOP - CALL ANOTHER FUNCTION TO PERFORM CHECK AND ANOTHER TO PERFORM MERGE IF REQUIRED
     for (i = start; i < end; i++) {
-        bufferKeys[start + buckets[(keys[i] >> shifts) & mask]] = keys[i];
-        bufferPayloads[start + buckets[(keys[i] >> shifts) & mask]++] = payloads[i];
+        bufferKeys[start + buckets[(keys[i] >> shifts) & mask]++] = keys[i];
+//        bufferPayloads[start + buckets[(keys[i] >> shifts) & mask]++] = payloads[i];
     }
 
 //    std::fill(buckets.begin(), buckets.end(), 0);
@@ -49,6 +51,12 @@ inline void radixPartitionAux(int start, int end, T1 *keys, T2 *payloads, T1 *bu
 //                              mask, numBuckets, buckets, pass, radixBits);
 //        }
 //    }
+
+    // UNCOMMENT AT THE END
+/*    if (copyRequired) {
+        memcpy(keys + start, bufferKeys + start, (end - start) * sizeof(T1));
+        memcpy(payloads + start, bufferPayloads + start, (end - start) * sizeof(T2));
+    }*/
 }
 
 template<typename T1, typename T2>
@@ -74,18 +82,13 @@ void radixPartition(int n, T1 *keys, T2 *payloads, int radixBits) {
 
     std::vector<int> buckets(1 + numBuckets, 0);
     T1 *bufferKeys = new T1[n];
-    T2 *bufferPayloads = new T2[n];
+//    T2 *bufferPayloads = new T2[n];
 
-    radixPartitionAux(0, n, keys, payloads, bufferKeys, bufferPayloads, mask, numBuckets, buckets,
-                      msbPosition, radixBits);
-
-/*    if ((pass % 2) == 0) {
-    memcpy(keys, bufferKeys, n * sizeof(T1));
-    memcpy(payloads, bufferPayloads, n * sizeof(T2));
-}*/
+    radixPartitionAux(0, n, keys, payloads, bufferKeys, bufferKeys, mask, numBuckets, buckets,
+                      msbPosition, radixBits, true);
 
     delete[]bufferKeys;
-    delete[]bufferPayloads;
+//    delete[]bufferPayloads;
 }
 
 
