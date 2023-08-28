@@ -674,6 +674,9 @@ void runImdbGroupByMacroBenchmark3() {
 
 int main() {
 
+//    testRadixPartition<int32_t>(DataFiles::uniformIntDistribution20mValuesMax20m, RadixPartition::RadixBitsAdaptive,
+//                                -1);
+
     // Can test with a maximum partition size of 1 i.e. this will fully sort the data
 /*    for (int i = 2; i < 20; i ++) {
         testRadixPartition<int32_t>(DataFiles::uniformIntDistribution20mValuesMax20m, i);
@@ -682,17 +685,16 @@ int main() {
         testRadixPartition<int32_t>(DataFiles::fullySortedIntDistribution20mValuesMax20m, i);
     }*/
 
-    radixPartitionBitsSweepBenchmark<uint32_t>(DataFiles::uniformIntDistribution250mValuesMax250m,
-                                               {RadixPartition::RadixBitsAdaptive},
-                                               16,16,"TEST",1);
+//    radixPartitionBitsSweepBenchmark<uint32_t>(DataFiles::uniformIntDistribution250mValuesMax250m,
+//                                               {RadixPartition::RadixBitsAdaptive},
+//                                               16,16,"TEST",20);
 
-    radixPartitionBitsSweepBenchmark<uint32_t>(DataFiles::slightlyClusteredDistribution250mValuesCardinality10mMax250m,
-                                               {RadixPartition::RadixBitsAdaptive},
-                                               16,16,"TEST",1);
-
-    radixPartitionBitsSweepBenchmark<uint32_t>(DataFiles::fullySortedIntDistribution250mValuesMax250m,
-                                               {RadixPartition::RadixBitsAdaptive},
-                                               16,16,"TEST",1);
+//    radixPartitionBitsSweepBenchmark<uint32_t>(DataFiles::slightlyClusteredDistribution250mValuesCardinality10mMax250m,
+//                                               {RadixPartition::RadixBitsAdaptive},
+//                                               16,16,"TEST",1);
+//    radixPartitionBitsSweepBenchmark<uint32_t>(DataFiles::fullySortedIntDistribution250mValuesMax250m,
+//                                               {RadixPartition::RadixBitsAdaptive},
+//                                               16,16,"TEST",1);
 
 //    radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations<uint32_t>(DataFiles::slightlyClusteredDistribution250mValuesCardinality10mMax250m,
 //                                                                              RadixPartition::RadixBitsFixed,
@@ -720,9 +722,9 @@ int main() {
 
 /*    unsigned int seed = 1;
     std::mt19937 gen(seed);
-    std::uniform_int_distribution<uint32_t> distribution(1, 99);
+    std::uniform_int_distribution<uint32_t> distribution(1, 20000000);
 
-    int n = 61;
+    int n = 70000;
     auto *keys = new uint32_t[n];
 
     for (auto i = 0; i < n; ++i) {
@@ -735,11 +737,14 @@ int main() {
     }
     std::cout << std::endl << std::endl;
 
-    MABPL::radixPartition(n, keys, 2);
+    MABPL::radixPartitionAdaptive(n, keys);
 
     std::cout << "After: " << std::endl;
     for (int i = 0; i < n; i++) {
         std::cout << keys[i] << " ";
+        if (keys[i-1] > keys[i]) {
+            std::cout << "Error - not sorted" << std::endl;
+        }
     }
     std::cout << std::endl << std::endl;
 
