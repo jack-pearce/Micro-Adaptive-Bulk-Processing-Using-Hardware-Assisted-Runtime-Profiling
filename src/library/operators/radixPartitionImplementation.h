@@ -134,6 +134,8 @@ inline void radixPartitionAdaptiveAux(int start, int end, T *keys, T *buffer, st
 
         Counters::getInstance().readSharedEventSet();
 
+        std::cout << tuplesToProcess << " " << counterValues[0] << std::endl;
+
 /*        if ((static_cast<float>(tuplesToProcess) / static_cast<float>(counterValues[0])) < tuplesPerTlbStoreMiss) {
             // Reduce radix bits by one
             // Merge histogram and reduce size

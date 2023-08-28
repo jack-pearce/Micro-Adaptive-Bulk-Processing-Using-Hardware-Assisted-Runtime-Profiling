@@ -682,6 +682,14 @@ int main() {
         testRadixPartition<int32_t>(DataFiles::fullySortedIntDistribution20mValuesMax20m, i);
     }*/
 
+    radixPartitionBitsSweepBenchmark<uint32_t>(DataFiles::uniformIntDistribution250mValuesMax250m,
+                                               {RadixPartition::RadixBitsAdaptive},
+                                               16,16,"TEST",1);
+
+    radixPartitionBitsSweepBenchmark<uint32_t>(DataFiles::slightlyClusteredDistribution250mValuesCardinality10mMax250m,
+                                               {RadixPartition::RadixBitsAdaptive},
+                                               16,16,"TEST",1);
+
     radixPartitionBitsSweepBenchmark<uint32_t>(DataFiles::fullySortedIntDistribution250mValuesMax250m,
                                                {RadixPartition::RadixBitsAdaptive},
                                                16,16,"TEST",1);
