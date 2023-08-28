@@ -210,8 +210,11 @@ void groupByWallTimeDopSweepBenchmark(DataSweep &dataSweep, int iterations, cons
 template <typename T1, typename T2>
 void groupByBenchmarkWithExtraCounters(DataSweep &dataSweep, GroupBy groupByImplementation, int iterations,
                                        std::vector<std::string> &benchmarkCounters, const std::string &fileNamePrefix) {
-    if (groupByImplementation == GroupBy::Adaptive)
-        std::cout << "Cannot benchmark adaptive groupBy using counters as adaptive select is already using these counters" << std::endl;
+    if (groupByImplementation == GroupBy::Adaptive) {
+        std::cout << "Cannot benchmark adaptive groupBy using counters as algorithm is already using these counters"
+                  << std::endl;
+        exit(1);
+    }
 
     int numTests = static_cast<int>(dataSweep.getTotalRuns());
 

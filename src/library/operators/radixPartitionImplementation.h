@@ -101,7 +101,12 @@ inline void radixPartitionAdaptiveAux(int start, int end, T *keys, T *buffer, st
     int numBuckets = 1 << radixBits;
     unsigned int mask = numBuckets - 1;
 
-    int i;
+    constexpr int tuplesPerChunk = 50 * 1000;
+    float tuplesPerTlbStoreMiss = 75.0;
+    std::vector<std::string> counters = {"DTLB-STORE-MISSES"};
+    long_long *counterValues = Counters::getInstance().getSharedEventSetEvents(counters);
+
+    int i, chunkStart, tuplesToProcess;
     for (i = start; i < end; i++) {
         buckets[1 + ((keys[i] >> shifts) & mask)]++;
     }
@@ -116,15 +121,36 @@ inline void radixPartitionAdaptiveAux(int start, int end, T *keys, T *buffer, st
         partitions[i] = start + buckets[1 + i];
     }
 
+    i = start;
+    while (i < end) {
+        tuplesToProcess = std::min(tuplesPerChunk, end - i);
+        chunkStart = i;
 
-    //////////////////////
-// ADAPTIVE CHECKS GO IN THIS FOR LOOP - CALL ANOTHER FUNCTION TO PERFORM CHECK AND ANOTHER TO PERFORM MERGE IF REQUIRED
-// UPDATE PARTITIONS IN HERE TOO
-    for (i = start; i < end; i++) {
-        buffer[start + buckets[(keys[i] >> shifts) & mask]++] = keys[i];
+        Counters::getInstance().readSharedEventSet();
+
+        for (; i < chunkStart + tuplesToProcess; i++) {
+            buffer[start + buckets[(keys[i] >> shifts) & mask]++] = keys[i];
+        }
+
+        Counters::getInstance().readSharedEventSet();
+
+/*        if ((static_cast<float>(tuplesToProcess) / static_cast<float>(counterValues[0])) < tuplesPerTlbStoreMiss) {
+            // Reduce radix bits by one
+            // Merge histogram and reduce size
+            // Merge partitions and reduce size
+
+            // if radix bits hits minimum then run another loop to completion and break
+        }*/
+
+        if (i >= 10 * 1000 * 1000) {
+            for (; i < end; i++) {
+                buffer[start + buckets[(keys[i] >> shifts) & mask]++] = keys[i];
+            }
+            return;
+            // break;
+        }
+
     }
-    //////////////////////
-
 
     std::fill(buckets.begin(), buckets.begin() + numBuckets + 1, 0);
     msbPosition -= radixBits;
@@ -152,7 +178,7 @@ template<typename T>
 void radixPartitionAdaptive(int n, T *keys) {
     static_assert(std::is_integral<T>::value, "Partition column must be an integer type");
 
-    int startingRadixBits = 16; ////////////////////////////////////////
+    int startingRadixBits = 16; // Negligible gain for higher radix bits than 16
 
     int numBuckets = 1 << startingRadixBits;
     T largest = 0;
@@ -175,14 +201,14 @@ void radixPartitionAdaptive(int n, T *keys) {
     std::vector<int> buckets(1 + numBuckets, 0);
     T *buffer = new T[n];
 
-    radixPartitionAdaptiveAux(0, n, keys, buffer, buckets, msbPosition, startingRadixBits, maxElementsPerPartition,
-                           true);
+    radixPartitionAdaptiveAux(0, n, keys, buffer, buckets, msbPosition, startingRadixBits,
+                              maxElementsPerPartition, true);
 
     delete[]buffer;
 }
 
 template<typename T>
-void runGroupByFunction(RadixPartition radixPartitionImplementation, int n, T *keys, int radixBits) {
+void runRadixPartitionFunction(RadixPartition radixPartitionImplementation, int n, T *keys, int radixBits) {
     switch (radixPartitionImplementation) {
         case RadixPartition::RadixBitsFixed:
             return radixPartitionFixed(n, keys, radixBits);

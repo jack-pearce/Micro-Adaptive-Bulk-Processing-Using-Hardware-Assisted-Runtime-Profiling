@@ -5,7 +5,7 @@
 namespace MABPL {
 
 
-std::string getGroupByName(RadixPartition radixPartitionImplementation) {
+std::string getRadixPartitionName(RadixPartition radixPartitionImplementation) {
     switch (radixPartitionImplementation) {
         case RadixPartition::RadixBitsFixed:
             return "RadixPartition_Static";

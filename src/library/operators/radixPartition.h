@@ -11,7 +11,7 @@ enum RadixPartition {
     RadixBitsAdaptive
 };
 
-std::string getGroupByName(RadixPartition radixPartitionImplementation);
+std::string getRadixPartitionName(RadixPartition radixPartitionImplementation);
 
 template<typename T>
 void radixPartitionFixed(int n, T *keys, int radixBits = 10);
@@ -20,7 +20,7 @@ template<typename T>
 void radixPartitionAdaptive(int n, T *keys);
 
 template<typename T>
-void runGroupByFunction(RadixPartition radixPartitionImplementation, int n, T *keys, int radixBits = 10);
+void runRadixPartitionFunction(RadixPartition radixPartitionImplementation, int n, T *keys, int radixBits = 10);
 
 }
 
