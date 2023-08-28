@@ -13,7 +13,7 @@ void testRadixPartition(const DataFile &dataFile, int radixBits) {
 
     std::cout << "Running test... ";
 
-    MABPL::radixPartition(dataFile.getNumElements(), keys, radixBits);
+    MABPL::radixPartitionFixed(dataFile.getNumElements(), keys, radixBits);
 
     for (int i = 1; i < dataFile.getNumElements(); i++) {
         if (keys[i] < keys[i - 1]) {
@@ -50,7 +50,7 @@ void radixPartitionBitsSweepBenchmarkWithExtraCounters(const DataFile &dataFile,
             if (PAPI_reset(benchmarkEventSet) != PAPI_OK)
                 exit(1);
 
-            MABPL::radixPartition(dataFile.getNumElements(), keys, radixBits);
+            MABPL::radixPartitionFixed(dataFile.getNumElements(), keys, radixBits);
 
             if (PAPI_read(benchmarkEventSet, benchmarkCounterValues) != PAPI_OK)
                 exit(1);
@@ -108,7 +108,7 @@ void radixPartitionSweepBenchmarkWithExtraCounters(DataSweep &dataSweep, int rad
             if (PAPI_reset(benchmarkEventSet) != PAPI_OK)
                 exit(1);
 
-            MABPL::radixPartition(n, keys, radixBits);
+            MABPL::radixPartitionFixed(n, keys, radixBits);
 
             if (PAPI_read(benchmarkEventSet, benchmarkCounterValues) != PAPI_OK)
                 exit(1);
