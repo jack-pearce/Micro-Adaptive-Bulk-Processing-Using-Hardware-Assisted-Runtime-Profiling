@@ -167,9 +167,9 @@ inline void radixPartitionAdaptiveAux(int n, T *keys, T *buffer, std::vector<int
                 mask = numBuckets - 1;
 
                 /////////////////////////////////////// ADAPTIVITY OUTPUT ///////////////////////////////////////////
-                std::cout << "RadixBits reduced to " << radixBits << " after tuple " << i << " due to reading of ";
-                std::cout << (static_cast<float>(tuplesToProcess) / static_cast<float>(counterValues[0]));
-                std::cout << " tuples per TLB store miss" << std::endl;
+//                std::cout << "RadixBits reduced to " << radixBits << " after tuple " << i << " due to reading of ";
+//                std::cout << (static_cast<float>(tuplesToProcess) / static_cast<float>(counterValues[0]));
+//                std::cout << " tuples per TLB store miss" << std::endl;
                 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
                 radixPartitionAdaptiveMergePartitions(buffer, buckets, partitions, numBuckets);
@@ -224,7 +224,7 @@ std::vector<int> radixPartitionAdaptive(int n, T *keys) {
     static_assert(std::is_integral<T>::value, "Partition column must be an integer type");
 
     int radixBits = 16;         // Negligible gain for higher radix bits than 16
-    int minimumRadixBits = 9;   // L2 TLB entries divided by 4 //////////////////////// NEED TO AUTOMATE ////////////////////////
+    int minimumRadixBits = 7;   // L2 TLB entries divided by 4 //////////////////////// NEED TO AUTOMATE ////////////////////////
 
     int numBuckets = 1 << radixBits;
     T largest = std::numeric_limits<T>::min();;
