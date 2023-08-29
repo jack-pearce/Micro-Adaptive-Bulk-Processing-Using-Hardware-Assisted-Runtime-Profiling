@@ -8,6 +8,9 @@ using MABPL::RadixPartition;
 
 
 template<typename T>
+void testRadixSort(const DataFile &dataFile, RadixPartition radixPartitionImplementation, int radixBits = 10);
+
+template<typename T>
 void testRadixPartition(const DataFile &dataFile, RadixPartition radixPartitionImplementation, int radixBits = 10);
 
 template<typename T>

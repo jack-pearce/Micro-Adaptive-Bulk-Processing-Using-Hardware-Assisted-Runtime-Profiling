@@ -674,8 +674,9 @@ void runImdbGroupByMacroBenchmark3() {
 
 int main() {
 
-//    testRadixPartition<int32_t>(DataFiles::uniformIntDistribution20mValuesMax20m, RadixPartition::RadixBitsAdaptive,
-//                                -1);
+//    testRadixSort<int32_t>(DataFiles::uniformIntDistribution20mValuesMax20m, RadixPartition::RadixBitsAdaptive);
+
+    testRadixPartition<int32_t>(DataFiles::uniformIntDistribution20mValuesMax20m, RadixPartition::RadixBitsAdaptive);
 
     // Can test with a maximum partition size of 1 i.e. this will fully sort the data
 /*    for (int i = 2; i < 20; i ++) {

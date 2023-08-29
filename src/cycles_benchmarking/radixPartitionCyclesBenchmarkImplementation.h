@@ -1,13 +1,15 @@
 #ifndef MABPL_RADIXPARTITIONCYCLESBENCHMARKIMPLEMENTATION_H
 #define MABPL_RADIXPARTITIONCYCLESBENCHMARKIMPLEMENTATION_H
 
+#include <limits>
+
 #include "../utilities/dataHelpers.h"
 #include "../utilities/papiHelpers.h"
 #include "radixPartitionCyclesBenchmark.h"
 
 
 template<typename T>
-void testRadixPartition(const DataFile &dataFile, RadixPartition radixPartitionImplementation, int radixBits) {
+void testRadixSort(const DataFile &dataFile, RadixPartition radixPartitionImplementation, int radixBits) {
     auto keys = new T[dataFile.getNumElements()];
     copyArray<T>(LoadedData<T>::getInstance(dataFile).getData(), keys, dataFile.getNumElements());
 
@@ -20,6 +22,43 @@ void testRadixPartition(const DataFile &dataFile, RadixPartition radixPartitionI
             std::cout << "Test Failed! Results are not ordered" << std::endl;
             return;
         }
+    }
+
+    delete[] keys;
+
+    std::cout << "Completed" << std::endl;
+}
+
+template<typename T>
+void testRadixPartition(const DataFile &dataFile, RadixPartition radixPartitionImplementation, int radixBits) {
+    auto keys = new T[dataFile.getNumElements()];
+    copyArray<T>(LoadedData<T>::getInstance(dataFile).getData(), keys, dataFile.getNumElements());
+
+    std::cout << "Running test... ";
+
+    std::vector<int> partitions = MABPL::runRadixPartitionFunction(radixPartitionImplementation,dataFile.getNumElements(),
+                                                           keys, radixBits);
+
+    int previous = 0;
+    int i;
+    T smallest, largest;
+    T prevLargest = std::numeric_limits<T>::min();
+
+    for (int partition : partitions) {
+        smallest = std::numeric_limits<T>::max();
+        largest = std::numeric_limits<T>::min();
+
+        for (i = previous; i < partition; ++i) {
+            smallest = std::min(smallest, keys[i]);
+            largest = std::max(largest, keys[i]);
+        }
+
+        if (smallest <= prevLargest) {
+            std::cout << "Test Failed! Overlapping partition found!" << std::endl;
+        }
+
+        prevLargest = largest;
+        previous = partition;
     }
 
     delete[] keys;

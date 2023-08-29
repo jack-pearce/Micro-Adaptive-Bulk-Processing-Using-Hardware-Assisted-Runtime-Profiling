@@ -2,6 +2,7 @@
 #define MABPL_RADIXPARTITION_H
 
 #include <string>
+#include <vector>
 
 
 namespace MABPL {
@@ -14,13 +15,13 @@ enum RadixPartition {
 std::string getRadixPartitionName(RadixPartition radixPartitionImplementation);
 
 template<typename T>
-void radixPartitionFixed(int n, T *keys, int radixBits = 10);
+std::vector<int> radixPartitionFixed(int n, T *keys, int radixBits = 10);
 
 template<typename T>
-void radixPartitionAdaptive(int n, T *keys);
+std::vector<int> radixPartitionAdaptive(int n, T *keys);
 
 template<typename T>
-void runRadixPartitionFunction(RadixPartition radixPartitionImplementation, int n, T *keys, int radixBits = 10);
+std::vector<int> runRadixPartitionFunction(RadixPartition radixPartitionImplementation, int n, T *keys, int radixBits = 10);
 
 }
 
