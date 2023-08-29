@@ -219,6 +219,38 @@ void readImdbStartYearColumn(const std::string& filePath, int* data) {
     file.close();
 }
 
+void readImdbStartYearColumn(const std::string& filePath, uint32_t* data) {
+    std::ifstream file(filePath);
+    if (!file.is_open()) {
+        std::cerr << "Error opening file: " << filePath << std::endl;
+        exit(1);
+    }
+
+    std::string line;
+    int index = 0;
+    bool isFirstRow = true;  // Flag to skip the first row
+    while (std::getline(file, line)) {
+        if (isFirstRow) {
+            isFirstRow = false;
+            continue;  // Skip the first row
+        }
+
+        std::istringstream iss(line);
+        std::string value;
+        for (size_t i = 0; i < 6; ++i) {
+            std::getline(iss, value, '\t');
+        }
+
+        try {
+            data[index++] = std::stoi(value);
+        } catch (const std::invalid_argument &e) {
+            data[index++] = 9999;
+        }
+    }
+
+    file.close();
+}
+
 bool isNumber(const std::string& str) {
     for (char c : str) {
         if (!std::isdigit(c)) {
@@ -229,6 +261,41 @@ bool isNumber(const std::string& str) {
 }
 
 void readImdbParentTvSeriesAndSeasonColumn(const std::string& filePath, int64_t* data) {
+    std::ifstream file(filePath);
+    if (!file.is_open()) {
+        std::cerr << "Error opening file: " << filePath << std::endl;
+        exit(1);
+    }
+
+    std::string line;
+    int index = 0;
+    bool isFirstRow = true;  // Flag to skip the first row
+    while (std::getline(file, line)) {
+        if (isFirstRow) {
+            isFirstRow = false;
+            continue;  // Skip the first row
+        }
+
+        std::istringstream iss(line);
+        std::string dummy, seriesId, seriesNumberOnly, seasonNum;
+
+        std::getline(iss, dummy, '\t');
+        std::getline(iss, seriesId, '\t');
+        std::getline(iss, seasonNum, '\t');
+
+        seriesNumberOnly = seriesId.substr(2);
+        addLeadingZeros(seriesNumberOnly, 10);
+
+        if (!isNumber(seasonNum)) seasonNum = "1";
+        addLeadingZeros(seasonNum, 4);
+
+        data[index++] = std::stoll(seasonNum + seriesNumberOnly);
+    }
+
+    file.close();
+}
+
+void readImdbParentTvSeriesAndSeasonColumn(const std::string& filePath, uint64_t* data) {
     std::ifstream file(filePath);
     if (!file.is_open()) {
         std::cerr << "Error opening file: " << filePath << std::endl;

@@ -45,7 +45,9 @@ inline void radixPartitionFixedAux(int n, T *keys, T *buffer, std::vector<int> &
         if (copyRequired) {
             memcpy(keys, buffer, n * sizeof(T));
         }
-        outputPartitions.push_back(offset + n);
+        for (int partitionEnd : partitions) {
+            outputPartitions.push_back(offset + partitionEnd);
+        }
         return;
     }
 
@@ -129,7 +131,7 @@ inline void radixPartitionAdaptiveAux(int n, T *keys, T *buffer, std::vector<int
     unsigned int mask = numBuckets - 1;
 
     constexpr int tuplesPerChunk = 10 * 1000;
-    float tuplesPerTlbStoreMiss = 75.0; //////////////////////// NEED TO AUTOMATE //////////////////////// - SHOULD BE 100?
+    float tuplesPerTlbStoreMiss = 50.0; //////////////////////// NEED TO AUTOMATE //////////////////////// - SHOULD BE 100?
     std::vector<std::string> counters = {"DTLB-STORE-MISSES"};
     long_long *counterValues = Counters::getInstance().getSharedEventSetEvents(counters);
 
@@ -193,7 +195,9 @@ inline void radixPartitionAdaptiveAux(int n, T *keys, T *buffer, std::vector<int
         if (copyRequired) {
             memcpy(keys, buffer, n * sizeof(T));
         }
-        outputPartitions.push_back(offset + n);
+        for (int partitionEnd : partitions) {
+            outputPartitions.push_back(offset + partitionEnd);
+        }
         return;
     }
 
