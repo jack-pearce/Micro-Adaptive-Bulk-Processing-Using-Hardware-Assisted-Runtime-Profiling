@@ -697,9 +697,16 @@ int main() {
 //                                               {RadixPartition::RadixBitsAdaptive},
 //                                               16,16,"TEST",1);
 
+
     radixPartitionSweepBenchmark<uint32_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
-                                           {RadixPartition::RadixBitsFixed, RadixPartition::RadixBitsAdaptive},
+                                           {RadixPartition::RadixBitsAdaptive},
                                            16, "ClusterednessSweep_16", 1);
+//    radixPartitionSweepBenchmark<uint32_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
+//                                           {RadixPartition::RadixBitsFixed},
+//                                           11, "ClusterednessSweep_11", 1);
+/*    radixPartitionSweepBenchmark<uint32_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
+                                           {RadixPartition::RadixBitsFixed},
+                                           10, "ClusterednessSweep_10", 1);
     radixPartitionSweepBenchmark<uint32_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
                                            {RadixPartition::RadixBitsFixed},
                                            9, "ClusterednessSweep_9", 1);
@@ -709,14 +716,15 @@ int main() {
     radixPartitionSweepBenchmark<uint32_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
                                            {RadixPartition::RadixBitsFixed},
                                            7, "ClusterednessSweep_7", 1);
-    radixPartitionSweepBenchmark<uint32_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
-                                           {RadixPartition::RadixBitsFixed},
-                                           6, "ClusterednessSweep_6", 1);
+
 
 
     radixPartitionSweepBenchmark<uint32_t>(DataSweeps::linearUniqueIntDistribution250mValuesSortednessSweep,
                                            {RadixPartition::RadixBitsFixed, RadixPartition::RadixBitsAdaptive},
                                            16, "SortednessSweep_16", 1);
+    radixPartitionSweepBenchmark<uint32_t>(DataSweeps::linearUniqueIntDistribution250mValuesSortednessSweep,
+                                           {RadixPartition::RadixBitsFixed},
+                                           10, "SortednessSweep_10", 1);
     radixPartitionSweepBenchmark<uint32_t>(DataSweeps::linearUniqueIntDistribution250mValuesSortednessSweep,
                                            {RadixPartition::RadixBitsFixed},
                                            9, "SortednessSweep_9", 1);
@@ -725,10 +733,8 @@ int main() {
                                            8, "SortednessSweep_8", 1);
     radixPartitionSweepBenchmark<uint32_t>(DataSweeps::linearUniqueIntDistribution250mValuesSortednessSweep,
                                            {RadixPartition::RadixBitsFixed},
-                                           7, "SortednessSweep_7", 1);
-    radixPartitionSweepBenchmark<uint32_t>(DataSweeps::linearUniqueIntDistribution250mValuesSortednessSweep,
-                                           {RadixPartition::RadixBitsFixed},
-                                           6, "SortednessSweep_6", 1);
+                                           7, "SortednessSweep_7", 1);*/
+
 
 
 //    radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations<uint32_t>(DataFiles::slightlyClusteredDistribution250mValuesCardinality10mMax250m,
