@@ -464,15 +464,18 @@ void runOisstMacroBenchmark() {
     readOisstDataFromCsv(inputDataFilePathTwo, n2, yearLatLong + n1, monthDay + n1, sst + n1);
     delete[] monthDay;
 
-    float thresholdTemperature = 0;
+//    randomiseArray(yearLatLong, n);
+//    randomiseArray(sst, n);
+
+    float thresholdTemperature = 10;
     auto *selectedIndexes = new int[n];
     int selectedCount = MABPL::selectIndexesAdaptive<float>(n,sst, selectedIndexes, thresholdTemperature);
 
-    auto *yearLatLong30 = new int64_t[selectedCount];
-    auto *sst30 = new float[selectedCount];
+    auto *yearLatLongFiltered = new int64_t[selectedCount];
+    auto *sstFiltered = new float[selectedCount];
 
-    projectIndexesOnToArray(selectedIndexes, selectedCount, yearLatLong, yearLatLong30);
-    projectIndexesOnToArray(selectedIndexes, selectedCount, sst, sst30);
+    projectIndexesOnToArray(selectedIndexes, selectedCount, yearLatLong, yearLatLongFiltered);
+    projectIndexesOnToArray(selectedIndexes, selectedCount, sst, sstFiltered);
 
     delete[] selectedIndexes;
     delete[] yearLatLong;
@@ -484,8 +487,8 @@ void runOisstMacroBenchmark() {
         auto *inputGroupBy = new int64_t[n];
         auto *inputAggregate = new float[n];
 
-        copyArray(yearLatLong30, inputGroupBy, n);
-        copyArray(sst30, inputAggregate, n);
+        copyArray(yearLatLongFiltered, inputGroupBy, n);
+        copyArray(sstFiltered, inputAggregate, n);
 
         long_long cycles;
 
@@ -503,8 +506,8 @@ void runOisstMacroBenchmark() {
         auto *inputGroupBy = new int64_t[n];
         auto *inputAggregate = new float[n];
 
-        copyArray(yearLatLong30, inputGroupBy, n);
-        copyArray(sst30, inputAggregate, n);
+        copyArray(yearLatLongFiltered, inputGroupBy, n);
+        copyArray(sstFiltered, inputAggregate, n);
 
         long_long cycles;
 
@@ -522,8 +525,8 @@ void runOisstMacroBenchmark() {
         auto *inputGroupBy = new int64_t[n];
         auto *inputAggregate = new float[n];
 
-        copyArray(yearLatLong30, inputGroupBy, n);
-        copyArray(sst30, inputAggregate, n);
+        copyArray(yearLatLongFiltered, inputGroupBy, n);
+        copyArray(sstFiltered, inputAggregate, n);
 
         long_long cycles;
 
@@ -537,8 +540,8 @@ void runOisstMacroBenchmark() {
         delete[] inputAggregate;
     }
 
-    delete[] yearLatLong30;
-    delete[] sst30;
+    delete[] yearLatLongFiltered;
+    delete[] sstFiltered;
 }
 
 void runImdbSelectMacroBenchmark() {
@@ -672,6 +675,81 @@ void runImdbGroupByMacroBenchmark3() {
     delete[] inputAggregate;
 }
 
+void runImdbGroupByMacroBenchmark4() {
+    std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.principals.tsv";
+    int n = getLengthOfTsv(filePath);
+    auto data = new int[n];
+    readImdbPrincipalsColumn(filePath, data);
+    randomiseArray(data, n);
+
+    auto inputGroupBy = new int[n];
+    auto inputAggregate = new int[n];
+    copyArray(data, inputGroupBy, n);
+    copyArray(data, inputAggregate, n);
+
+    long_long cycles;
+
+    cycles = *Counters::getInstance().readSharedEventSet();
+    auto results = MABPL::groupByAdaptive<CountAggregation>(n, inputGroupBy, inputAggregate, 9200000);
+    cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+
+    std::cout << "Cardinality: " << results.size() << ", Total input size: " << n << ", Cycles: " << cycles << std::endl;
+
+    delete[] data;
+    delete[] inputGroupBy;
+    delete[] inputAggregate;
+}
+
+void runImdbGroupByMacroBenchmark5() {
+    std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.principals.tsv";
+    int n = getLengthOfTsv(filePath);
+    auto data = new int[n];
+    readImdbFilmsColumnFromPrincipals(filePath, data);
+    randomiseArray(data, n);
+
+    auto inputGroupBy = new int[n];
+    auto inputAggregate = new int[n];
+    copyArray(data, inputGroupBy, n);
+    copyArray(data, inputAggregate, n);
+
+    long_long cycles;
+
+    cycles = *Counters::getInstance().readSharedEventSet();
+    auto results = MABPL::groupBySort<CountAggregation>(n, inputGroupBy, inputAggregate);
+    cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+
+    std::cout << "Cardinality: " << results.size() << ", Total input size: " << n << ", Cycles: " << cycles << std::endl;
+
+    delete[] data;
+    delete[] inputGroupBy;
+    delete[] inputAggregate;
+}
+
+void runImdbGroupByMacroBenchmark6() {
+    std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.crew.tsv";
+    int n = getLengthOfTsv(filePath);
+    auto data = new int[n];
+    readImdbDirectorsColumn(filePath, data);
+    randomiseArray(data, n);
+
+    auto inputGroupBy = new int[n];
+    auto inputAggregate = new int[n];
+    copyArray(data, inputGroupBy, n);
+    copyArray(data, inputAggregate, n);
+
+    long_long cycles;
+
+    cycles = *Counters::getInstance().readSharedEventSet();
+    auto results = MABPL::groupBySort<CountAggregation>(n, inputGroupBy, inputAggregate);
+    cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+
+    std::cout << "Cardinality: " << results.size() << ", Total input size: " << n << ", Cycles: " << cycles << std::endl;
+
+    delete[] data;
+    delete[] inputGroupBy;
+    delete[] inputAggregate;
+}
+
 void runImdbPartitionMacroBenchmark1() {
     std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.basics.tsv";
     int n = getLengthOfTsv(filePath);
@@ -746,6 +824,8 @@ void runImdbPartitionMacroBenchmark4() {
 
 int main() {
 
+//    runOisstMacroBenchmark();
+
 //    runImdbPartitionMacroBenchmark1();
 
 
@@ -761,32 +841,18 @@ int main() {
         testRadixPartition<int32_t>(DataFiles::fullySortedIntDistribution20mValuesMax20m, i);
     }*/
 
-//    radixPartitionBitsSweepBenchmark<uint32_t>(DataFiles::uniformIntDistribution250mValuesMax250m,
-//                                               {RadixPartition::RadixBitsFixed, RadixPartition::RadixBitsAdaptive},
-//                                               16,16,"Random_16_",5);
-//
-//    radixPartitionBitsSweepBenchmark<uint32_t>(DataFiles::uniformIntDistribution250mValuesMax250m,
-//                                               {RadixPartition::RadixBitsFixed},
-//                                               10,10,"Random_10_",5);
-
-//    radixPartitionBitsSweepBenchmark<uint32_t>(DataFiles::slightlyClusteredDistribution250mValuesCardinality10mMax250m,
-//                                               {RadixPartition::RadixBitsAdaptive},
-//                                               16,16,"TEST",1);
-//    radixPartitionBitsSweepBenchmark<uint32_t>(DataFiles::fullySortedIntDistribution250mValuesMax250m,
-//                                               {RadixPartition::RadixBitsAdaptive},
-//                                               16,16,"TEST",1);
-
-
-
-
-
 
     radixPartitionSweepBenchmark<uint32_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
-                                           {RadixPartition::RadixBitsFixed, RadixPartition::RadixBitsAdaptive},
-                                           16, "ClusterednessSweep_16", 5);
-    radixPartitionSweepBenchmark<uint32_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
-                                           {RadixPartition::RadixBitsFixed},
-                                           7, "ClusterednessSweep_7", 5);
+                                           {RadixPartition::RadixBitsAdaptive},
+                                           16, "ClusterednessSweep_16", 1);
+
+
+//    radixPartitionSweepBenchmark<uint32_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
+//                                           {RadixPartition::RadixBitsFixed, RadixPartition::RadixBitsAdaptive},
+//                                           16, "ClusterednessSweep_16", 5);
+//    radixPartitionSweepBenchmark<uint32_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
+//                                           {RadixPartition::RadixBitsFixed},
+//                                           7, "ClusterednessSweep_7", 5);
 
 /*    radixPartitionSweepBenchmark<uint32_t>(DataSweeps::linearUniqueIntDistribution250mValuesSortednessSweep,
                                            {RadixPartition::RadixBitsFixed, RadixPartition::RadixBitsAdaptive},

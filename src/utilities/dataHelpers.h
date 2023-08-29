@@ -31,8 +31,11 @@ void readImdbParentTvSeriesAndSeasonColumn(const std::string& filePath, int64_t*
 void readImdbParentTvSeriesAndSeasonColumn(const std::string& filePath, uint64_t* data);
 
 void readImdbPrincipalsColumn(const std::string& filePath, int* data);
+void readImdbFilmsColumnFromPrincipals(const std::string& filePath, int* data);
 
 void readImdbFilmColumn(const std::string& filePath, int64_t* data);
+
+void readImdbDirectorsColumn(const std::string& filePath, int* data);
 
 
 template <typename T>
@@ -49,6 +52,9 @@ void copyArray(T* source, T* destination, int size);
 
 template <typename T>
 void projectIndexesOnToArray(const int* indexes, int n, T* source, T* destination);
+
+template <typename T>
+void randomiseArray(T* data, int n);
 
 #include "dataHelpersImplementation.h"
 

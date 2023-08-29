@@ -4,6 +4,8 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <algorithm>
+#include <random>
 
 
 template <typename T>
@@ -61,6 +63,13 @@ void projectIndexesOnToArray(const int* indexes, int n, T* source, T* destinatio
     for (int i = 0; i < n; i++) {
         destination[i] = source[indexes[i]];
     }
+}
+
+template <typename T>
+void randomiseArray(T* data, int n) {
+    unsigned int seed = 1;
+    std::mt19937 gen(seed);
+    std::shuffle(data, data + n, gen);
 }
 
 

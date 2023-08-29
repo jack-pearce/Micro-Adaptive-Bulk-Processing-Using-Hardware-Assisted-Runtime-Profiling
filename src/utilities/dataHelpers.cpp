@@ -357,6 +357,36 @@ void readImdbPrincipalsColumn(const std::string& filePath, int* data) {
     file.close();
 }
 
+void readImdbFilmsColumnFromPrincipals(const std::string& filePath, int* data) {
+    std::ifstream file(filePath);
+    if (!file.is_open()) {
+        std::cerr << "Error opening file: " << filePath << std::endl;
+        exit(1);
+    }
+
+    std::string line;
+    int index = 0;
+    bool isFirstRow = true;  // Flag to skip the first row
+    while (std::getline(file, line)) {
+        if (isFirstRow) {
+            isFirstRow = false;
+            continue;  // Skip the first row
+        }
+
+        std::istringstream iss(line);
+        std::string dummy1, dummy2, filmId, filmNumOnly;
+
+        std::getline(iss, dummy1, '\t');
+        std::getline(iss, dummy2, '\t');
+        std::getline(iss, filmId, '\t');
+
+        filmNumOnly = filmId.substr(2);
+        data[index++] = std::stoi(filmNumOnly);
+    }
+
+    file.close();
+}
+
 void readImdbFilmColumn(const std::string& filePath, int64_t* data) {
     std::ifstream file(filePath);
     if (!file.is_open()) {
@@ -383,4 +413,44 @@ void readImdbFilmColumn(const std::string& filePath, int64_t* data) {
 
     file.close();
 }
+
+void readImdbDirectorsColumn(const std::string& filePath, int* data) {
+    std::ifstream file(filePath);
+    if (!file.is_open()) {
+        std::cerr << "Error opening file: " << filePath << std::endl;
+        exit(1);
+    }
+
+    std::string line;
+    int index = 0;
+    bool isFirstRow = true;  // Flag to skip the first row
+    while (std::getline(file, line)) {
+        if (isFirstRow) {
+            isFirstRow = false;
+            continue;  // Skip the first row
+        }
+
+        std::istringstream iss(line);
+        std::string dummy, directorId, directorNumOnly;
+
+        std::getline(iss, dummy, '\t');
+        std::getline(iss, directorId, '\t');
+
+        size_t commaPosition = directorId.find(',');
+        if (commaPosition != std::string::npos) {
+            directorId = directorId.substr(0, commaPosition);
+        }
+        directorNumOnly = directorId.substr(2);
+
+        try {
+            data[index] = std::stoi(directorNumOnly);
+        } catch (const std::invalid_argument&) {
+            data[index] = -1;
+        }
+        index++;
+    }
+
+    file.close();
+}
+
 
