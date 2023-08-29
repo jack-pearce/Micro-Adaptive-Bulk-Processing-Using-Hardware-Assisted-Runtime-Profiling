@@ -129,7 +129,7 @@ inline void radixPartitionAdaptiveAux(int n, T *keys, T *buffer, std::vector<int
     unsigned int mask = numBuckets - 1;
 
     constexpr int tuplesPerChunk = 50 * 1000;
-    float tuplesPerTlbStoreMiss = 75.0; //////////////////////// NEED TO AUTOMATE //////////////////////// - SHOULD BE 100?
+    float tuplesPerTlbStoreMiss = 100.0; //////////////////////// NEED TO AUTOMATE //////////////////////// - SHOULD BE 100?
     std::vector<std::string> counters = {"DTLB-STORE-MISSES"};
     long_long *counterValues = Counters::getInstance().getSharedEventSetEvents(counters);
 
