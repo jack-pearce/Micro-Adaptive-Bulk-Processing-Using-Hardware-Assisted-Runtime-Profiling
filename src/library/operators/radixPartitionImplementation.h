@@ -220,7 +220,7 @@ std::vector<int> radixPartitionAdaptive(int n, T *keys) {
     static_assert(std::is_integral<T>::value, "Partition column must be an integer type");
 
     int radixBits = 16;         // Negligible gain for higher radix bits than 16
-    int minimumRadixBits = 9;   // L2 TLB entries divided by 4 //////////////////////// NEED TO AUTOMATE ////////////////////////
+    int minimumRadixBits = 7;   // L2 TLB entries divided by 4 //////////////////////// NEED TO AUTOMATE ////////////////////////
 
     int numBuckets = 1 << radixBits;
     T largest = std::numeric_limits<T>::min();;
