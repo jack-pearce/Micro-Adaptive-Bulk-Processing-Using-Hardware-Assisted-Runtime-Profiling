@@ -900,11 +900,93 @@ void runOisstMacroBenchmark() {
 }
 
 int main() {
-    runImdbSelectSweepMacroBenchmark(1874, 2023, 5, {Select::ImplementationIndexesBranch, Select::ImplementationIndexesPredication, Select::ImplementationIndexesAdaptive});
 
-    runImdbPartitionMacroBenchmark_titleIdColumnBasicsTable(5);
-    runImdbPartitionMacroBenchmark_startYearColumnBasicsTable(5);
-    runImdbPartitionMacroBenchmark_personIdColumnPrincipalsTable(5);
+        runImdbSelectSweepMacroBenchmark(1874, 2023, 5,
+                                     {Select::ImplementationIndexesBranch,
+                                      Select::ImplementationIndexesPredication,
+                                      Select::ImplementationIndexesAdaptive});
+
+//    runImdbSelectSweepMacroBenchmark(1874, 2023, 5,
+//                                     {Select::ImplementationValuesBranch,
+//                                      Select::ImplementationValuesVectorized,
+//                                      Select::ImplementationValuesAdaptive});
+
+//    runImdbSelectMacroBenchmark();
+
+
+/*
+    std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.basics.tsv";
+    int n = getLengthOfTsv(filePath);
+    auto data = new int[n];
+    readImdbStartYearColumnFromBasicsTable(filePath, data);
+
+    int year = 1900;
+
+    long_long cycles;
+
+    {
+        auto inputFilter = new int[n];
+        copyArray<int>(data, inputFilter, n);
+        auto selectedIndexes = new int[n];
+
+        cycles = *Counters::getInstance().readSharedEventSet();
+        MABPL::selectIndexesAdaptive(n, inputFilter, selectedIndexes, year);
+        cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+
+        std::cout << cycles << std::endl;
+
+        delete[] inputFilter;
+        delete[] selectedIndexes;
+    }
+
+    {
+        auto inputFilter = new int[n];
+        copyArray<int>(data, inputFilter, n);
+        auto selectedIndexes = new int[n];
+
+        cycles = *Counters::getInstance().readSharedEventSet();
+        MABPL::selectIndexesBranch(n, inputFilter, selectedIndexes, year);
+        cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+
+        std::cout << cycles << std::endl;
+
+        delete[] inputFilter;
+        delete[] selectedIndexes;
+    }
+
+    {
+        auto inputFilter = new int[n];
+        copyArray<int>(data, inputFilter, n);
+        auto selectedIndexes = new int[n];
+
+        cycles = *Counters::getInstance().readSharedEventSet();
+        MABPL::selectIndexesPredication(n, inputFilter, selectedIndexes, year);
+        cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+
+        std::cout << cycles << std::endl;
+
+        delete[] inputFilter;
+        delete[] selectedIndexes;
+    }
+*/
+
+
+
+
+
+
+
+
+
+
+//    runImdbSelectSweepMacroBenchmark(1874, 2023, 1,
+//                                     {Select::ImplementationIndexesBranch,
+//                                      Select::ImplementationIndexesPredication,
+//                                      Select::ImplementationIndexesAdaptive});
+
+//    runImdbPartitionMacroBenchmark_titleIdColumnBasicsTable(5);
+//    runImdbPartitionMacroBenchmark_startYearColumnBasicsTable(5);
+//    runImdbPartitionMacroBenchmark_personIdColumnPrincipalsTable(5);
 
 
 
