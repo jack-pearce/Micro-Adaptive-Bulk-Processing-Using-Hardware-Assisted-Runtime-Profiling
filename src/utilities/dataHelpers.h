@@ -29,13 +29,18 @@ void readImdbStartYearColumn(const std::string& filePath, uint32_t* data);
 
 void readImdbParentTvSeriesAndSeasonColumn(const std::string& filePath, int64_t* data);
 void readImdbParentTvSeriesAndSeasonColumn(const std::string& filePath, uint64_t* data);
+void readImdbParentTvSeriesColumn(const std::string& filePath, uint32_t* data);
 
 void readImdbPrincipalsColumn(const std::string& filePath, int* data);
+void readImdbPrincipalsColumn(const std::string& filePath, uint32_t* data);
 void readImdbFilmsColumnFromPrincipals(const std::string& filePath, int* data);
+void readImdbPersonsColumnFromPrincipals(const std::string& filePath, uint32_t* data);
 
 void readImdbFilmColumn(const std::string& filePath, int64_t* data);
+void readImdbTitleIdColumn(const std::string& filePath, uint32_t* data);
 
 void readImdbDirectorsColumn(const std::string& filePath, int* data);
+void readImdbDirectorsColumn(const std::string& filePath, uint32_t* data);
 
 
 template <typename T>

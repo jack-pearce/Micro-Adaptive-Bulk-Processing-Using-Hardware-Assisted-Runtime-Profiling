@@ -242,10 +242,11 @@ void readImdbStartYearColumn(const std::string& filePath, uint32_t* data) {
         }
 
         try {
-            data[index++] = std::stoi(value);
+            data[index] = std::stoi(value);
         } catch (const std::invalid_argument &e) {
-            data[index++] = 9999;
+            data[index] = 0;
         }
+        index++;
     }
 
     file.close();
@@ -290,6 +291,36 @@ void readImdbParentTvSeriesAndSeasonColumn(const std::string& filePath, int64_t*
         addLeadingZeros(seasonNum, 4);
 
         data[index++] = std::stoll(seasonNum + seriesNumberOnly);
+    }
+
+    file.close();
+}
+
+void readImdbParentTvSeriesColumn(const std::string& filePath, uint32_t* data) {
+    std::ifstream file(filePath);
+    if (!file.is_open()) {
+        std::cerr << "Error opening file: " << filePath << std::endl;
+        exit(1);
+    }
+
+    std::string line;
+    int index = 0;
+    bool isFirstRow = true;  // Flag to skip the first row
+    while (std::getline(file, line)) {
+        if (isFirstRow) {
+            isFirstRow = false;
+            continue;  // Skip the first row
+        }
+
+        std::istringstream iss(line);
+        std::string dummy, tvSeriesId, tvSeriesNumberOnly;
+
+        std::getline(iss, dummy, '\t');
+        std::getline(iss, tvSeriesId, '\t');
+
+        tvSeriesNumberOnly = tvSeriesId.substr(2);
+
+        data[index++] = std::stoi(tvSeriesNumberOnly);
     }
 
     file.close();
@@ -357,6 +388,33 @@ void readImdbPrincipalsColumn(const std::string& filePath, int* data) {
     file.close();
 }
 
+void readImdbPrincipalsColumn(const std::string& filePath, uint32_t* data) {
+    std::ifstream file(filePath);
+    if (!file.is_open()) {
+        std::cerr << "Error opening file: " << filePath << std::endl;
+        exit(1);
+    }
+
+    std::string line;
+    int index = 0;
+    bool isFirstRow = true;  // Flag to skip the first row
+    while (std::getline(file, line)) {
+        if (isFirstRow) {
+            isFirstRow = false;
+            continue;  // Skip the first row
+        }
+
+        std::istringstream iss(line);
+        std::string titleId, titleNumOnly;
+
+        std::getline(iss, titleId, '\t');
+        titleNumOnly = titleId.substr(2);
+        data[index++] = std::stoi(titleNumOnly);
+    }
+
+    file.close();
+}
+
 void readImdbFilmsColumnFromPrincipals(const std::string& filePath, int* data) {
     std::ifstream file(filePath);
     if (!file.is_open()) {
@@ -387,7 +445,64 @@ void readImdbFilmsColumnFromPrincipals(const std::string& filePath, int* data) {
     file.close();
 }
 
+void readImdbPersonsColumnFromPrincipals(const std::string& filePath, uint32_t* data) {
+    std::ifstream file(filePath);
+    if (!file.is_open()) {
+        std::cerr << "Error opening file: " << filePath << std::endl;
+        exit(1);
+    }
+
+    std::string line;
+    int index = 0;
+    bool isFirstRow = true;  // Flag to skip the first row
+    while (std::getline(file, line)) {
+        if (isFirstRow) {
+            isFirstRow = false;
+            continue;  // Skip the first row
+        }
+
+        std::istringstream iss(line);
+        std::string dummy1, dummy2, personId, personNumOnly;
+
+        std::getline(iss, dummy1, '\t');
+        std::getline(iss, dummy2, '\t');
+        std::getline(iss, personId, '\t');
+
+        personNumOnly = personId.substr(2);
+        data[index++] = std::stoi(personNumOnly);
+    }
+
+    file.close();
+}
+
 void readImdbFilmColumn(const std::string& filePath, int64_t* data) {
+    std::ifstream file(filePath);
+    if (!file.is_open()) {
+        std::cerr << "Error opening file: " << filePath << std::endl;
+        exit(1);
+    }
+
+    std::string line;
+    int index = 0;
+    bool isFirstRow = true;  // Flag to skip the first row
+    while (std::getline(file, line)) {
+        if (isFirstRow) {
+            isFirstRow = false;
+            continue;  // Skip the first row
+        }
+
+        std::istringstream iss(line);
+        std::string filmId, filmNumOnly;
+
+        std::getline(iss, filmId, '\t');
+        filmNumOnly = filmId.substr(2);
+        data[index++] = std::stoi(filmNumOnly);
+    }
+
+    file.close();
+}
+
+void readImdbTitleIdColumn(const std::string& filePath, uint32_t* data) {
     std::ifstream file(filePath);
     if (!file.is_open()) {
         std::cerr << "Error opening file: " << filePath << std::endl;
@@ -453,4 +568,42 @@ void readImdbDirectorsColumn(const std::string& filePath, int* data) {
     file.close();
 }
 
+void readImdbDirectorsColumn(const std::string& filePath, uint32_t* data) {
+    std::ifstream file(filePath);
+    if (!file.is_open()) {
+        std::cerr << "Error opening file: " << filePath << std::endl;
+        exit(1);
+    }
+
+    std::string line;
+    int index = 0;
+    bool isFirstRow = true;  // Flag to skip the first row
+    while (std::getline(file, line)) {
+        if (isFirstRow) {
+            isFirstRow = false;
+            continue;  // Skip the first row
+        }
+
+        std::istringstream iss(line);
+        std::string dummy, directorId, directorNumOnly;
+
+        std::getline(iss, dummy, '\t');
+        std::getline(iss, directorId, '\t');
+
+        size_t commaPosition = directorId.find(',');
+        if (commaPosition != std::string::npos) {
+            directorId = directorId.substr(0, commaPosition);
+        }
+        directorNumOnly = directorId.substr(2);
+
+        try {
+            data[index] = std::stoi(directorNumOnly);
+        } catch (const std::invalid_argument&) {
+            data[index] = 9999999;
+        }
+        index++;
+    }
+
+    file.close();
+}
 
