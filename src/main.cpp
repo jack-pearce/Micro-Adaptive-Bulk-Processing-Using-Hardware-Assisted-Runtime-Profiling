@@ -467,7 +467,9 @@ void runOisstMacroBenchmark() {
 //    randomiseArray(yearLatLong, n);
 //    randomiseArray(sst, n);
 
-    float thresholdTemperature = 10;
+    float thresholdTemperature = -20;
+    int cardinality = 360000;
+
     auto *selectedIndexes = new int[n];
     int selectedCount = MABPL::selectIndexesAdaptive<float>(n,sst, selectedIndexes, thresholdTemperature);
 
@@ -493,7 +495,7 @@ void runOisstMacroBenchmark() {
         long_long cycles;
 
         cycles = *Counters::getInstance().readSharedEventSet();
-        auto results = MABPL::groupByAdaptive<MaxAggregation>(n, inputGroupBy, inputAggregate, 2 * 720 * 1440);
+        auto results = MABPL::groupByAdaptive<MaxAggregation>(n, inputGroupBy, inputAggregate, cardinality);
         cycles = *Counters::getInstance().readSharedEventSet() - cycles;
 
         std::cout << "Adpt result size " << results.size() << " / " << n << ", Cycles: " << cycles << std::endl;
@@ -512,7 +514,7 @@ void runOisstMacroBenchmark() {
         long_long cycles;
 
         cycles = *Counters::getInstance().readSharedEventSet();
-        auto results = MABPL::groupByHash<MaxAggregation>(n, inputGroupBy, inputAggregate, 2 * 720 * 1440);
+        auto results = MABPL::groupByHash<MaxAggregation>(n, inputGroupBy, inputAggregate, cardinality);
         cycles = *Counters::getInstance().readSharedEventSet() - cycles;
 
         std::cout << "Hash result size " << results.size() << " / " << n << ", Cycles: " << cycles << std::endl;
@@ -842,9 +844,9 @@ int main() {
     }*/
 
 
-    radixPartitionSweepBenchmark<uint32_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
-                                           {RadixPartition::RadixBitsAdaptive},
-                                           16, "ClusterednessSweep_16", 1);
+//    radixPartitionSweepBenchmark<uint32_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
+//                                           {RadixPartition::RadixBitsAdaptive},
+//                                           16, "ClusterednessSweep_16", 1);
 
 
 //    radixPartitionSweepBenchmark<uint32_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,

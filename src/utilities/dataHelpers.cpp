@@ -142,17 +142,17 @@ void readOisstDataFromCsv(std::string& filePath, int n, int64_t *yearLatLong, in
         std::getline(iss, latitudeStr, ':');
         std::getline(iss, longitudeStr, ':');
 
-/*        int64_t year = std::stoi(yearStr);
+        int64_t year = std::stoi(yearStr);
         float latitudeFloat = std::stof(latitudeStr);
         float longitudeFloat = std::stof(longitudeStr);
 
         int latitude = static_cast<int>(((latitudeFloat - 0.125) /0.25) + 360);
         int longitude = static_cast<int>((longitudeFloat - 0.125) /0.25);
 
-        yearLatLong[i] = (year * 10000 * 10000) + (latitude * 10000) + longitude;*/
+        yearLatLong[i] = (year * 10000 * 10000) + (latitude * 10000) + longitude;
 
-        std::hash<std::string> hashFunc;
-        yearLatLong[i] = hashFunc(yearStr + latitudeStr + longitudeStr);
+//        std::hash<std::string> hashFunc;
+//        yearLatLong[i] = hashFunc(yearStr + latitudeStr + longitudeStr);
 
         std::getline(ss, temp, ','); // Read monthDay
         monthDay[i] = stoi(temp);
