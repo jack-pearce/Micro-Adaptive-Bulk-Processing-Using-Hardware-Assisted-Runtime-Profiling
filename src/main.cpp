@@ -830,7 +830,7 @@ int main() {
                        {RadixPartition::RadixBitsFixed, RadixPartition::RadixBitsAdaptive},
                        MABPL::MachineConstants::getInstance().getMachineConstant(machineConstantName),
                        MABPL::MachineConstants::getInstance().getMachineConstant(machineConstantName),
-                       "5736150",5);
+                       "3290340",5);
 
 //    radixPartitionSweepBenchmark<uint32_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
 //                                           {RadixPartition::RadixBitsAdaptive},
