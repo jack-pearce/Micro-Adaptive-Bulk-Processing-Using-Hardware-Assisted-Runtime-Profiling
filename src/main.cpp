@@ -796,17 +796,14 @@ void runImdbGroupByMacroBenchmark_titleIdFromAkasTable(int iterations, bool rand
 
 int main() {
 
-    partitionBitsSweepBenchmark<int>(DataFiles::uniformIntDistribution250mValuesMax10000, {Partition::RadixBitsAdaptive, Partition::RadixBitsFixed},
-                                     8, 10, "TEST_DELETE", 1);
-
-/*    runImdbSelectSweepMacroBenchmark(1, 2, 1, {Select::ImplementationValuesBranch});
+    runImdbSelectSweepMacroBenchmark(1, 2, 1, {Select::ImplementationValuesBranch});
 
     runImdbPartitionMacroBenchmark_titleIdColumnBasicsTable(1);
     runImdbPartitionMacroBenchmark_startYearColumnBasicsTable(1);
     runImdbPartitionMacroBenchmark_personIdColumnPrincipalsTable(1);
 
     runImdbGroupByMacroBenchmark_titleIdColumnPrincipalsTable(1, true);
-    runImdbGroupByMacroBenchmark_titleIdFromAkasTable(1, true);*/
+    runImdbGroupByMacroBenchmark_titleIdFromAkasTable(1, true);
 
     return 0;
 }
