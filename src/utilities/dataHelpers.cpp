@@ -187,7 +187,7 @@ void writeOisstDataToCsv(std::string& filePath, int n, std::string *yearLatLong,
     std::cout << "Complete" << std::endl;
 }
 
-void readImdbStartYearColumn(const std::string& filePath, int* data) {
+void readImdbStartYearColumnFromBasicsTable(const std::string& filePath, int* data) {
     std::ifstream file(filePath);
     if (!file.is_open()) {
         std::cerr << "Error opening file: " << filePath << std::endl;
@@ -219,7 +219,7 @@ void readImdbStartYearColumn(const std::string& filePath, int* data) {
     file.close();
 }
 
-void readImdbStartYearColumn(const std::string& filePath, uint32_t* data) {
+void readImdbStartYearColumnFromBasicsTable(const std::string& filePath, uint32_t* data) {
     std::ifstream file(filePath);
     if (!file.is_open()) {
         std::cerr << "Error opening file: " << filePath << std::endl;
@@ -445,7 +445,7 @@ void readImdbFilmsColumnFromPrincipals(const std::string& filePath, int* data) {
     file.close();
 }
 
-void readImdbPersonsColumnFromPrincipals(const std::string& filePath, uint32_t* data) {
+void readImdbPersonIdColumnFromPrincipalsTable(const std::string& filePath, uint32_t* data) {
     std::ifstream file(filePath);
     if (!file.is_open()) {
         std::cerr << "Error opening file: " << filePath << std::endl;
@@ -502,7 +502,7 @@ void readImdbFilmColumn(const std::string& filePath, int64_t* data) {
     file.close();
 }
 
-void readImdbTitleIdColumn(const std::string& filePath, uint32_t* data) {
+void readImdbTitleIdColumnBasicsTable(const std::string& filePath, uint32_t* data) {
     std::ifstream file(filePath);
     if (!file.is_open()) {
         std::cerr << "Error opening file: " << filePath << std::endl;

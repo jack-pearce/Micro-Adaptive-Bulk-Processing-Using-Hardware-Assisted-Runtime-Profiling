@@ -449,121 +449,6 @@ void allParallelDataSizeTests(int iterations) {
                                                                   iterations, "5-DOP-1-GroupBy-CardinalitySweepParallel-64-64");
 }
 
-void runOisstMacroBenchmark() {
-    std::string inputDataFilePathOne = FilePaths::getInstance().getOisstInputFolderPath() + "1_month_(06-07)/" + "1982.csv";
-    const int n1 = getLengthOfCsv(inputDataFilePathOne);
-    std::string inputDataFilePathTwo = FilePaths::getInstance().getOisstInputFolderPath() + "1_month_(06-07)/" + "2023.csv";
-    const int n2 = getLengthOfCsv(inputDataFilePathTwo);
-    int n = n1 + n2;
-
-    auto *yearLatLong = new int64_t[n];
-    auto *monthDay = new int[n];
-    auto *sst = new float[n];
-
-    readOisstDataFromCsv(inputDataFilePathOne, n1, yearLatLong, monthDay, sst);
-    readOisstDataFromCsv(inputDataFilePathTwo, n2, yearLatLong + n1, monthDay + n1, sst + n1);
-    delete[] monthDay;
-
-//    randomiseArray(yearLatLong, n);
-//    randomiseArray(sst, n);
-
-    float thresholdTemperature = -20;
-    int cardinality = 360000;
-
-    auto *selectedIndexes = new int[n];
-    int selectedCount = MABPL::selectIndexesAdaptive<float>(n,sst, selectedIndexes, thresholdTemperature);
-
-    auto *yearLatLongFiltered = new int64_t[selectedCount];
-    auto *sstFiltered = new float[selectedCount];
-
-    projectIndexesOnToArray(selectedIndexes, selectedCount, yearLatLong, yearLatLongFiltered);
-    projectIndexesOnToArray(selectedIndexes, selectedCount, sst, sstFiltered);
-
-    delete[] selectedIndexes;
-    delete[] yearLatLong;
-    delete[] sst;
-
-    n = selectedCount;
-
-    {
-        auto *inputGroupBy = new int64_t[n];
-        auto *inputAggregate = new float[n];
-
-        copyArray(yearLatLongFiltered, inputGroupBy, n);
-        copyArray(sstFiltered, inputAggregate, n);
-
-        long_long cycles;
-
-        cycles = *Counters::getInstance().readSharedEventSet();
-        auto results = MABPL::groupByAdaptive<MaxAggregation>(n, inputGroupBy, inputAggregate, cardinality);
-        cycles = *Counters::getInstance().readSharedEventSet() - cycles;
-
-        std::cout << "Adpt result size " << results.size() << " / " << n << ", Cycles: " << cycles << std::endl;
-
-        delete[] inputGroupBy;
-        delete[] inputAggregate;
-    }
-
-    {
-        auto *inputGroupBy = new int64_t[n];
-        auto *inputAggregate = new float[n];
-
-        copyArray(yearLatLongFiltered, inputGroupBy, n);
-        copyArray(sstFiltered, inputAggregate, n);
-
-        long_long cycles;
-
-        cycles = *Counters::getInstance().readSharedEventSet();
-        auto results = MABPL::groupByHash<MaxAggregation>(n, inputGroupBy, inputAggregate, cardinality);
-        cycles = *Counters::getInstance().readSharedEventSet() - cycles;
-
-        std::cout << "Hash result size " << results.size() << " / " << n << ", Cycles: " << cycles << std::endl;
-
-        delete[] inputGroupBy;
-        delete[] inputAggregate;
-    }
-
-    {
-        auto *inputGroupBy = new int64_t[n];
-        auto *inputAggregate = new float[n];
-
-        copyArray(yearLatLongFiltered, inputGroupBy, n);
-        copyArray(sstFiltered, inputAggregate, n);
-
-        long_long cycles;
-
-        cycles = *Counters::getInstance().readSharedEventSet();
-        auto results = MABPL::groupBySort<MaxAggregation>(n, inputGroupBy, inputAggregate);
-        cycles = *Counters::getInstance().readSharedEventSet() - cycles;
-
-        std::cout << "Sort result size " << results.size() << " / " << n << ", Cycles: " << cycles << std::endl;
-
-        delete[] inputGroupBy;
-        delete[] inputAggregate;
-    }
-
-    delete[] yearLatLongFiltered;
-    delete[] sstFiltered;
-}
-
-void runImdbSelectMacroBenchmark() {
-    std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.basics.tsv";
-    int n = getLengthOfTsv(filePath);
-    auto inputData = new int[n];
-    readImdbStartYearColumn(filePath, inputData);
-
-    long_long cycles;
-    auto *selectedIndexes = new int[n];
-
-    cycles = *Counters::getInstance().readSharedEventSet();
-    int selectedCount = MABPL::selectIndexesBranch(n, inputData, selectedIndexes, 1960);
-    cycles = *Counters::getInstance().readSharedEventSet() - cycles;
-
-    std::cout << "Selected " << selectedCount << " / " << n << ", Cycles: " << cycles << std::endl;
-
-    delete[] inputData;
-}
-
 void runImdbSelectSweepMacroBenchmark(int startYear, int endYear, int iterations,
                                       const std::vector<Select> &selectImplementations) {
     int numImplementations = static_cast<int>(selectImplementations.size());
@@ -571,7 +456,7 @@ void runImdbSelectSweepMacroBenchmark(int startYear, int endYear, int iterations
     std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.basics.tsv";
     int n = getLengthOfTsv(filePath);
     auto data = new int[n];
-    readImdbStartYearColumn(filePath, data);
+    readImdbStartYearColumnFromBasicsTable(filePath, data);
 
     long_long cycles;
     std::vector<std::vector<long_long>> results(endYear - startYear + 1,
@@ -612,6 +497,171 @@ void runImdbSelectSweepMacroBenchmark(int startYear, int endYear, int iterations
     std::string fileName = "IMDB_select_year_sweep";
     std::string fullFilePath = FilePaths::getInstance().getImdbOutputFolderPath() + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
+}
+
+void runImdbPartitionMacroBenchmark_titleIdColumnBasicsTable(int iterations) {
+    std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.basics.tsv";
+    std::string machineConstantName = "Partition_minRadixBits";
+    int n = getLengthOfTsv(filePath);
+    auto data = new uint32_t [n];
+    readImdbTitleIdColumnBasicsTable(filePath, data);
+
+    long_long cycles;
+    std::vector<std::vector<long_long>> results(1, std::vector<long_long>((3 * iterations), 0));
+
+    for (int i = 0; i < iterations; i++) {
+
+        for (int j = 0; j < 3; j++) {
+
+            auto keys = new uint32_t[n];
+            copyArray(data, keys, n);
+
+            std::cout << "Running iteration " << i + 1 << "... ";
+
+            if (j == 0) {
+                cycles = *Counters::getInstance().readSharedEventSet();
+                auto partitions = MABPL::radixPartitionAdaptive(n, keys);
+                cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+            } else if (j == 1) {
+                cycles = *Counters::getInstance().readSharedEventSet();
+                auto partitions = MABPL::radixPartitionFixed(n, keys,  MABPL::MachineConstants::getInstance().getMachineConstant(machineConstantName));
+                cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+            } else if (j == 2) {
+                cycles = *Counters::getInstance().readSharedEventSet();
+                auto partitions = MABPL::radixPartitionFixed(n, keys,  16);
+                cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+            }
+
+            results[0][(i * 3) + j] = cycles;
+
+            delete[] keys;
+            std::cout << "Completed" << std::endl;
+        }
+    }
+
+    std::vector<std::string> headers(3 * iterations);
+    std::string functionNames[] = {"RadixPartition_Adaptive", "RadixPartition_Static_", "RadixPartition_Static_16bits"};
+    functionNames[1].append(std::to_string(static_cast<int>(MABPL::MachineConstants::getInstance().getMachineConstant(machineConstantName))));
+    functionNames[1].append("bits");
+    for (auto i = 0; i < (3 * iterations); ++i) {
+        headers[i] = functionNames[i % 3];
+    }
+
+    std::string fileName = "IMDB_partition_titleIdColumn_BasicsTable";
+    std::string fullFilePath = FilePaths::getInstance().getImdbOutputFolderPath() + fileName + ".csv";
+    writeHeadersAndTableToCSV(headers, results, fullFilePath);
+
+    delete[] data;
+}
+
+void runImdbPartitionMacroBenchmark_startYearColumnBasicsTable(int iterations) {
+    std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.basics.tsv";
+    std::string machineConstantName = "Partition_minRadixBits";
+    int n = getLengthOfTsv(filePath);
+    auto data = new uint32_t [n];
+    readImdbStartYearColumnFromBasicsTable(filePath, data);
+
+    long_long cycles;
+    std::vector<std::vector<long_long>> results(1, std::vector<long_long>((3 * iterations), 0));
+
+    for (int i = 0; i < iterations; i++) {
+
+        for (int j = 0; j < 3; j++) {
+
+            auto keys = new uint32_t[n];
+            copyArray(data, keys, n);
+
+            std::cout << "Running iteration " << i + 1 << "... ";
+
+            if (j == 0) {
+                cycles = *Counters::getInstance().readSharedEventSet();
+                auto partitions = MABPL::radixPartitionAdaptive(n, keys);
+                cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+            } else if (j == 1) {
+                cycles = *Counters::getInstance().readSharedEventSet();
+                auto partitions = MABPL::radixPartitionFixed(n, keys,  MABPL::MachineConstants::getInstance().getMachineConstant(machineConstantName));
+                cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+            } else if (j == 2) {
+                cycles = *Counters::getInstance().readSharedEventSet();
+                auto partitions = MABPL::radixPartitionFixed(n, keys,  16);
+                cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+            }
+
+            results[0][(i * 3) + j] = cycles;
+
+            delete[] keys;
+            std::cout << "Completed" << std::endl;
+        }
+    }
+
+    std::vector<std::string> headers(3 * iterations);
+    std::string functionNames[] = {"RadixPartition_Adaptive", "RadixPartition_Static_", "RadixPartition_Static_16bits"};
+    functionNames[1].append(std::to_string(static_cast<int>(MABPL::MachineConstants::getInstance().getMachineConstant(machineConstantName))));
+    functionNames[1].append("bits");
+    for (auto i = 0; i < (3 * iterations); ++i) {
+        headers[i] = functionNames[i % 3];
+    }
+
+    std::string fileName = "IMDB_partition_startYearColumn_BasicsTable";
+    std::string fullFilePath = FilePaths::getInstance().getImdbOutputFolderPath() + fileName + ".csv";
+    writeHeadersAndTableToCSV(headers, results, fullFilePath);
+
+    delete[] data;
+}
+
+void runImdbPartitionMacroBenchmark_personIdColumnPrincipalsTable(int iterations) {
+    std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.principals.tsv";
+    std::string machineConstantName = "Partition_minRadixBits";
+    int n = getLengthOfTsv(filePath);
+    auto data = new uint32_t [n];
+    readImdbPersonIdColumnFromPrincipalsTable(filePath, data);
+
+    long_long cycles;
+    std::vector<std::vector<long_long>> results(1, std::vector<long_long>((3 * iterations), 0));
+
+    for (int i = 0; i < iterations; i++) {
+
+        for (int j = 0; j < 3; j++) {
+
+            auto keys = new uint32_t[n];
+            copyArray(data, keys, n);
+
+            std::cout << "Running iteration " << i + 1 << "... ";
+
+            if (j == 0) {
+                cycles = *Counters::getInstance().readSharedEventSet();
+                auto partitions = MABPL::radixPartitionAdaptive(n, keys);
+                cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+            } else if (j == 1) {
+                cycles = *Counters::getInstance().readSharedEventSet();
+                auto partitions = MABPL::radixPartitionFixed(n, keys,  MABPL::MachineConstants::getInstance().getMachineConstant(machineConstantName));
+                cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+            } else if (j == 2) {
+                cycles = *Counters::getInstance().readSharedEventSet();
+                auto partitions = MABPL::radixPartitionFixed(n, keys,  16);
+                cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+            }
+
+            results[0][(i * 3) + j] = cycles;
+
+            delete[] keys;
+            std::cout << "Completed" << std::endl;
+        }
+    }
+
+    std::vector<std::string> headers(3 * iterations);
+    std::string functionNames[] = {"RadixPartition_Adaptive", "RadixPartition_Static_", "RadixPartition_Static_16bits"};
+    functionNames[1].append(std::to_string(static_cast<int>(MABPL::MachineConstants::getInstance().getMachineConstant(machineConstantName))));
+    functionNames[1].append("bits");
+    for (auto i = 0; i < (3 * iterations); ++i) {
+        headers[i] = functionNames[i % 3];
+    }
+
+    std::string fileName = "IMDB_partition_personIdColumn_PrincipalsTable";
+    std::string fullFilePath = FilePaths::getInstance().getImdbOutputFolderPath() + fileName + ".csv";
+    writeHeadersAndTableToCSV(headers, results, fullFilePath);
+
+    delete[] data;
 }
 
 void runImdbGroupByMacroBenchmark1() {
@@ -752,205 +802,111 @@ void runImdbGroupByMacroBenchmark6() {
     delete[] inputAggregate;
 }
 
-void runImdbPartitionMacroBenchmark_filmColumn() {
-    std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.basics.tsv";
-    std::string machineConstantName = "Partition_minRadixBits";
-    int n = getLengthOfTsv(filePath);
-    auto data = new uint32_t [n];
-    readImdbTitleIdColumn(filePath, data);
+void runOisstMacroBenchmark() {
+    std::string inputDataFilePathOne = FilePaths::getInstance().getOisstInputFolderPath() + "1_month_(06-07)/" + "1982.csv";
+    const int n1 = getLengthOfCsv(inputDataFilePathOne);
+    std::string inputDataFilePathTwo = FilePaths::getInstance().getOisstInputFolderPath() + "1_month_(06-07)/" + "2023.csv";
+    const int n2 = getLengthOfCsv(inputDataFilePathTwo);
+    int n = n1 + n2;
+
+    auto *yearLatLong = new int64_t[n];
+    auto *monthDay = new int[n];
+    auto *sst = new float[n];
+
+    readOisstDataFromCsv(inputDataFilePathOne, n1, yearLatLong, monthDay, sst);
+    readOisstDataFromCsv(inputDataFilePathTwo, n2, yearLatLong + n1, monthDay + n1, sst + n1);
+    delete[] monthDay;
+
+//    randomiseArray(yearLatLong, n);
+//    randomiseArray(sst, n);
+
+    float thresholdTemperature = -20;
+    int cardinality = 360000;
+
+    auto *selectedIndexes = new int[n];
+    int selectedCount = MABPL::selectIndexesAdaptive<float>(n,sst, selectedIndexes, thresholdTemperature);
+
+    auto *yearLatLongFiltered = new int64_t[selectedCount];
+    auto *sstFiltered = new float[selectedCount];
+
+    projectIndexesOnToArray(selectedIndexes, selectedCount, yearLatLong, yearLatLongFiltered);
+    projectIndexesOnToArray(selectedIndexes, selectedCount, sst, sstFiltered);
+
+    delete[] selectedIndexes;
+    delete[] yearLatLong;
+    delete[] sst;
+
+    n = selectedCount;
 
     {
-        auto keys = new uint32_t[n];
-        copyArray(data, keys, n);
+        auto *inputGroupBy = new int64_t[n];
+        auto *inputAggregate = new float[n];
+
+        copyArray(yearLatLongFiltered, inputGroupBy, n);
+        copyArray(sstFiltered, inputAggregate, n);
+
         long_long cycles;
 
         cycles = *Counters::getInstance().readSharedEventSet();
-        auto partitions = MABPL::radixPartitionAdaptive(n, keys);
+        auto results = MABPL::groupByAdaptive<MaxAggregation>(n, inputGroupBy, inputAggregate, cardinality);
         cycles = *Counters::getInstance().readSharedEventSet() - cycles;
 
-        std::cout << "Adaptive: Created " << partitions.size() << " partitions, Cycles: " << cycles << std::endl;
+        std::cout << "Adpt result size " << results.size() << " / " << n << ", Cycles: " << cycles << std::endl;
 
-        delete[] keys;
+        delete[] inputGroupBy;
+        delete[] inputAggregate;
     }
 
     {
-        auto keys = new uint32_t[n];
-        copyArray(data, keys, n);
+        auto *inputGroupBy = new int64_t[n];
+        auto *inputAggregate = new float[n];
+
+        copyArray(yearLatLongFiltered, inputGroupBy, n);
+        copyArray(sstFiltered, inputAggregate, n);
+
         long_long cycles;
 
         cycles = *Counters::getInstance().readSharedEventSet();
-        auto partitions = MABPL::radixPartitionFixed(n, keys,  MABPL::MachineConstants::getInstance().getMachineConstant(machineConstantName));
+        auto results = MABPL::groupByHash<MaxAggregation>(n, inputGroupBy, inputAggregate, cardinality);
         cycles = *Counters::getInstance().readSharedEventSet() - cycles;
 
-        std::cout << "Fixed_" << MABPL::MachineConstants::getInstance().getMachineConstant(machineConstantName);
-        std::cout << ": Created " << partitions.size() << " partitions, Cycles: " << cycles << std::endl;
+        std::cout << "Hash result size " << results.size() << " / " << n << ", Cycles: " << cycles << std::endl;
 
-        delete[] keys;
+        delete[] inputGroupBy;
+        delete[] inputAggregate;
     }
 
     {
-        auto keys = new uint32_t[n];
-        copyArray(data, keys, n);
+        auto *inputGroupBy = new int64_t[n];
+        auto *inputAggregate = new float[n];
+
+        copyArray(yearLatLongFiltered, inputGroupBy, n);
+        copyArray(sstFiltered, inputAggregate, n);
+
         long_long cycles;
 
         cycles = *Counters::getInstance().readSharedEventSet();
-        auto partitions = MABPL::radixPartitionFixed(n, keys,  16);
+        auto results = MABPL::groupBySort<MaxAggregation>(n, inputGroupBy, inputAggregate);
         cycles = *Counters::getInstance().readSharedEventSet() - cycles;
 
-        std::cout << "Fixed_16: Created " << partitions.size() << " partitions, Cycles: " << cycles << std::endl;
+        std::cout << "Sort result size " << results.size() << " / " << n << ", Cycles: " << cycles << std::endl;
 
-        delete[] keys;
+        delete[] inputGroupBy;
+        delete[] inputAggregate;
     }
 
-    delete[] data;
-}
-
-void runImdbPartitionMacroBenchmark_startYearColumn() {
-    std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.basics.tsv";
-    std::string machineConstantName = "Partition_minRadixBits";
-    int n = getLengthOfTsv(filePath);
-    auto data = new uint32_t[n];
-    readImdbStartYearColumn(filePath, data);
-
-    {
-        auto keys = new uint32_t[n];
-        copyArray(data, keys, n);
-        long_long cycles;
-
-        cycles = *Counters::getInstance().readSharedEventSet();
-        auto partitions = MABPL::radixPartitionAdaptive(n, keys);
-        cycles = *Counters::getInstance().readSharedEventSet() - cycles;
-
-        std::cout << "Adaptive: Created " << partitions.size() << " partitions, Cycles: " << cycles << std::endl;
-
-        delete[] keys;
-    }
-
-    {
-        auto keys = new uint32_t[n];
-        copyArray(data, keys, n);
-        long_long cycles;
-
-        cycles = *Counters::getInstance().readSharedEventSet();
-        auto partitions = MABPL::radixPartitionFixed(n, keys,  MABPL::MachineConstants::getInstance().getMachineConstant(machineConstantName));
-        cycles = *Counters::getInstance().readSharedEventSet() - cycles;
-
-        std::cout << "Fixed_" << MABPL::MachineConstants::getInstance().getMachineConstant(machineConstantName);
-        std::cout << ": Created " << partitions.size() << " partitions, Cycles: " << cycles << std::endl;
-
-        delete[] keys;
-    }
-
-    {
-        auto keys = new uint32_t[n];
-        copyArray(data, keys, n);
-        long_long cycles;
-
-        cycles = *Counters::getInstance().readSharedEventSet();
-        auto partitions = MABPL::radixPartitionFixed(n, keys,  16);
-        cycles = *Counters::getInstance().readSharedEventSet() - cycles;
-
-        std::cout << "Fixed_16: Created " << partitions.size() << " partitions, Cycles: " << cycles << std::endl;
-
-        delete[] keys;
-    }
-
-    delete[] data;
-}
-
-void runImdbPartitionMacroBenchmark_personColumn() {
-    std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.principals.tsv";
-    std::string machineConstantName = "Partition_minRadixBits";
-    int n = getLengthOfTsv(filePath);
-    auto data = new uint32_t [n];
-    readImdbPersonsColumnFromPrincipals(filePath, data);
-
-    {
-        auto keys = new uint32_t[n];
-        copyArray(data, keys, n);
-        long_long cycles;
-
-        cycles = *Counters::getInstance().readSharedEventSet();
-        auto partitions = MABPL::radixPartitionAdaptive(n, keys);
-        cycles = *Counters::getInstance().readSharedEventSet() - cycles;
-
-        std::cout << "Adaptive: Created " << partitions.size() << " partitions, Cycles: " << cycles << std::endl;
-
-        delete[] keys;
-    }
-
-    {
-        auto keys = new uint32_t[n];
-        copyArray(data, keys, n);
-        long_long cycles;
-
-        cycles = *Counters::getInstance().readSharedEventSet();
-        auto partitions = MABPL::radixPartitionFixed(n, keys,  MABPL::MachineConstants::getInstance().getMachineConstant(machineConstantName));
-        cycles = *Counters::getInstance().readSharedEventSet() - cycles;
-
-        std::cout << "Fixed_" << MABPL::MachineConstants::getInstance().getMachineConstant(machineConstantName);
-        std::cout << ": Created " << partitions.size() << " partitions, Cycles: " << cycles << std::endl;
-
-        delete[] keys;
-    }
-
-    {
-        auto keys = new uint32_t[n];
-        copyArray(data, keys, n);
-        long_long cycles;
-
-        cycles = *Counters::getInstance().readSharedEventSet();
-        auto partitions = MABPL::radixPartitionFixed(n, keys,  16);
-        cycles = *Counters::getInstance().readSharedEventSet() - cycles;
-
-        std::cout << "Fixed_16: Created " << partitions.size() << " partitions, Cycles: " << cycles << std::endl;
-
-        delete[] keys;
-    }
-
-    delete[] data;
-}
-
-void runImdbPartitionMacroBenchmark3() {
-    std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.principals.tsv";
-    int n = getLengthOfTsv(filePath);
-    auto keys = new int[n];
-    readImdbPrincipalsColumn(filePath, keys);
-
-    long_long cycles;
-
-    cycles = *Counters::getInstance().readSharedEventSet();
-//    auto partitions = MABPL::radixPartitionAdaptive(n, keys);
-    auto partitions = MABPL::radixPartitionFixed(n, keys, 16);
-    cycles = *Counters::getInstance().readSharedEventSet() - cycles;
-
-    std::cout << "Created " << partitions.size() << " partitions, Cycles: " << cycles << std::endl;
-
-    delete[] keys;
-}
-
-void runImdbPartitionMacroBenchmark4() {
-    std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.akas.tsv";
-    int n = getLengthOfTsv(filePath);
-    auto keys = new int64_t [n];
-    readImdbFilmColumn(filePath, keys);
-
-    long_long cycles;
-
-    cycles = *Counters::getInstance().readSharedEventSet();
-//    auto partitions = MABPL::radixPartitionAdaptive(n, keys);
-    auto partitions = MABPL::radixPartitionFixed(n, keys, 16);
-    cycles = *Counters::getInstance().readSharedEventSet() - cycles;
-
-    std::cout << "Created " << partitions.size() << " partitions, Cycles: " << cycles << std::endl;
-
-    delete[] keys;
+    delete[] yearLatLongFiltered;
+    delete[] sstFiltered;
 }
 
 int main() {
-    runImdbPartitionMacroBenchmark_filmColumn();
-    runImdbPartitionMacroBenchmark_startYearColumn();
-    runImdbPartitionMacroBenchmark_personColumn();
+    runImdbSelectSweepMacroBenchmark(1874, 2023, 5, {Select::ImplementationIndexesBranch, Select::ImplementationIndexesPredication, Select::ImplementationIndexesAdaptive});
+
+    runImdbPartitionMacroBenchmark_titleIdColumnBasicsTable(5);
+    runImdbPartitionMacroBenchmark_startYearColumnBasicsTable(5);
+    runImdbPartitionMacroBenchmark_personIdColumnPrincipalsTable(5);
+
+
 
 /*    std::string machineConstantName = "Partition_minRadixBits";
     radixPartitionBitsSweepBenchmark<uint32_t>(DataFiles::Clustered1mDistribution250mValuesCardinality10mMax250m,

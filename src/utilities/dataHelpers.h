@@ -24,8 +24,8 @@ void readOisstDataFromCsv(std::string& filePath, int n, int64_t *yearLatLong, in
 
 void writeOisstDataToCsv(std::string& filePath, int n, std::string *yearLatLong, float *sst);
 
-void readImdbStartYearColumn(const std::string& filePath, int* data);
-void readImdbStartYearColumn(const std::string& filePath, uint32_t* data);
+void readImdbStartYearColumnFromBasicsTable(const std::string& filePath, int* data);
+void readImdbStartYearColumnFromBasicsTable(const std::string& filePath, uint32_t* data);
 
 void readImdbParentTvSeriesAndSeasonColumn(const std::string& filePath, int64_t* data);
 void readImdbParentTvSeriesAndSeasonColumn(const std::string& filePath, uint64_t* data);
@@ -34,10 +34,10 @@ void readImdbParentTvSeriesColumn(const std::string& filePath, uint32_t* data);
 void readImdbPrincipalsColumn(const std::string& filePath, int* data);
 void readImdbPrincipalsColumn(const std::string& filePath, uint32_t* data);
 void readImdbFilmsColumnFromPrincipals(const std::string& filePath, int* data);
-void readImdbPersonsColumnFromPrincipals(const std::string& filePath, uint32_t* data);
+void readImdbPersonIdColumnFromPrincipalsTable(const std::string& filePath, uint32_t* data);
 
 void readImdbFilmColumn(const std::string& filePath, int64_t* data);
-void readImdbTitleIdColumn(const std::string& filePath, uint32_t* data);
+void readImdbTitleIdColumnBasicsTable(const std::string& filePath, uint32_t* data);
 
 void readImdbDirectorsColumn(const std::string& filePath, int* data);
 void readImdbDirectorsColumn(const std::string& filePath, uint32_t* data);
