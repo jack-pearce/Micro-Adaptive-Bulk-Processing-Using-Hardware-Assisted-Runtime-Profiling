@@ -131,7 +131,7 @@ inline void radixPartitionAdaptiveAux(int n, T *keys, T *buffer, std::vector<int
     unsigned int mask = numBuckets - 1;
 
     constexpr int tuplesPerChunk = 10 * 1000;
-    float tuplesPerTlbStoreMiss = 50.0; //////////////////////// NEED TO AUTOMATE //////////////////////// - SHOULD BE 100?
+    float tuplesPerTlbStoreMiss = 50.0;
     std::vector<std::string> counters = {"DTLB-STORE-MISSES"};
     long_long *counterValues = Counters::getInstance().getSharedEventSetEvents(counters);
 
@@ -226,8 +226,6 @@ std::vector<int> radixPartitionAdaptive(int n, T *keys) {
 
     int radixBits = 16;         // Negligible gain for higher radix bits than 16
     int minimumRadixBits = static_cast<int>(MachineConstants::getInstance().getMachineConstant(machineConstantName));
-
-    std::cout << "Min radix bits: " << minimumRadixBits << std::endl;
 
     int numBuckets = 1 << radixBits;
     T largest = std::numeric_limits<T>::min();;
