@@ -210,10 +210,11 @@ void readImdbStartYearColumnFromBasicsTable(const std::string& filePath, int* da
         }
 
         try {
-            data[index++] = std::stoi(value);
+            data[index] = std::stoi(value);
         } catch (const std::invalid_argument &e) {
-            data[index++] = 9999;
+            data[index] = 9999;
         }
+        index++;
     }
 
     file.close();
