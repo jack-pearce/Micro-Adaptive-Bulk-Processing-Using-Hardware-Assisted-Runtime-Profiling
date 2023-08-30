@@ -167,9 +167,9 @@ inline void radixPartitionAdaptiveAux(int n, T *keys, T *buffer, std::vector<int
                 mask = numBuckets - 1;
 
                 /////////////////////////////////////// ADAPTIVITY OUTPUT ///////////////////////////////////////////
-                std::cout << "RadixBits reduced to " << radixBits << " after tuple " << i << " due to reading of ";
-                std::cout << (static_cast<float>(tuplesToProcess) / static_cast<float>(counterValues[0]));
-                std::cout << " tuples per TLB store miss" << std::endl;
+//                std::cout << "RadixBits reduced to " << radixBits << " after tuple " << i << " due to reading of ";
+//                std::cout << (static_cast<float>(tuplesToProcess) / static_cast<float>(counterValues[0]));
+//                std::cout << " tuples per TLB store miss" << std::endl;
                 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
                 radixPartitionAdaptiveMergePartitions(buffer, buckets, partitions, numBuckets);
