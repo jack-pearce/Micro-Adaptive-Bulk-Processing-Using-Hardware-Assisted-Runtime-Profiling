@@ -237,6 +237,12 @@ const DataFile DataFiles::slightlyClusteredDistribution250mValuesCardinality10mM
         "slightlyClusteredDistribution250mValuesCardinality10mMax250m",
         ""};
 
+const DataFile DataFiles::Clustered1mDistribution250mValuesCardinality10mMax250m{
+        250 * 1000 * 1000,
+        "Clustered1mDistribution250mValuesCardinality10mMax250m",
+        ""};
+
+
 
 DataFile::DataFile(int _numElements, std::string _fileName, std::string _longDescription)
         : numElements(_numElements), fileName(std::move(_fileName)), longDescription(std::move(_longDescription)) {}

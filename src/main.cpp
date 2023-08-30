@@ -825,6 +825,12 @@ void runImdbPartitionMacroBenchmark4() {
 }
 
 int main() {
+    std::string machineConstantName = "Partition_minRadixBits";
+    radixPartitionBitsSweepBenchmark<uint32_t>(DataFiles::Clustered1mDistribution250mValuesCardinality10mMax250m,
+                       {RadixPartition::RadixBitsFixed, RadixPartition::RadixBitsAdaptive},
+                       MABPL::MachineConstants::getInstance().getMachineConstant(machineConstantName),
+                       MABPL::MachineConstants::getInstance().getMachineConstant(machineConstantName),
+                       "TEST",5);
 
 //    runOisstMacroBenchmark();
 
@@ -833,7 +839,7 @@ int main() {
 
 //    testRadixSort<int32_t>(DataFiles::uniformIntDistribution20mValuesMax20m, RadixPartition::RadixBitsFixed);
 
-    testRadixPartition<int32_t>(DataFiles::uniformIntDistribution20mValuesMax20m, RadixPartition::RadixBitsAdaptive);
+//    testRadixPartition<int32_t>(DataFiles::uniformIntDistribution20mValuesMax20m, RadixPartition::RadixBitsAdaptive);
 
     // Can test with a maximum partition size of 1 i.e. this will fully sort the data
 /*    for (int i = 2; i < 20; i ++) {
