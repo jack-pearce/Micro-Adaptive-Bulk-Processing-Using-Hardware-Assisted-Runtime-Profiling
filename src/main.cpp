@@ -1107,29 +1107,6 @@ void runImdbGroupByMacroBenchmark6() {
 
 int main() {
 
-    runImdbGroupByMacroBenchmark_titleIdColumnPrincipalsTable(5,false);
-    runImdbGroupByMacroBenchmark_titleIdColumnPrincipalsTable(5,true);
-
-    runImdbGroupByMacroBenchmark_titleIdFromAkasTable(5,false);
-    runImdbGroupByMacroBenchmark_titleIdFromAkasTable(5,true);
-
-//    runImdbGroupByMacroBenchmark5();
-
-//    runOisstMacroBenchmark();
-
-//        runImdbSelectSweepMacroBenchmark(1874, 2023, 5,
-//                                     {Select::ImplementationIndexesBranch,
-//                                      Select::ImplementationIndexesPredication,
-//                                      Select::ImplementationIndexesAdaptive});
-
-//    runImdbSelectSweepMacroBenchmark(1874, 2023, 5,
-//                                     {Select::ImplementationValuesBranch,
-//                                      Select::ImplementationValuesVectorized,
-//                                      Select::ImplementationValuesAdaptive});
-
-//    runImdbSelectMacroBenchmark();
-
-
 /*
     std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.basics.tsv";
     int n = getLengthOfTsv(filePath);
