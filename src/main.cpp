@@ -826,11 +826,22 @@ void runImdbPartitionMacroBenchmark4() {
 
 int main() {
     std::string machineConstantName = "Partition_minRadixBits";
-    radixPartitionBitsSweepBenchmark<uint32_t>(DataFiles::Clustered1mDistribution250mValuesCardinality10mMax250m,
+/*    radixPartitionBitsSweepBenchmark<uint32_t>(DataFiles::Clustered1mDistribution250mValuesCardinality10mMax250m,
                        {RadixPartition::RadixBitsFixed, RadixPartition::RadixBitsAdaptive},
                        MABPL::MachineConstants::getInstance().getMachineConstant(machineConstantName),
                        MABPL::MachineConstants::getInstance().getMachineConstant(machineConstantName),
-                       "TEST",5);
+                       "TEST",5);*/
+
+    radixPartitionSweepBenchmark<uint32_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
+                                           {RadixPartition::RadixBitsAdaptive},
+                                           16, "ClusterednessSweep", 5);
+    radixPartitionSweepBenchmark<uint32_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
+                                           {RadixPartition::RadixBitsFixed},
+                                           MABPL::MachineConstants::getInstance().getMachineConstant(machineConstantName),
+                                           "ClusterednessSweep_9", 5);
+
+
+
 
 //    runOisstMacroBenchmark();
 
