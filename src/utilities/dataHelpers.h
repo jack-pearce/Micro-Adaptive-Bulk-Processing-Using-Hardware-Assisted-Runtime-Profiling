@@ -33,7 +33,7 @@ void readImdbParentTvSeriesAndSeasonColumn(const std::string& filePath, uint64_t
 void readImdbParentTvSeriesColumn(const std::string& filePath, uint32_t* data);
 
 void readImdbPrincipalsColumn(const std::string& filePath, int* data);
-void readImdbPrincipalsColumn(const std::string& filePath, uint32_t* data);
+void readImdbTitleIdColumnFromPrincipalsTable(const std::string& filePath, uint32_t* data);
 void readImdbFilmsColumnFromPrincipals(const std::string& filePath, int* data);
 void readImdbPersonIdColumnFromPrincipalsTable(const std::string& filePath, uint32_t* data);
 

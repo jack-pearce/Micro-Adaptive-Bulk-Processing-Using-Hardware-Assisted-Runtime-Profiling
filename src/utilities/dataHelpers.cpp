@@ -440,7 +440,7 @@ void readImdbPrincipalsColumn(const std::string& filePath, int* data) {
     file.close();
 }
 
-void readImdbPrincipalsColumn(const std::string& filePath, uint32_t* data) {
+void readImdbTitleIdColumnFromPrincipalsTable(const std::string& filePath, uint32_t* data) {
     std::ifstream file(filePath);
     if (!file.is_open()) {
         std::cerr << "Error opening file: " << filePath << std::endl;

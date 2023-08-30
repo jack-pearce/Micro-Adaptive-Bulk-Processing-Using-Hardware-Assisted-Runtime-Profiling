@@ -669,7 +669,7 @@ void runImdbPartitionMacroBenchmark_personIdColumnPrincipalsTable(int iterations
     int n = getLengthOfTsv(filePath);
     auto data = new uint32_t[n];
     readImdbPersonIdColumnFromPrincipalsTable(filePath, data);
-    randomiseArray(data, n);
+//    randomiseArray(data, n);
 
     auto inputGroupBy = new uint32_t[n];
     auto inputAggregate = new uint32_t[n];
@@ -693,7 +693,7 @@ void runImdbGroupByMacroBenchmark_titleIdColumnPrincipalsTable(int iterations, b
     std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.principals.tsv";
     int n = getLengthOfTsv(filePath);
     auto data = new uint32_t[n];
-    readImdbPersonIdColumnFromPrincipalsTable(filePath, data);
+    readImdbTitleIdColumnFromPrincipalsTable(filePath, data);
 
     if (randomise) {
         randomiseArray(data, n);
