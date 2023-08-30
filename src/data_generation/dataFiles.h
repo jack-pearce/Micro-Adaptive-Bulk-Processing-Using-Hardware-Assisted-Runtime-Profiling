@@ -13,7 +13,7 @@ public:
 
     std::string getSelectCyclesFolderPath();
     std::string getGroupByCyclesFolderPath();
-    std::string getRadixPartitionCyclesFolderPath();
+    std::string getPartitionCyclesFolderPath();
     std::string getDataFilesFolderPath();
     std::string getOisstInputFolderPath();
     std::string getOisstOutputFolderPath();
@@ -27,7 +27,7 @@ private:
     std::string projectFilePath;
     const std::string selectCyclesFolder = "/data/output/select_cycles_benchmark/";
     const std::string groupByCyclesFolder = "/data/output/groupBy_cycles_benchmark/";
-    const std::string radixPartitionCyclesFolder = "/data/output/radixPartition_cycles_benchmark/";
+    const std::string partitionCyclesFolder = "/data/output/partition_cycles_benchmark/";
     const std::string dataFilesFolder = "/data/output/dataFiles/";
     const std::string oisstInputFolder = "/data/input/oisst_dataset_csv/";
     const std::string oisstOnputFolder = "/data/output/oisst_benchmark/";

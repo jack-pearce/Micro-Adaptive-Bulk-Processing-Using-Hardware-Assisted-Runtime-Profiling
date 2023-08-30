@@ -1,5 +1,5 @@
-#ifndef MABPL_RADIXPARTITIONIMPLEMENTATION_H
-#define MABPL_RADIXPARTITIONIMPLEMENTATION_H
+#ifndef MABPL_PARTITIONIMPLEMENTATION_H
+#define MABPL_PARTITIONIMPLEMENTATION_H
 
 
 #include <vector>
@@ -15,9 +15,9 @@
 namespace MABPL {
 
 template<typename T>
-inline void radixPartitionFixedAux(int n, T *keys, T *buffer, std::vector<int> &buckets, int msbToPartition,
-                                   int radixBits, int maxElementsPerPartition, std::vector<int> &outputPartitions,
-                                   int offset, bool copyRequired) {
+inline void partitionFixedAux(int n, T *keys, T *buffer, std::vector<int> &buckets, int msbToPartition,
+                              int radixBits, int maxElementsPerPartition, std::vector<int> &outputPartitions,
+                              int offset, bool copyRequired) {
     radixBits = std::min(msbToPartition, radixBits);
     int shifts = msbToPartition - radixBits;
     int numBuckets = 1 << radixBits;
@@ -54,10 +54,10 @@ inline void radixPartitionFixedAux(int n, T *keys, T *buffer, std::vector<int> &
     int prevPartitionEnd = 0;
     for (int partitionEnd : partitions) {
         if ((partitionEnd - prevPartitionEnd) > maxElementsPerPartition) {
-            radixPartitionFixedAux(partitionEnd - prevPartitionEnd, buffer + prevPartitionEnd,
-                                   keys + prevPartitionEnd, buckets, msbToPartition, radixBits,
-                                   maxElementsPerPartition, outputPartitions, offset + prevPartitionEnd,
-                                   !copyRequired);
+            partitionFixedAux(partitionEnd - prevPartitionEnd, buffer + prevPartitionEnd,
+                              keys + prevPartitionEnd, buckets, msbToPartition, radixBits,
+                              maxElementsPerPartition, outputPartitions, offset + prevPartitionEnd,
+                              !copyRequired);
         } else {
             if (copyRequired) {
                 memcpy(keys + prevPartitionEnd, buffer + prevPartitionEnd,
@@ -70,7 +70,7 @@ inline void radixPartitionFixedAux(int n, T *keys, T *buffer, std::vector<int> &
 }
 
 template<typename T>
-std::vector<int> radixPartitionFixed(int n, T *keys, int radixBits) {
+std::vector<int> partitionFixed(int n, T *keys, int radixBits) {
     static_assert(std::is_integral<T>::value, "Partition column must be an integer type");
 
     int numBuckets = 1 << radixBits;
@@ -93,16 +93,16 @@ std::vector<int> radixPartitionFixed(int n, T *keys, int radixBits) {
     std::vector<int> buckets(1 + numBuckets, 0);
     T *buffer = new T[n];
 
-    radixPartitionFixedAux(n, keys, buffer, buckets, msbToPartition, radixBits, maxElementsPerPartition,
-                           outputPartitions, 0, true);
+    partitionFixedAux(n, keys, buffer, buckets, msbToPartition, radixBits, maxElementsPerPartition,
+                      outputPartitions, 0, true);
 
     delete[]buffer;
     return outputPartitions;
 }
 
 template<typename T>
-inline void radixPartitionAdaptiveMergePartitions(T *buffer, std::vector<int> &buckets, std::vector<int> &partitions,
-                                                  int numBuckets) {
+inline void partitionAdaptiveMergePartitions(T *buffer, std::vector<int> &buckets, std::vector<int> &partitions,
+                                             int numBuckets) {
     for (int j = 0; j < numBuckets; ++j) {      // Move values in buffer
         memcpy(&buffer[buckets[j << 1]],
                &buffer[partitions[j << 1]],
@@ -121,10 +121,10 @@ inline void radixPartitionAdaptiveMergePartitions(T *buffer, std::vector<int> &b
 }
 
 template<typename T>
-inline void radixPartitionAdaptiveAux(int n, T *keys, T *buffer, std::vector<int> &buckets,
-                                      int msbToPartition, int &radixBits, int minimumRadixBits,
-                                      int maxElementsPerPartition, std::vector<int> &outputPartitions, int offset,
-                                      bool copyRequired) {
+inline void partitionAdaptiveAux(int n, T *keys, T *buffer, std::vector<int> &buckets,
+                                 int msbToPartition, int &radixBits, int minimumRadixBits,
+                                 int maxElementsPerPartition, std::vector<int> &outputPartitions, int offset,
+                                 bool copyRequired) {
     radixBits = std::min(msbToPartition, radixBits);
     int shifts = msbToPartition - radixBits;
     int numBuckets = 1 << radixBits;
@@ -172,7 +172,7 @@ inline void radixPartitionAdaptiveAux(int n, T *keys, T *buffer, std::vector<int
 //                std::cout << " tuples per TLB store miss" << std::endl;
                 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-                radixPartitionAdaptiveMergePartitions(buffer, buckets, partitions, numBuckets);
+                partitionAdaptiveMergePartitions(buffer, buckets, partitions, numBuckets);
 
                 if (radixBits == minimumRadixBits) {        // Complete partitioning to avoid unnecessary checks
                     for (; i < n; i++) {
@@ -204,10 +204,10 @@ inline void radixPartitionAdaptiveAux(int n, T *keys, T *buffer, std::vector<int
     int prevPartitionEnd = 0;
     for (int partitionEnd : partitions) {
         if ((partitionEnd - prevPartitionEnd) > maxElementsPerPartition) {
-            radixPartitionAdaptiveAux(partitionEnd - prevPartitionEnd, buffer + prevPartitionEnd,
-                                      keys + prevPartitionEnd, buckets, msbToPartition, radixBits,
-                                      minimumRadixBits, maxElementsPerPartition, outputPartitions,
-                                      offset + prevPartitionEnd, !copyRequired);
+            partitionAdaptiveAux(partitionEnd - prevPartitionEnd, buffer + prevPartitionEnd,
+                                 keys + prevPartitionEnd, buckets, msbToPartition, radixBits,
+                                 minimumRadixBits, maxElementsPerPartition, outputPartitions,
+                                 offset + prevPartitionEnd, !copyRequired);
         } else {
             if (copyRequired) {
                 memcpy(keys + prevPartitionEnd, buffer + prevPartitionEnd,
@@ -220,7 +220,7 @@ inline void radixPartitionAdaptiveAux(int n, T *keys, T *buffer, std::vector<int
 }
 
 template<typename T>
-std::vector<int> radixPartitionAdaptive(int n, T *keys) {
+std::vector<int> partitionAdaptive(int n, T *keys) {
     static_assert(std::is_integral<T>::value, "Partition column must be an integer type");
     std::string machineConstantName = "Partition_minRadixBits";
 
@@ -247,22 +247,22 @@ std::vector<int> radixPartitionAdaptive(int n, T *keys) {
     std::vector<int> buckets(1 + numBuckets, 0);
     T *buffer = new T[n];
 
-    radixPartitionAdaptiveAux(n, keys, buffer, buckets, msbToPartition, radixBits, minimumRadixBits,
-                              maxElementsPerPartition, outputPartitions, 0, true);
+    partitionAdaptiveAux(n, keys, buffer, buckets, msbToPartition, radixBits, minimumRadixBits,
+                         maxElementsPerPartition, outputPartitions, 0, true);
 
     delete[]buffer;
     return outputPartitions;
 }
 
 template<typename T>
-std::vector<int> runRadixPartitionFunction(RadixPartition radixPartitionImplementation, int n, T *keys, int radixBits) {
-    switch (radixPartitionImplementation) {
-        case RadixPartition::RadixBitsFixed:
-            return radixPartitionFixed(n, keys, radixBits);
-        case RadixPartition::RadixBitsAdaptive:
-            return radixPartitionAdaptive(n, keys);
+std::vector<int> runPartitionFunction(Partition partitionImplementation, int n, T *keys, int radixBits) {
+    switch (partitionImplementation) {
+        case Partition::RadixBitsFixed:
+            return partitionFixed(n, keys, radixBits);
+        case Partition::RadixBitsAdaptive:
+            return partitionAdaptive(n, keys);
         default:
-            std::cout << "Invalid selection of 'Radix Partition' implementation!" << std::endl;
+            std::cout << "Invalid selection of 'Partition' implementation!" << std::endl;
             exit(1);
     }
 }
@@ -270,4 +270,4 @@ std::vector<int> runRadixPartitionFunction(RadixPartition radixPartitionImplemen
 
 }
 
-#endif //MABPL_RADIXPARTITIONIMPLEMENTATION_H
+#endif //MABPL_PARTITIONIMPLEMENTATION_H

@@ -19,8 +19,8 @@ std::string FilePaths::getGroupByCyclesFolderPath() {
     return projectFilePath + groupByCyclesFolder;
 }
 
-std::string FilePaths::getRadixPartitionCyclesFolderPath() {
-    return projectFilePath + radixPartitionCyclesFolder;
+std::string FilePaths::getPartitionCyclesFolderPath() {
+    return projectFilePath + partitionCyclesFolder;
 }
 
 std::string FilePaths::getDataFilesFolderPath() {

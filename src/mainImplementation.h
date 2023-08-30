@@ -11,7 +11,7 @@
 #include "utilities/dataHelpers.h"
 #include "cycles_benchmarking/selectCyclesBenchmark.h"
 #include "cycles_benchmarking/groupByCyclesBenchmark.h"
-#include "cycles_benchmarking/radixPartitionCyclesBenchmark.h"
+#include "cycles_benchmarking/partitionCyclesBenchmark.h"
 #include "data_generation/dataFiles.h"
 #include "library/mabpl.h"
 
@@ -319,11 +319,11 @@ void groupByWallTimeDopSweepBenchmarkCalcDopRange(DataSweep &dataSweep, int iter
 }
 
 template<typename T>
-void radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations(const DataFile &dataFile,
-                                                                     RadixPartition radixPartitionImplementation,
-                                                                     int startBits, int endBits,
-                                                                     const std::string &fileNamePrefix,
-                                                                     int iterations) {
+void partitionBitsSweepBenchmarkWithExtraCountersConfigurations(const DataFile &dataFile,
+                                                                Partition partitionImplementation,
+                                                                int startBits, int endBits,
+                                                                const std::string &fileNamePrefix,
+                                                                int iterations) {
     {
         std::vector<std::string> benchmarkCounters = {"PERF_COUNT_HW_CPU_CYCLES",
                                                       "INSTRUCTION_RETIRED",
@@ -334,8 +334,8 @@ void radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations(const DataF
                                                       "PERF_COUNT_HW_CACHE_REFERENCES",
                                                       "PERF_COUNT_HW_CACHE_MISSES"};
 
-        radixPartitionBitsSweepBenchmarkWithExtraCounters<T>(dataFile, radixPartitionImplementation, startBits, endBits,
-                                                             benchmarkCounters, fileNamePrefix, iterations);
+        partitionBitsSweepBenchmarkWithExtraCounters<T>(dataFile, partitionImplementation, startBits, endBits,
+                                                        benchmarkCounters, fileNamePrefix, iterations);
     }
 
 /*    {
@@ -345,7 +345,7 @@ void radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations(const DataF
                                                       "DTLB-LOADS",
                                                       "DTLB-LOAD-MISSES"};
 
-        radixPartitionBitsSweepBenchmarkWithExtraCounters<T>(dataFile, radixPartitionImplementation, startBits, endBits,
+        partitionBitsSweepBenchmarkWithExtraCounters<T>(dataFile, partitionImplementation, startBits, endBits,
                                                             benchmarkCounters, fileNamePrefix + "1_", iterations);
     }*/
 
@@ -356,16 +356,16 @@ void radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations(const DataF
                                                       "PERF_COUNT_HW_CACHE_REFERENCES",
                                                       "PERF_COUNT_HW_CACHE_MISSES"};
 
-        radixPartitionBitsSweepBenchmarkWithExtraCounters<T>(dataFile, radixPartitionImplementation, startBits, endBits,
+        partitionBitsSweepBenchmarkWithExtraCounters<T>(dataFile, partitionImplementation, startBits, endBits,
                                                             benchmarkCounters, fileNamePrefix + "2_", iterations);
     }*/
 }
 
 template<typename T>
-void radixPartitionSweepBenchmarkWithExtraCountersConfigurations(DataSweep &dataSweep,
-                                                                 RadixPartition radixPartitionImplementation,
-                                                                 int radixBits, const std::string &fileNamePrefix,
-                                                                 int iterations) {
+void partitionSweepBenchmarkWithExtraCountersConfigurations(DataSweep &dataSweep,
+                                                            Partition partitionImplementation,
+                                                            int radixBits, const std::string &fileNamePrefix,
+                                                            int iterations) {
     {
         std::vector<std::string> benchmarkCounters = {"PERF_COUNT_HW_CPU_CYCLES",
                                                       "INSTRUCTION_RETIRED",
@@ -376,8 +376,8 @@ void radixPartitionSweepBenchmarkWithExtraCountersConfigurations(DataSweep &data
                                                       "PERF_COUNT_HW_CACHE_REFERENCES",
                                                       "PERF_COUNT_HW_CACHE_MISSES"};
 
-        radixPartitionSweepBenchmarkWithExtraCounters<T>(dataSweep, radixPartitionImplementation, radixBits,
-                                                         benchmarkCounters, fileNamePrefix, iterations);
+        partitionSweepBenchmarkWithExtraCounters<T>(dataSweep, partitionImplementation, radixBits,
+                                                    benchmarkCounters, fileNamePrefix, iterations);
     }
 
 /*    {
@@ -387,7 +387,7 @@ void radixPartitionSweepBenchmarkWithExtraCountersConfigurations(DataSweep &data
                                                       "DTLB-LOADS",
                                                       "DTLB-LOAD-MISSES"};
 
-        radixPartitionSweepBenchmarkWithExtraCounters<T>(dataSweep, radixPartitionImplementation, radixBits,
+        partitionSweepBenchmarkWithExtraCounters<T>(dataSweep, partitionImplementation, radixBits,
                                                         benchmarkCounters, fileNamePrefix + "1_", iterations);
     }
 
@@ -398,7 +398,7 @@ void radixPartitionSweepBenchmarkWithExtraCountersConfigurations(DataSweep &data
                                                       "PERF_COUNT_HW_CACHE_REFERENCES",
                                                       "PERF_COUNT_HW_CACHE_MISSES"};
 
-        radixPartitionSweepBenchmarkWithExtraCounters<T>(dataSweep, radixPartitionImplementation, radixBits,
+        partitionSweepBenchmarkWithExtraCounters<T>(dataSweep, partitionImplementation, radixBits,
                                                         benchmarkCounters, fileNamePrefix + "2_", iterations);
     }*/
 }

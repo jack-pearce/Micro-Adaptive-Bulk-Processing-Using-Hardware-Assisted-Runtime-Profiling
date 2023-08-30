@@ -7,7 +7,7 @@
 
 using MABPL::Select;
 using MABPL::GroupBy;
-using MABPL::RadixPartition;
+using MABPL::Partition;
 
 
 template <typename T>
@@ -59,17 +59,17 @@ void groupByWallTimeDopSweepBenchmarkCalcDopRange(DataSweep &dataSweep, int iter
                                                   const std::string &fileNamePrefix);
 
 template<typename T>
-void radixPartitionBitsSweepBenchmarkWithExtraCountersConfigurations(const DataFile &dataFile,
-                                                                     RadixPartition radixPartitionImplementation,
-                                                                     int startBits, int endBits,
-                                                                     const std::string &fileNamePrefix,
-                                                                     int iterations);
+void partitionBitsSweepBenchmarkWithExtraCountersConfigurations(const DataFile &dataFile,
+                                                                Partition partitionImplementation,
+                                                                int startBits, int endBits,
+                                                                const std::string &fileNamePrefix,
+                                                                int iterations);
 
 template<typename T>
-void radixPartitionSweepBenchmarkWithExtraCountersConfigurations(DataSweep &dataSweep,
-                                                                 RadixPartition radixPartitionImplementation,
-                                                                 int radixBits, const std::string &fileNamePrefix,
-                                                                 int iterations);
+void partitionSweepBenchmarkWithExtraCountersConfigurations(DataSweep &dataSweep,
+                                                            Partition partitionImplementation,
+                                                            int radixBits, const std::string &fileNamePrefix,
+                                                            int iterations);
 
 
 #include "mainImplementation.h"
