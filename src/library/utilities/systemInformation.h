@@ -22,6 +22,7 @@ long bytesPerCacheLine();
 int logicalCoresCount();
 std::string getCurrentWorkingDirectory();
 void printIntelTlbSpecifications();
+int l2TlbEntriesFor4KbytePages();
 
 }
 

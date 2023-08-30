@@ -826,6 +826,8 @@ void runImdbPartitionMacroBenchmark4() {
 
 int main() {
 
+    std::cout << MABPL::l2TlbEntriesFor4KbytePages() << std::endl;
+
 //    runOisstMacroBenchmark();
 
 //    runImdbPartitionMacroBenchmark1();

@@ -323,5 +323,94 @@ void printIntelTlbSpecifications() {
     printTlbLeaf0x2Descriptor(eax, ebx, ecx, edx);
 }
 
+int getL2TlbEntriesFor4KbytePages0x2LeafDescriptor(unsigned char value) {
+    switch (value) {
+        case 0xC1: return 1024;
+        case 0xC3: return 1536;
+        case 0xCA: return 512;
+        default: return 0;
+    }
+}
+
+int getL2TlbEntriesFor4KbytePages0x2Leaf(unsigned int eax, unsigned int ebx, unsigned int ecx, unsigned int edx) {
+    unsigned char descriptors[15] = {
+            static_cast<unsigned char>((eax >> 8) & 0xFF),
+            static_cast<unsigned char>((eax >> 16) & 0xFF), static_cast<unsigned char>((eax >> 24) & 0xFF),
+            static_cast<unsigned char>(ebx & 0xFF), static_cast<unsigned char>((ebx >> 8) & 0xFF),
+            static_cast<unsigned char>((ebx >> 16) & 0xFF), static_cast<unsigned char>((ebx >> 24) & 0xFF),
+            static_cast<unsigned char>(ecx & 0xFF), static_cast<unsigned char>((ecx >> 8) & 0xFF),
+            static_cast<unsigned char>((ecx >> 16) & 0xFF), static_cast<unsigned char>((ecx >> 24) & 0xFF),
+            static_cast<unsigned char>(edx & 0xFF), static_cast<unsigned char>((edx >> 8) & 0xFF),
+            static_cast<unsigned char>((edx >> 16) & 0xFF), static_cast<unsigned char>((edx >> 24) & 0xFF)
+    };
+
+    int totalL2Tlb4KbytePages = 0;
+    for (unsigned char descriptor : descriptors) {
+        totalL2Tlb4KbytePages += getL2TlbEntriesFor4KbytePages0x2LeafDescriptor(descriptor);
+    }
+    return totalL2Tlb4KbytePages;
+}
+
+int getL2TlbEntriesFor4KbytePages0x18Leaf(unsigned int maxSubleaf) {
+    unsigned int leaf = 0x18;
+    unsigned int eax, ebx, ecx, edx;
+
+    int totalL2Tlb4KbytePages = 0;
+
+    for (unsigned int subleaf = 0x1; subleaf <= maxSubleaf; subleaf++) {
+        eax = leaf;
+        ecx = subleaf;
+
+        asm volatile (
+                "cpuid"
+                : "=a" (eax), "=b" (ebx), "=c" (ecx), "=d" (edx)
+                : "a" (eax), "c" (ecx)
+                );
+
+        unsigned int translationCacheLevel = (edx >> 5) & 0x7;
+        unsigned int translationCacheType = edx & 0x1F;
+        unsigned int waysOfAssociativity = (ebx >> 16) & 0xFF;
+        unsigned int numberOfSets = ecx;
+        bool supports4KPage = ebx & 0x1;
+
+        if (translationCacheLevel == 2 &&
+                (translationCacheType == 1 || translationCacheType == 3 || translationCacheType == 5) &&
+                supports4KPage) {
+            totalL2Tlb4KbytePages += static_cast<int>(waysOfAssociativity) * static_cast<int>(numberOfSets);
+        }
+    }
+
+    return totalL2Tlb4KbytePages;
+}
+
+int l2TlbEntriesFor4KbytePages() {
+    unsigned int eax, ebx, ecx, edx;
+    eax = 0x02;
+
+    asm volatile (
+            "cpuid"
+            : "=a" (eax), "=b" (ebx), "=c" (ecx), "=d" (edx)
+            : "a" (eax)
+            );
+
+    unsigned char byteValue = 0xFE;
+    if (has0xfeByteValue(eax, byteValue) || has0xfeByteValue(ebx, byteValue) ||
+        has0xfeByteValue(ecx, byteValue) || has0xfeByteValue(edx, byteValue)) {
+
+        eax = 0x18;
+        ecx = 0x0;
+
+        asm volatile (
+                "cpuid"
+                : "=a" (eax), "=b" (ebx), "=c" (ecx), "=d" (edx)
+                : "a" (eax), "c" (ecx)
+                );
+
+        return getL2TlbEntriesFor4KbytePages0x18Leaf(eax);
+    }
+
+    return getL2TlbEntriesFor4KbytePages0x2Leaf(eax, ebx, ecx, edx);
+}
+
 
 }
