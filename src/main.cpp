@@ -826,8 +826,6 @@ void runImdbPartitionMacroBenchmark4() {
 
 int main() {
 
-    std::cout << MABPL::l2TlbEntriesFor4KbytePages() << std::endl;
-
 //    runOisstMacroBenchmark();
 
 //    runImdbPartitionMacroBenchmark1();
@@ -835,7 +833,7 @@ int main() {
 
 //    testRadixSort<int32_t>(DataFiles::uniformIntDistribution20mValuesMax20m, RadixPartition::RadixBitsFixed);
 
-//    testRadixPartition<int32_t>(DataFiles::uniformIntDistribution20mValuesMax20m, RadixPartition::RadixBitsFixed);
+    testRadixPartition<int32_t>(DataFiles::uniformIntDistribution20mValuesMax20m, RadixPartition::RadixBitsAdaptive);
 
     // Can test with a maximum partition size of 1 i.e. this will fully sort the data
 /*    for (int i = 2; i < 20; i ++) {

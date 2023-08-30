@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <json/json.h>
+#include <cmath>
 
 #include "machineConstants.h"
 
@@ -18,6 +19,15 @@ void clearAndRecalculateMachineConstants() {
 
 void printMachineConstants() {
     MachineConstants::getInstance().printMachineConstants();
+}
+
+void calculatePartitionMachineConstants() {
+    std::cout << "Calculating machine constants for Partition_minRadixBits... ";
+
+    double minimumRadixBits = log2(static_cast<double>(l2TlbEntriesFor4KbytePages()) / 4);
+
+    MachineConstants::getInstance().updateMachineConstant("Partition_minRadixBits", minimumRadixBits);
+    std::cout << " Complete" << std::endl;
 }
 
 
@@ -135,6 +145,9 @@ void MachineConstants::calculateMissingMachineConstants() {
         }
 
         dop *= 2;
+    }
+    if (machineConstants.count("Partition_minRadixBits") == 0) {
+        calculatePartitionMachineConstants();
     }
 }
 
