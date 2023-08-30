@@ -38,7 +38,7 @@ void readImdbFilmsColumnFromPrincipals(const std::string& filePath, int* data);
 void readImdbPersonIdColumnFromPrincipalsTable(const std::string& filePath, uint32_t* data);
 
 void readImdbFilmColumn(const std::string& filePath, int64_t* data);
-void readImdbFilmColumn(const std::string& filePath, int* data);
+void readImdbTitleIdColumnFromAkasTable(const std::string& filePath, int* data);
 void readImdbTitleIdColumnBasicsTable(const std::string& filePath, uint32_t* data);
 
 void readImdbDirectorsColumn(const std::string& filePath, int* data);

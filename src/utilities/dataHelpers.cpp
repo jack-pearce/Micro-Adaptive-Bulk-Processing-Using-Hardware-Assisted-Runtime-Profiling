@@ -554,7 +554,7 @@ void readImdbFilmColumn(const std::string& filePath, int64_t* data) {
     file.close();
 }
 
-void readImdbFilmColumn(const std::string& filePath, int* data) {
+void readImdbTitleIdColumnFromAkasTable(const std::string& filePath, int* data) {
     std::ifstream file(filePath);
     if (!file.is_open()) {
         std::cerr << "Error opening file: " << filePath << std::endl;
