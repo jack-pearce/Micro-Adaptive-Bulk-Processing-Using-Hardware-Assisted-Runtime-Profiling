@@ -169,6 +169,57 @@ void readOisstDataFromCsv(std::string& filePath, int n, int64_t *yearLatLong, in
     file.close();
 }
 
+void readOisstDataFromCsv(std::string& filePath, int n, uint32_t *yearLatLong, int* monthDay, float *sst) {
+    std::ifstream file(filePath);
+    if (!file.is_open()) {
+        std::cerr << "Error opening file: " << filePath << std::endl;
+        exit(1);
+    }
+
+    std::cout << "Reading data from csv... ";
+
+    // Skip the first line of data (header)
+    std::string headerLine;
+    std::getline(file, headerLine);
+
+    std::string line;
+    for (int i = 0; i < n && std::getline(file, line); ++i) {
+        std::istringstream ss(line);
+        std::string temp;
+
+        std::getline(ss, temp, ','); // Read yearLatLong
+        std::istringstream iss(temp);
+
+        std::string yearStr, latitudeStr, longitudeStr;
+        std::getline(iss, yearStr, ':');
+        std::getline(iss, latitudeStr, ':');
+        std::getline(iss, longitudeStr, ':');
+
+        yearStr = yearStr.substr(2);
+        int year = std::stoi(yearStr);
+        float latitudeFloat = std::stof(latitudeStr);
+        float longitudeFloat = std::stof(longitudeStr);
+
+        int latitude = static_cast<int>(((latitudeFloat - 0.125) /0.25) + 360);
+        int longitude = static_cast<int>((longitudeFloat - 0.125) /0.25);
+
+        yearLatLong[i] = (year * 1000 * 10000) + (latitude * 10000) + longitude;
+
+        std::getline(ss, temp, ','); // Read monthDay
+        monthDay[i] = stoi(temp);
+
+        std::getline(ss, temp, ','); // Read sst
+        try {
+            sst[i] = std::stof(temp);
+        } catch (const std::invalid_argument& e) {
+            sst[i] = std::numeric_limits<float>::quiet_NaN();
+        }
+    }
+
+    std::cout << "Complete" << std::endl;
+    file.close();
+}
+
 void writeOisstDataToCsv(std::string& filePath, int n, std::string *yearLatLong, float *sst) {
     std::ofstream file(filePath);
     std::cout << "Writing file to csv... ";
@@ -477,6 +528,33 @@ void readImdbPersonIdColumnFromPrincipalsTable(const std::string& filePath, uint
 }
 
 void readImdbFilmColumn(const std::string& filePath, int64_t* data) {
+    std::ifstream file(filePath);
+    if (!file.is_open()) {
+        std::cerr << "Error opening file: " << filePath << std::endl;
+        exit(1);
+    }
+
+    std::string line;
+    int index = 0;
+    bool isFirstRow = true;  // Flag to skip the first row
+    while (std::getline(file, line)) {
+        if (isFirstRow) {
+            isFirstRow = false;
+            continue;  // Skip the first row
+        }
+
+        std::istringstream iss(line);
+        std::string filmId, filmNumOnly;
+
+        std::getline(iss, filmId, '\t');
+        filmNumOnly = filmId.substr(2);
+        data[index++] = std::stoi(filmNumOnly);
+    }
+
+    file.close();
+}
+
+void readImdbFilmColumn(const std::string& filePath, int* data) {
     std::ifstream file(filePath);
     if (!file.is_open()) {
         std::cerr << "Error opening file: " << filePath << std::endl;

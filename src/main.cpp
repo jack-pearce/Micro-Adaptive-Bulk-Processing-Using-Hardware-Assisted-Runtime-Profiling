@@ -664,6 +664,109 @@ void runImdbPartitionMacroBenchmark_personIdColumnPrincipalsTable(int iterations
     delete[] data;
 }
 
+void runOisstMacroBenchmark() {
+//    std::string inputDataFilePathOne = FilePaths::getInstance().getOisstInputFolderPath() + "1_month_(06-07)/" + "1982.csv";
+//    std::string inputDataFilePathTwo = FilePaths::getInstance().getOisstInputFolderPath() + "1_month_(06-07)/" + "2023.csv";
+    std::string inputDataFilePathOne = FilePaths::getInstance().getOisstInputFolderPath() + "3_months_(04-07)/" + "1982.csv";
+    std::string inputDataFilePathTwo = FilePaths::getInstance().getOisstInputFolderPath() + "3_months_(04-07)/" + "2023.csv";
+    const int n1 = getLengthOfCsv(inputDataFilePathOne);
+    const int n2 = getLengthOfCsv(inputDataFilePathTwo);
+    int n = n1 + n2;
+
+    auto *yearLatLong = new uint32_t[n];
+    auto *monthDay = new int[n];
+    auto *sst = new float[n];
+
+    readOisstDataFromCsv(inputDataFilePathOne, n1, yearLatLong, monthDay, sst);
+    readOisstDataFromCsv(inputDataFilePathTwo, n2, yearLatLong + n1, monthDay + n1, sst + n1);
+    delete[] monthDay;
+
+//    randomiseArray(yearLatLong, n);
+//    randomiseArray(sst, n);
+
+    float thresholdTemperature = -1.7;
+    int cardinality = 208165;
+
+    auto *selectedIndexes = new int[n];
+    int selectedCount = MABPL::selectIndexesAdaptive<float>(n,sst, selectedIndexes, thresholdTemperature);
+
+    auto *yearLatLongFiltered = new uint32_t[selectedCount];
+    auto *sstFiltered = new float[selectedCount];
+
+    projectIndexesOnToArray(selectedIndexes, selectedCount, yearLatLong, yearLatLongFiltered);
+    projectIndexesOnToArray(selectedIndexes, selectedCount, sst, sstFiltered);
+
+    delete[] selectedIndexes;
+    delete[] yearLatLong;
+    delete[] sst;
+
+    n = selectedCount;
+
+    {
+        auto *inputGroupBy = new uint32_t[n];
+        auto *inputAggregate = new float[n];
+
+        copyArray(yearLatLongFiltered, inputGroupBy, n);
+        copyArray(sstFiltered, inputAggregate, n);
+
+        for (int i = 0; i < 1000; i++) {
+            std::cout << inputGroupBy[100000+i] << std::endl;
+        }
+
+        long_long cycles;
+
+        cycles = *Counters::getInstance().readSharedEventSet();
+        auto results = MABPL::groupByAdaptive<MaxAggregation>(n, inputGroupBy, inputAggregate, cardinality);
+        cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+
+        std::cout << "Adpt result size " << results.size() << " / " << n << ", Cycles: " << cycles << std::endl;
+
+        delete[] inputGroupBy;
+        delete[] inputAggregate;
+    }
+
+    {
+        auto *inputGroupBy = new uint32_t[n];
+        auto *inputAggregate = new float[n];
+
+        copyArray(yearLatLongFiltered, inputGroupBy, n);
+        copyArray(sstFiltered, inputAggregate, n);
+
+        long_long cycles;
+
+        cycles = *Counters::getInstance().readSharedEventSet();
+        auto results = MABPL::groupByHash<MaxAggregation>(n, inputGroupBy, inputAggregate, cardinality);
+        cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+
+        std::cout << "Hash result size " << results.size() << " / " << n << ", Cycles: " << cycles << std::endl;
+
+        delete[] inputGroupBy;
+        delete[] inputAggregate;
+    }
+
+    {
+        auto *inputGroupBy = new uint32_t[n];
+        auto *inputAggregate = new float[n];
+
+        copyArray(yearLatLongFiltered, inputGroupBy, n);
+        copyArray(sstFiltered, inputAggregate, n);
+
+        long_long cycles;
+
+        cycles = *Counters::getInstance().readSharedEventSet();
+        auto results = MABPL::groupBySort<MaxAggregation>(n, inputGroupBy, inputAggregate);
+        cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+
+        std::cout << "Sort result size " << results.size() << " / " << n << ", Cycles: " << cycles << std::endl;
+
+        delete[] inputGroupBy;
+        delete[] inputAggregate;
+    }
+
+    delete[] yearLatLongFiltered;
+    delete[] sstFiltered;
+}
+
 void runImdbGroupByMacroBenchmark1() {
     std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.episode.tsv";
     int n = getLengthOfTsv(filePath);
@@ -753,28 +856,79 @@ void runImdbGroupByMacroBenchmark4() {
 }
 
 void runImdbGroupByMacroBenchmark5() {
-    std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.principals.tsv";
+/*    std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.principals.tsv";
     int n = getLengthOfTsv(filePath);
     auto data = new int[n];
-    readImdbFilmsColumnFromPrincipals(filePath, data);
+    readImdbFilmsColumnFromPrincipals(filePath, data);*/
+
+    std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.akas.tsv";
+    int n = getLengthOfTsv(filePath);
+    auto data = new int [n];
+    readImdbFilmColumn(filePath, data);
+
+
     randomiseArray(data, n);
 
-    auto inputGroupBy = new int[n];
-    auto inputAggregate = new int[n];
-    copyArray(data, inputGroupBy, n);
-    copyArray(data, inputAggregate, n);
+    int cardinality = 7247075;
 
-    long_long cycles;
+    {
+        auto inputGroupBy = new int[n];
+        auto inputAggregate = new int[n];
+        copyArray(data, inputGroupBy, n);
+        copyArray(data, inputAggregate, n);
 
-    cycles = *Counters::getInstance().readSharedEventSet();
-    auto results = MABPL::groupBySort<CountAggregation>(n, inputGroupBy, inputAggregate);
-    cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+        long_long cycles;
 
-    std::cout << "Cardinality: " << results.size() << ", Total input size: " << n << ", Cycles: " << cycles << std::endl;
+        cycles = *Counters::getInstance().readSharedEventSet();
+        auto results = MABPL::groupByAdaptive<CountAggregation>(n, inputGroupBy, inputAggregate, cardinality);
+        cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+
+        std::cout << "Adpt: Cardinality: " << results.size() << ", Total input size: " << n << ", Cycles: " << cycles
+                  << std::endl;
+
+        delete[] inputGroupBy;
+        delete[] inputAggregate;
+    }
+
+    {
+        auto inputGroupBy = new int[n];
+        auto inputAggregate = new int[n];
+        copyArray(data, inputGroupBy, n);
+        copyArray(data, inputAggregate, n);
+
+        long_long cycles;
+
+        cycles = *Counters::getInstance().readSharedEventSet();
+        auto results = MABPL::groupByHash<CountAggregation>(n, inputGroupBy, inputAggregate, cardinality);
+        cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+
+        std::cout << "Hash: Cardinality: " << results.size() << ", Total input size: " << n << ", Cycles: " << cycles
+                  << std::endl;
+
+        delete[] inputGroupBy;
+        delete[] inputAggregate;
+    }
+
+    {
+        auto inputGroupBy = new int[n];
+        auto inputAggregate = new int[n];
+        copyArray(data, inputGroupBy, n);
+        copyArray(data, inputAggregate, n);
+
+        long_long cycles;
+
+        cycles = *Counters::getInstance().readSharedEventSet();
+        auto results = MABPL::groupBySort<CountAggregation>(n, inputGroupBy, inputAggregate);
+        cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+
+        std::cout << "Sort: Cardinality: " << results.size() << ", Total input size: " << n << ", Cycles: " << cycles
+                  << std::endl;
+
+        delete[] inputGroupBy;
+        delete[] inputAggregate;
+    }
 
     delete[] data;
-    delete[] inputGroupBy;
-    delete[] inputAggregate;
 }
 
 void runImdbGroupByMacroBenchmark6() {
@@ -802,109 +956,16 @@ void runImdbGroupByMacroBenchmark6() {
     delete[] inputAggregate;
 }
 
-void runOisstMacroBenchmark() {
-    std::string inputDataFilePathOne = FilePaths::getInstance().getOisstInputFolderPath() + "1_month_(06-07)/" + "1982.csv";
-    const int n1 = getLengthOfCsv(inputDataFilePathOne);
-    std::string inputDataFilePathTwo = FilePaths::getInstance().getOisstInputFolderPath() + "1_month_(06-07)/" + "2023.csv";
-    const int n2 = getLengthOfCsv(inputDataFilePathTwo);
-    int n = n1 + n2;
-
-    auto *yearLatLong = new int64_t[n];
-    auto *monthDay = new int[n];
-    auto *sst = new float[n];
-
-    readOisstDataFromCsv(inputDataFilePathOne, n1, yearLatLong, monthDay, sst);
-    readOisstDataFromCsv(inputDataFilePathTwo, n2, yearLatLong + n1, monthDay + n1, sst + n1);
-    delete[] monthDay;
-
-//    randomiseArray(yearLatLong, n);
-//    randomiseArray(sst, n);
-
-    float thresholdTemperature = -20;
-    int cardinality = 360000;
-
-    auto *selectedIndexes = new int[n];
-    int selectedCount = MABPL::selectIndexesAdaptive<float>(n,sst, selectedIndexes, thresholdTemperature);
-
-    auto *yearLatLongFiltered = new int64_t[selectedCount];
-    auto *sstFiltered = new float[selectedCount];
-
-    projectIndexesOnToArray(selectedIndexes, selectedCount, yearLatLong, yearLatLongFiltered);
-    projectIndexesOnToArray(selectedIndexes, selectedCount, sst, sstFiltered);
-
-    delete[] selectedIndexes;
-    delete[] yearLatLong;
-    delete[] sst;
-
-    n = selectedCount;
-
-    {
-        auto *inputGroupBy = new int64_t[n];
-        auto *inputAggregate = new float[n];
-
-        copyArray(yearLatLongFiltered, inputGroupBy, n);
-        copyArray(sstFiltered, inputAggregate, n);
-
-        long_long cycles;
-
-        cycles = *Counters::getInstance().readSharedEventSet();
-        auto results = MABPL::groupByAdaptive<MaxAggregation>(n, inputGroupBy, inputAggregate, cardinality);
-        cycles = *Counters::getInstance().readSharedEventSet() - cycles;
-
-        std::cout << "Adpt result size " << results.size() << " / " << n << ", Cycles: " << cycles << std::endl;
-
-        delete[] inputGroupBy;
-        delete[] inputAggregate;
-    }
-
-    {
-        auto *inputGroupBy = new int64_t[n];
-        auto *inputAggregate = new float[n];
-
-        copyArray(yearLatLongFiltered, inputGroupBy, n);
-        copyArray(sstFiltered, inputAggregate, n);
-
-        long_long cycles;
-
-        cycles = *Counters::getInstance().readSharedEventSet();
-        auto results = MABPL::groupByHash<MaxAggregation>(n, inputGroupBy, inputAggregate, cardinality);
-        cycles = *Counters::getInstance().readSharedEventSet() - cycles;
-
-        std::cout << "Hash result size " << results.size() << " / " << n << ", Cycles: " << cycles << std::endl;
-
-        delete[] inputGroupBy;
-        delete[] inputAggregate;
-    }
-
-    {
-        auto *inputGroupBy = new int64_t[n];
-        auto *inputAggregate = new float[n];
-
-        copyArray(yearLatLongFiltered, inputGroupBy, n);
-        copyArray(sstFiltered, inputAggregate, n);
-
-        long_long cycles;
-
-        cycles = *Counters::getInstance().readSharedEventSet();
-        auto results = MABPL::groupBySort<MaxAggregation>(n, inputGroupBy, inputAggregate);
-        cycles = *Counters::getInstance().readSharedEventSet() - cycles;
-
-        std::cout << "Sort result size " << results.size() << " / " << n << ", Cycles: " << cycles << std::endl;
-
-        delete[] inputGroupBy;
-        delete[] inputAggregate;
-    }
-
-    delete[] yearLatLongFiltered;
-    delete[] sstFiltered;
-}
-
 int main() {
 
-        runImdbSelectSweepMacroBenchmark(1874, 2023, 5,
-                                     {Select::ImplementationIndexesBranch,
-                                      Select::ImplementationIndexesPredication,
-                                      Select::ImplementationIndexesAdaptive});
+//    runImdbGroupByMacroBenchmark5();
+
+    runOisstMacroBenchmark();
+
+//        runImdbSelectSweepMacroBenchmark(1874, 2023, 5,
+//                                     {Select::ImplementationIndexesBranch,
+//                                      Select::ImplementationIndexesPredication,
+//                                      Select::ImplementationIndexesAdaptive});
 
 //    runImdbSelectSweepMacroBenchmark(1874, 2023, 5,
 //                                     {Select::ImplementationValuesBranch,

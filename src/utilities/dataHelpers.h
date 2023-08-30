@@ -21,6 +21,7 @@ int getLengthOfCsv(const std::string &filePath);
 int getLengthOfTsv(const std::string& filePath);
 
 void readOisstDataFromCsv(std::string& filePath, int n, int64_t *yearLatLong, int* monthDay, float *sst);
+void readOisstDataFromCsv(std::string& filePath, int n, uint32_t *yearLatLong, int* monthDay, float *sst);
 
 void writeOisstDataToCsv(std::string& filePath, int n, std::string *yearLatLong, float *sst);
 
@@ -37,6 +38,7 @@ void readImdbFilmsColumnFromPrincipals(const std::string& filePath, int* data);
 void readImdbPersonIdColumnFromPrincipalsTable(const std::string& filePath, uint32_t* data);
 
 void readImdbFilmColumn(const std::string& filePath, int64_t* data);
+void readImdbFilmColumn(const std::string& filePath, int* data);
 void readImdbTitleIdColumnBasicsTable(const std::string& filePath, uint32_t* data);
 
 void readImdbDirectorsColumn(const std::string& filePath, int* data);
