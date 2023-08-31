@@ -800,15 +800,18 @@ void runImdbGroupByMacroBenchmark_titleIdFromAkasTable(int iterations, bool rand
 
 int main() {
 
-    std::string machineConstantName = "Partition_minRadixBits";
+    partitionSweepBenchmark<uint64_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
+                                      {Partition::RadixBitsAdaptive},
+                                      16, "TESTInt64_ClusterednessSweep", 1);
 
-    partitionSweepBenchmark<uint64_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
-                                           {Partition::RadixBitsFixed, Partition::RadixBitsAdaptive},
-                                           16, "Int64_ClusterednessSweep", 5);
-    partitionSweepBenchmark<uint64_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
-                                           {Partition::RadixBitsFixed},
-                                           MABPL::MachineConstants::getInstance().getMachineConstant(machineConstantName),
-                                           "Int64_ClusterednessSweep_9", 5);
+//    std::string machineConstantName = "Partition_minRadixBits";
+//    partitionSweepBenchmark<uint64_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
+//                                           {Partition::RadixBitsFixed, Partition::RadixBitsAdaptive},
+//                                           16, "Int64_ClusterednessSweep", 5);
+//    partitionSweepBenchmark<uint64_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
+//                                           {Partition::RadixBitsFixed},
+//                                           MABPL::MachineConstants::getInstance().getMachineConstant(machineConstantName),
+//                                           "Int64_ClusterednessSweep_9", 5);
 
 //    runImdbSelectSweepMacroBenchmark(1874, 2023, 5,
 //                                     {Select::ImplementationIndexesBranch, Select::ImplementationIndexesPredication, Select::ImplementationIndexesAdaptive});
