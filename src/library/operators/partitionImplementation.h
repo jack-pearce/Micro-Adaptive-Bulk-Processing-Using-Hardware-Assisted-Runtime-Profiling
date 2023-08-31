@@ -222,10 +222,11 @@ inline void partitionAdaptiveAux(int n, T *keys, T *buffer, std::vector<int> &bu
 template<typename T>
 std::vector<int> partitionAdaptive(int n, T *keys) {
     static_assert(std::is_integral<T>::value, "Partition column must be an integer type");
-    std::string machineConstantName = "Partition_minRadixBits";
+    std::string minMachineConstantName = "Partition_minRadixBits";
+    std::string startMachineConstantName = "Partition_startRadixBits";
 
-    int radixBits = 15;         // Negligible gain for higher radix bits than 16
-    int minimumRadixBits = static_cast<int>(MachineConstants::getInstance().getMachineConstant(machineConstantName));
+    int radixBits = static_cast<int>(MachineConstants::getInstance().getMachineConstant(startMachineConstantName));
+    int minimumRadixBits = static_cast<int>(MachineConstants::getInstance().getMachineConstant(minMachineConstantName));
 
     int numBuckets = 1 << radixBits;
     T largest = std::numeric_limits<T>::min();;

@@ -799,10 +799,12 @@ void runImdbGroupByMacroBenchmark_titleIdFromAkasTable(int iterations, bool rand
 
 
 int main() {
+    std::string machineConstantName = "Partition_startRadixBits";
+    std::cout << MABPL::MachineConstants::getInstance().getMachineConstant(machineConstantName) << std::endl;
 
     partitionSweepBenchmark<uint64_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
-                                      {Partition::RadixBitsAdaptive},
-                                      -1, "start15_Int64_ClusterednessSweep", 5);
+                                      {Partition::RadixBitsAdaptive, Partition::RadixBitsFixed},
+                                      MABPL::MachineConstants::getInstance().getMachineConstant(machineConstantName), "Int64_ClusterednessSweep", 5);
 
 //    std::string machineConstantName = "Partition_minRadixBits";
 //    partitionSweepBenchmark<uint64_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
