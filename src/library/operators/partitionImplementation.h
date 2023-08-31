@@ -132,7 +132,7 @@ inline void partitionAdaptiveAux(int n, T *keys, T *buffer, std::vector<int> &bu
 
     constexpr int tuplesPerChunk = 10 * 1000;
     float tuplesPerTlbStoreMiss = 50.0;
-    std::vector<std::string> counters = {"DTLB-LOAD-MISSES"};
+    std::vector<std::string> counters = {"DTLB-STORE-MISSES"};
     long_long *counterValues = Counters::getInstance().getSharedEventSetEvents(counters);
 
     int i, chunkStart, tuplesToProcess;
