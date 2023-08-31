@@ -796,14 +796,15 @@ void runImdbGroupByMacroBenchmark_titleIdFromAkasTable(int iterations, bool rand
 
 int main() {
 
-    runImdbSelectSweepMacroBenchmark(1, 2, 1, {Select::ImplementationValuesBranch});
+    runImdbSelectSweepMacroBenchmark(1874, 2023, 5,
+                                     {Select::ImplementationIndexesBranch, Select::ImplementationIndexesPredication, Select::ImplementationIndexesAdaptive});
 
-    runImdbPartitionMacroBenchmark_titleIdColumnBasicsTable(1);
-    runImdbPartitionMacroBenchmark_startYearColumnBasicsTable(1);
-    runImdbPartitionMacroBenchmark_personIdColumnPrincipalsTable(1);
-
-    runImdbGroupByMacroBenchmark_titleIdColumnPrincipalsTable(1, true);
-    runImdbGroupByMacroBenchmark_titleIdFromAkasTable(1, true);
+//    runImdbPartitionMacroBenchmark_titleIdColumnBasicsTable(1);
+//    runImdbPartitionMacroBenchmark_startYearColumnBasicsTable(1);
+//    runImdbPartitionMacroBenchmark_personIdColumnPrincipalsTable(1);
+//
+//    runImdbGroupByMacroBenchmark_titleIdColumnPrincipalsTable(1, true);
+//    runImdbGroupByMacroBenchmark_titleIdFromAkasTable(1, true);
 
     return 0;
 }
