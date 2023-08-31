@@ -450,6 +450,10 @@ void allParallelDataSizeTests(int iterations) {
                                                                   iterations, "5-DOP-1-GroupBy-CardinalitySweepParallel-64-64");
 }
 
+void allPartitionTests() {
+
+}
+
 void runImdbSelectSweepMacroBenchmark(int startYear, int endYear, int iterations,
                                       const std::vector<Select> &selectImplementations) {
     int numImplementations = static_cast<int>(selectImplementations.size());
@@ -796,8 +800,18 @@ void runImdbGroupByMacroBenchmark_titleIdFromAkasTable(int iterations, bool rand
 
 int main() {
 
-    runImdbSelectSweepMacroBenchmark(1874, 2023, 1,
-                                     {Select::ImplementationIndexesBranch, Select::ImplementationIndexesPredication, Select::ImplementationIndexesAdaptive});
+    std::string machineConstantName = "Partition_minRadixBits";
+
+    partitionSweepBenchmark<uint32_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
+                                           {Partition::RadixBitsFixed, Partition::RadixBitsAdaptive},
+                                           16, "ClusterednessSweep", 5);
+    partitionSweepBenchmark<uint32_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
+                                           {Partition::RadixBitsFixed},
+                                           MABPL::MachineConstants::getInstance().getMachineConstant(machineConstantName),
+                                           "ClusterednessSweep_9", 5);
+
+//    runImdbSelectSweepMacroBenchmark(1874, 2023, 5,
+//                                     {Select::ImplementationIndexesBranch, Select::ImplementationIndexesPredication, Select::ImplementationIndexesAdaptive});
 
 //    runImdbPartitionMacroBenchmark_titleIdColumnBasicsTable(1);
 //    runImdbPartitionMacroBenchmark_startYearColumnBasicsTable(1);
