@@ -796,7 +796,7 @@ void runImdbGroupByMacroBenchmark_titleIdFromAkasTable(int iterations, bool rand
 
 int main() {
 
-    runImdbSelectSweepMacroBenchmark(1874, 2023, 5,
+    runImdbSelectSweepMacroBenchmark(1874, 2023, 1,
                                      {Select::ImplementationIndexesBranch, Select::ImplementationIndexesPredication, Select::ImplementationIndexesAdaptive});
 
 //    runImdbPartitionMacroBenchmark_titleIdColumnBasicsTable(1);
