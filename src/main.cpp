@@ -506,7 +506,8 @@ void runImdbSelectSweepMacroBenchmark(int startYear, int endYear, int iterations
 
 void runImdbPartitionMacroBenchmark_titleIdColumnBasicsTable(int iterations) {
     std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.basics.tsv";
-    std::string machineConstantName = "Partition_minRadixBits";
+    std::string minMachineConstantName = "Partition_minRadixBits";
+    std::string startMachineConstantName = "Partition_startRadixBits";
     int n = getLengthOfTsv(filePath);
     auto data = new uint32_t [n];
     readImdbTitleIdColumnFromBasicsTable(filePath, data);
@@ -531,11 +532,13 @@ void runImdbPartitionMacroBenchmark_titleIdColumnBasicsTable(int iterations) {
                 cycles = *Counters::getInstance().readSharedEventSet();
                 auto partitions = MABPL::partitionFixed(n, keys,
                                                         static_cast<int>(MABPL::MachineConstants::getInstance().getMachineConstant(
-                                                                machineConstantName)));
+                                                                minMachineConstantName)));
                 cycles = *Counters::getInstance().readSharedEventSet() - cycles;
             } else if (j == 2) {
                 cycles = *Counters::getInstance().readSharedEventSet();
-                auto partitions = MABPL::partitionFixed(n, keys, 16);
+                auto partitions = MABPL::partitionFixed(n, keys,
+                                                        static_cast<int>(MABPL::MachineConstants::getInstance().getMachineConstant(
+                                                                startMachineConstantName)));
                 cycles = *Counters::getInstance().readSharedEventSet() - cycles;
             }
 
@@ -547,9 +550,11 @@ void runImdbPartitionMacroBenchmark_titleIdColumnBasicsTable(int iterations) {
     }
 
     std::vector<std::string> headers(3 * iterations);
-    std::string functionNames[] = {"RadixPartition_Adaptive", "RadixPartition_Static_", "RadixPartition_Static_16bits"};
-    functionNames[1].append(std::to_string(static_cast<int>(MABPL::MachineConstants::getInstance().getMachineConstant(machineConstantName))));
+    std::string functionNames[] = {"RadixPartition_Adaptive", "RadixPartition_Static_", "RadixPartition_Static_"};
+    functionNames[1].append(std::to_string(static_cast<int>(MABPL::MachineConstants::getInstance().getMachineConstant(minMachineConstantName))));
     functionNames[1].append("bits");
+    functionNames[2].append(std::to_string(static_cast<int>(MABPL::MachineConstants::getInstance().getMachineConstant(startMachineConstantName))));
+    functionNames[2].append("bits");
     for (auto i = 0; i < (3 * iterations); ++i) {
         headers[i] = functionNames[i % 3];
     }
@@ -563,7 +568,8 @@ void runImdbPartitionMacroBenchmark_titleIdColumnBasicsTable(int iterations) {
 
 void runImdbPartitionMacroBenchmark_startYearColumnBasicsTable(int iterations) {
     std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.basics.tsv";
-    std::string machineConstantName = "Partition_minRadixBits";
+    std::string minMachineConstantName = "Partition_minRadixBits";
+    std::string startMachineConstantName = "Partition_startRadixBits";
     int n = getLengthOfTsv(filePath);
     auto data = new uint32_t [n];
     readImdbStartYearColumnFromBasicsTable(filePath, data);
@@ -588,11 +594,13 @@ void runImdbPartitionMacroBenchmark_startYearColumnBasicsTable(int iterations) {
                 cycles = *Counters::getInstance().readSharedEventSet();
                 auto partitions = MABPL::partitionFixed(n, keys,
                                                         static_cast<int>(MABPL::MachineConstants::getInstance().getMachineConstant(
-                                                                machineConstantName)));
+                                                                minMachineConstantName)));
                 cycles = *Counters::getInstance().readSharedEventSet() - cycles;
             } else if (j == 2) {
                 cycles = *Counters::getInstance().readSharedEventSet();
-                auto partitions = MABPL::partitionFixed(n, keys, 16);
+                auto partitions = MABPL::partitionFixed(n, keys,
+                                                        static_cast<int>(MABPL::MachineConstants::getInstance().getMachineConstant(
+                                                                startMachineConstantName)));
                 cycles = *Counters::getInstance().readSharedEventSet() - cycles;
             }
 
@@ -604,9 +612,11 @@ void runImdbPartitionMacroBenchmark_startYearColumnBasicsTable(int iterations) {
     }
 
     std::vector<std::string> headers(3 * iterations);
-    std::string functionNames[] = {"RadixPartition_Adaptive", "RadixPartition_Static_", "RadixPartition_Static_16bits"};
-    functionNames[1].append(std::to_string(static_cast<int>(MABPL::MachineConstants::getInstance().getMachineConstant(machineConstantName))));
+    std::string functionNames[] = {"RadixPartition_Adaptive", "RadixPartition_Static_", "RadixPartition_Static_"};
+    functionNames[1].append(std::to_string(static_cast<int>(MABPL::MachineConstants::getInstance().getMachineConstant(minMachineConstantName))));
     functionNames[1].append("bits");
+    functionNames[2].append(std::to_string(static_cast<int>(MABPL::MachineConstants::getInstance().getMachineConstant(startMachineConstantName))));
+    functionNames[2].append("bits");
     for (auto i = 0; i < (3 * iterations); ++i) {
         headers[i] = functionNames[i % 3];
     }
@@ -620,7 +630,8 @@ void runImdbPartitionMacroBenchmark_startYearColumnBasicsTable(int iterations) {
 
 void runImdbPartitionMacroBenchmark_personIdColumnPrincipalsTable(int iterations) {
     std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.principals.tsv";
-    std::string machineConstantName = "Partition_minRadixBits";
+    std::string minMachineConstantName = "Partition_minRadixBits";
+    std::string startMachineConstantName = "Partition_startRadixBits";
     int n = getLengthOfTsv(filePath);
     auto data = new uint32_t [n];
     readImdbPersonIdColumnFromPrincipalsTable(filePath, data);
@@ -645,11 +656,13 @@ void runImdbPartitionMacroBenchmark_personIdColumnPrincipalsTable(int iterations
                 cycles = *Counters::getInstance().readSharedEventSet();
                 auto partitions = MABPL::partitionFixed(n, keys,
                                                         static_cast<int>(MABPL::MachineConstants::getInstance().getMachineConstant(
-                                                                machineConstantName)));
+                                                                minMachineConstantName)));
                 cycles = *Counters::getInstance().readSharedEventSet() - cycles;
             } else if (j == 2) {
                 cycles = *Counters::getInstance().readSharedEventSet();
-                auto partitions = MABPL::partitionFixed(n, keys, 16);
+                auto partitions = MABPL::partitionFixed(n, keys,
+                                                        static_cast<int>(MABPL::MachineConstants::getInstance().getMachineConstant(
+                                                                startMachineConstantName)));
                 cycles = *Counters::getInstance().readSharedEventSet() - cycles;
             }
 
@@ -661,9 +674,11 @@ void runImdbPartitionMacroBenchmark_personIdColumnPrincipalsTable(int iterations
     }
 
     std::vector<std::string> headers(3 * iterations);
-    std::string functionNames[] = {"RadixPartition_Adaptive", "RadixPartition_Static_", "RadixPartition_Static_16bits"};
-    functionNames[1].append(std::to_string(static_cast<int>(MABPL::MachineConstants::getInstance().getMachineConstant(machineConstantName))));
+    std::string functionNames[] = {"RadixPartition_Adaptive", "RadixPartition_Static_", "RadixPartition_Static_"};
+    functionNames[1].append(std::to_string(static_cast<int>(MABPL::MachineConstants::getInstance().getMachineConstant(minMachineConstantName))));
     functionNames[1].append("bits");
+    functionNames[2].append(std::to_string(static_cast<int>(MABPL::MachineConstants::getInstance().getMachineConstant(startMachineConstantName))));
+    functionNames[2].append("bits");
     for (auto i = 0; i < (3 * iterations); ++i) {
         headers[i] = functionNames[i % 3];
     }
@@ -799,12 +814,12 @@ void runImdbGroupByMacroBenchmark_titleIdFromAkasTable(int iterations, bool rand
 
 
 int main() {
-    std::string machineConstantName = "Partition_startRadixBits";
-    std::cout << MABPL::MachineConstants::getInstance().getMachineConstant(machineConstantName) << std::endl;
-
-    partitionSweepBenchmark<uint64_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
-                                      {Partition::RadixBitsAdaptive, Partition::RadixBitsFixed},
-                                      MABPL::MachineConstants::getInstance().getMachineConstant(machineConstantName), "Int64_ClusterednessSweep", 5);
+//    std::string machineConstantName = "Partition_startRadixBits";
+//    std::cout << MABPL::MachineConstants::getInstance().getMachineConstant(machineConstantName) << std::endl;
+//
+//    partitionSweepBenchmark<uint64_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
+//                                      {Partition::RadixBitsAdaptive},
+//                                      MABPL::MachineConstants::getInstance().getMachineConstant(machineConstantName), "Int64_ClusterednessSweep", 5);
 
 //    std::string machineConstantName = "Partition_minRadixBits";
 //    partitionSweepBenchmark<uint64_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
@@ -818,9 +833,9 @@ int main() {
 //    runImdbSelectSweepMacroBenchmark(1874, 2023, 5,
 //                                     {Select::ImplementationIndexesBranch, Select::ImplementationIndexesPredication, Select::ImplementationIndexesAdaptive});
 
-//    runImdbPartitionMacroBenchmark_titleIdColumnBasicsTable(1);
-//    runImdbPartitionMacroBenchmark_startYearColumnBasicsTable(1);
-//    runImdbPartitionMacroBenchmark_personIdColumnPrincipalsTable(1);
+    runImdbPartitionMacroBenchmark_titleIdColumnBasicsTable(5);
+    runImdbPartitionMacroBenchmark_startYearColumnBasicsTable(5);
+    runImdbPartitionMacroBenchmark_personIdColumnPrincipalsTable(5);
 //
 //    runImdbGroupByMacroBenchmark_titleIdColumnPrincipalsTable(1, true);
 //    runImdbGroupByMacroBenchmark_titleIdFromAkasTable(1, true);
