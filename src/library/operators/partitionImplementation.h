@@ -224,7 +224,7 @@ std::vector<int> partitionAdaptive(int n, T *keys) {
     static_assert(std::is_integral<T>::value, "Partition column must be an integer type");
     std::string machineConstantName = "Partition_minRadixBits";
 
-    int radixBits = 16;         // Negligible gain for higher radix bits than 16
+    int radixBits = 15;         // Negligible gain for higher radix bits than 16
     int minimumRadixBits = static_cast<int>(MachineConstants::getInstance().getMachineConstant(machineConstantName));
 
     int numBuckets = 1 << radixBits;

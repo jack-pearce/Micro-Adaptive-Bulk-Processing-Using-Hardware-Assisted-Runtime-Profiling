@@ -802,7 +802,7 @@ int main() {
 
     partitionSweepBenchmark<uint64_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
                                       {Partition::RadixBitsAdaptive},
-                                      16, "TESTInt64_ClusterednessSweep", 1);
+                                      -1, "start15_Int64_ClusterednessSweep", 5);
 
 //    std::string machineConstantName = "Partition_minRadixBits";
 //    partitionSweepBenchmark<uint64_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
