@@ -802,10 +802,10 @@ int main() {
 
     std::string machineConstantName = "Partition_minRadixBits";
 
-    partitionSweepBenchmark<uint32_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
+    partitionSweepBenchmark<uint64_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
                                            {Partition::RadixBitsFixed, Partition::RadixBitsAdaptive},
                                            16, "ClusterednessSweep", 5);
-    partitionSweepBenchmark<uint32_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
+    partitionSweepBenchmark<uint64_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
                                            {Partition::RadixBitsFixed},
                                            MABPL::MachineConstants::getInstance().getMachineConstant(machineConstantName),
                                            "ClusterednessSweep_9", 5);
