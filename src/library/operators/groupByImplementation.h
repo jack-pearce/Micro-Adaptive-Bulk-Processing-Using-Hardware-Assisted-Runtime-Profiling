@@ -15,7 +15,11 @@
 
 namespace MABPL {
 
+#ifdef __AVX2__
 constexpr int BITS_PER_GROUPBY_RADIX_PASS = 10;
+#else
+constexpr int BITS_PER_GROUPBY_RADIX_PASS = 8;
+#endif
 
 template<typename T>
 T MinAggregation<T>::operator()(T currentAggregate, T numberToInclude, bool firstAggregation) const {
@@ -349,7 +353,7 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
         Counters::getInstance().readSharedEventSet();
 
         if ((static_cast<float>(tuplesToProcess) / counterValues[0]) < tuplesPerLastLevelCacheMissThreshold) {
-            std::cout << "Switched to sort at index " << index << std::endl;
+//            std::cout << "Switched to sort at index " << index << std::endl;
             tuplesToProcess = std::min(tuplesBetweenHashing, n - index);
 
             sectionsToBeSorted.emplace_back(index, index + tuplesToProcess);

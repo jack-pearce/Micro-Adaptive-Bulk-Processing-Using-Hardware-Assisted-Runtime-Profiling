@@ -1008,8 +1008,9 @@ int main() {
 
 
 //    runImdbGroupByMacroBenchmark_titleIdFromPrincipalsTable_clusteringSweep(5,30);
-    runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(1,30);
+//    runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(1,30);
 
+    MABPL::MachineConstants::getInstance().calculateMissingMachineConstants();
 
     return 0;
 }
