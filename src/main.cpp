@@ -710,7 +710,6 @@ void runImdbPartitionMacroBenchmark_personIdColumnPrincipalsTable(int iterations
     delete[] data;
 }
 
-/*
 void runImdbGroupByMacroBenchmark_titleIdColumnPrincipalsTable(int iterations, bool randomise) {
     std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.principals.tsv";
     int n = getLengthOfTsv(filePath);
@@ -771,9 +770,8 @@ void runImdbGroupByMacroBenchmark_titleIdColumnPrincipalsTable(int iterations, b
 
     delete[] data;
 }
-*/
 
-/*void runImdbGroupByMacroBenchmark_titleIdFromAkasTable(int iterations, bool randomise) {
+void runImdbGroupByMacroBenchmark_titleIdFromAkasTable(int iterations, bool randomise) {
     std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.akas.tsv";
     int n = getLengthOfTsv(filePath);
     auto data = new int [n];
@@ -832,7 +830,7 @@ void runImdbGroupByMacroBenchmark_titleIdColumnPrincipalsTable(int iterations, b
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 
     delete[] data;
-}*/
+}
 
 void runImdbMacroBenchmarks() {
     runImdbSelectSweepMacroBenchmark(1874, 2023, 5,
@@ -844,16 +842,16 @@ void runImdbMacroBenchmarks() {
     runImdbPartitionMacroBenchmark_startYearColumnBasicsTable(5);
     runImdbPartitionMacroBenchmark_personIdColumnPrincipalsTable(5);
 
-//    runImdbGroupByMacroBenchmark_titleIdColumnPrincipalsTable(5, false);
-//    runImdbGroupByMacroBenchmark_titleIdColumnPrincipalsTable(5, true);
-//    runImdbGroupByMacroBenchmark_titleIdFromAkasTable(5, false);
-//    runImdbGroupByMacroBenchmark_titleIdFromAkasTable(5, true);
+    runImdbGroupByMacroBenchmark_titleIdColumnPrincipalsTable(5, false);
+    runImdbGroupByMacroBenchmark_titleIdColumnPrincipalsTable(5, true);
+    runImdbGroupByMacroBenchmark_titleIdFromAkasTable(5, false);
+    runImdbGroupByMacroBenchmark_titleIdFromAkasTable(5, true);
 }
 
 void runImdbGroupByMacroBenchmark_titleIdFromPrincipalsTable_clusteringSweep(int iterations, int numRuns) {
     std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.principals.tsv";
     int n = getLengthOfTsv(filePath);
-    auto data = new uint64_t[n];
+    auto data = new uint32_t[n];
     readImdbTitleIdColumnFromPrincipalsTable(filePath, data);
 
     int cardinality = 9135620;
@@ -866,7 +864,7 @@ void runImdbGroupByMacroBenchmark_titleIdFromPrincipalsTable_clusteringSweep(int
     for (int numRun = 0; numRun < numRuns; numRun++) {
         results[numRun][0] = static_cast<int>(spreadInCluster[numRun]);
 
-        auto clusteredData = new uint64_t [n];
+        auto clusteredData = new uint32_t [n];
         copyArray(data, clusteredData, n);
         runClusteringOnData(clusteredData, n, static_cast<int>(spreadInCluster[numRun]));
 
@@ -874,8 +872,8 @@ void runImdbGroupByMacroBenchmark_titleIdFromPrincipalsTable_clusteringSweep(int
 
             for (int j = 0; j < 3; j++) {
 
-                auto inputGroupBy = new uint64_t[n];
-                auto inputAggregate = new uint64_t[n];
+                auto inputGroupBy = new uint32_t[n];
+                auto inputAggregate = new uint32_t[n];
                 copyArray(clusteredData, inputGroupBy, n);
                 copyArray(clusteredData, inputAggregate, n);
 
@@ -916,7 +914,7 @@ void runImdbGroupByMacroBenchmark_titleIdFromPrincipalsTable_clusteringSweep(int
         headers[1 + i] = functionNames[i % 3];
     }
 
-    std::string fileName = "64IMDB_groupBy_titleIdColumn_PrincipalsTable";
+    std::string fileName = "IMDB_groupBy_titleIdColumn_PrincipalsTable";
     std::string fullFilePath = FilePaths::getInstance().getImdbOutputFolderPath() + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 
@@ -926,7 +924,7 @@ void runImdbGroupByMacroBenchmark_titleIdFromPrincipalsTable_clusteringSweep(int
 void runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(int iterations, int numRuns) {
     std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.akas.tsv";
     int n = getLengthOfTsv(filePath);
-    auto data = new uint64_t [n];
+    auto data = new int [n];
     readImdbTitleIdColumnFromAkasTable(filePath, data);
 
     int cardinality = 7247075;
@@ -939,7 +937,7 @@ void runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(int itera
     for (int numRun = 0; numRun < numRuns; numRun++) {
         results[numRun][0] = static_cast<int>(spreadInCluster[numRun]);
 
-        auto clusteredData = new uint64_t [n];
+        auto clusteredData = new int [n];
         copyArray(data, clusteredData, n);
         runClusteringOnData(clusteredData, n, static_cast<int>(spreadInCluster[numRun]));
 
@@ -947,8 +945,8 @@ void runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(int itera
 
             for (int j = 0; j < 3; j++) {
 
-                auto inputGroupBy = new uint64_t[n];
-                auto inputAggregate = new uint64_t[n];
+                auto inputGroupBy = new int[n];
+                auto inputAggregate = new int[n];
                 copyArray(clusteredData, inputGroupBy, n);
                 copyArray(clusteredData, inputAggregate, n);
 
@@ -989,7 +987,7 @@ void runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(int itera
         headers[1 + i] = functionNames[i % 3];
     }
 
-    std::string fileName = "64IMDB_groupBy_titleIdColumn_AkasTable";
+    std::string fileName = "IMDB_groupBy_titleIdColumn_AkasTable";
     std::string fullFilePath = FilePaths::getInstance().getImdbOutputFolderPath() + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 
@@ -1009,8 +1007,8 @@ int main() {
     }*/
 
 
-    runImdbGroupByMacroBenchmark_titleIdFromPrincipalsTable_clusteringSweep(5,30);
-    runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(5,30);
+//    runImdbGroupByMacroBenchmark_titleIdFromPrincipalsTable_clusteringSweep(5,30);
+    runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(1,30);
 
 
     return 0;

@@ -200,7 +200,7 @@ void readImdbStartYearColumnFromBasicsTable(const std::string& filePath, uint32_
     file.close();
 }
 
-void readImdbTitleIdColumnFromPrincipalsTable(const std::string& filePath, uint64_t* data) {
+void readImdbTitleIdColumnFromPrincipalsTable(const std::string& filePath, uint32_t* data) {
     std::ifstream file(filePath);
     if (!file.is_open()) {
         std::cerr << "Error opening file: " << filePath << std::endl;
@@ -257,7 +257,7 @@ void readImdbPersonIdColumnFromPrincipalsTable(const std::string& filePath, uint
     file.close();
 }
 
-void readImdbTitleIdColumnFromAkasTable(const std::string& filePath, uint64_t* data) {
+void readImdbTitleIdColumnFromAkasTable(const std::string& filePath, int* data) {
     std::ifstream file(filePath);
     if (!file.is_open()) {
         std::cerr << "Error opening file: " << filePath << std::endl;
@@ -284,29 +284,4 @@ void readImdbTitleIdColumnFromAkasTable(const std::string& filePath, uint64_t* d
     file.close();
 }
 
-void readImdbTitleIdColumnFromAkasTable(const std::string& filePath, int64_t* data) {
-    std::ifstream file(filePath);
-    if (!file.is_open()) {
-        std::cerr << "Error opening file: " << filePath << std::endl;
-        exit(1);
-    }
 
-    std::string line;
-    int index = 0;
-    bool isFirstRow = true;  // Flag to skip the first row
-    while (std::getline(file, line)) {
-        if (isFirstRow) {
-            isFirstRow = false;
-            continue;  // Skip the first row
-        }
-
-        std::istringstream iss(line);
-        std::string filmId, filmNumOnly;
-
-        std::getline(iss, filmId, '\t');
-        filmNumOnly = filmId.substr(2);
-        data[index++] = std::stoi(filmNumOnly);
-    }
-
-    file.close();
-}
