@@ -200,7 +200,7 @@ void readImdbStartYearColumnFromBasicsTable(const std::string& filePath, uint32_
     file.close();
 }
 
-void readImdbTitleIdColumnFromPrincipalsTable(const std::string& filePath, uint32_t* data) {
+void readImdbTitleIdColumnFromPrincipalsTable(const std::string& filePath, uint64_t* data) {
     std::ifstream file(filePath);
     if (!file.is_open()) {
         std::cerr << "Error opening file: " << filePath << std::endl;
@@ -257,7 +257,7 @@ void readImdbPersonIdColumnFromPrincipalsTable(const std::string& filePath, uint
     file.close();
 }
 
-void readImdbTitleIdColumnFromAkasTable(const std::string& filePath, int* data) {
+void readImdbTitleIdColumnFromAkasTable(const std::string& filePath, uint64_t* data) {
     std::ifstream file(filePath);
     if (!file.is_open()) {
         std::cerr << "Error opening file: " << filePath << std::endl;
