@@ -283,3 +283,30 @@ void readImdbTitleIdColumnFromAkasTable(const std::string& filePath, int* data) 
 
     file.close();
 }
+
+void readImdbTitleIdColumnFromAkasTable(const std::string& filePath, int64_t* data) {
+    std::ifstream file(filePath);
+    if (!file.is_open()) {
+        std::cerr << "Error opening file: " << filePath << std::endl;
+        exit(1);
+    }
+
+    std::string line;
+    int index = 0;
+    bool isFirstRow = true;  // Flag to skip the first row
+    while (std::getline(file, line)) {
+        if (isFirstRow) {
+            isFirstRow = false;
+            continue;  // Skip the first row
+        }
+
+        std::istringstream iss(line);
+        std::string filmId, filmNumOnly;
+
+        std::getline(iss, filmId, '\t');
+        filmNumOnly = filmId.substr(2);
+        data[index++] = std::stoi(filmNumOnly);
+    }
+
+    file.close();
+}
