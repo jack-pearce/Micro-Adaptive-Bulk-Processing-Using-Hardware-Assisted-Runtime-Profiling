@@ -928,7 +928,7 @@ void runImdbGroupByMacroBenchmark_titleIdFromPrincipalsTable_clusteringSweep(int
     auto data = new uint32_t[n];
     readImdbTitleIdColumnFromPrincipalsTable(filePath, data);
 
-    int cardinality = 7247075;
+    int cardinality = 9135620;
     long_long cycles;
     std::vector<std::vector<long_long>> results(numRuns, std::vector<long_long>(1 + (3 * iterations), 0));
 
