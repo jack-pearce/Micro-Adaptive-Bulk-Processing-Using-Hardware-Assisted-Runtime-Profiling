@@ -1006,11 +1006,26 @@ int main() {
         std::cout << data[i] << std::endl;
     }*/
 
+    runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(1,30);
+
+    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
+                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                            1, "1-NoClustering");
+
+    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::linearUniformIntDistribution200mValuesMultipleCardinalitySections_100_10m_Max100m,
+                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                            1, "3-MultipleSection_100_10m");
+
+    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                            1, "1-NoClustering-200mValues");
+
+
 
 //    runImdbGroupByMacroBenchmark_titleIdFromPrincipalsTable_clusteringSweep(5,30);
-//    runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(1,30);
 
-    MABPL::MachineConstants::getInstance().calculateMissingMachineConstants();
+
+//    MABPL::MachineConstants::getInstance().calculateMissingMachineConstants();
 
     return 0;
 }
