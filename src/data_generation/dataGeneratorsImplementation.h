@@ -5,6 +5,7 @@
 #include <random>
 #include <set>
 #include <cassert>
+#include <algorithm>
 
 
 template <typename T>
@@ -539,5 +540,37 @@ void generateUniformDistributionInMemoryWithMultipleTwoCardinalitySections(T *da
         data += tuplesPerSection;
     }
 }
+
+template <typename T>
+void generateClusteredDistributionFromAlreadySortedData(T *data, int n, int spreadInCluster) {
+    static_assert(std::is_integral<T>::value, "Must be an integer type");
+
+    std::cout << "Generating data in memory... ";
+    std::cout.flush();
+
+    if (spreadInCluster == 1) {
+        std::cout << "Complete" << std::endl;
+        return;
+    }
+
+    unsigned int seed = 1;
+    std::mt19937 gen(seed);
+
+    int numberOfSections = n / spreadInCluster;
+    int elementsPerSection = n / numberOfSections;
+
+    int index = 0;
+    for (int i = 0; i < numberOfSections; i++) {
+        std::shuffle(data + index, data + index + elementsPerSection, gen);
+
+        index += elementsPerSection;
+    }
+    if (index < n) {
+        std::shuffle(data + index, data + n, gen);
+    }
+
+    std::cout << "Complete" << std::endl;
+}
+
 
 #endif //MABPL_DATAGENERATORSIMPLEMENTATION_H

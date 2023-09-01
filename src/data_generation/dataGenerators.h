@@ -73,6 +73,9 @@ void generateUniformDistributionInMemoryWithMultipleTwoCardinalitySections(T *da
                                                                            float fractionSectionTwo,
                                                                            int numSections);
 
+template <typename T>
+void generateClusteredDistributionFromAlreadySortedData(T *data, int n, int spreadInCluster);
+
 
 #include "dataGeneratorsImplementation.h"
 
