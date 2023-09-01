@@ -1007,8 +1007,8 @@ int main() {
     }*/
 
 
-//    runImdbGroupByMacroBenchmark_titleIdFromPrincipalsTable_clusteringSweep(5,30);
-    runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(5,30);
+    runImdbGroupByMacroBenchmark_titleIdFromPrincipalsTable_clusteringSweep(5,30);
+//    runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(5,30);
 
 
     return 0;
