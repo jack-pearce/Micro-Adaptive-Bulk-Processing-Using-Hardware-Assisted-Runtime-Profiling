@@ -852,7 +852,7 @@ void runImdbMacroBenchmarks() {
 void runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(int iterations, int numRuns) {
     std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.akas.tsv";
     int n = getLengthOfTsv(filePath);
-    auto data = new int64_t[n];
+    auto data = new int [n];
     readImdbTitleIdColumnFromAkasTable(filePath, data);
 
     int cardinality = 7247075;
@@ -866,7 +866,7 @@ void runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(int itera
     for (int numRun = 0; numRun < numRuns; numRun++) {
         results[numRun][0] = static_cast<int>(spreadInCluster[numRun]);
 
-        auto clusteredData = new int64_t[n];
+        auto clusteredData = new int [n];
         copyArray(data, clusteredData, n);
         generateClusteredDistributionFromAlreadySortedData(clusteredData, n,
                                                            static_cast<int>(spreadInCluster[numRun]));
@@ -875,8 +875,8 @@ void runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(int itera
 
             for (int j = 0; j < 3; j++) {
 
-                auto inputGroupBy = new int64_t[n];
-                auto inputAggregate = new int64_t[n];
+                auto inputGroupBy = new int[n];
+                auto inputAggregate = new int[n];
                 copyArray(clusteredData, inputGroupBy, n);
                 copyArray(clusteredData, inputAggregate, n);
 
