@@ -7,6 +7,8 @@
 #include <cassert>
 #include <algorithm>
 
+#include "../utilities/dataHelpers.h"
+
 
 template <typename T>
 LoadedData<T>::LoadedData(const DataFile &dataFile) : data(nullptr), dataFile(&dataFile) {
@@ -542,32 +544,20 @@ void generateUniformDistributionInMemoryWithMultipleTwoCardinalitySections(T *da
 }
 
 template <typename T>
-void generateClusteredDistributionFromAlreadySortedData(T *data, int n, int spreadInCluster) {
-    static_assert(std::is_integral<T>::value, "Must be an integer type");
-
+void runClusteringOnData(T *data, int n, int spreadInCluster) {
     std::cout << "Generating data in memory... ";
     std::cout.flush();
 
-    if (spreadInCluster == 1) {
-        std::cout << "Complete" << std::endl;
-        return;
+    auto positions = generateClusteringOrder(n, spreadInCluster);
+
+    auto dataCopy = new T[n];
+    copyArray(data, dataCopy, n);
+
+    for (int i = 0; i < n; i++) {
+        data[i] = dataCopy[positions[i]];
     }
 
-    unsigned int seed = 1;
-    std::mt19937 gen(seed);
-
-    int numberOfSections = n / spreadInCluster;
-    int elementsPerSection = n / numberOfSections;
-
-    int index = 0;
-    for (int i = 0; i < numberOfSections; i++) {
-        std::shuffle(data + index, data + index + elementsPerSection, gen);
-
-        index += elementsPerSection;
-    }
-    if (index < n) {
-        std::shuffle(data + index, data + n, gen);
-    }
+    delete[] dataCopy;
 
     std::cout << "Complete" << std::endl;
 }

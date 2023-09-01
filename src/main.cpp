@@ -848,6 +848,79 @@ void runImdbMacroBenchmarks() {
     runImdbGroupByMacroBenchmark_titleIdFromAkasTable(5, true);
 }
 
+void runImdbGroupByMacroBenchmark_titleIdFromPrincipalsTable_clusteringSweep(int iterations, int numRuns) {
+    std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.principals.tsv";
+    int n = getLengthOfTsv(filePath);
+    auto data = new uint32_t[n];
+    readImdbTitleIdColumnFromPrincipalsTable(filePath, data);
+
+    int cardinality = 9135620;
+    long_long cycles;
+    std::vector<std::vector<long_long>> results(numRuns, std::vector<long_long>(1 + (3 * iterations), 0));
+
+    std::vector<float> spreadInCluster;
+    generateLogDistribution(numRuns, 1, n, spreadInCluster);
+
+    for (int numRun = 0; numRun < numRuns; numRun++) {
+        results[numRun][0] = static_cast<int>(spreadInCluster[numRun]);
+
+        auto clusteredData = new uint32_t [n];
+        copyArray(data, clusteredData, n);
+        runClusteringOnData(clusteredData, n, static_cast<int>(spreadInCluster[numRun]));
+
+        for (int iteration = 0; iteration < iterations; iteration++) {
+
+            for (int j = 0; j < 3; j++) {
+
+                auto inputGroupBy = new uint32_t[n];
+                auto inputAggregate = new uint32_t[n];
+                copyArray(clusteredData, inputGroupBy, n);
+                copyArray(clusteredData, inputAggregate, n);
+
+                std::cout << "Running input " << static_cast<int>(spreadInCluster[numRun]) << ", iteration ";
+                std::cout << iteration + 1 << "... ";
+
+                if (j == 0) {
+                    cycles = *Counters::getInstance().readSharedEventSet();
+                    auto result = MABPL::groupByAdaptive<CountAggregation>(n, inputGroupBy,
+                                                                           inputAggregate, cardinality);
+                    cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+                } else if (j == 1) {
+                    cycles = *Counters::getInstance().readSharedEventSet();
+                    auto result = MABPL::groupByHash<CountAggregation>(n, inputGroupBy,
+                                                                       inputAggregate, cardinality);
+                    cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+                } else if (j == 2) {
+                    cycles = *Counters::getInstance().readSharedEventSet();
+                    auto result = MABPL::groupBySort<CountAggregation>(n, inputGroupBy, inputAggregate);
+                    cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+                }
+
+                results[numRun][1 + (iteration * 3) + j] = cycles;
+
+                delete[] inputGroupBy;
+                delete[] inputAggregate;
+                std::cout << "Completed" << std::endl;
+            }
+        }
+
+        delete[] clusteredData;
+    }
+
+    std::vector<std::string> headers(1 + (3 * iterations));
+    headers[0] = "SpreadInCluster";
+    std::string functionNames[] = {"GroupBy_Adaptive", "GroupBy_Hash", "GroupBy_Sort"};
+    for (auto i = 0; i < (3 * iterations); ++i) {
+        headers[1 + i] = functionNames[i % 3];
+    }
+
+    std::string fileName = "IMDB_groupBy_titleIdColumn_PrincipalsTable";
+    std::string fullFilePath = FilePaths::getInstance().getImdbOutputFolderPath() + fileName + ".csv";
+    writeHeadersAndTableToCSV(headers, results, fullFilePath);
+
+    delete[] data;
+}
+
 void runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(int iterations, int numRuns) {
     std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.akas.tsv";
     int n = getLengthOfTsv(filePath);
@@ -866,8 +939,7 @@ void runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(int itera
 
         auto clusteredData = new int [n];
         copyArray(data, clusteredData, n);
-        generateClusteredDistributionFromAlreadySortedData(clusteredData, n,
-                                                           static_cast<int>(spreadInCluster[numRun]));
+        runClusteringOnData(clusteredData, n, static_cast<int>(spreadInCluster[numRun]));
 
         for (int iteration = 0; iteration < iterations; iteration++) {
 
@@ -922,113 +994,21 @@ void runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(int itera
     delete[] data;
 }
 
-void runImdbGroupByMacroBenchmark_titleIdFromPrincipalsTable_clusteringSweep(int iterations, int numRuns) {
-    std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.principals.tsv";
-    int n = getLengthOfTsv(filePath);
-    auto data = new uint32_t[n];
-    readImdbTitleIdColumnFromPrincipalsTable(filePath, data);
-
-    int cardinality = 9135620;
-    long_long cycles;
-    std::vector<std::vector<long_long>> results(numRuns, std::vector<long_long>(1 + (3 * iterations), 0));
-
-    std::vector<float> spreadInCluster;
-    generateLogDistribution(numRuns, 1, n, spreadInCluster);
-
-    for (int numRun = 0; numRun < numRuns; numRun++) {
-        results[numRun][0] = static_cast<int>(spreadInCluster[numRun]);
-
-        auto clusteredData = new uint32_t [n];
-        copyArray(data, clusteredData, n);
-        generateClusteredDistributionFromAlreadySortedData(clusteredData, n,
-                                                           static_cast<int>(spreadInCluster[numRun]));
-
-        for (int iteration = 0; iteration < iterations; iteration++) {
-
-            for (int j = 0; j < 3; j++) {
-
-                auto inputGroupBy = new uint32_t[n];
-                auto inputAggregate = new uint32_t[n];
-                copyArray(clusteredData, inputGroupBy, n);
-                copyArray(clusteredData, inputAggregate, n);
-
-                std::cout << "Running input " << static_cast<int>(spreadInCluster[numRun]) << ", iteration ";
-                std::cout << iteration + 1 << "... ";
-
-                if (j == 0) {
-                    cycles = *Counters::getInstance().readSharedEventSet();
-                    auto result = MABPL::groupByAdaptive<CountAggregation>(n, inputGroupBy,
-                                                                           inputAggregate, cardinality);
-                    cycles = *Counters::getInstance().readSharedEventSet() - cycles;
-                } else if (j == 1) {
-                    cycles = *Counters::getInstance().readSharedEventSet();
-                    auto result = MABPL::groupByHash<CountAggregation>(n, inputGroupBy,
-                                                                       inputAggregate, cardinality);
-                    cycles = *Counters::getInstance().readSharedEventSet() - cycles;
-                } else if (j == 2) {
-                    cycles = *Counters::getInstance().readSharedEventSet();
-                    auto result = MABPL::groupBySort<CountAggregation>(n, inputGroupBy, inputAggregate);
-                    cycles = *Counters::getInstance().readSharedEventSet() - cycles;
-                }
-
-                results[numRun][1 + (iteration * 3) + j] = cycles;
-
-                delete[] inputGroupBy;
-                delete[] inputAggregate;
-                std::cout << "Completed" << std::endl;
-            }
-        }
-
-        delete[] clusteredData;
-    }
-
-    std::vector<std::string> headers(1 + (3 * iterations));
-    headers[0] = "SpreadInCluster";
-    std::string functionNames[] = {"GroupBy_Adaptive", "GroupBy_Hash", "GroupBy_Sort"};
-    for (auto i = 0; i < (3 * iterations); ++i) {
-        headers[1 + i] = functionNames[i % 3];
-    }
-
-    std::string fileName = "IMDB_groupBy_titleIdColumn_AkasTable";
-    std::string fullFilePath = FilePaths::getInstance().getImdbOutputFolderPath() + fileName + ".csv";
-    writeHeadersAndTableToCSV(headers, results, fullFilePath);
-
-    delete[] data;
-}
-
 int main() {
+/*    std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.akas.tsv";
+    int n = getLengthOfTsv(filePath);
+    auto data = new int [n];
+    readImdbTitleIdColumnFromAkasTable(filePath, data);
 
-//    runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(1,30);
-    runImdbGroupByMacroBenchmark_titleIdFromPrincipalsTable_clusteringSweep(5,30);
+    runClusteringOnData(data, n, 250);
 
-
-
-
-/*
-    unsigned int seed = 1;
-
-    int n = 50;
-    auto *data = new uint32_t[n];
-
-    for (auto i = 0; i < n; ++i) {
-        data[i] = i + 1;
-    }
-
-    std::cout << "Before: " << std::endl;
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < 1000; i++) {
         std::cout << data[i] << std::endl;
-    }
-    std::cout << std::endl << std::endl;
+    }*/
 
-    generateClusteredDistributionFromAlreadySortedData(data, n, 1);
 
-    std::cout << "After: " << std::endl;
-    for (int i = 0; i < n; i++) {
-        std::cout << data[i] << std::endl;
-    }
-
-    delete[] data;
-*/
+//    runImdbGroupByMacroBenchmark_titleIdFromPrincipalsTable_clusteringSweep(5,30);
+    runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(5,30);
 
 
     return 0;

@@ -36,6 +36,7 @@ add_executable(${PROJECT_NAME}
         src/utilities/dataHelpers.cpp
         src/utilities/papiHelpers.cpp
         src/cycles_benchmarking/selectCyclesBenchmark.h
+        src/data_generation/dataGenerators.cpp
         src/data_generation/dataGenerators.h
         src/library/operators/groupBy.cpp
         src/cycles_benchmarking/groupByCyclesBenchmark.h

@@ -1,6 +1,9 @@
 #ifndef MICRO_ADAPTIVE_BULK_PROCESSING_LIBRARY_DATA_GENERATOR_H
 #define MICRO_ADAPTIVE_BULK_PROCESSING_LIBRARY_DATA_GENERATOR_H
 
+#include "dataFiles.h"
+
+std::vector<int> generateClusteringOrder(int n, int spreadInCluster);
 
 template <typename T>
 class LoadedData {
@@ -74,7 +77,7 @@ void generateUniformDistributionInMemoryWithMultipleTwoCardinalitySections(T *da
                                                                            int numSections);
 
 template <typename T>
-void generateClusteredDistributionFromAlreadySortedData(T *data, int n, int spreadInCluster);
+void runClusteringOnData(T *data, int n, int spreadInCluster);
 
 
 #include "dataGeneratorsImplementation.h"
