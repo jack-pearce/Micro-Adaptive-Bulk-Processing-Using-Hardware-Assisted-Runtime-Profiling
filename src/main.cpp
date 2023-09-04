@@ -871,8 +871,8 @@ void runImdbMacroBenchmarks() {
 }
 
 int main() {
-
-    MABPL::MachineConstants::getInstance().calculateMissingMachineConstants();
-
+    partitionBitsSweepBenchmarkWithExtraCountersConfigurations<uint64_t>(DataFiles::uniformIntDistribution250mValuesMax250m,
+                                                                         Partition::RadixBitsFixed,
+                                                                         4,20, "", 5);
     return 0;
 }
