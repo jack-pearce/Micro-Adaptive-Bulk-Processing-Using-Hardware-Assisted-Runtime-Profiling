@@ -871,27 +871,17 @@ void runImdbMacroBenchmarks() {
 }
 
 int main() {
-/*    std::string startMachineConstantName = "Partition_startRadixBits";
-    std::string minMachineConstantName = "Partition_minRadixBits";
 
-    int startMachineConstant = MABPL::MachineConstants::getInstance().getMachineConstant(startMachineConstantName);
-    int minMachineConstant = MABPL::MachineConstants::getInstance().getMachineConstant(minMachineConstantName);
+    std::cout << "Running personID column from principals table" << std::endl;
+    runImdbPartitionMacroBenchmark_personIdColumnPrincipalsTable(5);
 
-    for (int i = minMachineConstant; i <= startMachineConstant; i++) {
+    std::cout << "Running startYear column from basics table" << std::endl;
+    runImdbPartitionMacroBenchmark_startYearColumnBasicsTable(5);
 
-        std::string name = std::to_string(i) + "radixBits_Int64_ClusterednessSweep_";
-
-        partitionSweepBenchmark<uint64_t>(
-                DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
-                {Partition::RadixBitsFixed},
-                i, name, 5);
-    }*/
+    std::cout << "Running titleID column from basics table" << std::endl;
+    runImdbPartitionMacroBenchmark_titleIdColumnBasicsTable(5);
 
 
-    partitionSweepBenchmark<uint64_t>(
-            DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
-            {Partition::RadixBitsAdaptive},
-            -1, "TEST", 5);
 
     return 0;
 }
