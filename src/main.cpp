@@ -871,8 +871,21 @@ void runImdbMacroBenchmarks() {
 }
 
 int main() {
-    partitionBitsSweepBenchmarkWithExtraCountersConfigurations<uint64_t>(DataFiles::uniformIntDistribution250mValuesMax250m,
-                                                                         Partition::RadixBitsFixed,
-                                                                         4,20, "", 5);
+    std::string startMachineConstantName = "Partition_startRadixBits";
+    std::string minMachineConstantName = "Partition_minRadixBits";
+
+    int startMachineConstant = MABPL::MachineConstants::getInstance().getMachineConstant(startMachineConstantName);
+    int minMachineConstant = MABPL::MachineConstants::getInstance().getMachineConstant(minMachineConstantName);
+
+    for (int i = minMachineConstant; i <= startMachineConstant; i++) {
+
+        std::string name = std::to_string(i) + "radixBits_Int64_ClusterednessSweep_";
+
+        partitionSweepBenchmark<uint64_t>(
+                DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
+                {Partition::RadixBitsFixed},
+                i, name, 5);
+    }
+
     return 0;
 }
