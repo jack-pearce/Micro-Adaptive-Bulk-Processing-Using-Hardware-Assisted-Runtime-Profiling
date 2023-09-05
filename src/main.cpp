@@ -871,7 +871,7 @@ void runImdbMacroBenchmarks() {
 }
 
 int main() {
-    std::string startMachineConstantName = "Partition_startRadixBits";
+/*    std::string startMachineConstantName = "Partition_startRadixBits";
     std::string minMachineConstantName = "Partition_minRadixBits";
 
     int startMachineConstant = MABPL::MachineConstants::getInstance().getMachineConstant(startMachineConstantName);
@@ -885,7 +885,13 @@ int main() {
                 DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
                 {Partition::RadixBitsFixed},
                 i, name, 5);
-    }
+    }*/
+
+
+    partitionSweepBenchmark<uint64_t>(
+            DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
+            {Partition::RadixBitsAdaptive},
+            -1, "TEST", 5);
 
     return 0;
 }
