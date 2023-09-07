@@ -15,9 +15,7 @@ Counters& Counters::getInstance() {
 
 Counters::Counters() {
     sharedEventSet=PAPI_NULL;
-//    std::vector<std::string> initialCounters = {"PERF_COUNT_HW_CPU_CYCLES"};
-//    std::vector<std::string> initialCounters = {"PERF_COUNT_HW_CACHE_MISSES"};
-    std::vector<std::string> initialCounters = {"DTLB-LOAD-MISSES"};
+    std::vector<std::string> initialCounters = {"PERF_COUNT_HW_CPU_CYCLES"};
 
     if (PAPI_library_init(PAPI_VER_CURRENT) != PAPI_VER_CURRENT) {
         std::cerr << "PAPI library init error!" << std::endl;
