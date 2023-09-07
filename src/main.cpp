@@ -849,7 +849,7 @@ void runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(int itera
         headers[1 + i] = functionNames[i % 3];
     }
 
-    std::string fileName = "LLC_MISSES_IMDB_groupBy_titleIdColumn_AkasTable";
+    std::string fileName = "TLB_LOAD_MISSES_IMDB_groupBy_titleIdColumn_AkasTable";
     std::string fullFilePath = FilePaths::getInstance().getImdbOutputFolderPath() + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 
