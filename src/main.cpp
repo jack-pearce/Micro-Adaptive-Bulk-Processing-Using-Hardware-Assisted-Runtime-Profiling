@@ -849,7 +849,7 @@ void runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(int itera
         headers[1 + i] = functionNames[i % 3];
     }
 
-    std::string fileName = "IMDB_groupBy_titleIdColumn_AkasTable";
+    std::string fileName = "LLC_MISSES_IMDB_groupBy_titleIdColumn_AkasTable";
     std::string fullFilePath = FilePaths::getInstance().getImdbOutputFolderPath() + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 
@@ -872,13 +872,7 @@ void runImdbMacroBenchmarks() {
 
 int main() {
 
-    std::string startMachineConstantName = "Partition_startRadixBits";
-    int startMachineConstant = MABPL::MachineConstants::getInstance().getMachineConstant(startMachineConstantName);
-    std::string nameOne = "LLC_MISSES_Int64_ClusterednessSweep_" + std::to_string(startMachineConstant);
-
-    partitionSweepBenchmark<uint64_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
-                                      {Partition::RadixBitsFixed, Partition::RadixBitsAdaptive},
-                                      startMachineConstant, nameOne, 1);
+    runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(1,30);
 
     return 0;
 }
