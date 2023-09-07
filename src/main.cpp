@@ -872,16 +872,13 @@ void runImdbMacroBenchmarks() {
 
 int main() {
 
-    std::cout << "Running personID column from principals table" << std::endl;
-    runImdbPartitionMacroBenchmark_personIdColumnPrincipalsTable(5);
+    std::string startMachineConstantName = "Partition_startRadixBits";
+    int startMachineConstant = MABPL::MachineConstants::getInstance().getMachineConstant(startMachineConstantName);
+    std::string nameOne = "Int64_ClusterednessSweep_" + std::to_string(startMachineConstant);
 
-    std::cout << "Running startYear column from basics table" << std::endl;
-    runImdbPartitionMacroBenchmark_startYearColumnBasicsTable(5);
-
-    std::cout << "Running titleID column from basics table" << std::endl;
-    runImdbPartitionMacroBenchmark_titleIdColumnBasicsTable(5);
-
-
+    partitionSweepBenchmark<uint64_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
+                                      {Partition::RadixBitsFixed, Partition::RadixBitsAdaptive},
+                                      startMachineConstant, nameOne, 5);
 
     return 0;
 }
