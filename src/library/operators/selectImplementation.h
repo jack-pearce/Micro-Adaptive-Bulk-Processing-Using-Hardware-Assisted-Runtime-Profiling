@@ -93,11 +93,9 @@ inline void performSelectIndexesAdaption(SelectIndexesChoice &selectIndexesChoic
 
 template<typename T>
 int selectIndexesAdaptive(int n, const T *inputFilter, int *selection, T threshold) {
-//    int tuplesPerAdaption = 50000;
-    int tuplesPerAdaption = 100;
+    int tuplesPerAdaption = 50000;
     int maxConsecutivePredications = 10;
-//    int tuplesInBranchBurst = 1000
-    int tuplesInBranchBurst = 100;
+    int tuplesInBranchBurst = 1000;
 
     std::string lowerMachineConstantName = "SelectIndexesLower_" + std::to_string(sizeof(T)) + "B_inputFilter_1_dop";
     std::string upperMachineConstantName = "SelectIndexesUpper_" + std::to_string(sizeof(T)) + "B_inputFilter_1_dop";
