@@ -872,5 +872,18 @@ void runImdbMacroBenchmarks() {
 
 int main() {
 
+    std::vector<float> inputThresholdDistribution;
+    generateLogDistribution(30, 1, 10*1000, inputThresholdDistribution);
+    selectCpuCyclesInputSweepBenchmark<int,int>(DataFiles::uniformIntDistribution250mValuesMax10000,
+                                                {Select::ImplementationIndexesBranch,
+                                                 Select::ImplementationIndexesPredication,
+                                                 Select::ImplementationIndexesAdaptive},
+                                                inputThresholdDistribution,
+                                                1, "DEMO_1-Indexes");
+
+    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
+                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                            1, "DEMO_1-NoClustering");
+
     return 0;
 }
