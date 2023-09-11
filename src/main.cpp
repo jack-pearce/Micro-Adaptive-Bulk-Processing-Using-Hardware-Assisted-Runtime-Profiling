@@ -872,5 +872,13 @@ void runImdbMacroBenchmarks() {
 
 int main() {
 
+    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::linearUniformIntDistribution20mValuesCardinalitySections_100_3m_Max20m,
+                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                            1, "2-TwoSection_100_3m");
+
+    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::linearUniformIntDistribution200mValuesMultipleCardinalitySections_100_10m_Max100m,
+                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                            1, "3-MultipleSection_100_10m");
+
     return 0;
 }
