@@ -912,9 +912,9 @@ int main() {
                                             {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                             1, "NewClusteringSweep");*/
 
-    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesMaxValueSweep,
+    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesMaxValueSweepCardinality10m,
                                             {GroupBy::Sort},
-                                            1, "Sort200mValuesMaxValueSweep");
+                                            1, "Sort200mValuesMaxValueSweepCardinality10m");
 
     return 0;
 }

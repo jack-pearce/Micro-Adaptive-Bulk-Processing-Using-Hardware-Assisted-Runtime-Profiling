@@ -190,6 +190,9 @@ bool DataSweep::loadNextDataSetIntoMemory(T *data) {
     } else if (getSweepName() == "logUniformIntDistribution200mValuesMaxValueSweep") {
         generateUniformDistributionInMemory(data, getNumElements(), inputs[runsCompleted++]);
         return true;
+    } else if (getSweepName() == "logUniformIntDistribution200mValuesMaxValueSweepCardinality10m") {
+        generateUniformDistributionInMemoryWithSetCardinality(data, getNumElements(), inputs[runsCompleted++], 10*1000*1000);
+        return true;
     }
     return false;
 }
