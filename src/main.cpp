@@ -263,6 +263,11 @@ void allGroupBySingleThreadedTests(int iterations) {
                                    iterations, "3-MultipleSection_10m_100");
 
     tessilRobinMapInitialisationBenchmark<int,int>("4-MapOverheadCosts");
+
+    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1m,
+                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                            iterations, "1-ClusteringSweep-20mValues");
+
 }
 
 void allGroupByParallelTests(int iterations) {
@@ -872,9 +877,21 @@ void runImdbMacroBenchmarks() {
 
 int main() {
 
-    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+/*    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
                                             {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                            1, "1-NoClustering-200mValues");
+                                            1, "1-NoClustering-200mValues");*/
+
+    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1m,
+                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                            1, "1-ClusteringSweep-20mValues");
+
+/*    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
+                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                            5, "1-NoClustering-20mValues");*/
+
+/*    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution40mValuesCardinalitySweepFixedMax,
+                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                            1, "1-NoClustering-40mValues");*/
 
     return 0;
 }
