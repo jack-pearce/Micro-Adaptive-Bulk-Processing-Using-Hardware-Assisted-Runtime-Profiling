@@ -900,17 +900,17 @@ int main() {
                                             {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                             1, "1-ClusteringSweep-20mValues");*/
 
-/*    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
+    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
                                             {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                            5, "1-NoClustering-20mValues");*/
+                                            1, "1-NoClustering-20mValues");
 
 /*    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution40mValuesCardinalitySweepFixedMax,
                                             {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                             1, "1-NoClustering-40mValues");*/
 
-    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesClusteredSweepFixedCardinality10mMax200m,
+/*    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesClusteredSweepFixedCardinality10mMax200m,
                                             {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                            1, "ClusteringSweep");
+                                            1, "ClusteringSweep");*/
 
 /*    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesMaxValueSweep,
                                             {GroupBy::Sort},
