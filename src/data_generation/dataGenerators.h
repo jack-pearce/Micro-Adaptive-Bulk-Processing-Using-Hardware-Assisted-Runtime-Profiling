@@ -79,6 +79,10 @@ void generateUniformDistributionInMemoryWithMultipleTwoCardinalitySections(T *da
 template <typename T>
 void runClusteringOnData(T *data, int n, int spreadInCluster);
 
+template <typename T>
+void generateUniformDistributionInMemoryWithSetCardinalityClusteredAlternative(T *data, int n, int upperBound,
+                                                                               int cardinality, int spreadInCluster);
+
 
 #include "dataGeneratorsImplementation.h"
 

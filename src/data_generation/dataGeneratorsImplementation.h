@@ -562,5 +562,31 @@ void runClusteringOnData(T *data, int n, int spreadInCluster) {
     std::cout << "Complete" << std::endl;
 }
 
+template <typename T>
+void generateUniformDistributionInMemoryWithSetCardinalityClusteredAlternative(T *data, int n, int upperBound,
+                                                                               int cardinality, int spreadInCluster) {
+    std::cout << "Generating data in memory... ";
+    std::cout.flush();
+
+    int duplicates = n / cardinality;
+    int index = 0;
+
+    for (int section = 0; section < cardinality; section++) {
+        for (int elemInSection = 0; elemInSection < duplicates; elemInSection++) {
+            data[index++] = section + 1;
+        }
+    }
+
+    runClusteringOnData(data, n, spreadInCluster);
+
+    if (upperBound != cardinality) {
+        for (int i = 0; i < n; i++) {
+            data[i] = scaleNumberLogarithmically(data[i], cardinality, upperBound);
+        }
+    }
+
+    std::cout << "Complete" << std::endl;
+}
+
 
 #endif //MABPL_DATAGENERATORSIMPLEMENTATION_H

@@ -877,13 +877,28 @@ void runImdbMacroBenchmarks() {
 
 int main() {
 
+/*
+    int n = 5000;
+    auto data = new int[n];
+
+    generateUniformDistributionInMemoryWithSetCardinalityClusteredAlternative(data, n, 5000, 1000, 2500);
+
+    for (int i = 0; i < n; i++) {
+        std::cout << data[i] << std::endl;
+    }
+
+    delete [] data;
+*/
+
+
+
 /*    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
                                             {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                             1, "1-NoClustering-200mValues");*/
 
-    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1m,
+/*    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1m,
                                             {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                            1, "1-ClusteringSweep-20mValues");
+                                            1, "1-ClusteringSweep-20mValues");*/
 
 /*    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
                                             {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
@@ -892,6 +907,10 @@ int main() {
 /*    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution40mValuesCardinalitySweepFixedMax,
                                             {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                             1, "1-NoClustering-40mValues");*/
+
+    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1mMax1m,
+                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                            1, "NewClusteringSweep");
 
     return 0;
 }
