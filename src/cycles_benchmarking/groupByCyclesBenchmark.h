@@ -29,6 +29,11 @@ void groupByBenchmarkWithExtraCountersDuringRun(const DataFile &dataFile,
                                                 const std::string &fileNamePrefix);
 
 template <typename T1, typename T2>
+void groupByBenchmarkSingleRun(const DataFile &dataFile, int cardinality,
+                               const std::vector<GroupBy> &groupByImplementations,
+                               int iterations, const std::string &fileNamePrefix);
+
+template <typename T1, typename T2>
 void tessilRobinMapInitialisationBenchmark(const std::string &fileNamePrefix);
 
 

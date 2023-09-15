@@ -354,6 +354,61 @@ void groupByBenchmarkWithExtraCountersDuringRun(const DataFile &dataFile,
 }
 
 template <typename T1, typename T2>
+void groupByBenchmarkSingleRun(const DataFile &dataFile, int cardinality,
+                               const std::vector<GroupBy> &groupByImplementations,
+                               int iterations, const std::string &fileNamePrefix) {
+    assert(!groupByImplementations.empty());
+    if (std::count(groupByImplementations.begin(), groupByImplementations.end(), GroupBy::AdaptiveParallel)) {
+        std::cout << "Cannot use cpu cycles to time multi-threaded programs, use wall time instead" << std::endl;
+        exit(1);
+    }
+
+    long_long cycles;
+    std::vector<std::vector<double>> results(iterations,
+                           std::vector<double>(static_cast<int>(groupByImplementations.size()) + 1, 0));
+
+    for (auto i = 0; i < iterations; ++i) {
+        for (auto j = 0; j < static_cast<int>(groupByImplementations.size()); ++j) {
+            results[i][0] = i + 1;
+
+            auto inputGroupBy = new T1[dataFile.getNumElements()];
+            auto inputAggregate = new T2[dataFile.getNumElements()];
+
+            std::cout << "Running " << getGroupByName(groupByImplementations[j]) << " for iteration ";
+            std::cout << i + 1 << "... ";
+
+            dataFile.loadDataIntoMemory<T1>(inputGroupBy);
+            generateUniformDistributionInMemory<T2>(inputAggregate, dataFile.getNumElements(), 10);
+
+            cycles = *Counters::getInstance().readSharedEventSet();
+
+            auto result = MABPL::runGroupByFunction<MaxAggregation>(groupByImplementations[j],
+                                                                    dataFile.getNumElements(), inputGroupBy,
+                                                                    inputAggregate, cardinality);
+
+            results[i][1 + j] = static_cast<double>(*Counters::getInstance().readSharedEventSet() - cycles);
+
+            delete[] inputGroupBy;
+            delete []inputAggregate;
+
+            std::cout << "Completed" << std::endl;
+
+            std::cout << "Result vector length: " << result.size() << std::endl;
+        }
+    }
+
+    std::vector<std::string> headers(1 + static_cast<int>(groupByImplementations.size()));
+    headers [0] = "Input";
+    for (auto i = 0; i < static_cast<int>(groupByImplementations.size()); ++i) {
+        headers[1 + i] = getGroupByName(groupByImplementations[i]);
+    }
+
+    std::string fileName = fileNamePrefix + "_GroupBy_SingleCyclesBM_" + dataFile.getFileName();
+    std::string fullFilePath = FilePaths::getInstance().getGroupByCyclesFolderPath() + fileName + ".csv";
+    writeHeadersAndTableToCSV(headers, results, fullFilePath);
+}
+
+template <typename T1, typename T2>
 void tessilRobinMapInitialisationBenchmark(const std::string &fileNamePrefix) {
 
     int totalPoints = 100;

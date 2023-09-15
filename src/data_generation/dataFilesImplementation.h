@@ -73,6 +73,8 @@ void DataFile::loadDataIntoMemory(T *data) const {
         generateUniformDistributionInMemoryWithSetCardinalityClustered(data, getNumElements(), getNumElements(), 10*1000*1000, 1000);
     } else if (getFileName() == "Clustered1mDistribution250mValuesCardinality10mMax250m") {
         generateUniformDistributionInMemoryWithSetCardinalityClustered(data, getNumElements(), getNumElements(), 10*1000*1000, 10*1000*1000);
+    } else if (getFileName() == "uniformIntDistribution200mValuesCardinality26Max200m") {
+        generateUniformDistributionInMemoryWithSetCardinality(data, getNumElements(), getNumElements(), 26);
     }
 }
 
