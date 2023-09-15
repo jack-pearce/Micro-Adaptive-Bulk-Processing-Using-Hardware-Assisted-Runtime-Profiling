@@ -908,7 +908,7 @@ int main() {
                                             {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                             1, "1-NoClustering-40mValues");*/
 
-    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1mMax1m,
+    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesClusteredSweepFixedCardinality10mMax200m,
                                             {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                             1, "NewClusteringSweep");
 

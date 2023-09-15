@@ -480,10 +480,10 @@ DataSweep DataSweeps::logUniformIntDistribution20mValuesClusteredSweepFixedCardi
         "logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1m",
         ""};
 
-DataSweep DataSweeps::logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1mMax1m {
+DataSweep DataSweeps::logUniformIntDistribution200mValuesClusteredSweepFixedCardinality10mMax200m {
         30,
-        20*1000*1000,
-        "logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1mMax1m",
+        200*1000*1000,
+        "logUniformIntDistribution200mValuesClusteredSweepFixedCardinality10mMax200m",
         ""};
 
 DataSweep DataSweeps::linearUniqueIntDistribution250mValuesSortednessSweep {
@@ -557,7 +557,7 @@ DataSweep::DataSweep(int _totalRuns, int _numElements, std::string _sweepName, s
         generateLinearDistribution(getTotalRuns(), 0, 1, inputs);
     } else if (getSweepName() == "logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1m") {
         generateLogDistribution(getTotalRuns(), 1, 1000000, inputs);
-    } else if (getSweepName() == "logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1mMax1m") {
+    } else if (getSweepName() == "logUniformIntDistribution200mValuesClusteredSweepFixedCardinality10mMax200m") {
         generateLogDistribution(getTotalRuns(), 1, getNumElements(), inputs);
     } else if (getSweepName() == "linearUniqueIntDistribution250mValuesSortednessSweep") {
         generateLinearDistribution(getTotalRuns(), 0, 100, inputs);
@@ -599,8 +599,8 @@ int DataSweep::getCardinality() const {
         return 10*1000*1000;
     } else if (getSweepName() == "logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1m") {
         return 1*1000*1000;
-    } else if (getSweepName() == "logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1mMax1m") {
-        return 1*1000*1000;
+    } else if (getSweepName() == "logUniformIntDistribution200mValuesClusteredSweepFixedCardinality10mMax200m") {
+        return 10*1000*1000;
     } else {
         return -1;
     }
