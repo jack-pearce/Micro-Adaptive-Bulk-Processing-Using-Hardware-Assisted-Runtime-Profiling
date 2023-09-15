@@ -175,7 +175,6 @@ public:
     static DataSweep linearUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m;
 
     static DataSweep logUniformIntDistribution200mValuesMaxValueSweep;
-    static DataSweep logUniformIntDistribution200mValuesMaxValueSweepCardinality10m;
 
 };
 
