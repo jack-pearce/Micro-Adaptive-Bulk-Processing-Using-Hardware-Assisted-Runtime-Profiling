@@ -908,9 +908,13 @@ int main() {
                                             {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                             1, "1-NoClustering-40mValues");*/
 
-    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesClusteredSweepFixedCardinality10mMax200m,
+/*    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesClusteredSweepFixedCardinality10mMax200m,
                                             {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                            1, "NewClusteringSweep");
+                                            1, "NewClusteringSweep");*/
+
+    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesMaxValueSweep,
+                                            {GroupBy::Sort},
+                                            1, "Sort200mValuesMaxValueSweep");
 
     return 0;
 }

@@ -187,6 +187,9 @@ bool DataSweep::loadNextDataSetIntoMemory(T *data) {
     } else if (getSweepName() == "linearUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m") {
         generateUniformDistributionInMemoryWithSetCardinalityClustered(data, getNumElements(), getNumElements(), 10*1000*1000, inputs[runsCompleted++]);
         return true;
+    } else if (getSweepName() == "logUniformIntDistribution200mValuesMaxValueSweep") {
+        generateUniformDistributionInMemory(data, getNumElements(), inputs[runsCompleted++]);
+        return true;
     }
     return false;
 }

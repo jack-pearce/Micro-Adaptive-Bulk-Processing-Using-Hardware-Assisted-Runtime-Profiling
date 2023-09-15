@@ -504,6 +504,12 @@ DataSweep DataSweeps::linearUniformIntDistribution250mValuesClusteredSweepFixedC
         "linearUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m",
         ""};
 
+DataSweep DataSweeps::logUniformIntDistribution200mValuesMaxValueSweep {
+        30,
+        200*1000*1000,
+        "logUniformIntDistribution200mValuesMaxValueSweep",
+        ""};
+
 
 
 DataSweep::DataSweep(int _totalRuns, int _numElements, std::string _sweepName, std::string _longDescription)
@@ -565,6 +571,8 @@ DataSweep::DataSweep(int _totalRuns, int _numElements, std::string _sweepName, s
         generateLogDistribution(getTotalRuns(), 1, 10*1000*1000, inputs);
     } else if (getSweepName() == "linearUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m") {
         generateLinearDistribution(getTotalRuns(), 1, 10*1000*1000, inputs);
+    } else if (getSweepName() == "logUniformIntDistribution200mValuesMaxValueSweep") {
+        generateLogDistribution(getTotalRuns(), 1, getNumElements(), inputs);
     }
 }
 
