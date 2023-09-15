@@ -64,6 +64,10 @@ void generateUniformDistributionInMemoryWithSetCardinality(T *data, int n, int u
 template <typename T>
 void generateUniformDistributionInMemoryWithSetCardinalityClustered(T *data, int n, int upperBound,
                                                                     int cardinality, int spreadInCluster);
+
+template <typename T>
+void generateUniformDistributionInMemoryWithSetCardinalityClusteredAlternative(T *data, int n, int upperBound,
+                                                                               int cardinality, int spreadInCluster);
 template <typename T>
 void generateUniformDistributionInMemoryWithTwoCardinalitySections(T *data, int n, int upperBound,
                                                                    int cardinalitySectionOne, int cardinalitySectionTwo,

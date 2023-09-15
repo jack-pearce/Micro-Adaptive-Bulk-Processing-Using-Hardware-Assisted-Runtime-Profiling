@@ -445,34 +445,7 @@ void generateUniformDistributionInMemoryWithSetCardinality(T *data, int n, int u
 template <typename T>
 void generateUniformDistributionInMemoryWithSetCardinalityClustered(T *data, int n, int upperBound,
                                                                     int cardinality, int spreadInCluster) {
-    std::cout << "Generating data in memory... ";
-    std::cout.flush();
-
-    int duplicates = n / cardinality;
-    int index = 0;
-
-    for (int section = 0; section < cardinality; section++) {
-        for (int elemInSection = 0; elemInSection < duplicates; elemInSection++) {
-            data[index++] = section + 1;
-        }
-    }
-
-    while (index < n) {
-        data[index++] = cardinality;
-    }
-
-    runClusteringOnData(data, n, spreadInCluster);
-
-    if (upperBound != cardinality) {
-        for (int i = 0; i < n; i++) {
-            data[i] = scaleNumberLogarithmically(data[i], cardinality, upperBound);
-        }
-    }
-
-    std::cout << "Complete" << std::endl;
-
-    // Old clustering generator - to be removed, but kept until new version above is fully verified
-    /*    static_assert(std::is_integral<T>::value, "Must be an integer type");
+    static_assert(std::is_integral<T>::value, "Must be an integer type");
     assert(cardinality <= upperBound);
     if (spreadInCluster >= cardinality) {
         generateUniformDistributionInMemoryWithSetCardinality(data, n, upperBound ,cardinality);
@@ -509,7 +482,37 @@ void generateUniformDistributionInMemoryWithSetCardinalityClustered(T *data, int
                                                    cardinality, upperBound);
     }
 
-    std::cout << "Complete" << std::endl;*/
+    std::cout << "Complete" << std::endl;
+}
+
+template <typename T>
+void generateUniformDistributionInMemoryWithSetCardinalityClusteredAlternative(T *data, int n, int upperBound,
+                                                                               int cardinality, int spreadInCluster) {
+    std::cout << "Generating data in memory... ";
+    std::cout.flush();
+
+    int duplicates = n / cardinality;
+    int index = 0;
+
+    for (int section = 0; section < cardinality; section++) {
+        for (int elemInSection = 0; elemInSection < duplicates; elemInSection++) {
+            data[index++] = section + 1;
+        }
+    }
+
+    while (index < n) {
+        data[index++] = cardinality;
+    }
+
+    runClusteringOnData(data, n, spreadInCluster);
+
+    if (upperBound != cardinality) {
+        for (int i = 0; i < n; i++) {
+            data[i] = scaleNumberLogarithmically(data[i], cardinality, upperBound);
+        }
+    }
+
+    std::cout << "Complete" << std::endl;
 }
 
 template <typename T>
