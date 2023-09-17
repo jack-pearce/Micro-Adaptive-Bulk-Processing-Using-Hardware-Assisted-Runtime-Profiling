@@ -60,9 +60,11 @@ inline void groupByHashAux(int n, T1 *inputGroupBy, T2 *inputAggregate, tsl::rob
     for (; index < startingIndex + n; ++index) {
         it = map.find(inputGroupBy[index]);
         if (it != map.end()) {
-            it.value() = Aggregator<T2>()(it->second, inputAggregate[index], false);
+            it.value() += 1;
+//            it.value() = Aggregator<T2>()(it->second, inputAggregate[index], false);
         } else {
-            map.insert({inputGroupBy[index], Aggregator<T2>()(0, inputAggregate[index], true)});
+            map.insert({inputGroupBy[index], inputAggregate[index]});
+//            map.insert({inputGroupBy[index], Aggregator<T2>()(0, inputAggregate[index], true)});
         }
     }
 }
@@ -211,9 +213,11 @@ inline void groupByAdaptiveAuxHash(int n, T1 *inputGroupBy, T2 *inputAggregate, 
     for (; index < startingIndex + n; ++index) {
         it = map.find(inputGroupBy[index]);
         if (it != map.end()) {
-            it.value() = Aggregator<T2>()(it->second, inputAggregate[index], false);
+            it.value() += 1;
+//            it.value() = Aggregator<T2>()(it->second, inputAggregate[index], false);
         } else {
-            map.insert({inputGroupBy[index], Aggregator<T2>()(0, inputAggregate[index], true)});
+            map.insert({inputGroupBy[index], inputAggregate[index]});
+//            map.insert({inputGroupBy[index], Aggregator<T2>()(0, inputAggregate[index], true)});
             largest = std::max(largest, inputGroupBy[index]);
         }
     }
