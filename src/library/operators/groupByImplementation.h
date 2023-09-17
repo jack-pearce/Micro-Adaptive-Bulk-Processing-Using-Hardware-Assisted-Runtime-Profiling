@@ -22,7 +22,7 @@ constexpr int BITS_PER_GROUPBY_RADIX_PASS = 8;
 #endif
 
 template<typename T>
-T MinAggregation<T>::operator()(T currentAggregate, T numberToInclude, bool firstAggregation) const {
+inline T MinAggregation<T>::operator()(T currentAggregate, T numberToInclude, bool firstAggregation) const {
     if (firstAggregation) {
         return numberToInclude;
     }
@@ -30,7 +30,7 @@ T MinAggregation<T>::operator()(T currentAggregate, T numberToInclude, bool firs
 }
 
 template<typename T>
-T MaxAggregation<T>::operator()(T currentAggregate, T numberToInclude, bool firstAggregation) const {
+inline T MaxAggregation<T>::operator()(T currentAggregate, T numberToInclude, bool firstAggregation) const {
     if (firstAggregation) {
         return numberToInclude;
     }
@@ -38,7 +38,7 @@ T MaxAggregation<T>::operator()(T currentAggregate, T numberToInclude, bool firs
 }
 
 template<typename T>
-T SumAggregation<T>::operator()(T currentAggregate, T numberToInclude, bool firstAggregation) const {
+inline T SumAggregation<T>::operator()(T currentAggregate, T numberToInclude, bool firstAggregation) const {
     if (firstAggregation) {
         return numberToInclude;
     }
@@ -46,7 +46,7 @@ T SumAggregation<T>::operator()(T currentAggregate, T numberToInclude, bool firs
 }
 
 template<typename T>
-T CountAggregation<T>::operator()(T currentAggregate, T _, bool firstAggregation) const {
+inline T CountAggregation<T>::operator()(T currentAggregate, T _, bool firstAggregation) const {
     if (firstAggregation) {
         return 1;
     }
@@ -75,13 +75,13 @@ vectorOfPairs<T1, T2> groupByHash(int n, T1 *inputGroupBy, T2 *inputAggregate, i
     tsl::robin_map<T1, T2> map(std::max(static_cast<int>(2.5 * cardinality), 400000));
     int index = 0;
 
-//    int tuplesToProcess;
-//    while (index < n) {
-//        tuplesToProcess = std::min(75000, n - index);
-//        groupByHashAux<Aggregator>(tuplesToProcess, inputGroupBy, inputAggregate, map, index);
-//    }
+    int tuplesToProcess;
+    while (index < n) {
+        tuplesToProcess = std::min(75000, n - index);
+        groupByHashAux<Aggregator>(tuplesToProcess, inputGroupBy, inputAggregate, map, index);
+    }
 
-    groupByHashAux<Aggregator>(n, inputGroupBy, inputAggregate, map, index);
+//    groupByHashAux<Aggregator>(n, inputGroupBy, inputAggregate, map, index);
 
     return {map.begin(), map.end()};
 }

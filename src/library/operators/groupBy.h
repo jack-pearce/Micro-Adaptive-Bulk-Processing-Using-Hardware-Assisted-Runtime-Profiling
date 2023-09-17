@@ -22,22 +22,22 @@ std::string getGroupByName(GroupBy groupByImplementation);
 
 template<typename T>
 struct MinAggregation {
-    T operator()(T currentAggregate, T numberToInclude, bool firstAggregation) const;
+    inline T operator()(T currentAggregate, T numberToInclude, bool firstAggregation) const;
 };
 
 template<typename T>
 struct MaxAggregation {
-    T operator()(T currentAggregate, T numberToInclude, bool firstAggregation) const;
+    inline T operator()(T currentAggregate, T numberToInclude, bool firstAggregation) const;
 };
 
 template<typename T>
 struct SumAggregation {
-    T operator()(T currentAggregate, T numberToInclude, bool firstAggregation) const;
+    inline T operator()(T currentAggregate, T numberToInclude, bool firstAggregation) const;
 };
 
 template<typename T>
 struct CountAggregation {
-    T operator()(T currentAggregate, T _, bool firstAggregation) const;
+    inline T operator()(T currentAggregate, T _, bool firstAggregation) const;
 };
 
 
