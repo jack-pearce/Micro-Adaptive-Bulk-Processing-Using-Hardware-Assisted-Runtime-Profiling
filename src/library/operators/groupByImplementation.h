@@ -218,7 +218,7 @@ inline void groupByAdaptiveAuxHash(int n, T1 *inputGroupBy, T2 *inputAggregate, 
         } else {
             map.insert({inputGroupBy[index], inputAggregate[index]});
 //            map.insert({inputGroupBy[index], Aggregator<T2>()(0, inputAggregate[index], true)});
-            largest = std::max(largest, inputGroupBy[index]);
+//            largest = std::max(largest, inputGroupBy[index]);
         }
     }
 }
@@ -330,12 +330,12 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
     tsl::robin_map<T1, T2> map(initialSize);
     typename tsl::robin_map<T1, T2>::iterator it;
 
-    std::vector<std::string> counters = {"PERF_COUNT_HW_CACHE_MISSES"};
-    long_long *counterValues = Counters::getInstance().getSharedEventSetEvents(counters);
-
-    std::string machineConstantName = "GroupBy_" + std::to_string(sizeof(T1)) + "B_inputFilter_" +
-            std::to_string(sizeof(T2)) + "B_inputAggregate_1_dop";
-    float tuplesPerLastLevelCacheMissThreshold = MachineConstants::getInstance().getMachineConstant(machineConstantName);
+//    std::vector<std::string> counters = {"PERF_COUNT_HW_CACHE_MISSES"};
+//    long_long *counterValues = Counters::getInstance().getSharedEventSetEvents(counters);
+//
+//    std::string machineConstantName = "GroupBy_" + std::to_string(sizeof(T1)) + "B_inputFilter_" +
+//            std::to_string(sizeof(T2)) + "B_inputAggregate_1_dop";
+//    float tuplesPerLastLevelCacheMissThreshold = MachineConstants::getInstance().getMachineConstant(machineConstantName);
 
     int index = 0;
     int tuplesToProcess;
@@ -350,21 +350,23 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
 
         tuplesToProcess = std::min(tuplesPerChunk, n - index);
 
-        Counters::getInstance().readSharedEventSet();
+//        Counters::getInstance().readSharedEventSet();
 
         groupByAdaptiveAuxHash<Aggregator>(tuplesToProcess, inputGroupBy, inputAggregate, map, index, mapLargest);
 
-        Counters::getInstance().readSharedEventSet();
+//        Counters::getInstance().readSharedEventSet();
 
-        if ((static_cast<float>(tuplesToProcess) / counterValues[0]) < tuplesPerLastLevelCacheMissThreshold) {
+/*        if ((static_cast<float>(tuplesToProcess) / counterValues[0]) < tuplesPerLastLevelCacheMissThreshold) {
 //            std::cout << "Switched to sort at index " << index << std::endl;
             tuplesToProcess = std::min(tuplesBetweenHashing, n - index);
 
             sectionsToBeSorted.emplace_back(index, index + tuplesToProcess);
             index += tuplesToProcess;
             elements += tuplesToProcess;
-        }
+        }*/
     }
+
+    return {map.begin(), map.end()};
 
     if (sectionsToBeSorted.empty()) {
         return {map.begin(), map.end()};
