@@ -330,12 +330,12 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
     tsl::robin_map<T1, T2> map(initialSize);
     typename tsl::robin_map<T1, T2>::iterator it;
 
-//    std::vector<std::string> counters = {"PERF_COUNT_HW_CACHE_MISSES"};
-//    long_long *counterValues = Counters::getInstance().getSharedEventSetEvents(counters);
-//
-//    std::string machineConstantName = "GroupBy_" + std::to_string(sizeof(T1)) + "B_inputFilter_" +
-//            std::to_string(sizeof(T2)) + "B_inputAggregate_1_dop";
-//    float tuplesPerLastLevelCacheMissThreshold = MachineConstants::getInstance().getMachineConstant(machineConstantName);
+    std::vector<std::string> counters = {"PERF_COUNT_HW_CACHE_MISSES"};
+    long_long *counterValues = Counters::getInstance().getSharedEventSetEvents(counters);
+
+    std::string machineConstantName = "GroupBy_" + std::to_string(sizeof(T1)) + "B_inputFilter_" +
+            std::to_string(sizeof(T2)) + "B_inputAggregate_1_dop";
+    float tuplesPerLastLevelCacheMissThreshold = MachineConstants::getInstance().getMachineConstant(machineConstantName);
 
     int index = 0;
     int tuplesToProcess;
@@ -366,11 +366,10 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
         }*/
     }
 
-    return {map.begin(), map.end()};
-
     if (sectionsToBeSorted.empty()) {
         return {map.begin(), map.end()};
     }
+    std::cout << "Here" << std::endl;
     elements += map.size();
     return groupByAdaptiveAuxSort<Aggregator>(elements, inputGroupBy, inputAggregate, sectionsToBeSorted,
                                               map, mapLargest, result);
