@@ -388,10 +388,10 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
 
         Counters::getInstance().readSharedEventSet();
 
-//        std::cout << counterValues[0] << std::endl;
+        std::cout << counterValues[0] << std::endl;
 
-        performGroupByAdaption(counterValues, tuplesToProcess, tuplesPerLastLevelCacheMissThreshold,
-                               sectionsToBeSorted, index, elements, n, tuplesBetweenHashing);
+//        performGroupByAdaption(counterValues, tuplesToProcess, tuplesPerLastLevelCacheMissThreshold,
+//                               sectionsToBeSorted, index, elements, n, tuplesBetweenHashing);
 
 /*        if ((static_cast<float>(tuplesToProcess) / counterValues[0]) < tuplesPerLastLevelCacheMissThreshold) {
 //            std::cout << "Switched to sort at index " << index << std::endl;
