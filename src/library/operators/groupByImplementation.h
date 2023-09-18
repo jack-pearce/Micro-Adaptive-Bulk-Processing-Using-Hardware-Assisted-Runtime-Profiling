@@ -331,6 +331,22 @@ vectorOfPairs<T1, T2> groupByAdaptiveAuxSort(int n, T1 *inputGroupBy, T2 *inputA
     return result;
 }
 
+inline void performGroupByAdaption(const long_long *counterValues, int &tuplesToProcess,
+                                   float tuplesPerLastLevelCacheMissThreshold,
+                                   vectorOfPairs<int, int> &sectionsToBeSorted, int &index, int &elements,
+                                   int n, int tuplesBetweenHashing) {
+
+    if (__builtin_expect((static_cast<float>(tuplesToProcess) / counterValues[0]) <
+                                 tuplesPerLastLevelCacheMissThreshold, false)) {
+//            std::cout << "Switched to sort at index " << index << std::endl;
+        tuplesToProcess = std::min(tuplesBetweenHashing, n - index);
+
+        sectionsToBeSorted.emplace_back(index, index + tuplesToProcess);
+        index += tuplesToProcess;
+        elements += tuplesToProcess;
+    }
+}
+
 template<template<typename> class Aggregator, typename T1, typename T2>
 vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregate, int cardinality) {
     static_assert(std::is_integral<T1>::value, "GroupBy column must be an integer type");
@@ -374,14 +390,17 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
 
 //        std::cout << counterValues[0] << std::endl;
 
-        if ((static_cast<float>(tuplesToProcess) / counterValues[0]) < tuplesPerLastLevelCacheMissThreshold) {
+        performGroupByAdaption(counterValues, tuplesToProcess, tuplesPerLastLevelCacheMissThreshold,
+                               sectionsToBeSorted, index, elements, n, tuplesBetweenHashing);
+
+/*        if ((static_cast<float>(tuplesToProcess) / counterValues[0]) < tuplesPerLastLevelCacheMissThreshold) {
 //            std::cout << "Switched to sort at index " << index << std::endl;
             tuplesToProcess = std::min(tuplesBetweenHashing, n - index);
 
             sectionsToBeSorted.emplace_back(index, index + tuplesToProcess);
             index += tuplesToProcess;
             elements += tuplesToProcess;
-        }
+        }*/
     }
 
 //    return {map.begin(), map.end()};
