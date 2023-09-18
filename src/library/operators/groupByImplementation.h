@@ -405,6 +405,7 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
             tuplesToProcess = std::min(tuplesBetweenHashing, n - index);
 
 //            sectionsToBeSorted.emplace_back(index, index + tuplesToProcess);
+            std::cout << index << ", " << index + tuplesToProcess << std::endl;
             index += tuplesToProcess;
             elements += tuplesToProcess;
         }
