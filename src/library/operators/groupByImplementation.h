@@ -72,7 +72,8 @@ vectorOfPairs<T1, T2> groupByHash(int n, T1 *inputGroupBy, T2 *inputAggregate, i
     static_assert(std::is_integral<T1>::value, "GroupBy column must be an integer type");
     static_assert(std::is_arithmetic<T2>::value, "Payload column must be an numeric type");
 
-    tsl::robin_map<T1, T2> map(std::max(static_cast<int>(2.5 * cardinality), 400000));
+//    tsl::robin_map<T1, T2> map(std::max(static_cast<int>(2.5 * cardinality), 400000));
+    tsl::robin_map<T1, T2> map(std::max(static_cast<int>(2.5 * cardinality), 0));
     int index = 0;
 
     int tuplesToProcess;
@@ -321,7 +322,8 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
 
     constexpr int tuplesPerChunk = 75 * 1000;
     constexpr int tuplesBetweenHashing = 2*1000*1000;
-    int initialSize = std::max(static_cast<int>(2.5 * cardinality), 400000);
+//    int initialSize = std::max(static_cast<int>(2.5 * cardinality), 400000);
+    int initialSize = std::max(static_cast<int>(2.5 * cardinality), 0);
 
     tsl::robin_map<T1, T2> map(initialSize);
     typename tsl::robin_map<T1, T2>::iterator it;
@@ -352,27 +354,22 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
 
         Counters::getInstance().readSharedEventSet();
 
-        std::cout << counterValues[0] << std::endl;
-
-/*        if ((static_cast<float>(tuplesToProcess) / counterValues[0]) < tuplesPerLastLevelCacheMissThreshold) {
+        if ((static_cast<float>(tuplesToProcess) / counterValues[0]) < tuplesPerLastLevelCacheMissThreshold) {
 //            std::cout << "Switched to sort at index " << index << std::endl;
             tuplesToProcess = std::min(tuplesBetweenHashing, n - index);
 
             sectionsToBeSorted.emplace_back(index, index + tuplesToProcess);
             index += tuplesToProcess;
             elements += tuplesToProcess;
-        }*/
+        }
     }
 
-    return {map.begin(), map.end()};
-
-/*    if (sectionsToBeSorted.empty()) {
+    if (sectionsToBeSorted.empty()) {
         return {map.begin(), map.end()};
     }
-    std::cout << "Here" << std::endl;
     elements += map.size();
     return groupByAdaptiveAuxSort<Aggregator>(elements, inputGroupBy, inputAggregate, sectionsToBeSorted,
-                                              map, mapLargest, result);*/
+                                              map, mapLargest, result);
 }
 
 template<typename T1, typename T2>
