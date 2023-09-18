@@ -73,7 +73,7 @@ vectorOfPairs<T1, T2> groupByHash(int n, T1 *inputGroupBy, T2 *inputAggregate, i
     static_assert(std::is_arithmetic<T2>::value, "Payload column must be an numeric type");
 
 //    tsl::robin_map<T1, T2> map(std::max(static_cast<int>(2.5 * cardinality), 400000));
-    tsl::robin_map<T1, T2> map(std::max(static_cast<int>(2.5 * cardinality), 0));
+    tsl::robin_map<T1, T2> map(static_cast<int>(2.5 * cardinality));
     int index = 0;
 
     int tuplesToProcess;
