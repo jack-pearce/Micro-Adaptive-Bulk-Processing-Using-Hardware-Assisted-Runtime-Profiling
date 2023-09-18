@@ -99,6 +99,7 @@ public:
     static const DataFile Clustered1mDistribution250mValuesCardinality10mMax250m;
 
     static const DataFile uniformIntDistribution200mValuesCardinality26Max200m;
+    static const DataFile uniformIntDistribution20mValuesCardinality26Max20m;
 };
 
 class DataSweep {

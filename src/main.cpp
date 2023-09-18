@@ -919,10 +919,10 @@ int main() {
 #ifdef __AVX2__
     constexpr int iterations = 5;
 #else
-    constexpr int iterations = 2;
+    constexpr int iterations = 4;
 #endif
 
-    groupByBenchmarkSingleRun<int,int>(DataFiles::uniformIntDistribution200mValuesCardinality26Max200m,
+    groupByBenchmarkSingleRun<int,int>(DataFiles::uniformIntDistribution20mValuesCardinality26Max20m,
                                        26, {GroupBy::Hash, GroupBy::Adaptive}, iterations, "OverheadTest");
 
     return 0;
