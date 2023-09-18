@@ -65,7 +65,11 @@ inline void performGroupByAdaption(const long_long *counterValues, int &tuplesTo
 //            std::cout << "Switched to sort at index " << index << std::endl;
         tuplesToProcess = std::min(tuplesBetweenHashing, n - index);
 
-        sectionsToBeSorted.emplace_back(index, index + tuplesToProcess);
+//        sectionsToBeSorted.emplace_back(index, index + tuplesToProcess);
+
+        std::pair<int, int> sectionToSort(index, index + tuplesToProcess);
+        sectionsToBeSorted.push_back(sectionToSort);
+
         index += tuplesToProcess;
         elements += tuplesToProcess;
     }
