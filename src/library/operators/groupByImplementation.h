@@ -323,7 +323,7 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
     constexpr int tuplesPerChunk = 75 * 1000;
     constexpr int tuplesBetweenHashing = 2*1000*1000;
 //    int initialSize = std::max(static_cast<int>(2.5 * cardinality), 400000);
-    int initialSize = std::max(static_cast<int>(2.5 * cardinality), 0);
+    int initialSize = static_cast<int>(2.5 * cardinality);
 
     tsl::robin_map<T1, T2> map(initialSize);
     typename tsl::robin_map<T1, T2>::iterator it;
@@ -346,8 +346,7 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
 
     while (index < n) {
 
-//        tuplesToProcess = std::min(tuplesPerChunk, n - index);
-        tuplesToProcess = n;
+        tuplesToProcess = std::min(tuplesPerChunk, n - index);
 
 //        Counters::getInstance().readSharedEventSet();
 
