@@ -917,7 +917,7 @@ int main() {
                                             1, "Sort200mValuesMaxValueSweep");*/
 
     groupByBenchmarkSingleRun<int,int>(DataFiles::uniformIntDistribution200mValuesCardinality26Max200m,
-                                       26, {GroupBy::Hash, GroupBy::Adaptive}, 5, "OverheadTest");
+                                       26, {GroupBy::Hash, GroupBy::Adaptive}, 2, "OverheadTest");
 
     return 0;
 }
