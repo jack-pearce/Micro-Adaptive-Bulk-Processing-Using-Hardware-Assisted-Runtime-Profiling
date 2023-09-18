@@ -60,14 +60,14 @@ inline void performGroupByAdaption(const long_long *counterValues, int &tuplesTo
 
     if (__builtin_expect((static_cast<float>(tuplesToProcess) / counterValues[0]) <
                          tuplesPerLastLevelCacheMissThreshold, false)) {
-        std::cout << counterValues[0] << std::endl;
+//        std::cout << counterValues[0] << std::endl;
 
 //            std::cout << "Switched to sort at index " << index << std::endl;
-/*        tuplesToProcess = std::min(tuplesBetweenHashing, n - index);
+//        tuplesToProcess = std::min(tuplesBetweenHashing, n - index);
 
-        sectionsToBeSorted.emplace_back(index, index + tuplesToProcess);
+//        sectionsToBeSorted.emplace_back(index, index + tuplesToProcess);
         index += tuplesToProcess;
-        elements += tuplesToProcess;*/
+        elements += tuplesToProcess;
     }
 }
 
