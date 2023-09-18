@@ -916,8 +916,14 @@ int main() {
                                             {GroupBy::Sort},
                                             1, "Sort200mValuesMaxValueSweep");*/
 
+#ifdef __AVX2__
+    constexpr int iterations = 5;
+#else
+    constexpr int iterations = 2;
+#endif
+
     groupByBenchmarkSingleRun<int,int>(DataFiles::uniformIntDistribution200mValuesCardinality26Max200m,
-                                       26, {GroupBy::Hash, GroupBy::Adaptive}, 2, "OverheadTest");
+                                       26, {GroupBy::Hash, GroupBy::Adaptive}, iterations, "OverheadTest");
 
     return 0;
 }

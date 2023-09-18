@@ -76,13 +76,13 @@ vectorOfPairs<T1, T2> groupByHash(int n, T1 *inputGroupBy, T2 *inputAggregate, i
     tsl::robin_map<T1, T2> map(static_cast<int>(2.5 * cardinality));
     int index = 0;
 
-    int tuplesToProcess;
-    while (index < n) {
-        tuplesToProcess = std::min(75000, n - index);
-        groupByHashAux<Aggregator>(tuplesToProcess, inputGroupBy, inputAggregate, map, index);
-    }
+//    int tuplesToProcess;
+//    while (index < n) {
+//        tuplesToProcess = std::min(75000, n - index);
+//        groupByHashAux<Aggregator>(tuplesToProcess, inputGroupBy, inputAggregate, map, index);
+//    }
 
-//    groupByHashAux<Aggregator>(n, inputGroupBy, inputAggregate, map, index);
+    groupByHashAux<Aggregator>(n, inputGroupBy, inputAggregate, map, index);
 
     return {map.begin(), map.end()};
 }
@@ -346,7 +346,8 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
 
     while (index < n) {
 
-        tuplesToProcess = std::min(tuplesPerChunk, n - index);
+//        tuplesToProcess = std::min(tuplesPerChunk, n - index);
+        tuplesToProcess = n;
 
 //        Counters::getInstance().readSharedEventSet();
 
