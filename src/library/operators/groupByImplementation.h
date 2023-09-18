@@ -364,31 +364,31 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
 
         tuplesToProcess = std::min(tuplesPerChunk, n - index);
 
-//        Counters::getInstance().readSharedEventSet();
+        Counters::getInstance().readSharedEventSet();
 
 //        groupByAdaptiveAuxHash<Aggregator>(tuplesToProcess, inputGroupBy, inputAggregate, map, index, mapLargest);
         groupByHashAux<Aggregator>(tuplesToProcess, inputGroupBy, inputAggregate, map, index);
 
-//        Counters::getInstance().readSharedEventSet();
+        Counters::getInstance().readSharedEventSet();
 
-/*        if ((static_cast<float>(tuplesToProcess) / counterValues[0]) < tuplesPerLastLevelCacheMissThreshold) {
+        if ((static_cast<float>(tuplesToProcess) / counterValues[0]) < tuplesPerLastLevelCacheMissThreshold) {
 //            std::cout << "Switched to sort at index " << index << std::endl;
             tuplesToProcess = std::min(tuplesBetweenHashing, n - index);
 
             sectionsToBeSorted.emplace_back(index, index + tuplesToProcess);
             index += tuplesToProcess;
             elements += tuplesToProcess;
-        }*/
+        }
     }
 
-    return {map.begin(), map.end()};
+//    return {map.begin(), map.end()};
 
-/*    if (sectionsToBeSorted.empty()) {
+    if (sectionsToBeSorted.empty()) {
         return {map.begin(), map.end()};
     }
     elements += map.size();
     return groupByAdaptiveAuxSort<Aggregator>(elements, inputGroupBy, inputAggregate, sectionsToBeSorted,
-                                              map, mapLargest, result);*/
+                                              map, mapLargest, result);
 }
 
 template<typename T1, typename T2>
