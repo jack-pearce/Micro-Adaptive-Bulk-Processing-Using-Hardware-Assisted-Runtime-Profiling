@@ -378,8 +378,10 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
     int tuplesToProcess;
 
     vectorOfPairs<int, int> sectionsToBeSorted;
-    sectionsToBeSorted.reserve(n / tuplesPerChunk);
     int elements = 0;
+
+    std::vector<int> sectionsToBeSortedStart;
+    std::vector<int> sectionsToBeSortedEnd;
 
     vectorOfPairs<T1, T2> result;
     T1 mapLargest = std::numeric_limits<T1>::lowest();
@@ -405,7 +407,9 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
             tuplesToProcess = std::min(tuplesBetweenHashing, n - index);
 
 //            sectionsToBeSorted.emplace_back(index, index + tuplesToProcess);
-            std::cout << index << ", " << index + tuplesToProcess << std::endl;
+            sectionsToBeSortedStart.push_back(index);
+            sectionsToBeSortedEnd.push_back(index + tuplesToProcess);
+
             index += tuplesToProcess;
             elements += tuplesToProcess;
         }
