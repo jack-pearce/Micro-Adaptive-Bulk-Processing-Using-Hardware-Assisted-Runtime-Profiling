@@ -350,7 +350,8 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
 
 //        Counters::getInstance().readSharedEventSet();
 
-        groupByAdaptiveAuxHash<Aggregator>(tuplesToProcess, inputGroupBy, inputAggregate, map, index, mapLargest);
+//        groupByAdaptiveAuxHash<Aggregator>(tuplesToProcess, inputGroupBy, inputAggregate, map, index, mapLargest);
+        groupByAdaptiveAuxHash<Aggregator>(tuplesToProcess, inputGroupBy, inputAggregate, map, index);
 
 //        Counters::getInstance().readSharedEventSet();
 
@@ -364,12 +365,14 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
         }*/
     }
 
-    if (sectionsToBeSorted.empty()) {
+    return {map.begin(), map.end()};
+
+/*    if (sectionsToBeSorted.empty()) {
         return {map.begin(), map.end()};
     }
     elements += map.size();
     return groupByAdaptiveAuxSort<Aggregator>(elements, inputGroupBy, inputAggregate, sectionsToBeSorted,
-                                              map, mapLargest, result);
+                                              map, mapLargest, result);*/
 }
 
 template<typename T1, typename T2>
