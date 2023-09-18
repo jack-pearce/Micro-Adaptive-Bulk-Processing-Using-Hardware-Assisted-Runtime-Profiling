@@ -336,7 +336,7 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
     static_assert(std::is_integral<T1>::value, "GroupBy column must be an integer type");
     static_assert(std::is_arithmetic<T2>::value, "Payload column must be an numeric type");
 
-    constexpr int tuplesPerChunk = 75 * 1000;
+    constexpr int tuplesPerChunk = 750 * 1000;
     constexpr int tuplesBetweenHashing = 2*1000*1000;
 //    int initialSize = std::max(static_cast<int>(2.5 * cardinality), 400000);
     int initialSize = static_cast<int>(2.5 * cardinality);
