@@ -367,8 +367,8 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
 
         Counters::getInstance().readSharedEventSet();
 
-//        groupByAdaptiveAuxHash<Aggregator>(tuplesToProcess, inputGroupBy, inputAggregate, map, index, mapLargest);
-        groupByHashAux<Aggregator>(tuplesToProcess, inputGroupBy, inputAggregate, map, index);
+        groupByAdaptiveAuxHash<Aggregator>(tuplesToProcess, inputGroupBy, inputAggregate, map, index, mapLargest);
+//        groupByHashAux<Aggregator>(tuplesToProcess, inputGroupBy, inputAggregate, map, index);
 
         Counters::getInstance().readSharedEventSet();
 
