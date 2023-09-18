@@ -53,6 +53,22 @@ inline T CountAggregation<T>::operator()(T currentAggregate, T _, bool firstAggr
     return ++currentAggregate;
 }
 
+inline void performGroupByAdaption(const long_long *counterValues, int &tuplesToProcess,
+                                   float tuplesPerLastLevelCacheMissThreshold,
+                                   vectorOfPairs<int, int> &sectionsToBeSorted, int &index, int &elements,
+                                   int n, int tuplesBetweenHashing) {
+
+    if (__builtin_expect((static_cast<float>(tuplesToProcess) / counterValues[0]) <
+                         tuplesPerLastLevelCacheMissThreshold, false)) {
+//            std::cout << "Switched to sort at index " << index << std::endl;
+        tuplesToProcess = std::min(tuplesBetweenHashing, n - index);
+
+        sectionsToBeSorted.emplace_back(index, index + tuplesToProcess);
+        index += tuplesToProcess;
+        elements += tuplesToProcess;
+    }
+}
+
 template<template<typename> class Aggregator, typename T1, typename T2>
 inline void groupByAdaptiveAuxHash(int n, T1 *inputGroupBy, T2 *inputAggregate, tsl::robin_map<T1, T2> &map,
                                    int &index, T1 &largest) {
@@ -329,22 +345,6 @@ vectorOfPairs<T1, T2> groupByAdaptiveAuxSort(int n, T1 *inputGroupBy, T2 *inputA
     delete[]bufferAggregate;
 
     return result;
-}
-
-inline void performGroupByAdaption(const long_long *counterValues, int &tuplesToProcess,
-                                   float tuplesPerLastLevelCacheMissThreshold,
-                                   vectorOfPairs<int, int> &sectionsToBeSorted, int &index, int &elements,
-                                   int n, int tuplesBetweenHashing) {
-
-    if (__builtin_expect((static_cast<float>(tuplesToProcess) / counterValues[0]) <
-                                 tuplesPerLastLevelCacheMissThreshold, false)) {
-//            std::cout << "Switched to sort at index " << index << std::endl;
-        tuplesToProcess = std::min(tuplesBetweenHashing, n - index);
-
-        sectionsToBeSorted.emplace_back(index, index + tuplesToProcess);
-        index += tuplesToProcess;
-        elements += tuplesToProcess;
-    }
 }
 
 template<template<typename> class Aggregator, typename T1, typename T2>
