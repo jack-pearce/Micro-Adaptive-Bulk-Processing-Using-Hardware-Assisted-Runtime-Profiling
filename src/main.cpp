@@ -892,9 +892,9 @@ int main() {
 
 
 
-/*    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
                                             {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                            1, "1-NoClustering-200mValues");*/
+                                            1, "1-NoClustering-200mValues");
 
 /*    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1m,
                                             {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
@@ -908,15 +908,15 @@ int main() {
                                             {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                             1, "1-NoClustering-40mValues");*/
 
-/*    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesClusteredSweepFixedCardinality10mMax200m,
+    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesClusteredSweepFixedCardinality10mMax200m,
                                             {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                            1, "ClusteringSweep");*/
+                                            1, "ClusteringSweep");
 
 /*    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesMaxValueSweep,
                                             {GroupBy::Sort},
                                             1, "Sort200mValuesMaxValueSweep");*/
 
-#ifdef __AVX2__
+/*#ifdef __AVX2__
     constexpr int iterations = 5;
 #else
     constexpr int iterations = 4;
@@ -925,5 +925,5 @@ int main() {
     groupByBenchmarkSingleRun<int,int>(DataFiles::uniformIntDistribution20mValuesCardinality26Max20m,
                                        26, {GroupBy::Hash, GroupBy::Adaptive}, iterations, "OverheadTest");
 
-    return 0;
+    return 0;*/
 }

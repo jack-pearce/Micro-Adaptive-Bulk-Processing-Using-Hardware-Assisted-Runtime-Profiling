@@ -400,7 +400,7 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
 //                               sectionsToBeSorted, index, elements, n, tuplesBetweenHashing);
 
         if ((static_cast<float>(tuplesToProcess) / counterValues[0]) < tuplesPerLastLevelCacheMissThreshold) {
-//            std::cout << "Switched to sort at index " << index << std::endl;
+            std::cout << "Switched to sort at index " << index << std::endl;
             tuplesToProcess = std::min(tuplesBetweenHashing, n - index);
 
 //            sectionsToBeSorted.emplace_back(index, index + tuplesToProcess);
