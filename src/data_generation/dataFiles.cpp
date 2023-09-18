@@ -243,7 +243,7 @@ const DataFile DataFiles::Clustered1mDistribution250mValuesCardinality10mMax250m
         ""};
 
 const DataFile DataFiles::uniformIntDistribution200mValuesCardinality26Max200m{
-        200 * 1000 * 1000,
+        20 * 1000 * 1000,
         "uniformIntDistribution200mValuesCardinality26Max200m",
         ""};
 
