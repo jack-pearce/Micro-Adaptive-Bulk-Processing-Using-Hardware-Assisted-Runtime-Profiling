@@ -60,11 +60,9 @@ inline void groupByHashAux(int n, T1 *inputGroupBy, T2 *inputAggregate, tsl::rob
     for (; index < startingIndex + n; ++index) {
         it = map.find(inputGroupBy[index]);
         if (it != map.end()) {
-            it.value() += 1;
-//            it.value() = Aggregator<T2>()(it->second, inputAggregate[index], false);
+            it.value() = Aggregator<T2>()(it->second, inputAggregate[index], false);
         } else {
-            map.insert({inputGroupBy[index], inputAggregate[index]});
-//            map.insert({inputGroupBy[index], Aggregator<T2>()(0, inputAggregate[index], true)});
+            map.insert({inputGroupBy[index], Aggregator<T2>()(0, inputAggregate[index], true)});
         }
     }
 }
@@ -213,12 +211,10 @@ inline void groupByAdaptiveAuxHash(int n, T1 *inputGroupBy, T2 *inputAggregate, 
     for (; index < startingIndex + n; ++index) {
         it = map.find(inputGroupBy[index]);
         if (it != map.end()) {
-            it.value() += 1;
-//            it.value() = Aggregator<T2>()(it->second, inputAggregate[index], false);
+            it.value() = Aggregator<T2>()(it->second, inputAggregate[index], false);
         } else {
-            map.insert({inputGroupBy[index], inputAggregate[index]});
-//            map.insert({inputGroupBy[index], Aggregator<T2>()(0, inputAggregate[index], true)});
-//            largest = std::max(largest, inputGroupBy[index]);
+            map.insert({inputGroupBy[index], Aggregator<T2>()(0, inputAggregate[index], true)});
+            largest = std::max(largest, inputGroupBy[index]);
         }
     }
 }
@@ -356,6 +352,8 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
 
         Counters::getInstance().readSharedEventSet();
 
+        std::cout << counterValues[0] << std::endl;
+
 /*        if ((static_cast<float>(tuplesToProcess) / counterValues[0]) < tuplesPerLastLevelCacheMissThreshold) {
 //            std::cout << "Switched to sort at index " << index << std::endl;
             tuplesToProcess = std::min(tuplesBetweenHashing, n - index);
@@ -368,13 +366,13 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
 
     return {map.begin(), map.end()};
 
-    if (sectionsToBeSorted.empty()) {
+/*    if (sectionsToBeSorted.empty()) {
         return {map.begin(), map.end()};
     }
     std::cout << "Here" << std::endl;
     elements += map.size();
     return groupByAdaptiveAuxSort<Aggregator>(elements, inputGroupBy, inputAggregate, sectionsToBeSorted,
-                                              map, mapLargest, result);
+                                              map, mapLargest, result);*/
 }
 
 template<typename T1, typename T2>
