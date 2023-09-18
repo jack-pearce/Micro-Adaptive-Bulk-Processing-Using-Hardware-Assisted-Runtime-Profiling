@@ -58,7 +58,9 @@ inline void performGroupByAdaption(const long_long *counterValues, int &tuplesTo
                                    vectorOfPairs<int, int> &sectionsToBeSorted, int &index, int &elements,
                                    int n, int tuplesBetweenHashing) {
 
-    if (__builtin_expect((static_cast<float>(tuplesToProcess) / counterValues[0]) <
+    std::cout << counterValues[0] << std::endl;
+
+/*    if (__builtin_expect((static_cast<float>(tuplesToProcess) / counterValues[0]) <
                          tuplesPerLastLevelCacheMissThreshold, false)) {
 //            std::cout << "Switched to sort at index " << index << std::endl;
         tuplesToProcess = std::min(tuplesBetweenHashing, n - index);
@@ -66,7 +68,7 @@ inline void performGroupByAdaption(const long_long *counterValues, int &tuplesTo
         sectionsToBeSorted.emplace_back(index, index + tuplesToProcess);
         index += tuplesToProcess;
         elements += tuplesToProcess;
-    }
+    }*/
 }
 
 template<template<typename> class Aggregator, typename T1, typename T2>
@@ -388,10 +390,10 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
 
         Counters::getInstance().readSharedEventSet();
 
-        std::cout << counterValues[0] << std::endl;
+//        std::cout << counterValues[0] << std::endl;
 
-//        performGroupByAdaption(counterValues, tuplesToProcess, tuplesPerLastLevelCacheMissThreshold,
-//                               sectionsToBeSorted, index, elements, n, tuplesBetweenHashing);
+        performGroupByAdaption(counterValues, tuplesToProcess, tuplesPerLastLevelCacheMissThreshold,
+                               sectionsToBeSorted, index, elements, n, tuplesBetweenHashing);
 
 /*        if ((static_cast<float>(tuplesToProcess) / counterValues[0]) < tuplesPerLastLevelCacheMissThreshold) {
 //            std::cout << "Switched to sort at index " << index << std::endl;
