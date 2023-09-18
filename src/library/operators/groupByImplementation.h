@@ -378,6 +378,7 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
     int tuplesToProcess;
 
     vectorOfPairs<int, int> sectionsToBeSorted;
+    sectionsToBeSorted.reserve(n / tuplesPerChunk);
     int elements = 0;
 
     vectorOfPairs<T1, T2> result;
