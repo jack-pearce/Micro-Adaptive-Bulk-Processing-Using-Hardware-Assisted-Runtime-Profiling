@@ -397,17 +397,17 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
 
 //        std::cout << counterValues[0] << std::endl;
 
-        performGroupByAdaption(counterValues, tuplesToProcess, tuplesPerLastLevelCacheMissThreshold,
-                               sectionsToBeSorted, index, elements, n, tuplesBetweenHashing);
+//        performGroupByAdaption(counterValues, tuplesToProcess, tuplesPerLastLevelCacheMissThreshold,
+//                               sectionsToBeSorted, index, elements, n, tuplesBetweenHashing);
 
-/*        if ((static_cast<float>(tuplesToProcess) / counterValues[0]) < tuplesPerLastLevelCacheMissThreshold) {
+        if ((static_cast<float>(tuplesToProcess) / counterValues[0]) < tuplesPerLastLevelCacheMissThreshold) {
 //            std::cout << "Switched to sort at index " << index << std::endl;
             tuplesToProcess = std::min(tuplesBetweenHashing, n - index);
 
-            sectionsToBeSorted.emplace_back(index, index + tuplesToProcess);
+//            sectionsToBeSorted.emplace_back(index, index + tuplesToProcess);
             index += tuplesToProcess;
             elements += tuplesToProcess;
-        }*/
+        }
     }
 
 //    return {map.begin(), map.end()};
