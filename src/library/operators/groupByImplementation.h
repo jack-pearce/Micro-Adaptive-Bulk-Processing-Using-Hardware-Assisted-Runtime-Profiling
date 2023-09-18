@@ -380,9 +380,6 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
     vectorOfPairs<int, int> sectionsToBeSorted;
     int elements = 0;
 
-    std::vector<int> sectionsToBeSortedStart;
-    std::vector<int> sectionsToBeSortedEnd;
-
     vectorOfPairs<T1, T2> result;
     T1 mapLargest = std::numeric_limits<T1>::lowest();
 
@@ -402,19 +399,24 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
 //        performGroupByAdaption(counterValues, tuplesToProcess, tuplesPerLastLevelCacheMissThreshold,
 //                               sectionsToBeSorted, index, elements, n, tuplesBetweenHashing);
 
-//        if ((static_cast<float>(tuplesToProcess) / counterValues[0]) >= tuplesPerLastLevelCacheMissThreshold) {
-//            continue;
-//        }
-
+/*        if ((static_cast<float>(tuplesToProcess) / counterValues[0]) < tuplesPerLastLevelCacheMissThreshold) {
 //            std::cout << "Switched to sort at index " << index << std::endl;
-        tuplesToProcess = std::min(tuplesBetweenHashing, n - index);
+            tuplesToProcess = std::min(tuplesBetweenHashing, n - index);
 
             sectionsToBeSorted.emplace_back(index, index + tuplesToProcess);
-//        sectionsToBeSortedStart.push_back(index);
-//        sectionsToBeSortedEnd.push_back(index + tuplesToProcess);
 
-        index += tuplesToProcess;
-        elements += tuplesToProcess;
+            index += tuplesToProcess;
+            elements += tuplesToProcess;
+        }*/
+
+        int value = (static_cast<float>(tuplesToProcess) / counterValues[0]) < tuplesPerLastLevelCacheMissThreshold;
+        tuplesToProcess = std::min(tuplesBetweenHashing, n - index);
+
+//        sectionsToBeSorted.emplace_back(index, index + tuplesToProcess);
+
+        index += (tuplesToProcess * value);
+        elements += (tuplesToProcess * value);
+
     }
 
 //    return {map.begin(), map.end()};
