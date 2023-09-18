@@ -53,7 +53,7 @@ inline T CountAggregation<T>::operator()(T currentAggregate, T _, bool firstAggr
     return ++currentAggregate;
 }
 
-inline void performGroupByAdaption(const long_long *counterValues, int &tuplesToProcess,
+/*inline void performGroupByAdaption(const long_long *counterValues, int &tuplesToProcess,
                                    float tuplesPerLastLevelCacheMissThreshold,
                                    vectorOfPairs<int, int> &sectionsToBeSorted, int &index, int &elements,
                                    int n, int tuplesBetweenHashing) {
@@ -73,7 +73,7 @@ inline void performGroupByAdaption(const long_long *counterValues, int &tuplesTo
         index += tuplesToProcess;
         elements += tuplesToProcess;
     }
-}
+}*/
 
 template<template<typename> class Aggregator, typename T1, typename T2>
 inline void groupByAdaptiveAuxHash(int n, T1 *inputGroupBy, T2 *inputAggregate, tsl::robin_map<T1, T2> &map,
@@ -110,8 +110,8 @@ vectorOfPairs<T1, T2> groupByHash(int n, T1 *inputGroupBy, T2 *inputAggregate, i
     static_assert(std::is_integral<T1>::value, "GroupBy column must be an integer type");
     static_assert(std::is_arithmetic<T2>::value, "Payload column must be an numeric type");
 
-//    tsl::robin_map<T1, T2> map(std::max(static_cast<int>(2.5 * cardinality), 400000));
-    tsl::robin_map<T1, T2> map(static_cast<int>(2.5 * cardinality));
+    tsl::robin_map<T1, T2> map(std::max(static_cast<int>(2.5 * cardinality), 400000));
+//    tsl::robin_map<T1, T2> map(static_cast<int>(2.5 * cardinality));
     int index = 0;
 
 //    int tuplesToProcess;
@@ -361,8 +361,8 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
     constexpr int tuplesPerChunk = 75 * 1000;
 //    constexpr int tuplesPerChunk = 10 * 1000 * 1000;
     constexpr int tuplesBetweenHashing = 2*1000*1000;
-//    int initialSize = std::max(static_cast<int>(2.5 * cardinality), 400000);
-    int initialSize = static_cast<int>(2.5 * cardinality);
+    int initialSize = std::max(static_cast<int>(2.5 * cardinality), 400000);
+//    int initialSize = static_cast<int>(2.5 * cardinality);
 
     tsl::robin_map<T1, T2> map(initialSize);
     typename tsl::robin_map<T1, T2>::iterator it;
@@ -403,7 +403,7 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
 //            std::cout << "Switched to sort at index " << index << std::endl;
             tuplesToProcess = std::min(tuplesBetweenHashing, n - index);
 
-            sectionsToBeSorted.emplace_back(index, index + tuplesToProcess);
+//            sectionsToBeSorted.emplace_back(index, index + tuplesToProcess);
 
             index += tuplesToProcess;
             elements += tuplesToProcess;
