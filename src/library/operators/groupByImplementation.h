@@ -204,7 +204,7 @@ vectorOfPairs<T1, T2> groupBySort(int n, T1 *inputGroupBy, T2 *inputAggregate) {
     return result;
 }
 
-template<template<typename> class Aggregator, typename T1, typename T2>
+/*template<template<typename> class Aggregator, typename T1, typename T2>
 inline void groupByAdaptiveAuxHash(int n, T1 *inputGroupBy, T2 *inputAggregate, tsl::robin_map<T1, T2> &map,
                                    int &index, T1 &largest) {
     typename tsl::robin_map<T1, T2>::iterator it;
@@ -216,6 +216,22 @@ inline void groupByAdaptiveAuxHash(int n, T1 *inputGroupBy, T2 *inputAggregate, 
         } else {
             map.insert({inputGroupBy[index], Aggregator<T2>()(0, inputAggregate[index], true)});
             largest = std::max(largest, inputGroupBy[index]);
+        }
+    }
+}*/
+
+template<template<typename> class Aggregator, typename T1, typename T2>
+inline void groupByAdaptiveAuxHash(int n, T1 *inputGroupBy, T2 *inputAggregate, tsl::robin_map<T1, T2> &map,
+                                   int &index) {
+    typename tsl::robin_map<T1, T2>::iterator it;
+    int startingIndex = index;
+    for (; index < startingIndex + n; ++index) {
+        it = map.find(inputGroupBy[index]);
+        if (it != map.end()) {
+            it.value() = Aggregator<T2>()(it->second, inputAggregate[index], false);
+        } else {
+            map.insert({inputGroupBy[index], Aggregator<T2>()(0, inputAggregate[index], true)});
+//            largest = std::max(largest, inputGroupBy[index]);
         }
     }
 }
@@ -351,7 +367,7 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
 //        Counters::getInstance().readSharedEventSet();
 
 //        groupByAdaptiveAuxHash<Aggregator>(tuplesToProcess, inputGroupBy, inputAggregate, map, index, mapLargest);
-          groupByHashAux<Aggregator>(tuplesToProcess, inputGroupBy, inputAggregate, map, index);
+        groupByAdaptiveAuxHash<Aggregator>(tuplesToProcess, inputGroupBy, inputAggregate, map, index);
 
 //        Counters::getInstance().readSharedEventSet();
 
