@@ -358,8 +358,8 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
     static_assert(std::is_integral<T1>::value, "GroupBy column must be an integer type");
     static_assert(std::is_arithmetic<T2>::value, "Payload column must be an numeric type");
 
-//    constexpr int tuplesPerChunk = 75 * 1000;
-    constexpr int tuplesPerChunk = 10 * 1000 * 1000;
+    constexpr int tuplesPerChunk = 75 * 1000;
+//    constexpr int tuplesPerChunk = 10 * 1000 * 1000;
     constexpr int tuplesBetweenHashing = 2*1000*1000;
 //    int initialSize = std::max(static_cast<int>(2.5 * cardinality), 400000);
     int initialSize = static_cast<int>(2.5 * cardinality);
@@ -399,7 +399,7 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
 //        performGroupByAdaption(counterValues, tuplesToProcess, tuplesPerLastLevelCacheMissThreshold,
 //                               sectionsToBeSorted, index, elements, n, tuplesBetweenHashing);
 
-/*        if ((static_cast<float>(tuplesToProcess) / counterValues[0]) < tuplesPerLastLevelCacheMissThreshold) {
+        if ((static_cast<float>(tuplesToProcess) / counterValues[0]) < tuplesPerLastLevelCacheMissThreshold) {
 //            std::cout << "Switched to sort at index " << index << std::endl;
             tuplesToProcess = std::min(tuplesBetweenHashing, n - index);
 
@@ -407,16 +407,7 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
 
             index += tuplesToProcess;
             elements += tuplesToProcess;
-        }*/
-
-        int value = (static_cast<float>(tuplesToProcess) / counterValues[0]) < tuplesPerLastLevelCacheMissThreshold;
-        tuplesToProcess = std::min(tuplesBetweenHashing, n - index);
-
-//        sectionsToBeSorted.emplace_back(index, index + tuplesToProcess);
-
-        index += (tuplesToProcess * value);
-        elements += (tuplesToProcess * value);
-
+        }
     }
 
 //    return {map.begin(), map.end()};
