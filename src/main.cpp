@@ -877,13 +877,6 @@ void runImdbMacroBenchmarks() {
 
 int main() {
 
-    std::string minMachineConstantName = "Partition_minRadixBits";
-    int minMachineConstant = MABPL::MachineConstants::getInstance().getMachineConstant(minMachineConstantName);
-    std::string name = "SortMaxValueSweep_" + std::to_string(minMachineConstant + 1);
-
-    partitionSweepBenchmark<uint64_t>(DataSweeps::logUniformIntDistribution200mValuesMaxValueSweep,
-                                      {Partition::RadixBitsFixed},
-                                      minMachineConstant + 1, name, 1);
 
 /*
     int n = 5000;
@@ -912,9 +905,9 @@ int main() {
                                             {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                             1, "1-NoClustering-20mValues");*/
 
-/*    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution40mValuesCardinalitySweepFixedMax,
-                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                            1, "1-NoClustering-40mValues");*/
+    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution40mValuesCardinalitySweepFixedMax,
+                                            {GroupBy::Hash, GroupBy::Adaptive},
+                                            1, "1-NoClustering-40mValues");
 
 /*    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesClusteredSweepFixedCardinality10mMax200m,
                                             {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},

@@ -87,8 +87,7 @@ std::vector<int> partitionFixed(int n, T *keys, int radixBits) {
     }
 
     // 2 for payload, 2.5 for load factor
-//    int maxElementsPerPartition = static_cast<double>(l3cacheSize()) / (sizeof(T) * 2 * 2.5);
-    int maxElementsPerPartition = 1;
+    int maxElementsPerPartition = static_cast<double>(l3cacheSize()) / (sizeof(T) * 2 * 2.5);
 
     std::vector<int> outputPartitions;
     std::vector<int> buckets(1 + numBuckets, 0);
