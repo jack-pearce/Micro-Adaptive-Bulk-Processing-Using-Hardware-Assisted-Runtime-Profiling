@@ -877,47 +877,19 @@ void runImdbMacroBenchmarks() {
 
 int main() {
 
-
-/*
-    int n = 5000;
-    auto data = new int[n];
-
-    generateUniformDistributionInMemoryWithSetCardinalityClusteredAlternative(data, n, 5000, 1000, 2500);
-
-    for (int i = 0; i < n; i++) {
-        std::cout << data[i] << std::endl;
-    }
-
-    delete [] data;
-*/
-
-
-
-/*    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                            1, "1-NoClustering-200mValues");*/
-
-/*    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1m,
-                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                            1, "1-ClusteringSweep-20mValues");*/
-
-/*    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
-                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                            1, "1-NoClustering-20mValues");*/
-
     MABPL::calculateMissingMachineConstants();
 
-    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution40mValuesCardinalitySweepFixedMax,
-                                            {GroupBy::Adaptive},
-                                            1, "TEST_1-NoClustering-40mValues");
-
-/*    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesClusteredSweepFixedCardinality10mMax200m,
+/*    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution40mValuesCardinalitySweepFixedMax,
                                             {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                            1, "ClusteringSweep");*/
+                                            1, "NoClustering-40mValues");
 
-/*    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesMaxValueSweep,
-                                            {GroupBy::Sort},
-                                            1, "Sort200mValuesMaxValueSweep");*/
+    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                        {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                        1, "NoClustering-200mValues");
+
+    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesClusteredSweepFixedCardinality10mMax200m,
+                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                            1, "ClusteringSweep-200mValues");*/
 
     return 0;
 }
