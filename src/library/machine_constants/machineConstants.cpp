@@ -41,7 +41,7 @@ MachineConstants& MachineConstants::getInstance() {
 
 MachineConstants::MachineConstants() {
     machineConstantsFilePath = getCurrentWorkingDirectory()
-            + "/src/library/machine_constants/machineConstantValues.json";
+            + "/data/machine_constants/machineConstantValues.json";
     loadMachineConstants(machineConstants);
 }
 
