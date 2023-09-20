@@ -140,7 +140,12 @@ inline void partitionAdaptiveAux(int n, T *keys, T *buffer, std::vector<int> &bu
         buckets[1 + ((keys[i] >> shifts) & mask)]++;
     }
 
+    bool onFinalPass = true;
+
     for (i = 2; i <= numBuckets; i++) {
+        if (buckets[i] > maxElementsPerPartition) {
+            onFinalPass = false;
+        }
         buckets[i] += buckets[i - 1];
     }
 
@@ -160,16 +165,17 @@ inline void partitionAdaptiveAux(int n, T *keys, T *buffer, std::vector<int> &bu
 
             Counters::getInstance().readSharedEventSet();
 
-            if ((static_cast<float>(tuplesToProcess) / static_cast<float>(counterValues[0])) < tuplesPerTlbStoreMiss) {
+            if ((!onFinalPass && ((static_cast<float>(tuplesToProcess) / static_cast<float>(counterValues[0])) < tuplesPerTlbStoreMiss)) ||
+                    (onFinalPass && ((static_cast<float>(tuplesToProcess) / static_cast<float>(counterValues[0])) < (0.8 * tuplesPerTlbStoreMiss)))) {
                 --radixBits;
                 ++shifts;
                 numBuckets >>= 1;
                 mask = numBuckets - 1;
 
                 /////////////////////////////////////// ADAPTIVITY OUTPUT ///////////////////////////////////////////
-//                std::cout << "RadixBits reduced to " << radixBits << " after tuple " << i << " due to reading of ";
-//                std::cout << (static_cast<float>(tuplesToProcess) / static_cast<float>(counterValues[0]));
-//                std::cout << " tuples per TLB store miss" << std::endl;
+                std::cout << "RadixBits reduced to " << radixBits << " after tuple " << i << " due to reading of ";
+                std::cout << (static_cast<float>(tuplesToProcess) / static_cast<float>(counterValues[0]));
+                std::cout << " tuples per TLB store miss" << std::endl;
                 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
                 partitionAdaptiveMergePartitions(buffer, buckets, partitions, numBuckets);

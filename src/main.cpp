@@ -877,19 +877,24 @@ void runImdbMacroBenchmarks() {
 
 int main() {
 
-    MABPL::calculateMissingMachineConstants();
+    partitionSweepBenchmark<uint64_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
+                                      {Partition::RadixBitsAdaptive},
+                                      -1, "TEST", 5);
+
+
+//    MABPL::calculateMissingMachineConstants();
 
 /*    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution40mValuesCardinalitySweepFixedMax,
                                             {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                            1, "NoClustering-40mValues");
+                                            1, "NoClustering-40mValues");*/
 
-    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                        {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                        1, "NoClustering-200mValues");
-
-    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesClusteredSweepFixedCardinality10mMax200m,
-                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+/*    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesClusteredSweepFixedCardinality10mMax200m,
+                                            {GroupBy::Adaptive},
                                             1, "ClusteringSweep-200mValues");*/
+
+/*    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                    {GroupBy::Adaptive},
+                                    1, "NoClustering-200mValues");*/
 
     return 0;
 }
