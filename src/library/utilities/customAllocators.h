@@ -37,7 +37,7 @@ public:
             throw std::bad_alloc();
         }
 
-        std::cout << "Custom allocator called" << std::endl;
+        std::cout << "Custom allocator called" << std::endl; //////////////////////////////////////////////
 
         pointer ptr = static_cast<pointer>(std::calloc(n, sizeof(value_type)));
 //        pointer ptr = static_cast<pointer>(std::malloc(n * sizeof(value_type)));
@@ -58,6 +58,7 @@ public:
     }
 
     void construct(pointer p, const_reference value) {
+        std::cout << "Constructor called" << std::endl; /////////////////////////////////////////////////
         new (static_cast<void*>(p)) T(value);
     }
 
