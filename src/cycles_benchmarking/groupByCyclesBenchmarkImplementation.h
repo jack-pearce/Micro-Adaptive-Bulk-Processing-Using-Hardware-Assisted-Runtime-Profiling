@@ -10,6 +10,7 @@
 #include "../utilities/dataHelpers.h"
 #include "../utilities/papiHelpers.h"
 #include "../data_generation/dataGenerators.h"
+#include "../library/utilities/customAllocators.h"
 
 using MABPL::Counters;
 using MABPL::MaxAggregation;
@@ -307,9 +308,10 @@ void groupByBenchmarkWithExtraCountersDuringRun(const DataFile &dataFile,
     int cardinality = 10*1000*1000; ////////////////// NEED TO UPDATE TO MATCH RUN ///////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    tsl::robin_map<T1, T2> map(std::max(static_cast<int>(2.5 * cardinality), 400000));
+    tsl::robin_map<T1, T2, std::hash<T1>, std::equal_to<T1>, MABPL::CustomAllocator<std::pair<T1, T2>>>
+            map(std::max(static_cast<int>(2.5 * cardinality), 400000));
 
-    typename tsl::robin_map<T1, T2>::iterator it;
+    typename tsl::robin_map<T1, T2, std::hash<T1>, std::equal_to<T1>, MABPL::CustomAllocator<std::pair<T1, T2>>>::iterator it;
     for (auto j = 0; j < numMeasurements; ++j) {
         tuplesToProcess = std::min(tuplesPerMeasurement, numElements - index);
 
@@ -354,11 +356,11 @@ void groupByBenchmarkWithExtraCountersDuringRun(const DataFile &dataFile,
 }
 
 template <typename T1, typename T2>
-void tessilRobinMapInitialisationBenchmark(const std::string &fileNamePrefix) {
+void tessilRobinMapInitialisationBenchmarkDefaultAllocator(const std::string &fileNamePrefix) {
 
-    int totalPoints = 100;
+    int totalPoints = 30;
     std::vector<float> points;
-    generateLogDistribution(30, 1, 200*1000*1000, points);
+    generateLogDistribution(totalPoints, 1, 200*1000*1000, points);
 
     long_long cycles;
     std::vector<std::vector<double>> results(totalPoints,
@@ -371,7 +373,41 @@ void tessilRobinMapInitialisationBenchmark(const std::string &fileNamePrefix) {
         cycles = *Counters::getInstance().readSharedEventSet();
 
         int initialSize = std::max(static_cast<int>(2.5 * points[i]), 400000);
-        tsl::robin_map<T1, T2> map(initialSize);
+        tsl::robin_map<T1, T2, std::hash<T1>, std::equal_to<T1>, MABPL::CustomAllocator<std::pair<T1, T2>>> map(initialSize);
+
+        results[i][1] = static_cast<double>(*Counters::getInstance().readSharedEventSet() - cycles);
+
+    }
+
+    std::vector<std::string> headers(2);
+    headers [0] = "Cardinality";
+    headers [1] = "Cycles";
+
+    std::string fileName = fileNamePrefix + "_tsl_robinMap_initialisationCostOnly_";
+    std::string fullFilePath = FilePaths::getInstance().getGroupByCyclesFolderPath() + fileName + ".csv";
+    writeHeadersAndTableToCSV(headers, results, fullFilePath);
+}
+
+template <typename T1, typename T2>
+void tessilRobinMapInitialisationBenchmarkCustomAllocator(const std::string &fileNamePrefix) {
+
+    int totalPoints = 30;
+    std::vector<float> points;
+    generateLogDistribution(totalPoints, 1, 200*1000*1000, points);
+
+    long_long cycles;
+    std::vector<std::vector<double>> results(totalPoints,
+                                             std::vector<double>(2, 0));
+
+    for (auto i = 0; i < totalPoints; ++i) {
+
+        results[i][0] = static_cast<int>(points[i]);
+
+        cycles = *Counters::getInstance().readSharedEventSet();
+
+        int initialSize = std::max(static_cast<int>(2.5 * points[i]), 400000);
+        tsl::robin_map<T1, T2, std::hash<T1>, std::equal_to<T1>, MABPL::CustomAllocator<std::pair<T1, T2>>>
+                map(initialSize);
 
         results[i][1] = static_cast<double>(*Counters::getInstance().readSharedEventSet() - cycles);
 

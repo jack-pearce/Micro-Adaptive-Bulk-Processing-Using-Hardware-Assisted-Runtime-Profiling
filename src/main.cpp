@@ -262,7 +262,7 @@ void allGroupBySingleThreadedTests(int iterations) {
                                    {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                    iterations, "3-MultipleSection_10m_100");
 
-    tessilRobinMapInitialisationBenchmark<int,int>("4-MapOverheadCosts");
+    tessilRobinMapInitialisationBenchmarkDefaultAllocator<int, int>("4-MapOverheadCosts");
 
     groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1m,
                                             {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
@@ -877,7 +877,16 @@ void runImdbMacroBenchmarks() {
 
 int main() {
 
-    MABPL::calculateMissingMachineConstants();
+//    groupByCompareResultsTest<int, int>(DataFiles::uniformIntDistribution250mValuesMax10000, GroupBy::Hash, GroupBy::Sort);
+
+    tessilRobinMapInitialisationBenchmarkDefaultAllocator<int, int>("DefaultAllocatorInitCosts");
+    tessilRobinMapInitialisationBenchmarkCustomAllocator<int, int>("CustomAllocatorInitCosts");
+
+    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
+                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                            5, "CallocAllocator-NoClustering");
+
+//    MABPL::calculateMissingMachineConstants();
 
 /*    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution40mValuesCardinalitySweepFixedMax,
                                             {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
@@ -890,6 +899,7 @@ int main() {
     groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesClusteredSweepFixedCardinality10mMax200m,
                                             {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                             1, "ClusteringSweep-200mValues");*/
+
 
     return 0;
 }

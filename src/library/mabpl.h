@@ -12,5 +12,6 @@
 #include "utilities/papi.h"
 #include "utilities/systemInformation.h"
 #include "utilities/dataGeneration.h"
+#include "utilities/customAllocators.h"
 
 #endif //MABPL_MABPL_H
