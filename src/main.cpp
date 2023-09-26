@@ -875,16 +875,37 @@ void runImdbMacroBenchmarks() {
     runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(5,30);
 }
 
+void runVectorInitBenchmark() {
+    size_t n = 200*1000*1000;
+
+    long_long cycles;
+    cycles = *Counters::getInstance().readSharedEventSet();
+
+//    std::vector<int> testVector(n);
+
+    std::vector<int, MABPL::CustomAllocator<int>> testVector(n);
+
+/*    using buckets_allocator = typename std::allocator_traits<
+            MABPL::CustomAllocator<int>>::template rebind_alloc<int>;
+
+    std::vector<int, buckets_allocator> testVector(n);*/
+
+    std::cout << "Cycles: " << static_cast<double>(*Counters::getInstance().readSharedEventSet() - cycles) << std::endl;
+
+}
+
 int main() {
+
+//    runVectorInitBenchmark();
 
 //    groupByCompareResultsTest<int, int>(DataFiles::uniformIntDistribution250mValuesMax10000, GroupBy::Hash, GroupBy::Sort);
 
-    tessilRobinMapInitialisationBenchmarkDefaultAllocator<int, int>("DefaultAllocatorInitCosts");
+//    tessilRobinMapInitialisationBenchmarkDefaultAllocator<int, int>("DefaultAllocatorInitCosts");
     tessilRobinMapInitialisationBenchmarkCustomAllocator<int, int>("CustomAllocatorInitCosts");
 
-    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
-                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                            5, "CallocAllocator-NoClustering");
+//    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
+//                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+//                                            5, "CallocAllocator-NoClustering");
 
 //    MABPL::calculateMissingMachineConstants();
 

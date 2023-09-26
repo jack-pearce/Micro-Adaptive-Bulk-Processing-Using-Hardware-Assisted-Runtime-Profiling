@@ -37,6 +37,8 @@ public:
             throw std::bad_alloc();
         }
 
+        std::cout << "Custom allocator called" << std::endl;
+
         pointer ptr = static_cast<pointer>(std::calloc(n, sizeof(value_type)));
 //        pointer ptr = static_cast<pointer>(std::malloc(n * sizeof(value_type)));
         if (!ptr) {
