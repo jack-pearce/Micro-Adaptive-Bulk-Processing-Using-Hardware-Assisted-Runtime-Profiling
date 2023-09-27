@@ -15,7 +15,7 @@
 
 namespace MABPL {
 
-#ifdef __AVX2__
+#ifdef __AVX512F__
 constexpr int BITS_PER_GROUPBY_RADIX_PASS = 10;
 #else
 constexpr int BITS_PER_GROUPBY_RADIX_PASS = 8;

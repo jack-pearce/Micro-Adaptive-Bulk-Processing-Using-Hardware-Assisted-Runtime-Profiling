@@ -378,7 +378,7 @@ int selectValuesPredication(int endIndex, const T2 *inputData, const T1 *inputFi
 }
 
 
-#ifdef __AVX2__
+#ifdef __AVX512F__
 
 template<typename T1, typename T2>
 struct selectValuesVectorizedStruct {
