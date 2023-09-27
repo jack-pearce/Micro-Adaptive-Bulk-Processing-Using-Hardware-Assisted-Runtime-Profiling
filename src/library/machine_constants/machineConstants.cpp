@@ -24,11 +24,12 @@ void printMachineConstants() {
 void calculatePartitionMachineConstants() {
     std::cout << "Calculating machine constants for Partition_minRadixBits... ";
     double minimumRadixBits = log2(static_cast<double>(l2TlbEntriesFor4KbytePages()) / 4);
-    MachineConstants::getInstance().updateMachineConstant("Partition_minRadixBits", minimumRadixBits);
+    int roundedMinimumRadixBits = static_cast<int>(std::floor(minimumRadixBits));
+    MachineConstants::getInstance().updateMachineConstant("Partition_minRadixBits", roundedMinimumRadixBits);
     std::cout << " Complete" << std::endl;
 
     std::cout << "Calculating machine constants for Partition_startRadixBits... ";
-    double startRadixBits = minimumRadixBits + 8;
+    int startRadixBits = roundedMinimumRadixBits + 8;
     MachineConstants::getInstance().updateMachineConstant("Partition_startRadixBits", startRadixBits);
     std::cout << " Complete" << std::endl;
 }
