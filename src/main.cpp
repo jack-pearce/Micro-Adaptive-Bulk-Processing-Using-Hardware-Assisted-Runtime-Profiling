@@ -462,7 +462,7 @@ void allParallelDataSizeTests(int iterations) {
                                                                   iterations, "5-DOP-1-GroupBy-CardinalitySweepParallel-64-64");
 }
 
-void allPartitionTests() {
+void allPartitionTests(int iterations) {
     std::string startMachineConstantName = "Partition_startRadixBits";
     std::string minMachineConstantName = "Partition_minRadixBits";
 
@@ -474,10 +474,10 @@ void allPartitionTests() {
 
     partitionSweepBenchmark<uint64_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
                                       {Partition::RadixBitsFixed, Partition::RadixBitsAdaptive},
-                                      startMachineConstant, nameOne, 5);
+                                      startMachineConstant, nameOne, iterations);
     partitionSweepBenchmark<uint64_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
                                       {Partition::RadixBitsFixed},
-                                      minMachineConstant, nameTwo, 5);
+                                      minMachineConstant, nameTwo, iterations);
 }
 
 void runImdbSelectSweepMacroBenchmark(int startYear, int endYear, int iterations,
@@ -868,18 +868,18 @@ void runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(int itera
     delete[] data;
 }
 
-void runImdbMacroBenchmarks() {
-    runImdbSelectSweepMacroBenchmark(1874, 2023, 5,
+void runImdbMacroBenchmarks(int iterations) {
+    runImdbSelectSweepMacroBenchmark(1874, 2023, iterations,
                                      {Select::ImplementationIndexesBranch,
                                       Select::ImplementationIndexesPredication,
                                       Select::ImplementationIndexesAdaptive});
 
-    runImdbPartitionMacroBenchmark_titleIdColumnBasicsTable(5);
-    runImdbPartitionMacroBenchmark_startYearColumnBasicsTable(5);
-    runImdbPartitionMacroBenchmark_personIdColumnPrincipalsTable(5);
+    runImdbPartitionMacroBenchmark_titleIdColumnBasicsTable(iterations);
+    runImdbPartitionMacroBenchmark_startYearColumnBasicsTable(iterations);
+    runImdbPartitionMacroBenchmark_personIdColumnPrincipalsTable(iterations);
 
-    runImdbGroupByMacroBenchmark_titleIdFromPrincipalsTable_clusteringSweep(5,30);
-    runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(5,30);
+    runImdbGroupByMacroBenchmark_titleIdFromPrincipalsTable_clusteringSweep(iterations,30);
+    runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(iterations,30);
 }
 
 int main() {
