@@ -10,7 +10,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -g -O3 -march=native -std=c++17")
 set(benchmark_DIR "libs/benchmark/build")
 find_package(benchmark REQUIRED)
 
-link_directories(/home/jack/CLionProjects/micro-adaptive-bulk-processing-library/libs/papi/src/install/lib)
+link_directories("${CMAKE_SOURCE_DIR}/libs/papi/src/install/lib")
 
 #set(FOLLY_DIR "libs//folly")
 #find_package(folly REQUIRED)
