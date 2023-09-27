@@ -41,7 +41,7 @@ void allSelectIndexesSingleThreadedTests(int iterations) {
                                        {Select::ImplementationIndexesBranch,
                                         Select::ImplementationIndexesPredication,
                                         Select::ImplementationIndexesAdaptive},
-                                       inputThresholdDistribution,
+                                       inputThresholdDistribution2,
                                        iterations, "2-5-Indexes");
 
     // Graph 3: Period range on linearly varying selectivity
@@ -119,7 +119,7 @@ void allSelectValuesSingleThreadedTests(int iterations) {
                                        {Select::ImplementationValuesBranch,
                                         Select::ImplementationValuesVectorized,
                                         Select::ImplementationValuesAdaptive},
-                                       inputThresholdDistribution,
+                                       inputThresholdDistribution2,
                                        iterations, "2-5-Values");
 
 
