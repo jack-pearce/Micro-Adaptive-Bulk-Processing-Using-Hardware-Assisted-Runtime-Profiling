@@ -134,6 +134,7 @@ public:
     static DataSweep lowerStep50IntDistribution250mValuesSweep;
     static DataSweep lowerStep50IntDistribution250mValuesSweepSectionLength_1;
     static DataSweep lowerStep50IntDistribution250mValuesSweepSectionLength_2;
+    static DataSweep lowerStep50IntDistribution250mValuesSweepSectionLength_3;
 
     static DataSweep lowerStep50IntDistribution250mValuesPercentageStepSweep;
 

@@ -100,6 +100,9 @@ bool DataSweep::loadNextDataSetIntoMemory(T *data) {
     } else if (getSweepName() == "lowerStep50IntDistribution250mValuesSweepSectionLength_2") {
         generateLowerStepSelectivityInMemoryLengthOfSection(data, getNumElements(), 51, static_cast<int>(inputs[runsCompleted++]));
         return true;
+    } else if (getSweepName() == "lowerStep50IntDistribution250mValuesSweepSectionLength_3") {
+        generateLowerStepSelectivityInMemoryLengthOfSection(data, getNumElements(), 51, static_cast<int>(inputs[runsCompleted++]));
+        return true;
     } else if (getSweepName() == "lowerStep50IntDistribution250mValuesPercentageStepSweep") {
         generateUnequalLowerStepSelectivityInMemory(data, getNumElements(), 51, 10, inputs[runsCompleted++]);
         return true;

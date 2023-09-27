@@ -56,13 +56,20 @@ void allSelectIndexesSingleThreadedTests(int iterations) {
                                            {Select::ImplementationIndexesBranch,
                                             Select::ImplementationIndexesPredication,
                                             Select::ImplementationIndexesAdaptive},
-                                           50, 5, "4_1-Indexes");
+                                           50, iterations, "4_1-Indexes");
 
     selectCpuCyclesSweepBenchmark<int,int>(DataSweeps::lowerStep50IntDistribution250mValuesSweepSectionLength_2,
                                            {Select::ImplementationIndexesBranch,
                                             Select::ImplementationIndexesPredication,
                                             Select::ImplementationIndexesAdaptive},
-                                           50, 5, "4_2-Indexes");
+                                           50, iterations, "4_2-Indexes");
+
+    selectCpuCyclesSweepBenchmark<int,int>(DataSweeps::lowerStep50IntDistribution250mValuesSweepSectionLength_3,
+                                           {Select::ImplementationIndexesBranch,
+                                            Select::ImplementationIndexesPredication,
+                                            Select::ImplementationIndexesAdaptive},
+                                           50, iterations, "4_3-Indexes");
+
 
     // Graph 5: Best case - tuned unequal step varying selectivity
     selectCpuCyclesSweepBenchmark<int,int>(DataSweeps::lowerStep50IntDistribution250mValuesPercentageStepSweep,
