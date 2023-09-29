@@ -569,7 +569,7 @@ void runImdbSelectValuesSweepMacroBenchmark(int startYear, int endYear, int iter
 
                 cycles = *Counters::getInstance().readSharedEventSet();
 
-                int selected = MABPL::runSelectFunction(selectImplementations[j],
+                MABPL::runSelectFunction(selectImplementations[j],
                                          n, inputData, inputFilter, selectedValues, year);
 
                 results[year - startYear][1 + (i * numImplementations) + j] = *Counters::getInstance().readSharedEventSet() - cycles;
