@@ -480,8 +480,8 @@ void allPartitionTests(int iterations) {
                                       minMachineConstant, nameTwo, iterations);
 }
 
-void runImdbSelectSweepMacroBenchmark(int startYear, int endYear, int iterations,
-                                      const std::vector<Select> &selectImplementations) {
+void runImdbSelectIndexesSweepMacroBenchmark(int startYear, int endYear, int iterations,
+                                             const std::vector<Select> &selectImplementations) {
     int numImplementations = static_cast<int>(selectImplementations.size());
 
     std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.basics.tsv";
@@ -525,7 +525,64 @@ void runImdbSelectSweepMacroBenchmark(int startYear, int endYear, int iterations
         headers[1 + i] = getSelectName(selectImplementations[i % numImplementations]);
     }
 
-    std::string fileName = "IMDB_select_year_sweep";
+    std::string fileName = "IMDB_selectIndexes_year_sweep";
+    std::string fullFilePath = FilePaths::getInstance().getImdbOutputFolderPath() + fileName + ".csv";
+    writeHeadersAndTableToCSV(headers, results, fullFilePath);
+}
+
+void runImdbSelectValuesSweepMacroBenchmark(int startYear, int endYear, int iterations,
+                                             const std::vector<Select> &selectImplementations) {
+    int numImplementations = static_cast<int>(selectImplementations.size());
+
+    std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.basics.tsv";
+    int n = getLengthOfTsv(filePath);
+    auto yearData = new int[n];
+    readImdbStartYearColumnFromBasicsTable(filePath, yearData);
+    auto idData = new uint32_t[n];
+    readImdbTitleIdColumnFromBasicsTable(filePath, idData);
+
+    long_long cycles;
+    std::vector<std::vector<long_long>> results(endYear - startYear + 1,
+                                                std::vector<long_long>((numImplementations * iterations) + 1, 0));
+
+    for (auto year = startYear; year <= endYear; ++year) {
+        results[year - startYear][0] = year;
+
+        for (auto i = 0; i < iterations; ++i) {
+            for (auto j = 0; j < numImplementations; ++j) {
+                auto inputFilter = new int[n];
+                copyArray<int>(yearData, inputFilter, n);
+
+                auto inputData = new uint32_t[n];
+                copyArray<uint32_t>(idData, inputData, n);
+
+                auto selectedValues = new uint32_t[n];
+
+                std::cout << "Running year " << year << ", iteration " << i + 1 << "... ";
+
+                cycles = *Counters::getInstance().readSharedEventSet();
+
+                int selected = MABPL::runSelectFunction(selectImplementations[j],
+                                         n, inputData, inputFilter, selectedValues, year);
+
+                results[year - startYear][1 + (i * numImplementations) + j] = *Counters::getInstance().readSharedEventSet() - cycles;
+
+                delete[] inputFilter;
+                delete[] inputData;
+                delete[] selectedValues;
+
+                std::cout << "Completed" << std::endl;
+            }
+        }
+    }
+
+    std::vector<std::string> headers((numImplementations * iterations) + 1);
+    headers [0] = "Year";
+    for (auto i = 0; i < (numImplementations * iterations); ++i) {
+        headers[1 + i] = getSelectName(selectImplementations[i % numImplementations]);
+    }
+
+    std::string fileName = "IMDB_selectValues_year_sweep";
     std::string fullFilePath = FilePaths::getInstance().getImdbOutputFolderPath() + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }
@@ -869,10 +926,15 @@ void runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(int itera
 }
 
 void runImdbMacroBenchmarks(int iterations) {
-    runImdbSelectSweepMacroBenchmark(1874, 2023, iterations,
-                                     {Select::ImplementationIndexesBranch,
-                                      Select::ImplementationIndexesPredication,
-                                      Select::ImplementationIndexesAdaptive});
+    runImdbSelectIndexesSweepMacroBenchmark(1874, 2023, iterations,
+                                            {Select::ImplementationIndexesBranch,
+                                             Select::ImplementationIndexesPredication,
+                                             Select::ImplementationIndexesAdaptive});
+
+    runImdbSelectValuesSweepMacroBenchmark(1874, 2023, iterations,
+                                           {Select::ImplementationValuesBranch,
+                                            Select::ImplementationValuesVectorized,
+                                            Select::ImplementationValuesAdaptive});
 
     runImdbPartitionMacroBenchmark_titleIdColumnBasicsTable(iterations);
     runImdbPartitionMacroBenchmark_startYearColumnBasicsTable(iterations);
@@ -883,21 +945,6 @@ void runImdbMacroBenchmarks(int iterations) {
 }
 
 int main() {
-
-
-//    MABPL::calculateMissingMachineConstants();
-
-/*    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution40mValuesCardinalitySweepFixedMax,
-                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                            1, "NoClustering-40mValues");
-
-    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                        {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                        1, "NoClustering-200mValues");
-
-    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesClusteredSweepFixedCardinality10mMax200m,
-                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                            1, "ClusteringSweep-200mValues");*/
 
     return 0;
 }
