@@ -478,6 +478,13 @@ void allPartitionTests(int iterations) {
     partitionSweepBenchmark<uint64_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
                                       {Partition::RadixBitsFixed},
                                       minMachineConstant, nameTwo, iterations);
+
+    partitionSweepBenchmark<uint64_t>(DataSweeps::logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1m,
+                                      {Partition::RadixBitsFixed, Partition::RadixBitsAdaptive},
+                                      startMachineConstant, nameOne, iterations);
+    partitionSweepBenchmark<uint64_t>(DataSweeps::logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1m,
+                                      {Partition::RadixBitsFixed},
+                                      minMachineConstant, nameTwo, iterations);
 }
 
 void runImdbSelectIndexesSweepMacroBenchmark(int startYear, int endYear, int iterations,
