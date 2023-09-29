@@ -479,12 +479,26 @@ void allPartitionTests(int iterations) {
                                       {Partition::RadixBitsFixed},
                                       minMachineConstant, nameTwo, iterations);
 
+    for (int radixBits = minMachineConstant + 1; radixBits < startMachineConstant; radixBits++) {
+        std::string name = "Int64_ClusterednessSweep_" + std::to_string(radixBits);
+        partitionSweepBenchmark<uint64_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
+                                          {Partition::RadixBitsFixed},
+                                          radixBits, name, iterations);
+    }
+
     partitionSweepBenchmark<uint64_t>(DataSweeps::logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1m,
                                       {Partition::RadixBitsFixed, Partition::RadixBitsAdaptive},
                                       startMachineConstant, nameOne, iterations);
     partitionSweepBenchmark<uint64_t>(DataSweeps::logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1m,
                                       {Partition::RadixBitsFixed},
                                       minMachineConstant, nameTwo, iterations);
+
+    for (int radixBits = minMachineConstant + 1; radixBits < startMachineConstant; radixBits++) {
+        std::string name = "Int64_ClusterednessSweep_" + std::to_string(radixBits);
+        partitionSweepBenchmark<uint64_t>(DataSweeps::logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1m,
+                                          {Partition::RadixBitsFixed},
+                                          radixBits, name, iterations);
+    }
 }
 
 void runImdbSelectIndexesSweepMacroBenchmark(int startYear, int endYear, int iterations,
