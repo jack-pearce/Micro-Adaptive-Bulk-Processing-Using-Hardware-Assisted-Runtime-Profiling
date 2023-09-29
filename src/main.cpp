@@ -896,30 +896,48 @@ void runVectorInitBenchmark() {
 
 int main() {
 
+/*    long_long cycles;
+    cycles = *Counters::getInstance().readSharedEventSet();
+
+    MABPL::LazilyInitialisedVector<std::string> vectorTest (100000000);
+
+    std::cout << "Cycles: " << static_cast<double>(*Counters::getInstance().readSharedEventSet() - cycles) << std::endl;
+
+    std::cout << vectorTest[3] << std::endl;
+    vectorTest[3] = "Test";
+    std::cout << vectorTest[3] << std::endl;*/
+
+
+    long_long cycles;
+    cycles = *Counters::getInstance().readSharedEventSet();
+
+    MABPL::LazyInitializationVector<std::string> vectorTest (100000000);
+
+    std::cout << "Cycles: " << static_cast<double>(*Counters::getInstance().readSharedEventSet() - cycles) << std::endl;
+
+    std::string* data = vectorTest.data();
+    std::cout << "Last element: " << data << std::endl;
+
+
+
+
+
+
+
+
+
+
+
 //    runVectorInitBenchmark();
 
 //    groupByCompareResultsTest<int, int>(DataFiles::uniformIntDistribution250mValuesMax10000, GroupBy::Hash, GroupBy::Sort);
 
 //    tessilRobinMapInitialisationBenchmarkDefaultAllocator<int, int>("DefaultAllocatorInitCosts");
-    tessilRobinMapInitialisationBenchmarkCustomAllocator<int, int>("CustomAllocatorInitCosts");
+//    tessilRobinMapInitialisationBenchmarkCustomAllocator<int, int>("CustomAllocatorInitCosts");
 
 //    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
 //                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
 //                                            5, "CallocAllocator-NoClustering");
-
-//    MABPL::calculateMissingMachineConstants();
-
-/*    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution40mValuesCardinalitySweepFixedMax,
-                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                            1, "NoClustering-40mValues");
-
-    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                        {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                        1, "NoClustering-200mValues");
-
-    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesClusteredSweepFixedCardinality10mMax200m,
-                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                            1, "ClusteringSweep-200mValues");*/
 
 
     return 0;
