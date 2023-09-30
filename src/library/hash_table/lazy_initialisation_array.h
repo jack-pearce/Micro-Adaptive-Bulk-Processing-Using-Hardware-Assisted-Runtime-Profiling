@@ -58,6 +58,10 @@ public:
         return data_;
     }
 
+    const value_type* data() const {
+        return data_;
+    }
+
     allocator_type get_allocator() const {
         return allocator_type();
     }

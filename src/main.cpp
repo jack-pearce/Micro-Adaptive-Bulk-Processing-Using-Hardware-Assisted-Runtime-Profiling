@@ -920,11 +920,38 @@ int main() {
     std::cout << "Last element: " << vectorTest[6] << std::endl;*/
 
 
+    MABPL_tsl::robin_map<int,int> map(100);
+
+    std::cout << map.bucket_count() << std::endl;
+
+    typename MABPL_tsl::robin_map<int,int>::iterator it;
+    int n = 3;
+
+    map[11] = 1;
+    map[31] = 1;
+
+/*    for (int index = 0; index < n; ++index) {
+        it = map.find(3);
+        if (it != map.end()) {
+            it.value() = 5;
+        } else {
+            map.insert({3,5});
+        }
+    }
+
+    it = map.end();
+    std::cout << it->first << ", " << it->second << std::endl;*/
+
+//    MABPL::vectorOfPairs<int,int> result = {map.begin(), map.end()};
+//
+//    for (auto& pair : result) {
+//        std::cout << pair.first << ", " << pair.second << std::endl;
+//    }
 
 
-    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
-                                            {GroupBy::Hash, GroupBy::Adaptive},
-                                            1, "TEST");
+//    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
+//                                            {GroupBy::Hash, GroupBy::Adaptive},
+//                                            1, "TEST");
 
 
 

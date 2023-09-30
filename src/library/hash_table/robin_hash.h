@@ -437,8 +437,11 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
 
   using buckets_allocator = typename std::allocator_traits<
       allocator_type>::template rebind_alloc<bucket_entry>;
-  using buckets_container_type = std::vector<bucket_entry, buckets_allocator>;
-//  using buckets_container_type = LazyInitializationArray<bucket_entry>;
+
+//  using buckets_container_type = std::vector<bucket_entry, buckets_allocator>;
+
+//    using buckets_container_type = std::vector<bucket_entry>;
+  using buckets_container_type = LazyInitializationArray<bucket_entry>;
 
  public:
   /**
@@ -551,8 +554,8 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
         GrowthPolicy(bucket_count),
 //        m_buckets_data(bucket_count, alloc),
         m_buckets_data(bucket_count),
-        m_buckets(m_buckets_data.empty() ? static_empty_bucket_ptr()
-                                         : m_buckets_data.data()),
+//        m_buckets(m_buckets_data.empty() ? static_empty_bucket_ptr()
+//                                         : m_buckets_data.data()),
         m_bucket_count(bucket_count),
         m_nb_elements(0),
         m_grow_on_next_insert(false),
@@ -687,31 +690,35 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
    * Iterators
    */
   iterator begin() noexcept {
+      std::cout << "Here" << std::endl;
     std::size_t i = 0;
-    while (i < m_bucket_count && m_buckets[i].empty()) {
+    while (i < m_bucket_count && m_buckets_data[i].empty()) {
       i++;
     }
 
-    return iterator(m_buckets + i);
+    return iterator(m_buckets_data.data() + i);
   }
 
   const_iterator begin() const noexcept { return cbegin(); }
 
   const_iterator cbegin() const noexcept {
     std::size_t i = 0;
-    while (i < m_bucket_count && m_buckets[i].empty()) {
+    while (i < m_bucket_count && m_buckets_data[i].empty()) {
       i++;
     }
 
-    return const_iterator(m_buckets + i);
+    return const_iterator(m_buckets_data.data() + i);
   }
 
-  iterator end() noexcept { return iterator(m_buckets + m_bucket_count); }
+  iterator end() noexcept {
+      std::cout << "Here" << std::endl;
+      return iterator(m_buckets_data.data() + m_bucket_count);
+  }
 
   const_iterator end() const noexcept { return cend(); }
 
   const_iterator cend() const noexcept {
-    return const_iterator(m_buckets + m_bucket_count);
+    return const_iterator(m_buckets_data.data() + m_bucket_count);
   }
 
   /*
@@ -869,9 +876,9 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
      * We try to move the values closer to their ideal bucket.
      */
     std::size_t icloser_bucket =
-        static_cast<std::size_t>(first_mutable.m_bucket - m_buckets);
+        static_cast<std::size_t>(first_mutable.m_bucket - m_buckets_data.data());
     std::size_t ito_move_closer_value =
-        static_cast<std::size_t>(last_mutable.m_bucket - m_buckets);
+        static_cast<std::size_t>(last_mutable.m_bucket - m_buckets_data.data());
     tsl_rh_assert(ito_move_closer_value > icloser_bucket);
 
     const std::size_t ireturn_bucket =
@@ -879,25 +886,25 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
         std::min(
             ito_move_closer_value - icloser_bucket,
             std::size_t(
-                m_buckets[ito_move_closer_value].dist_from_ideal_bucket()));
+                m_buckets_data[ito_move_closer_value].dist_from_ideal_bucket()));
 
     while (ito_move_closer_value < m_bucket_count &&
-           m_buckets[ito_move_closer_value].dist_from_ideal_bucket() > 0) {
+           m_buckets_data[ito_move_closer_value].dist_from_ideal_bucket() > 0) {
       icloser_bucket =
           ito_move_closer_value -
           std::min(
               ito_move_closer_value - icloser_bucket,
               std::size_t(
-                  m_buckets[ito_move_closer_value].dist_from_ideal_bucket()));
+                  m_buckets_data[ito_move_closer_value].dist_from_ideal_bucket()));
 
-      tsl_rh_assert(m_buckets[icloser_bucket].empty());
+      tsl_rh_assert(m_buckets_data[icloser_bucket].empty());
       const distance_type new_distance = distance_type(
-          m_buckets[ito_move_closer_value].dist_from_ideal_bucket() -
+          m_buckets_data[ito_move_closer_value].dist_from_ideal_bucket() -
           (ito_move_closer_value - icloser_bucket));
-      m_buckets[icloser_bucket].set_value_of_empty_bucket(
-          new_distance, m_buckets[ito_move_closer_value].truncated_hash(),
-          std::move(m_buckets[ito_move_closer_value].value()));
-      m_buckets[ito_move_closer_value].clear();
+      m_buckets_data[icloser_bucket].set_value_of_empty_bucket(
+          new_distance, m_buckets_data[ito_move_closer_value].truncated_hash(),
+          std::move(m_buckets_data[ito_move_closer_value].value()));
+      m_buckets_data[ito_move_closer_value].clear();
 
       ++icloser_bucket;
       ++ito_move_closer_value;
@@ -905,7 +912,7 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
 
     m_try_shrink_on_next_insert = true;
 
-    return iterator(m_buckets + ireturn_bucket);
+    return iterator(m_buckets_data.data() + ireturn_bucket);
   }
 
   template <class K>
@@ -933,7 +940,7 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
     swap(static_cast<KeyEqual&>(*this), static_cast<KeyEqual&>(other));
     swap(static_cast<GrowthPolicy&>(*this), static_cast<GrowthPolicy&>(other));
     swap(m_buckets_data, other.m_buckets_data);
-    swap(m_buckets, other.m_buckets);
+//    swap(m_buckets, other.m_buckets);
     swap(m_bucket_count, other.m_bucket_count);
     swap(m_nb_elements, other.m_nb_elements);
     swap(m_load_threshold, other.m_load_threshold);
@@ -1170,12 +1177,12 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
     distance_type dist_from_ideal_bucket = 0;
 
     while (dist_from_ideal_bucket <=
-           m_buckets[ibucket].dist_from_ideal_bucket()) {
+            (m_buckets_data.data() + ibucket)->dist_from_ideal_bucket()) {
       if (TSL_RH_LIKELY(
               (!USE_STORED_HASH_ON_LOOKUP ||
-               m_buckets[ibucket].bucket_hash_equal(hash)) &&
-              compare_keys(KeySelect()(m_buckets[ibucket].value()), key))) {
-        return const_iterator(m_buckets + ibucket);
+               (m_buckets_data.data() + ibucket)->bucket_hash_equal(hash)) &&
+              compare_keys(KeySelect()((m_buckets_data.data() + ibucket)->value()), key))) {
+        return const_iterator(m_buckets_data.data() + ibucket);
       }
 
       ibucket = next_bucket(ibucket);
@@ -1197,18 +1204,18 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
      * We try to move the values closer to their ideal bucket.
      */
     std::size_t previous_ibucket =
-        static_cast<std::size_t>(pos.m_bucket - m_buckets);
+        static_cast<std::size_t>(pos.m_bucket - m_buckets_data.data());
     std::size_t ibucket = next_bucket(previous_ibucket);
 
-    while (m_buckets[ibucket].dist_from_ideal_bucket() > 0) {
-      tsl_rh_assert(m_buckets[previous_ibucket].empty());
+    while (m_buckets_data[ibucket].dist_from_ideal_bucket() > 0) {
+      tsl_rh_assert(m_buckets_data[previous_ibucket].empty());
 
       const distance_type new_distance =
-          distance_type(m_buckets[ibucket].dist_from_ideal_bucket() - 1);
-      m_buckets[previous_ibucket].set_value_of_empty_bucket(
-          new_distance, m_buckets[ibucket].truncated_hash(),
-          std::move(m_buckets[ibucket].value()));
-      m_buckets[ibucket].clear();
+          distance_type(m_buckets_data[ibucket].dist_from_ideal_bucket() - 1);
+      m_buckets_data[previous_ibucket].set_value_of_empty_bucket(
+          new_distance, m_buckets_data[ibucket].truncated_hash(),
+          std::move(m_buckets_data[ibucket].value()));
+      m_buckets_data[ibucket].clear();
 
       previous_ibucket = ibucket;
       ibucket = next_bucket(ibucket);
@@ -1224,11 +1231,11 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
     distance_type dist_from_ideal_bucket = 0;
 
     while (dist_from_ideal_bucket <=
-           m_buckets[ibucket].dist_from_ideal_bucket()) {
+           m_buckets_data[ibucket].dist_from_ideal_bucket()) {
       if ((!USE_STORED_HASH_ON_LOOKUP ||
-           m_buckets[ibucket].bucket_hash_equal(hash)) &&
-          compare_keys(KeySelect()(m_buckets[ibucket].value()), key)) {
-        return std::make_pair(iterator(m_buckets + ibucket), false);
+           m_buckets_data[ibucket].bucket_hash_equal(hash)) &&
+          compare_keys(KeySelect()(m_buckets_data[ibucket].value()), key)) {
+        return std::make_pair(iterator(m_buckets_data.data() + ibucket), false);
       }
 
       ibucket = next_bucket(ibucket);
@@ -1240,14 +1247,14 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
       dist_from_ideal_bucket = 0;
 
       while (dist_from_ideal_bucket <=
-             m_buckets[ibucket].dist_from_ideal_bucket()) {
+             m_buckets_data[ibucket].dist_from_ideal_bucket()) {
         ibucket = next_bucket(ibucket);
         dist_from_ideal_bucket++;
       }
     }
 
-    if (m_buckets[ibucket].empty()) {
-      m_buckets[ibucket].set_value_of_empty_bucket(
+    if (m_buckets_data[ibucket].empty()) {
+      m_buckets_data[ibucket].set_value_of_empty_bucket(
           dist_from_ideal_bucket, bucket_entry::truncate_hash(hash),
           std::forward<Args>(value_type_args)...);
     } else {
@@ -1261,7 +1268,7 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
      * The value will be inserted in ibucket in any case, either because it was
      * empty or by stealing the bucket (robin hood).
      */
-    return std::make_pair(iterator(m_buckets + ibucket), true);
+    return std::make_pair(iterator(m_buckets_data.data() + ibucket), true);
   }
 
   template <class... Args>
@@ -1288,15 +1295,15 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
                          distance_type dist_from_ideal_bucket,
                          truncated_hash_type hash, value_type& value) {
     tsl_rh_assert(dist_from_ideal_bucket >
-                  m_buckets[ibucket].dist_from_ideal_bucket());
-    m_buckets[ibucket].swap_with_value_in_bucket(dist_from_ideal_bucket, hash,
+                  m_buckets_data[ibucket].dist_from_ideal_bucket());
+    m_buckets_data[ibucket].swap_with_value_in_bucket(dist_from_ideal_bucket, hash,
                                                  value);
     ibucket = next_bucket(ibucket);
     dist_from_ideal_bucket++;
 
-    while (!m_buckets[ibucket].empty()) {
+    while (!m_buckets_data[ibucket].empty()) {
       if (dist_from_ideal_bucket >
-          m_buckets[ibucket].dist_from_ideal_bucket()) {
+          m_buckets_data[ibucket].dist_from_ideal_bucket()) {
         if (dist_from_ideal_bucket >
             bucket_entry::DIST_FROM_IDEAL_BUCKET_LIMIT) {
           /**
@@ -1306,7 +1313,7 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
           m_grow_on_next_insert = true;
         }
 
-        m_buckets[ibucket].swap_with_value_in_bucket(dist_from_ideal_bucket,
+        m_buckets_data[ibucket].swap_with_value_in_bucket(dist_from_ideal_bucket,
                                                      hash, value);
       }
 
@@ -1314,7 +1321,7 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
       dist_from_ideal_bucket++;
     }
 
-    m_buckets[ibucket].set_value_of_empty_bucket(dist_from_ideal_bucket, hash,
+    m_buckets_data[ibucket].set_value_of_empty_bucket(dist_from_ideal_bucket, hash,
                                                  std::move(value));
   }
 
@@ -1360,13 +1367,13 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
                               truncated_hash_type hash, value_type&& value) {
     while (true) {
       if (dist_from_ideal_bucket >
-          m_buckets[ibucket].dist_from_ideal_bucket()) {
-        if (m_buckets[ibucket].empty()) {
-          m_buckets[ibucket].set_value_of_empty_bucket(dist_from_ideal_bucket,
+          m_buckets_data[ibucket].dist_from_ideal_bucket()) {
+        if (m_buckets_data[ibucket].empty()) {
+          m_buckets_data[ibucket].set_value_of_empty_bucket(dist_from_ideal_bucket,
                                                        hash, std::move(value));
           return;
         } else {
-          m_buckets[ibucket].swap_with_value_in_bucket(dist_from_ideal_bucket,
+          m_buckets_data[ibucket].swap_with_value_in_bucket(dist_from_ideal_bucket,
                                                        hash, value);
         }
       }
@@ -1614,7 +1621,7 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
    * pointer+vector to save some space in the robin_hash object. Manage the
    * Allocator manually.
    */
-  bucket_entry* m_buckets;
+//  bucket_entry* m_buckets;
 
   /**
    * Used a lot in find, avoid the call to m_buckets_data.size() which is a bit
