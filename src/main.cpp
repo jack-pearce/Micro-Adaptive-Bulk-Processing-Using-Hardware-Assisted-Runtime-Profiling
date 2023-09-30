@@ -915,8 +915,9 @@ int main() {
 
     std::cout << "Cycles: " << static_cast<double>(*Counters::getInstance().readSharedEventSet() - cycles) << std::endl;
 
-    std::string* data = vectorTest.data();
-    std::cout << "Last element: " << data << std::endl;
+    vectorTest[6] = "Jack";
+    vectorTest[6] = "Gail";
+    std::cout << "Last element: " << vectorTest[6] << std::endl;
 
 
 

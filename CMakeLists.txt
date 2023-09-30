@@ -46,7 +46,10 @@ add_executable(${PROJECT_NAME}
         src/time_benchmarking/selectTimeBenchmark.h
         src/main.h
         src/library/operators/partition.cpp
-        src/cycles_benchmarking/partitionCyclesBenchmark.h)
+        src/cycles_benchmarking/partitionCyclesBenchmark.h
+        src/library/hash_table/robin_map.h
+        src/library/hash_table/robin_hash.h
+        src/library/hash_table/robin_growth_policy.h)
 
 target_link_libraries(${PROJECT_NAME} benchmark::benchmark)
 
