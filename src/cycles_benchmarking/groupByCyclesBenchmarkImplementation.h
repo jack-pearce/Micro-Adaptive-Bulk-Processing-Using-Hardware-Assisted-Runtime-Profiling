@@ -11,6 +11,7 @@
 #include "../utilities/papiHelpers.h"
 #include "../data_generation/dataGenerators.h"
 #include "../library/utilities/customAllocators.h"
+#include "../library/hash_table/robin_map.h"
 
 using MABPL::Counters;
 using MABPL::MaxAggregation;
@@ -308,10 +309,9 @@ void groupByBenchmarkWithExtraCountersDuringRun(const DataFile &dataFile,
     int cardinality = 10*1000*1000; ////////////////// NEED TO UPDATE TO MATCH RUN ///////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    tsl::robin_map<T1, T2, std::hash<T1>, std::equal_to<T1>, MABPL::CustomAllocator<std::pair<T1, T2>>>
-            map(std::max(static_cast<int>(2.5 * cardinality), 400000));
+    MABPL_tsl::robin_map<T1, T2> map(std::max(static_cast<int>(2.5 * cardinality), 400000));
 
-    typename tsl::robin_map<T1, T2, std::hash<T1>, std::equal_to<T1>, MABPL::CustomAllocator<std::pair<T1, T2>>>::iterator it;
+    typename MABPL_tsl::robin_map<T1, T2>::iterator it;
     for (auto j = 0; j < numMeasurements; ++j) {
         tuplesToProcess = std::min(tuplesPerMeasurement, numElements - index);
 
@@ -373,7 +373,7 @@ void tessilRobinMapInitialisationBenchmarkDefaultAllocator(const std::string &fi
         cycles = *Counters::getInstance().readSharedEventSet();
 
         int initialSize = std::max(static_cast<int>(2.5 * points[i]), 400000);
-        tsl::robin_map<T1, T2, std::hash<T1>, std::equal_to<T1>, MABPL::CustomAllocator<std::pair<T1, T2>>> map(initialSize);
+        MABPL_tsl::robin_map<T1, T2> map(initialSize);
 
         results[i][1] = static_cast<double>(*Counters::getInstance().readSharedEventSet() - cycles);
 
@@ -406,8 +406,7 @@ void tessilRobinMapInitialisationBenchmarkCustomAllocator(const std::string &fil
         cycles = *Counters::getInstance().readSharedEventSet();
 
         int initialSize = std::max(static_cast<int>(2.5 * points[i]), 400000);
-        tsl::robin_map<T1, T2, std::hash<T1>, std::equal_to<T1>, MABPL::CustomAllocator<std::pair<T1, T2>>>
-                map(initialSize);
+        MABPL_tsl::robin_map<T1, T2> map(initialSize);
 
         results[i][1] = static_cast<double>(*Counters::getInstance().readSharedEventSet() - cycles);
 

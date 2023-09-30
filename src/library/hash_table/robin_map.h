@@ -21,8 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef TSL_ROBIN_MAP_H
-#define TSL_ROBIN_MAP_H
+#ifndef MABPL_TSL_ROBIN_MAP_H
+#define MABPL_TSL_ROBIN_MAP_H
 
 #include <cstddef>
 #include <functional>
@@ -161,49 +161,49 @@ class robin_map {
   explicit robin_map(const Allocator& alloc)
       : robin_map(ht::DEFAULT_INIT_BUCKETS_SIZE, alloc) {}
 
-  template <class InputIt>
-  robin_map(InputIt first, InputIt last,
-            size_type bucket_count = ht::DEFAULT_INIT_BUCKETS_SIZE,
-            const Hash& hash = Hash(), const KeyEqual& equal = KeyEqual(),
-            const Allocator& alloc = Allocator())
-      : robin_map(bucket_count, hash, equal, alloc) {
-    insert(first, last);
-  }
-
-  template <class InputIt>
-  robin_map(InputIt first, InputIt last, size_type bucket_count,
-            const Allocator& alloc)
-      : robin_map(first, last, bucket_count, Hash(), KeyEqual(), alloc) {}
-
-  template <class InputIt>
-  robin_map(InputIt first, InputIt last, size_type bucket_count,
-            const Hash& hash, const Allocator& alloc)
-      : robin_map(first, last, bucket_count, hash, KeyEqual(), alloc) {}
-
-  robin_map(std::initializer_list<value_type> init,
-            size_type bucket_count = ht::DEFAULT_INIT_BUCKETS_SIZE,
-            const Hash& hash = Hash(), const KeyEqual& equal = KeyEqual(),
-            const Allocator& alloc = Allocator())
-      : robin_map(init.begin(), init.end(), bucket_count, hash, equal, alloc) {}
-
-  robin_map(std::initializer_list<value_type> init, size_type bucket_count,
-            const Allocator& alloc)
-      : robin_map(init.begin(), init.end(), bucket_count, Hash(), KeyEqual(),
-                  alloc) {}
-
-  robin_map(std::initializer_list<value_type> init, size_type bucket_count,
-            const Hash& hash, const Allocator& alloc)
-      : robin_map(init.begin(), init.end(), bucket_count, hash, KeyEqual(),
-                  alloc) {}
-
-  robin_map& operator=(std::initializer_list<value_type> ilist) {
-    m_ht.clear();
-
-    m_ht.reserve(ilist.size());
-    m_ht.insert(ilist.begin(), ilist.end());
-
-    return *this;
-  }
+//  template <class InputIt>
+//  robin_map(InputIt first, InputIt last,
+//            size_type bucket_count = ht::DEFAULT_INIT_BUCKETS_SIZE,
+//            const Hash& hash = Hash(), const KeyEqual& equal = KeyEqual(),
+//            const Allocator& alloc = Allocator())
+//      : robin_map(bucket_count, hash, equal, alloc) {
+//    insert(first, last);
+//  }
+//
+//  template <class InputIt>
+//  robin_map(InputIt first, InputIt last, size_type bucket_count,
+//            const Allocator& alloc)
+//      : robin_map(first, last, bucket_count, Hash(), KeyEqual(), alloc) {}
+//
+//  template <class InputIt>
+//  robin_map(InputIt first, InputIt last, size_type bucket_count,
+//            const Hash& hash, const Allocator& alloc)
+//      : robin_map(first, last, bucket_count, hash, KeyEqual(), alloc) {}
+//
+//  robin_map(std::initializer_list<value_type> init,
+//            size_type bucket_count = ht::DEFAULT_INIT_BUCKETS_SIZE,
+//            const Hash& hash = Hash(), const KeyEqual& equal = KeyEqual(),
+//            const Allocator& alloc = Allocator())
+//      : robin_map(init.begin(), init.end(), bucket_count, hash, equal, alloc) {}
+//
+//  robin_map(std::initializer_list<value_type> init, size_type bucket_count,
+//            const Allocator& alloc)
+//      : robin_map(init.begin(), init.end(), bucket_count, Hash(), KeyEqual(),
+//                  alloc) {}
+//
+//  robin_map(std::initializer_list<value_type> init, size_type bucket_count,
+//            const Hash& hash, const Allocator& alloc)
+//      : robin_map(init.begin(), init.end(), bucket_count, hash, KeyEqual(),
+//                  alloc) {}
+//
+//  robin_map& operator=(std::initializer_list<value_type> ilist) {
+//    m_ht.clear();
+//
+//    m_ht.reserve(ilist.size());
+//    m_ht.insert(ilist.begin(), ilist.end());
+//
+//    return *this;
+//  }
 
   allocator_type get_allocator() const { return m_ht.get_allocator(); }
 
@@ -228,7 +228,7 @@ class robin_map {
   /*
    * Modifiers
    */
-  void clear() noexcept { m_ht.clear(); }
+//  void clear() noexcept { m_ht.clear(); }
 
   std::pair<iterator, bool> insert(const value_type& value) {
     return m_ht.insert(value);
@@ -267,25 +267,25 @@ class robin_map {
     m_ht.insert(ilist.begin(), ilist.end());
   }
 
-  template <class M>
-  std::pair<iterator, bool> insert_or_assign(const key_type& k, M&& obj) {
-    return m_ht.insert_or_assign(k, std::forward<M>(obj));
-  }
+//  template <class M>
+//  std::pair<iterator, bool> insert_or_assign(const key_type& k, M&& obj) {
+//    return m_ht.insert_or_assign(k, std::forward<M>(obj));
+//  }
+//
+//  template <class M>
+//  std::pair<iterator, bool> insert_or_assign(key_type&& k, M&& obj) {
+//    return m_ht.insert_or_assign(std::move(k), std::forward<M>(obj));
+//  }
 
-  template <class M>
-  std::pair<iterator, bool> insert_or_assign(key_type&& k, M&& obj) {
-    return m_ht.insert_or_assign(std::move(k), std::forward<M>(obj));
-  }
-
-  template <class M>
-  iterator insert_or_assign(const_iterator hint, const key_type& k, M&& obj) {
-    return m_ht.insert_or_assign(hint, k, std::forward<M>(obj));
-  }
-
-  template <class M>
-  iterator insert_or_assign(const_iterator hint, key_type&& k, M&& obj) {
-    return m_ht.insert_or_assign(hint, std::move(k), std::forward<M>(obj));
-  }
+//  template <class M>
+//  iterator insert_or_assign(const_iterator hint, const key_type& k, M&& obj) {
+//    return m_ht.insert_or_assign(hint, k, std::forward<M>(obj));
+//  }
+//
+//  template <class M>
+//  iterator insert_or_assign(const_iterator hint, key_type&& k, M&& obj) {
+//    return m_ht.insert_or_assign(hint, std::move(k), std::forward<M>(obj));
+//  }
 
   /**
    * Due to the way elements are stored, emplace will need to move or copy the
@@ -294,10 +294,10 @@ class robin_map {
    *
    * Mainly here for compatibility with the std::unordered_map interface.
    */
-  template <class... Args>
-  std::pair<iterator, bool> emplace(Args&&... args) {
-    return m_ht.emplace(std::forward<Args>(args)...);
-  }
+//  template <class... Args>
+//  std::pair<iterator, bool> emplace(Args&&... args) {
+//    return m_ht.emplace(std::forward<Args>(args)...);
+//  }
 
   /**
    * Due to the way elements are stored, emplace_hint will need to move or copy
@@ -306,59 +306,59 @@ class robin_map {
    *
    * Mainly here for compatibility with the std::unordered_map interface.
    */
-  template <class... Args>
-  iterator emplace_hint(const_iterator hint, Args&&... args) {
-    return m_ht.emplace_hint(hint, std::forward<Args>(args)...);
-  }
+//  template <class... Args>
+//  iterator emplace_hint(const_iterator hint, Args&&... args) {
+//    return m_ht.emplace_hint(hint, std::forward<Args>(args)...);
+//  }
+//
+//  template <class... Args>
+//  std::pair<iterator, bool> try_emplace(const key_type& k, Args&&... args) {
+//    return m_ht.try_emplace(k, std::forward<Args>(args)...);
+//  }
+//
+//  template <class... Args>
+//  std::pair<iterator, bool> try_emplace(key_type&& k, Args&&... args) {
+//    return m_ht.try_emplace(std::move(k), std::forward<Args>(args)...);
+//  }
+//
+//  template <class... Args>
+//  iterator try_emplace(const_iterator hint, const key_type& k, Args&&... args) {
+//    return m_ht.try_emplace_hint(hint, k, std::forward<Args>(args)...);
+//  }
+//
+//  template <class... Args>
+//  iterator try_emplace(const_iterator hint, key_type&& k, Args&&... args) {
+//    return m_ht.try_emplace_hint(hint, std::move(k),
+//                                 std::forward<Args>(args)...);
+//  }
 
-  template <class... Args>
-  std::pair<iterator, bool> try_emplace(const key_type& k, Args&&... args) {
-    return m_ht.try_emplace(k, std::forward<Args>(args)...);
-  }
-
-  template <class... Args>
-  std::pair<iterator, bool> try_emplace(key_type&& k, Args&&... args) {
-    return m_ht.try_emplace(std::move(k), std::forward<Args>(args)...);
-  }
-
-  template <class... Args>
-  iterator try_emplace(const_iterator hint, const key_type& k, Args&&... args) {
-    return m_ht.try_emplace_hint(hint, k, std::forward<Args>(args)...);
-  }
-
-  template <class... Args>
-  iterator try_emplace(const_iterator hint, key_type&& k, Args&&... args) {
-    return m_ht.try_emplace_hint(hint, std::move(k),
-                                 std::forward<Args>(args)...);
-  }
-
-  iterator erase(iterator pos) { return m_ht.erase(pos); }
-  iterator erase(const_iterator pos) { return m_ht.erase(pos); }
-  iterator erase(const_iterator first, const_iterator last) {
-    return m_ht.erase(first, last);
-  }
-  size_type erase(const key_type& key) { return m_ht.erase(key); }
+//  iterator erase(iterator pos) { return m_ht.erase(pos); }
+//  iterator erase(const_iterator pos) { return m_ht.erase(pos); }
+//  iterator erase(const_iterator first, const_iterator last) {
+//    return m_ht.erase(first, last);
+//  }
+//  size_type erase(const key_type& key) { return m_ht.erase(key); }
 
   /**
    * Use the hash value 'precalculated_hash' instead of hashing the key. The
    * hash value should be the same as hash_function()(key). Useful to speed-up
    * the lookup to the value if you already have the hash.
    */
-  size_type erase(const key_type& key, std::size_t precalculated_hash) {
-    return m_ht.erase(key, precalculated_hash);
-  }
+//  size_type erase(const key_type& key, std::size_t precalculated_hash) {
+//    return m_ht.erase(key, precalculated_hash);
+//  }
 
   /**
    * This overload only participates in the overload resolution if the typedef
    * KeyEqual::is_transparent exists. If so, K must be hashable and comparable
    * to Key.
    */
-  template <
-      class K, class KE = KeyEqual,
-      typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
-  size_type erase(const K& key) {
-    return m_ht.erase(key);
-  }
+//  template <
+//      class K, class KE = KeyEqual,
+//      typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
+//  size_type erase(const K& key) {
+//    return m_ht.erase(key);
+//  }
 
   /**
    * @copydoc erase(const K& key)
@@ -367,12 +367,12 @@ class robin_map {
    * hash value should be the same as hash_function()(key). Useful to speed-up
    * the lookup to the value if you already have the hash.
    */
-  template <
-      class K, class KE = KeyEqual,
-      typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
-  size_type erase(const K& key, std::size_t precalculated_hash) {
-    return m_ht.erase(key, precalculated_hash);
-  }
+//  template <
+//      class K, class KE = KeyEqual,
+//      typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
+//  size_type erase(const K& key, std::size_t precalculated_hash) {
+//    return m_ht.erase(key, precalculated_hash);
+//  }
 
   void swap(robin_map& other) { other.m_ht.swap(m_ht); }
 
@@ -692,8 +692,8 @@ class robin_map {
   void min_load_factor(float ml) { m_ht.min_load_factor(ml); }
   void max_load_factor(float ml) { m_ht.max_load_factor(ml); }
 
-  void rehash(size_type count_) { m_ht.rehash(count_); }
-  void reserve(size_type count_) { m_ht.reserve(count_); }
+//  void rehash(size_type count_) { m_ht.rehash(count_); }
+//  void reserve(size_type count_) { m_ht.reserve(count_); }
 
   /*
    * Observers
@@ -725,10 +725,10 @@ class robin_map {
    * floats, ...) of the types it serializes in the hands of the `Serializer`
    * function object if compatibility is required.
    */
-  template <class Serializer>
-  void serialize(Serializer& serializer) const {
-    m_ht.serialize(serializer);
-  }
+//  template <class Serializer>
+//  void serialize(Serializer& serializer) const {
+//    m_ht.serialize(serializer);
+//  }
 
   /**
    * Deserialize a previously serialized map through the `deserializer`
@@ -756,14 +756,14 @@ class robin_map {
    * floats, size of int, ...) of the types it deserializes in the hands of the
    * `Deserializer` function object if compatibility is required.
    */
-  template <class Deserializer>
-  static robin_map deserialize(Deserializer& deserializer,
-                               bool hash_compatible = false) {
-    robin_map map(0);
-    map.m_ht.deserialize(deserializer, hash_compatible);
-
-    return map;
-  }
+//  template <class Deserializer>
+//  static robin_map deserialize(Deserializer& deserializer,
+//                               bool hash_compatible = false) {
+//    robin_map map(0);
+//    map.m_ht.deserialize(deserializer, hash_compatible);
+//
+//    return map;
+//  }
 
   friend bool operator==(const robin_map& lhs, const robin_map& rhs) {
     if (lhs.size() != rhs.size()) {

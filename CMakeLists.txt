@@ -49,7 +49,8 @@ add_executable(${PROJECT_NAME}
         src/cycles_benchmarking/partitionCyclesBenchmark.h
         src/library/hash_table/robin_map.h
         src/library/hash_table/robin_hash.h
-        src/library/hash_table/robin_growth_policy.h)
+        src/library/hash_table/robin_growth_policy.h
+        src/library/hash_table/lazy_initialisation_array.h)
 
 target_link_libraries(${PROJECT_NAME} benchmark::benchmark)
 

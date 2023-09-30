@@ -908,7 +908,7 @@ int main() {
     std::cout << vectorTest[3] << std::endl;*/
 
 
-    long_long cycles;
+/*    long_long cycles;
     cycles = *Counters::getInstance().readSharedEventSet();
 
     MABPL::LazyInitializationVector<std::string> vectorTest (100000000);
@@ -917,10 +917,14 @@ int main() {
 
     vectorTest[6] = "Jack";
     vectorTest[6] = "Gail";
-    std::cout << "Last element: " << vectorTest[6] << std::endl;
+    std::cout << "Last element: " << vectorTest[6] << std::endl;*/
 
 
 
+
+    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
+                                            {GroupBy::Hash, GroupBy::Adaptive},
+                                            1, "TEST");
 
 
 

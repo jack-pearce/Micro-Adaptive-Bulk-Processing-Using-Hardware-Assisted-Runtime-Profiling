@@ -21,8 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef TSL_ROBIN_HASH_H
-#define TSL_ROBIN_HASH_H
+#ifndef MABPL_TSL_ROBIN_HASH_H
+#define MABPL_TSL_ROBIN_HASH_H
 
 #include <algorithm>
 #include <cassert>
@@ -41,6 +41,7 @@
 #include <vector>
 
 #include "robin_growth_policy.h"
+#include "lazy_initialisation_array.h"
 
 namespace MABPL_tsl {
 
@@ -437,6 +438,7 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
   using buckets_allocator = typename std::allocator_traits<
       allocator_type>::template rebind_alloc<bucket_entry>;
   using buckets_container_type = std::vector<bucket_entry, buckets_allocator>;
+//  using buckets_container_type = LazyInitializationArray<bucket_entry>;
 
  public:
   /**
@@ -547,7 +549,8 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
       : Hash(hash),
         KeyEqual(equal),
         GrowthPolicy(bucket_count),
-        m_buckets_data(bucket_count, alloc),
+//        m_buckets_data(bucket_count, alloc),
+        m_buckets_data(bucket_count),
         m_buckets(m_buckets_data.empty() ? static_empty_bucket_ptr()
                                          : m_buckets_data.data()),
         m_bucket_count(bucket_count),
@@ -610,71 +613,71 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
   }
 #endif
 
-  robin_hash(const robin_hash& other)
-      : Hash(other),
-        KeyEqual(other),
-        GrowthPolicy(other),
-        m_buckets_data(other.m_buckets_data),
-        m_buckets(m_buckets_data.empty() ? static_empty_bucket_ptr()
-                                         : m_buckets_data.data()),
-        m_bucket_count(other.m_bucket_count),
-        m_nb_elements(other.m_nb_elements),
-        m_load_threshold(other.m_load_threshold),
-        m_min_load_factor(other.m_min_load_factor),
-        m_max_load_factor(other.m_max_load_factor),
-        m_grow_on_next_insert(other.m_grow_on_next_insert),
-        m_try_shrink_on_next_insert(other.m_try_shrink_on_next_insert) {}
+//  robin_hash(const robin_hash& other)
+//      : Hash(other),
+//        KeyEqual(other),
+//        GrowthPolicy(other),
+//        m_buckets_data(other.m_buckets_data),
+//        m_buckets(m_buckets_data.empty() ? static_empty_bucket_ptr()
+//                                         : m_buckets_data.data()),
+//        m_bucket_count(other.m_bucket_count),
+//        m_nb_elements(other.m_nb_elements),
+//        m_load_threshold(other.m_load_threshold),
+//        m_min_load_factor(other.m_min_load_factor),
+//        m_max_load_factor(other.m_max_load_factor),
+//        m_grow_on_next_insert(other.m_grow_on_next_insert),
+//        m_try_shrink_on_next_insert(other.m_try_shrink_on_next_insert) {}
+//
+//  robin_hash(robin_hash&& other) noexcept(
+//      std::is_nothrow_move_constructible<
+//          Hash>::value&& std::is_nothrow_move_constructible<KeyEqual>::value&&
+//          std::is_nothrow_move_constructible<GrowthPolicy>::value&&
+//              std::is_nothrow_move_constructible<buckets_container_type>::value)
+//      : Hash(std::move(static_cast<Hash&>(other))),
+//        KeyEqual(std::move(static_cast<KeyEqual&>(other))),
+//        GrowthPolicy(std::move(static_cast<GrowthPolicy&>(other))),
+//        m_buckets_data(std::move(other.m_buckets_data)),
+//        m_buckets(m_buckets_data.empty() ? static_empty_bucket_ptr()
+//                                         : m_buckets_data.data()),
+//        m_bucket_count(other.m_bucket_count),
+//        m_nb_elements(other.m_nb_elements),
+//        m_load_threshold(other.m_load_threshold),
+//        m_min_load_factor(other.m_min_load_factor),
+//        m_max_load_factor(other.m_max_load_factor),
+//        m_grow_on_next_insert(other.m_grow_on_next_insert),
+//        m_try_shrink_on_next_insert(other.m_try_shrink_on_next_insert) {
+//    other.clear_and_shrink();
+//  }
 
-  robin_hash(robin_hash&& other) noexcept(
-      std::is_nothrow_move_constructible<
-          Hash>::value&& std::is_nothrow_move_constructible<KeyEqual>::value&&
-          std::is_nothrow_move_constructible<GrowthPolicy>::value&&
-              std::is_nothrow_move_constructible<buckets_container_type>::value)
-      : Hash(std::move(static_cast<Hash&>(other))),
-        KeyEqual(std::move(static_cast<KeyEqual&>(other))),
-        GrowthPolicy(std::move(static_cast<GrowthPolicy&>(other))),
-        m_buckets_data(std::move(other.m_buckets_data)),
-        m_buckets(m_buckets_data.empty() ? static_empty_bucket_ptr()
-                                         : m_buckets_data.data()),
-        m_bucket_count(other.m_bucket_count),
-        m_nb_elements(other.m_nb_elements),
-        m_load_threshold(other.m_load_threshold),
-        m_min_load_factor(other.m_min_load_factor),
-        m_max_load_factor(other.m_max_load_factor),
-        m_grow_on_next_insert(other.m_grow_on_next_insert),
-        m_try_shrink_on_next_insert(other.m_try_shrink_on_next_insert) {
-    other.clear_and_shrink();
-  }
+//  robin_hash& operator=(const robin_hash& other) {
+//    if (&other != this) {
+//      Hash::operator=(other);
+//      KeyEqual::operator=(other);
+//      GrowthPolicy::operator=(other);
+//
+//      m_buckets_data = other.m_buckets_data;
+//      m_buckets = m_buckets_data.empty() ? static_empty_bucket_ptr()
+//                                         : m_buckets_data.data();
+//      m_bucket_count = other.m_bucket_count;
+//      m_nb_elements = other.m_nb_elements;
+//
+//      m_load_threshold = other.m_load_threshold;
+//      m_min_load_factor = other.m_min_load_factor;
+//      m_max_load_factor = other.m_max_load_factor;
+//
+//      m_grow_on_next_insert = other.m_grow_on_next_insert;
+//      m_try_shrink_on_next_insert = other.m_try_shrink_on_next_insert;
+//    }
+//
+//    return *this;
+//  }
 
-  robin_hash& operator=(const robin_hash& other) {
-    if (&other != this) {
-      Hash::operator=(other);
-      KeyEqual::operator=(other);
-      GrowthPolicy::operator=(other);
-
-      m_buckets_data = other.m_buckets_data;
-      m_buckets = m_buckets_data.empty() ? static_empty_bucket_ptr()
-                                         : m_buckets_data.data();
-      m_bucket_count = other.m_bucket_count;
-      m_nb_elements = other.m_nb_elements;
-
-      m_load_threshold = other.m_load_threshold;
-      m_min_load_factor = other.m_min_load_factor;
-      m_max_load_factor = other.m_max_load_factor;
-
-      m_grow_on_next_insert = other.m_grow_on_next_insert;
-      m_try_shrink_on_next_insert = other.m_try_shrink_on_next_insert;
-    }
-
-    return *this;
-  }
-
-  robin_hash& operator=(robin_hash&& other) {
-    other.swap(*this);
-    other.clear_and_shrink();
-
-    return *this;
-  }
+//  robin_hash& operator=(robin_hash&& other) {
+//    other.swap(*this);
+//    other.clear_and_shrink();
+//
+//    return *this;
+//  }
 
   allocator_type get_allocator() const {
     return m_buckets_data.get_allocator();
@@ -723,18 +726,18 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
   /*
    * Modifiers
    */
-  void clear() noexcept {
-    if (m_min_load_factor > 0.0f) {
-      clear_and_shrink();
-    } else {
-      for (auto& bucket : m_buckets_data) {
-        bucket.clear();
-      }
-
-      m_nb_elements = 0;
-      m_grow_on_next_insert = false;
-    }
-  }
+//  void clear() noexcept {
+//    if (m_min_load_factor > 0.0f) {
+//      clear_and_shrink();
+//    } else {
+//      for (auto& bucket : m_buckets_data) {
+//        bucket.clear();
+//      }
+//
+//      m_nb_elements = 0;
+//      m_grow_on_next_insert = false;
+//    }
+//  }
 
   template <typename P>
   std::pair<iterator, bool> insert(P&& value) {
@@ -1083,15 +1086,15 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
     tsl_rh_assert(bucket_count() == 0 || m_load_threshold < bucket_count());
   }
 
-  void rehash(size_type count_) {
-    count_ = std::max(count_,
-                      size_type(std::ceil(float(size()) / max_load_factor())));
-    rehash_impl(count_);
-  }
-
-  void reserve(size_type count_) {
-    rehash(size_type(std::ceil(float(count_) / max_load_factor())));
-  }
+//  void rehash(size_type count_) {
+//    count_ = std::max(count_,
+//                      size_type(std::ceil(float(size()) / max_load_factor())));
+//    rehash_impl(count_);
+//  }
+//
+//  void reserve(size_type count_) {
+//    rehash(size_type(std::ceil(float(count_) / max_load_factor())));
+//  }
 
   /*
    * Observers
@@ -1107,15 +1110,15 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
     return iterator(const_cast<bucket_entry*>(pos.m_bucket));
   }
 
-  template <class Serializer>
-  void serialize(Serializer& serializer) const {
-    serialize_impl(serializer);
-  }
-
-  template <class Deserializer>
-  void deserialize(Deserializer& deserializer, bool hash_compatible) {
-    deserialize_impl(deserializer, hash_compatible);
-  }
+//  template <class Serializer>
+//  void serialize(Serializer& serializer) const {
+//    serialize_impl(serializer);
+//  }
+//
+//  template <class Deserializer>
+//  void deserialize(Deserializer& deserializer, bool hash_compatible) {
+//    deserialize_impl(deserializer, hash_compatible);
+//  }
 
  private:
   template <class K>
@@ -1315,42 +1318,42 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
                                                  std::move(value));
   }
 
-  void rehash_impl(size_type count_) {
-    robin_hash new_table(count_, static_cast<Hash&>(*this),
-                         static_cast<KeyEqual&>(*this), get_allocator(),
-                         m_min_load_factor, m_max_load_factor);
-    tsl_rh_assert(size() <= new_table.m_load_threshold);
+//  void rehash_impl(size_type count_) {
+//    robin_hash new_table(count_, static_cast<Hash&>(*this),
+//                         static_cast<KeyEqual&>(*this), get_allocator(),
+//                         m_min_load_factor, m_max_load_factor);
+//    tsl_rh_assert(size() <= new_table.m_load_threshold);
+//
+//    const bool use_stored_hash =
+//        USE_STORED_HASH_ON_REHASH(new_table.bucket_count());
+//    for (auto& bucket : m_buckets_data) {
+//      if (bucket.empty()) {
+//        continue;
+//      }
+//
+//      const std::size_t hash =
+//          use_stored_hash ? bucket.truncated_hash()
+//                          : new_table.hash_key(KeySelect()(bucket.value()));
+//
+//      new_table.insert_value_on_rehash(new_table.bucket_for_hash(hash), 0,
+//                                       bucket_entry::truncate_hash(hash),
+//                                       std::move(bucket.value()));
+//    }
+//
+//    new_table.m_nb_elements = m_nb_elements;
+//    new_table.swap(*this);
+//  }
 
-    const bool use_stored_hash =
-        USE_STORED_HASH_ON_REHASH(new_table.bucket_count());
-    for (auto& bucket : m_buckets_data) {
-      if (bucket.empty()) {
-        continue;
-      }
-
-      const std::size_t hash =
-          use_stored_hash ? bucket.truncated_hash()
-                          : new_table.hash_key(KeySelect()(bucket.value()));
-
-      new_table.insert_value_on_rehash(new_table.bucket_for_hash(hash), 0,
-                                       bucket_entry::truncate_hash(hash),
-                                       std::move(bucket.value()));
-    }
-
-    new_table.m_nb_elements = m_nb_elements;
-    new_table.swap(*this);
-  }
-
-  void clear_and_shrink() noexcept {
-    GrowthPolicy::clear();
-    m_buckets_data.clear();
-    m_buckets = static_empty_bucket_ptr();
-    m_bucket_count = 0;
-    m_nb_elements = 0;
-    m_load_threshold = 0;
-    m_grow_on_next_insert = false;
-    m_try_shrink_on_next_insert = false;
-  }
+//  void clear_and_shrink() noexcept {
+//    GrowthPolicy::clear();
+//    m_buckets_data.clear();
+//    m_buckets = static_empty_bucket_ptr();
+//    m_bucket_count = 0;
+//    m_nb_elements = 0;
+//    m_load_threshold = 0;
+//    m_grow_on_next_insert = false;
+//    m_try_shrink_on_next_insert = false;
+//  }
 
   void insert_value_on_rehash(std::size_t ibucket,
                               distance_type dist_from_ideal_bucket,
@@ -1381,184 +1384,189 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
    * Return true if the table has been rehashed.
    */
   bool rehash_on_extreme_load(distance_type curr_dist_from_ideal_bucket) {
+
     if (m_grow_on_next_insert ||
         curr_dist_from_ideal_bucket >
             bucket_entry::DIST_FROM_IDEAL_BUCKET_LIMIT ||
         size() >= m_load_threshold) {
-      rehash_impl(GrowthPolicy::next_bucket_count());
-      m_grow_on_next_insert = false;
+//      rehash_impl(GrowthPolicy::next_bucket_count());
+//      m_grow_on_next_insert = false;
 
-      return true;
+      std::cout << "Should have rehashed due to load" << std::endl;
+      exit(2);
+//      return true;
     }
 
     if (m_try_shrink_on_next_insert) {
       m_try_shrink_on_next_insert = false;
       if (m_min_load_factor != 0.0f && load_factor() < m_min_load_factor) {
-        reserve(size() + 1);
+//        reserve(size() + 1);
 
-        return true;
+        std::cout << "Should have shrunk due to load" << std::endl;
+        exit(2);
+//        return true;
       }
     }
 
     return false;
   }
 
-  template <class Serializer>
-  void serialize_impl(Serializer& serializer) const {
-    const slz_size_type version = SERIALIZATION_PROTOCOL_VERSION;
-    serializer(version);
+//  template <class Serializer>
+//  void serialize_impl(Serializer& serializer) const {
+//    const slz_size_type version = SERIALIZATION_PROTOCOL_VERSION;
+//    serializer(version);
+//
+//    // Indicate if the truncated hash of each bucket is stored. Use a
+//    // std::int16_t instead of a bool to avoid the need for the serializer to
+//    // support an extra 'bool' type.
+//    const std::int16_t hash_stored_for_bucket =
+//        static_cast<std::int16_t>(STORE_HASH);
+//    serializer(hash_stored_for_bucket);
+//
+//    const slz_size_type nb_elements = m_nb_elements;
+//    serializer(nb_elements);
+//
+//    const slz_size_type bucket_count = m_buckets_data.size();
+//    serializer(bucket_count);
+//
+//    const float min_load_factor = m_min_load_factor;
+//    serializer(min_load_factor);
+//
+//    const float max_load_factor = m_max_load_factor;
+//    serializer(max_load_factor);
+//
+//    for (const bucket_entry& bucket : m_buckets_data) {
+//      if (bucket.empty()) {
+//        const std::int16_t empty_bucket =
+//            bucket_entry::EMPTY_MARKER_DIST_FROM_IDEAL_BUCKET;
+//        serializer(empty_bucket);
+//      } else {
+//        const std::int16_t dist_from_ideal_bucket =
+//            bucket.dist_from_ideal_bucket();
+//        serializer(dist_from_ideal_bucket);
+//        if (STORE_HASH) {
+//          const std::uint32_t truncated_hash = bucket.truncated_hash();
+//          serializer(truncated_hash);
+//        }
+//        serializer(bucket.value());
+//      }
+//    }
+//  }
 
-    // Indicate if the truncated hash of each bucket is stored. Use a
-    // std::int16_t instead of a bool to avoid the need for the serializer to
-    // support an extra 'bool' type.
-    const std::int16_t hash_stored_for_bucket =
-        static_cast<std::int16_t>(STORE_HASH);
-    serializer(hash_stored_for_bucket);
-
-    const slz_size_type nb_elements = m_nb_elements;
-    serializer(nb_elements);
-
-    const slz_size_type bucket_count = m_buckets_data.size();
-    serializer(bucket_count);
-
-    const float min_load_factor = m_min_load_factor;
-    serializer(min_load_factor);
-
-    const float max_load_factor = m_max_load_factor;
-    serializer(max_load_factor);
-
-    for (const bucket_entry& bucket : m_buckets_data) {
-      if (bucket.empty()) {
-        const std::int16_t empty_bucket =
-            bucket_entry::EMPTY_MARKER_DIST_FROM_IDEAL_BUCKET;
-        serializer(empty_bucket);
-      } else {
-        const std::int16_t dist_from_ideal_bucket =
-            bucket.dist_from_ideal_bucket();
-        serializer(dist_from_ideal_bucket);
-        if (STORE_HASH) {
-          const std::uint32_t truncated_hash = bucket.truncated_hash();
-          serializer(truncated_hash);
-        }
-        serializer(bucket.value());
-      }
-    }
-  }
-
-  template <class Deserializer>
-  void deserialize_impl(Deserializer& deserializer, bool hash_compatible) {
-    tsl_rh_assert(m_buckets_data.empty());  // Current hash table must be empty
-
-    const slz_size_type version =
-        deserialize_value<slz_size_type>(deserializer);
-    // For now we only have one version of the serialization protocol.
-    // If it doesn't match there is a problem with the file.
-    if (version != SERIALIZATION_PROTOCOL_VERSION) {
-      TSL_RH_THROW_OR_TERMINATE(std::runtime_error,
-                                "Can't deserialize the ordered_map/set. "
-                                "The protocol version header is invalid.");
-    }
-
-    const bool hash_stored_for_bucket =
-        deserialize_value<std::int16_t>(deserializer) ? true : false;
-    if (hash_compatible && STORE_HASH != hash_stored_for_bucket) {
-      TSL_RH_THROW_OR_TERMINATE(
-          std::runtime_error,
-          "Can't deserialize a map with a different StoreHash "
-          "than the one used during the serialization when "
-          "hash compatibility is used");
-    }
-
-    const slz_size_type nb_elements =
-        deserialize_value<slz_size_type>(deserializer);
-    const slz_size_type bucket_count_ds =
-        deserialize_value<slz_size_type>(deserializer);
-    const float min_load_factor = deserialize_value<float>(deserializer);
-    const float max_load_factor = deserialize_value<float>(deserializer);
-
-    if (min_load_factor < MINIMUM_MIN_LOAD_FACTOR ||
-        min_load_factor > MAXIMUM_MIN_LOAD_FACTOR) {
-      TSL_RH_THROW_OR_TERMINATE(
-          std::runtime_error,
-          "Invalid min_load_factor. Check that the serializer "
-          "and deserializer support floats correctly as they "
-          "can be converted implicitly to ints.");
-    }
-
-    if (max_load_factor < MINIMUM_MAX_LOAD_FACTOR ||
-        max_load_factor > MAXIMUM_MAX_LOAD_FACTOR) {
-      TSL_RH_THROW_OR_TERMINATE(
-          std::runtime_error,
-          "Invalid max_load_factor. Check that the serializer "
-          "and deserializer support floats correctly as they "
-          "can be converted implicitly to ints.");
-    }
-
-    this->min_load_factor(min_load_factor);
-    this->max_load_factor(max_load_factor);
-
-    if (bucket_count_ds == 0) {
-      tsl_rh_assert(nb_elements == 0);
-      return;
-    }
-
-    if (!hash_compatible) {
-      reserve(numeric_cast<size_type>(nb_elements,
-                                      "Deserialized nb_elements is too big."));
-      for (slz_size_type ibucket = 0; ibucket < bucket_count_ds; ibucket++) {
-        const distance_type dist_from_ideal_bucket =
-            deserialize_value<std::int16_t>(deserializer);
-        if (dist_from_ideal_bucket !=
-            bucket_entry::EMPTY_MARKER_DIST_FROM_IDEAL_BUCKET) {
-          if (hash_stored_for_bucket) {
-            TSL_RH_UNUSED(deserialize_value<std::uint32_t>(deserializer));
-          }
-
-          insert(deserialize_value<value_type>(deserializer));
-        }
-      }
-
-      tsl_rh_assert(nb_elements == size());
-    } else {
-      m_bucket_count = numeric_cast<size_type>(
-          bucket_count_ds, "Deserialized bucket_count is too big.");
-
-      GrowthPolicy::operator=(GrowthPolicy(m_bucket_count));
-      // GrowthPolicy should not modify the bucket count we got from
-      // deserialization
-      if (m_bucket_count != bucket_count_ds) {
-        TSL_RH_THROW_OR_TERMINATE(std::runtime_error,
-                                  "The GrowthPolicy is not the same even "
-                                  "though hash_compatible is true.");
-      }
-
-      m_nb_elements = numeric_cast<size_type>(
-          nb_elements, "Deserialized nb_elements is too big.");
-      m_buckets_data.resize(m_bucket_count);
-      m_buckets = m_buckets_data.data();
-
-      for (bucket_entry& bucket : m_buckets_data) {
-        const distance_type dist_from_ideal_bucket =
-            deserialize_value<std::int16_t>(deserializer);
-        if (dist_from_ideal_bucket !=
-            bucket_entry::EMPTY_MARKER_DIST_FROM_IDEAL_BUCKET) {
-          truncated_hash_type truncated_hash = 0;
-          if (hash_stored_for_bucket) {
-            tsl_rh_assert(hash_stored_for_bucket);
-            truncated_hash = deserialize_value<std::uint32_t>(deserializer);
-          }
-
-          bucket.set_value_of_empty_bucket(
-              dist_from_ideal_bucket, truncated_hash,
-              deserialize_value<value_type>(deserializer));
-        }
-      }
-
-      if (!m_buckets_data.empty()) {
-        m_buckets_data.back().set_as_last_bucket();
-      }
-    }
-  }
+//  template <class Deserializer>
+//  void deserialize_impl(Deserializer& deserializer, bool hash_compatible) {
+//    tsl_rh_assert(m_buckets_data.empty());  // Current hash table must be empty
+//
+//    const slz_size_type version =
+//        deserialize_value<slz_size_type>(deserializer);
+//    // For now we only have one version of the serialization protocol.
+//    // If it doesn't match there is a problem with the file.
+//    if (version != SERIALIZATION_PROTOCOL_VERSION) {
+//      TSL_RH_THROW_OR_TERMINATE(std::runtime_error,
+//                                "Can't deserialize the ordered_map/set. "
+//                                "The protocol version header is invalid.");
+//    }
+//
+//    const bool hash_stored_for_bucket =
+//        deserialize_value<std::int16_t>(deserializer) ? true : false;
+//    if (hash_compatible && STORE_HASH != hash_stored_for_bucket) {
+//      TSL_RH_THROW_OR_TERMINATE(
+//          std::runtime_error,
+//          "Can't deserialize a map with a different StoreHash "
+//          "than the one used during the serialization when "
+//          "hash compatibility is used");
+//    }
+//
+//    const slz_size_type nb_elements =
+//        deserialize_value<slz_size_type>(deserializer);
+//    const slz_size_type bucket_count_ds =
+//        deserialize_value<slz_size_type>(deserializer);
+//    const float min_load_factor = deserialize_value<float>(deserializer);
+//    const float max_load_factor = deserialize_value<float>(deserializer);
+//
+//    if (min_load_factor < MINIMUM_MIN_LOAD_FACTOR ||
+//        min_load_factor > MAXIMUM_MIN_LOAD_FACTOR) {
+//      TSL_RH_THROW_OR_TERMINATE(
+//          std::runtime_error,
+//          "Invalid min_load_factor. Check that the serializer "
+//          "and deserializer support floats correctly as they "
+//          "can be converted implicitly to ints.");
+//    }
+//
+//    if (max_load_factor < MINIMUM_MAX_LOAD_FACTOR ||
+//        max_load_factor > MAXIMUM_MAX_LOAD_FACTOR) {
+//      TSL_RH_THROW_OR_TERMINATE(
+//          std::runtime_error,
+//          "Invalid max_load_factor. Check that the serializer "
+//          "and deserializer support floats correctly as they "
+//          "can be converted implicitly to ints.");
+//    }
+//
+//    this->min_load_factor(min_load_factor);
+//    this->max_load_factor(max_load_factor);
+//
+//    if (bucket_count_ds == 0) {
+//      tsl_rh_assert(nb_elements == 0);
+//      return;
+//    }
+//
+//    if (!hash_compatible) {
+//      reserve(numeric_cast<size_type>(nb_elements,
+//                                      "Deserialized nb_elements is too big."));
+//      for (slz_size_type ibucket = 0; ibucket < bucket_count_ds; ibucket++) {
+//        const distance_type dist_from_ideal_bucket =
+//            deserialize_value<std::int16_t>(deserializer);
+//        if (dist_from_ideal_bucket !=
+//            bucket_entry::EMPTY_MARKER_DIST_FROM_IDEAL_BUCKET) {
+//          if (hash_stored_for_bucket) {
+//            TSL_RH_UNUSED(deserialize_value<std::uint32_t>(deserializer));
+//          }
+//
+//          insert(deserialize_value<value_type>(deserializer));
+//        }
+//      }
+//
+//      tsl_rh_assert(nb_elements == size());
+//    } else {
+//      m_bucket_count = numeric_cast<size_type>(
+//          bucket_count_ds, "Deserialized bucket_count is too big.");
+//
+//      GrowthPolicy::operator=(GrowthPolicy(m_bucket_count));
+//      // GrowthPolicy should not modify the bucket count we got from
+//      // deserialization
+//      if (m_bucket_count != bucket_count_ds) {
+//        TSL_RH_THROW_OR_TERMINATE(std::runtime_error,
+//                                  "The GrowthPolicy is not the same even "
+//                                  "though hash_compatible is true.");
+//      }
+//
+//      m_nb_elements = numeric_cast<size_type>(
+//          nb_elements, "Deserialized nb_elements is too big.");
+//      m_buckets_data.resize(m_bucket_count);
+//      m_buckets = m_buckets_data.data();
+//
+//      for (bucket_entry& bucket : m_buckets_data) {
+//        const distance_type dist_from_ideal_bucket =
+//            deserialize_value<std::int16_t>(deserializer);
+//        if (dist_from_ideal_bucket !=
+//            bucket_entry::EMPTY_MARKER_DIST_FROM_IDEAL_BUCKET) {
+//          truncated_hash_type truncated_hash = 0;
+//          if (hash_stored_for_bucket) {
+//            tsl_rh_assert(hash_stored_for_bucket);
+//            truncated_hash = deserialize_value<std::uint32_t>(deserializer);
+//          }
+//
+//          bucket.set_value_of_empty_bucket(
+//              dist_from_ideal_bucket, truncated_hash,
+//              deserialize_value<value_type>(deserializer));
+//        }
+//      }
+//
+//      if (!m_buckets_data.empty()) {
+//        m_buckets_data.back().set_as_last_bucket();
+//      }
+//    }
+//  }
 
  public:
   static const size_type DEFAULT_INIT_BUCKETS_SIZE = 0;

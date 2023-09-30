@@ -8,6 +8,7 @@
 #include "../utilities/customAllocators.h"
 #include "../operators/select.h"
 #include "../operators/groupBy.h"
+#include "../hash_table/robin_map.h"
 
 namespace MABPL {
 
@@ -504,8 +505,8 @@ void *groupByHashCountLastLevelCacheMisses(void *arg) {
     T2 *inputAggregate = args->inputAggregate;
     int cardinality = args->cardinality;
 
-    tsl::robin_map<T1, T2, std::hash<T1>, std::equal_to<T1>, CustomAllocator<std::pair<T1, T2>>> map(std::max(static_cast<int>(2.5 * cardinality), 400000));
-    typename tsl::robin_map<T1, T2, std::hash<T1>, std::equal_to<T1>, CustomAllocator<std::pair<T1, T2>>>::iterator it;
+    MABPL_tsl::robin_map<T1, T2> map(std::max(static_cast<int>(2.5 * cardinality), 400000));
+    typename MABPL_tsl::robin_map<T1, T2>::iterator it;
 
     int eventSet = PAPI_NULL;
     std::vector<std::string> counters = {"PERF_COUNT_HW_CACHE_MISSES"};

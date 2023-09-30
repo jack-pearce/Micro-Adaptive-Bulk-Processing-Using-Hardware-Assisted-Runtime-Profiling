@@ -12,6 +12,7 @@
 #include "../utilities/papi.h"
 #include "../machine_constants/machineConstants.h"
 #include "../utilities/customAllocators.h"
+#include "../hash_table/robin_map.h"
 
 
 namespace MABPL {
@@ -56,8 +57,8 @@ T CountAggregation<T>::operator()(T currentAggregate, T _, bool firstAggregation
 }
 
 template<template<typename> class Aggregator, typename T1, typename T2>
-inline void groupByHashAux(int n, T1 *inputGroupBy, T2 *inputAggregate, tsl::robin_map<T1, T2, std::hash<T1>, std::equal_to<T1>, CustomAllocator<std::pair<T1, T2>>>  &map, int &index) {
-    typename tsl::robin_map<T1, T2, std::hash<T1>, std::equal_to<T1>, CustomAllocator<std::pair<T1, T2>>>::iterator it;
+inline void groupByHashAux(int n, T1 *inputGroupBy, T2 *inputAggregate, MABPL_tsl::robin_map<T1, T2> &map, int &index) {
+    typename MABPL_tsl::robin_map<T1, T2>::iterator it;
     int startingIndex = index;
     for (; index < startingIndex + n; ++index) {
         it = map.find(inputGroupBy[index]);
@@ -74,8 +75,7 @@ vectorOfPairs<T1, T2> groupByHash(int n, T1 *inputGroupBy, T2 *inputAggregate, i
     static_assert(std::is_integral<T1>::value, "GroupBy column must be an integer type");
     static_assert(std::is_arithmetic<T2>::value, "Payload column must be an numeric type");
 
-    tsl::robin_map<T1, T2, std::hash<T1>, std::equal_to<T1>, CustomAllocator<std::pair<T1, T2>>>
-            map(std::max(static_cast<int>(2.5 * cardinality), 400000));
+    MABPL_tsl::robin_map<T1, T2> map(std::max(static_cast<int>(2.5 * cardinality), 400000));
 
     int index = 0;
 
@@ -202,9 +202,9 @@ vectorOfPairs<T1, T2> groupBySort(int n, T1 *inputGroupBy, T2 *inputAggregate) {
 }
 
 template<template<typename> class Aggregator, typename T1, typename T2>
-inline void groupByAdaptiveAuxHash(int n, T1 *inputGroupBy, T2 *inputAggregate, tsl::robin_map<T1, T2, std::hash<T1>, std::equal_to<T1>, CustomAllocator<std::pair<T1, T2>>> &map,
+inline void groupByAdaptiveAuxHash(int n, T1 *inputGroupBy, T2 *inputAggregate, MABPL_tsl::robin_map<T1, T2> &map,
                                    int &index, T1 &largest) {
-    typename tsl::robin_map<T1, T2, std::hash<T1>, std::equal_to<T1>, CustomAllocator<std::pair<T1, T2>>>::iterator it;
+    typename MABPL_tsl::robin_map<T1, T2>::iterator it;
     int startingIndex = index;
     for (; index < startingIndex + n; ++index) {
         it = map.find(inputGroupBy[index]);
@@ -220,7 +220,7 @@ inline void groupByAdaptiveAuxHash(int n, T1 *inputGroupBy, T2 *inputAggregate, 
 template<template<typename> class Aggregator, typename T1, typename T2>
 vectorOfPairs<T1, T2> groupByAdaptiveAuxSort(int n, T1 *inputGroupBy, T2 *inputAggregate,
                                              vectorOfPairs<int, int> &sectionsToBeSorted,
-                                             tsl::robin_map<T1, T2, std::hash<T1>, std::equal_to<T1>, CustomAllocator<std::pair<T1, T2>>> &map, T1 largest,
+                                             MABPL_tsl::robin_map<T1, T2> &map, T1 largest,
                                              vectorOfPairs<T1, T2> &result) {
     int i;
     for (const auto& section : sectionsToBeSorted) {
@@ -321,9 +321,8 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
     constexpr int tuplesBetweenHashing = 2*1000*1000;
     int initialSize = std::max(static_cast<int>(2.5 * cardinality), 400000);
 
-    tsl::robin_map<T1, T2, std::hash<T1>, std::equal_to<T1>, CustomAllocator<std::pair<T1, T2>>>
-            map(initialSize);
-    typename tsl::robin_map<T1, T2, std::hash<T1>, std::equal_to<T1>, CustomAllocator<std::pair<T1, T2>>>::iterator it;
+    MABPL_tsl::robin_map<T1, T2> map(initialSize);
+    typename MABPL_tsl::robin_map<T1, T2>::iterator it;
 
     std::vector<std::string> counters = {"PERF_COUNT_HW_CACHE_MISSES"};
     long_long *counterValues = Counters::getInstance().getSharedEventSetEvents(counters);
@@ -526,8 +525,8 @@ void *groupByAdaptiveParallelAux(void *arg) {
     int maxCardinality = std::min(cardinality, n);
     int initialSize = std::max(static_cast<int>(2.5 * maxCardinality), 400000);
 
-    tsl::robin_map<T1, T2, std::hash<T1>, std::equal_to<T1>, CustomAllocator<std::pair<T1, T2>>> map(initialSize);
-    typename tsl::robin_map<T1, T2, std::hash<T1>, std::equal_to<T1>, CustomAllocator<std::pair<T1, T2>>>::iterator it;
+    MABPL_tsl::robin_map<T1, T2> map(initialSize);
+    typename MABPL_tsl::robin_map<T1, T2>::iterator it;
 
     int eventSet = PAPI_NULL;
     std::vector<std::string> counters = {"PERF_COUNT_HW_CACHE_MISSES"};
