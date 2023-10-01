@@ -140,6 +140,8 @@ class robin_map {
   using const_pointer = typename ht::const_pointer;
   using iterator = typename ht::iterator;
   using const_iterator = typename ht::const_iterator;
+  using iteratorCustom = typename ht::iteratorCustom;
+  using const_iteratorCustom = typename ht::const_iteratorCustom;
 
  public:
   /*
@@ -217,6 +219,17 @@ class robin_map {
   iterator end() noexcept { return m_ht.end(); }
   const_iterator end() const noexcept { return m_ht.end(); }
   const_iterator cend() const noexcept { return m_ht.cend(); }
+
+    /*
+     * Custom Iterators
+     */
+    iteratorCustom beginCustom() noexcept { return m_ht.beginCustom(); }
+    const_iteratorCustom beginCustom() const noexcept { return m_ht.beginCustom(); }
+    const_iteratorCustom cbeginCustom() const noexcept { return m_ht.cbeginCustom(); }
+
+    iteratorCustom endCustom() noexcept { return m_ht.endCustom(); }
+    const_iteratorCustom endCustom() const noexcept { return m_ht.endCustom(); }
+    const_iteratorCustom cendCustom() const noexcept { return m_ht.cendCustom(); }
 
   /*
    * Capacity
@@ -487,6 +500,8 @@ class robin_map {
 
   iterator find(const Key& key) { return m_ht.find(key); }
 
+  iteratorCustom findCustom(const Key& key) { return m_ht.findCustom(key); }
+
   /**
    * Use the hash value 'precalculated_hash' instead of hashing the key. The
    * hash value should be the same as hash_function()(key). Useful to speed-up
@@ -496,13 +511,23 @@ class robin_map {
     return m_ht.find(key, precalculated_hash);
   }
 
+  iteratorCustom findCustom(const Key& key, std::size_t precalculated_hash) {
+    return m_ht.findCustom(key, precalculated_hash);
+  }
+
   const_iterator find(const Key& key) const { return m_ht.find(key); }
+
+  const_iteratorCustom findCustom(const Key& key) const { return m_ht.findCustom(key); }
 
   /**
    * @copydoc find(const Key& key, std::size_t precalculated_hash)
    */
   const_iterator find(const Key& key, std::size_t precalculated_hash) const {
     return m_ht.find(key, precalculated_hash);
+  }
+
+  const_iteratorCustom findCustom(const Key& key, std::size_t precalculated_hash) const {
+    return m_ht.findCustom(key, precalculated_hash);
   }
 
   /**
@@ -515,6 +540,13 @@ class robin_map {
       typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
   iterator find(const K& key) {
     return m_ht.find(key);
+  }
+
+  template <
+        class K, class KE = KeyEqual,
+        typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
+  iteratorCustom findCustom(const K& key) {
+    return m_ht.findCustom(key);
   }
 
   /**
@@ -531,6 +563,13 @@ class robin_map {
     return m_ht.find(key, precalculated_hash);
   }
 
+ template <
+        class K, class KE = KeyEqual,
+        typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
+  iteratorCustom findCustom(const K& key, std::size_t precalculated_hash) {
+    return m_ht.findCustom(key, precalculated_hash);
+  }
+
   /**
    * @copydoc find(const K& key)
    */
@@ -539,6 +578,13 @@ class robin_map {
       typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
   const_iterator find(const K& key) const {
     return m_ht.find(key);
+  }
+
+  template <
+        class K, class KE = KeyEqual,
+        typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
+  const_iteratorCustom findCustom(const K& key) const {
+    return m_ht.findCustom(key);
   }
 
   /**
@@ -553,6 +599,13 @@ class robin_map {
       typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
   const_iterator find(const K& key, std::size_t precalculated_hash) const {
     return m_ht.find(key, precalculated_hash);
+  }
+
+  template <
+        class K, class KE = KeyEqual,
+        typename std::enable_if<has_is_transparent<KE>::value>::type* = nullptr>
+  const_iteratorCustom findCustom(const K& key, std::size_t precalculated_hash) const {
+    return m_ht.findCustom(key, precalculated_hash);
   }
 
   bool contains(const Key& key) const { return m_ht.contains(key); }

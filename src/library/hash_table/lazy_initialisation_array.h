@@ -79,7 +79,7 @@ private:
 
     value_type& getElement(size_type index) {
         if (memoryIsAllZero(data_[index])) {
-            std::cout << "Object constructed at index " << index << std::endl;
+//            std::cout << "Object constructed at index " << index << std::endl;
             new (&data_[index]) value_type();
         }
 

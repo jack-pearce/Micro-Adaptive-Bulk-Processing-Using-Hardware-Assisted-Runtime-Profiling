@@ -899,18 +899,6 @@ int main() {
 /*    long_long cycles;
     cycles = *Counters::getInstance().readSharedEventSet();
 
-    MABPL::LazilyInitialisedVector<std::string> vectorTest (100000000);
-
-    std::cout << "Cycles: " << static_cast<double>(*Counters::getInstance().readSharedEventSet() - cycles) << std::endl;
-
-    std::cout << vectorTest[3] << std::endl;
-    vectorTest[3] = "Test";
-    std::cout << vectorTest[3] << std::endl;*/
-
-
-/*    long_long cycles;
-    cycles = *Counters::getInstance().readSharedEventSet();
-
     MABPL::LazyInitializationVector<std::string> vectorTest (100000000);
 
     std::cout << "Cycles: " << static_cast<double>(*Counters::getInstance().readSharedEventSet() - cycles) << std::endl;
@@ -922,31 +910,50 @@ int main() {
 
     MABPL_tsl::robin_map<int,int> map(100);
 
-    std::cout << map.bucket_count() << std::endl;
+    typename MABPL_tsl::robin_map<int,int>::iteratorCustom it;
 
-    typename MABPL_tsl::robin_map<int,int>::iterator it;
-    int n = 3;
 
-    map[11] = 1;
-    map[31] = 1;
-
-/*    for (int index = 0; index < n; ++index) {
-        it = map.find(3);
-        if (it != map.end()) {
+    int n = 10;
+    for (int index = 2; index < n; ++index) {
+        it = map.findCustom(index / 2);
+        if (it != map.endCustom()) {
             it.value() = 5;
+            std::cout << "Updated value" << std::endl;
         } else {
-            map.insert({3,5});
+            map.insert({index,3});
+            std::cout << "Inserted value" << std::endl;
         }
     }
 
-    it = map.end();
-    std::cout << it->first << ", " << it->second << std::endl;*/
-
-//    MABPL::vectorOfPairs<int,int> result = {map.begin(), map.end()};
+//    it = map.begin();
+//    std::cout << it->first << ", " << it->second << std::endl;
 //
-//    for (auto& pair : result) {
-//        std::cout << pair.first << ", " << pair.second << std::endl;
-//    }
+//    it = map.end();
+//    std::cout << it->first << ", " << it->second << std::endl;
+
+/*    it = map.beginCustom();
+    std::cout << it->first << ", " << it->second << std::endl;
+    it++;
+    std::cout << it->first << ", " << it->second << std::endl;
+    it++;
+
+    itEnd = map.endCustom();
+    if(it == itEnd) {
+        std::cout << "Yes end" << std::endl;
+    } else {
+        std::cout << "Not end" << std::endl;
+    }*/
+
+
+//    std::cout << it->first << ", " << it->second << std::endl;
+
+    MABPL::vectorOfPairs<int,int> result = {map.beginCustom(), map.endCustom()};
+    std::cout << "Result when converted to vectorOfPairs" << std::endl;
+    std::cout << "Result length: " << result.size() << std::endl;
+
+    for (auto& pair : result) {
+        std::cout << pair.first << ", " << pair.second << std::endl;
+    }
 
 
 //    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,

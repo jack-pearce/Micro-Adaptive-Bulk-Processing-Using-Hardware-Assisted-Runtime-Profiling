@@ -374,6 +374,9 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
   template <bool IsConst>
   class robin_iterator;
 
+  template <bool IsConst>
+  class CustomIterator;
+
   using key_type = typename KeySelect::key_type;
   using value_type = ValueType;
   using size_type = std::size_t;
@@ -387,6 +390,8 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
   using const_pointer = const value_type*;
   using iterator = robin_iterator<false>;
   using const_iterator = robin_iterator<true>;
+  using iteratorCustom = CustomIterator<false>;
+  using const_iteratorCustom = CustomIterator<true>;
 
  private:
   /**
@@ -559,7 +564,15 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
         m_bucket_count(bucket_count),
         m_nb_elements(0),
         m_grow_on_next_insert(false),
-        m_try_shrink_on_next_insert(false) {
+        m_try_shrink_on_next_insert(false),
+        bucket_indexes_populated(bucket_count) {
+
+//      std::cout << "Bucket count: " << bucket_count << ", bitset size: " << bucket_indexes_populated.size() << std::endl;
+//
+//      for (int i = 0; i < bucket_count; i++) {
+//          std::cout << bucket_indexes_populated[i];
+//      }
+//      std::cout << std::endl;
 
     if (bucket_count > max_bucket_count()) {
       TSL_RH_THROW_OR_TERMINATE(std::length_error,
@@ -687,13 +700,133 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
   }
 
   /*
-   * Iterators
+   * Custom iterator
    */
+    template <bool IsConst>
+    class CustomIterator {
+    friend class robin_hash;
+
+    private:
+        using bucket_entry_ptr =
+                typename std::conditional<IsConst, const bucket_entry*,
+                        bucket_entry*>::type;
+
+        using bitmap_ptr =
+                typename std::conditional<IsConst, const std::vector<bool>*,
+                        std::vector<bool>*>::type;
+
+        CustomIterator(bucket_entry_ptr containerStart_, size_t index_, bitmap_ptr bucket_indexes_populated_) noexcept:
+                containerStart(containerStart_), index(index_), bucket_indexes_populated(bucket_indexes_populated_) {}
+
+    public:
+        using iterator_category = std::forward_iterator_tag;
+        using value_type = const typename robin_hash::value_type;
+        using difference_type = std::ptrdiff_t;
+        using reference = value_type&;
+        using pointer = value_type*;
+
+        CustomIterator() noexcept {}
+
+        // Copy constructor from iterator to const_iterator.
+        template <bool TIsConst = IsConst,
+                typename std::enable_if<TIsConst>::type* = nullptr>
+        CustomIterator(const CustomIterator<!TIsConst>& other) noexcept
+                : containerStart(other.containerStart), index(other.index),
+                  bucket_indexes_populated(other.bucket_indexes_populated) {}
+
+        CustomIterator(const CustomIterator& other) = default;
+        CustomIterator(CustomIterator&& other) = default;
+        CustomIterator& operator=(const CustomIterator& other) = default;
+        CustomIterator& operator=(CustomIterator&& other) = default;
+
+        const typename robin_hash::key_type& key() const {
+            return KeySelect()((containerStart + index)->value());
+        }
+
+        template <class U = ValueSelect,
+                typename std::enable_if<has_mapped_type<U>::value &&
+                                        IsConst>::type* = nullptr>
+        const typename U::value_type& value() const {
+            return U()((containerStart + index)->value());
+        }
+
+        template <class U = ValueSelect,
+                typename std::enable_if<has_mapped_type<U>::value &&
+                                        !IsConst>::type* = nullptr>
+        typename U::value_type& value() const {
+            return U()((containerStart + index)->value());
+        }
+
+        CustomIterator& operator++() {
+            index++;
+            while (!(*bucket_indexes_populated)[index] && index < bucket_indexes_populated->size()) {
+                index++;
+            }
+            return *this;
+        }
+
+        CustomIterator operator++(int) {
+            CustomIterator tmp(*this);
+            ++*this;
+
+            return tmp;
+        }
+
+        friend bool operator==(const CustomIterator& lhs,
+                               const CustomIterator& rhs) {
+            return lhs.index == rhs.index;
+        }
+
+        friend bool operator!=(const CustomIterator& lhs,
+                               const CustomIterator& rhs) {
+            return !(lhs == rhs);
+        }
+
+        reference operator*() const { return (containerStart + index)->value(); }
+
+        pointer operator->() const { return std::addressof((containerStart + index)->value()); }
+
+    private:
+        bucket_entry_ptr containerStart;
+        size_t index;
+        bitmap_ptr bucket_indexes_populated;
+    };
+
+    iteratorCustom beginCustom() {
+        std::size_t i = 0;
+        while (!bucket_indexes_populated[i]) {
+            i++;
+        }
+        return iteratorCustom(m_buckets_data.data(), i, &bucket_indexes_populated);
+    }
+
+    const_iteratorCustom beginCustom() const noexcept { return cbeginCustom(); }
+
+    const_iteratorCustom cbeginCustom() const noexcept {
+        std::size_t i = 0;
+        while (!bucket_indexes_populated[i]) {
+            i++;
+        }
+        return const_iteratorCustom(m_buckets_data.data(), i, &bucket_indexes_populated);
+    }
+
+    iteratorCustom endCustom() {
+        return iteratorCustom(m_buckets_data.data(), m_bucket_count, &bucket_indexes_populated);
+    }
+
+    const_iteratorCustom endCustom() const noexcept { return cendCustom(); }
+
+    const_iteratorCustom cendCustom() const noexcept {
+        return const_iteratorCustom(m_buckets_data.data(), m_bucket_count, &bucket_indexes_populated);
+    }
+
+    /*
+    * Iterators
+    */
   iterator begin() noexcept {
-      std::cout << "Here" << std::endl;
     std::size_t i = 0;
     while (i < m_bucket_count && m_buckets_data[i].empty()) {
-      i++;
+        i++;
     }
 
     return iterator(m_buckets_data.data() + i);
@@ -711,7 +844,6 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
   }
 
   iterator end() noexcept {
-      std::cout << "Here" << std::endl;
       return iterator(m_buckets_data.data() + m_bucket_count);
   }
 
@@ -1003,6 +1135,26 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
     }
   }
 
+    template <class K>
+    iteratorCustom findCustom(const K& key) {
+        return find_implCustom(key, hash_key(key));
+    }
+
+    template <class K>
+    iteratorCustom findCustom(const K& key, std::size_t hash) {
+        return find_implCustom(key, hash);
+    }
+
+    template <class K>
+    const_iteratorCustom findCustom(const K& key) const {
+        return find_implCustom(key, hash_key(key));
+    }
+
+    template <class K>
+    const_iteratorCustom findCustom(const K& key, std::size_t hash) const {
+        return find_implCustom(key, hash);
+    }
+
   template <class K>
   iterator find(const K& key) {
     return find_impl(key, hash_key(key));
@@ -1117,6 +1269,10 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
     return iterator(const_cast<bucket_entry*>(pos.m_bucket));
   }
 
+  iteratorCustom mutable_iteratorCustom(const_iteratorCustom pos) {
+    return iteratorCustom(const_cast<bucket_entry*>(pos.containerStart), pos.index, &bucket_indexes_populated);
+  }
+
 //  template <class Serializer>
 //  void serialize(Serializer& serializer) const {
 //    serialize_impl(serializer);
@@ -1171,6 +1327,12 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
         static_cast<const robin_hash*>(this)->find(key, hash));
   }
 
+    template <class K>
+    iteratorCustom find_implCustom(const K& key, std::size_t hash) {
+        return mutable_iteratorCustom(
+                static_cast<const robin_hash*>(this)->findCustom(key, hash));
+    }
+
   template <class K>
   const_iterator find_impl(const K& key, std::size_t hash) const {
     std::size_t ibucket = bucket_for_hash(hash);
@@ -1191,6 +1353,27 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
 
     return cend();
   }
+
+    template <class K>
+    const_iteratorCustom find_implCustom(const K& key, std::size_t hash) const {
+        std::size_t ibucket = bucket_for_hash(hash);
+        distance_type dist_from_ideal_bucket = 0;
+
+        while (dist_from_ideal_bucket <=
+               (m_buckets_data.data() + ibucket)->dist_from_ideal_bucket()) {
+            if (TSL_RH_LIKELY(
+                    (!USE_STORED_HASH_ON_LOOKUP ||
+                     (m_buckets_data.data() + ibucket)->bucket_hash_equal(hash)) &&
+                    compare_keys(KeySelect()((m_buckets_data.data() + ibucket)->value()), key))) {
+                return const_iteratorCustom(m_buckets_data.data(), ibucket, &bucket_indexes_populated);
+            }
+
+            ibucket = next_bucket(ibucket);
+            dist_from_ideal_bucket++;
+        }
+
+        return cendCustom();
+    }
 
   void erase_from_bucket(iterator pos) {
     pos.m_bucket->clear();
@@ -1235,6 +1418,7 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
       if ((!USE_STORED_HASH_ON_LOOKUP ||
            m_buckets_data[ibucket].bucket_hash_equal(hash)) &&
           compare_keys(KeySelect()(m_buckets_data[ibucket].value()), key)) {
+          bucket_indexes_populated[ibucket] = true;
         return std::make_pair(iterator(m_buckets_data.data() + ibucket), false);
       }
 
@@ -1268,6 +1452,7 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
      * The value will be inserted in ibucket in any case, either because it was
      * empty or by stealing the bucket (robin hood).
      */
+    bucket_indexes_populated[ibucket] = true;
     return std::make_pair(iterator(m_buckets_data.data() + ibucket), true);
   }
 
@@ -1637,6 +1822,8 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
   float m_max_load_factor;
 
   bool m_grow_on_next_insert;
+
+  std::vector<bool> bucket_indexes_populated;
 
   /**
    * We can't shrink down the map on erase operations as the erase methods need
