@@ -877,6 +877,8 @@ void runImdbMacroBenchmarks() {
 
 int main() {
 
+    MABPL::calculateMissingMachineConstants();
+
     groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
                                             {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                             1, "LazyInit-1-NoClustering-20mValues");

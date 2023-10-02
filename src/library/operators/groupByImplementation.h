@@ -258,10 +258,16 @@ vectorOfPairs<T1, T2> groupByAdaptiveAuxSort(int n, T1 *inputGroupBy, T2 *inputA
             buckets[(inputGroupBy[i] >> (pass * BITS_PER_GROUPBY_RADIX_PASS)) & mask]++;
         }
     }
-//    for (auto it = map.begin(); it != map.end(); ++it) {
+
+    vectorOfPairs<T1,T2> mapValues(map.size());
+    size_t mapValuesIndex = 0;
     for (auto it = map.beginCustom(); it != map.endCustom(); ++it) {
+        mapValues[mapValuesIndex++] = std::make_pair(it->first, it->second);
         buckets[(it->first >> (pass * BITS_PER_GROUPBY_RADIX_PASS)) & mask]++;
     }
+//    for (auto it = map.begin(); it != map.end(); ++it) {
+//        buckets[(it->first >> (pass * BITS_PER_GROUPBY_RADIX_PASS)) & mask]++;
+//    }
 
     for (i = 1; i < numBuckets; i++) {
         buckets[i] += buckets[i - 1];
@@ -269,11 +275,14 @@ vectorOfPairs<T1, T2> groupByAdaptiveAuxSort(int n, T1 *inputGroupBy, T2 *inputA
 
     std::vector<int> partitions(buckets.data(), buckets.data() + numBuckets);
 
-//    for (auto it = map.begin(); it != map.end(); it++) {
-    for (auto it = map.beginCustom(); it != map.endCustom(); it++) {
-        bufferGroupBy[--buckets[(it->first >> (pass * BITS_PER_GROUPBY_RADIX_PASS)) & mask]] = it->first;
-        bufferAggregate[buckets[(it->first >> (pass * BITS_PER_GROUPBY_RADIX_PASS)) & mask]] = it->second;
+    for (auto &pair : mapValues) {
+        bufferGroupBy[--buckets[(pair.first >> (pass * BITS_PER_GROUPBY_RADIX_PASS)) & mask]] = pair.first;
+        bufferAggregate[buckets[(pair.first >> (pass * BITS_PER_GROUPBY_RADIX_PASS)) & mask]] = pair.second;
     }
+//    for (auto it = map.begin(); it != map.end(); it++) {
+//        bufferGroupBy[--buckets[(it->first >> (pass * BITS_PER_GROUPBY_RADIX_PASS)) & mask]] = it->first;
+//        bufferAggregate[buckets[(it->first >> (pass * BITS_PER_GROUPBY_RADIX_PASS)) & mask]] = it->second;
+//    }
     for (const auto& section : vectorOfPairs<int, int>(sectionsToBeSorted.rbegin(), sectionsToBeSorted.rend())) {
         for (i = section.first; i < section.second; i++) {
             bufferGroupBy[--buckets[(inputGroupBy[i] >> (pass * BITS_PER_GROUPBY_RADIX_PASS)) & mask]] = inputGroupBy[i];
