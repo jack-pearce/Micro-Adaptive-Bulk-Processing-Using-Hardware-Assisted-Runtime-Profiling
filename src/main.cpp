@@ -781,7 +781,7 @@ void runImdbGroupByMacroBenchmark_titleIdFromPrincipalsTable_clusteringSweep(int
         headers[1 + i] = functionNames[i % 3];
     }
 
-    std::string fileName = "IMDB_groupBy_titleIdColumn_PrincipalsTable";
+    std::string fileName = "LazyInit-IMDB_groupBy_titleIdColumn_PrincipalsTable";
     std::string fullFilePath = FilePaths::getInstance().getImdbOutputFolderPath() + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 
@@ -854,7 +854,7 @@ void runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(int itera
         headers[1 + i] = functionNames[i % 3];
     }
 
-    std::string fileName = "IMDB_groupBy_titleIdColumn_AkasTable";
+    std::string fileName = "LazyInit-IMDB_groupBy_titleIdColumn_AkasTable";
     std::string fullFilePath = FilePaths::getInstance().getImdbOutputFolderPath() + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 
@@ -875,119 +875,36 @@ void runImdbMacroBenchmarks() {
     runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(5,30);
 }
 
-void runVectorInitBenchmark() {
-    size_t n = 200*1000*1000;
-
-    long_long cycles;
-    cycles = *Counters::getInstance().readSharedEventSet();
-
-//    std::vector<int> testVector(n);
-
-    std::vector<int, MABPL::CustomAllocator<int>> testVector(n);
-
-/*    using buckets_allocator = typename std::allocator_traits<
-            MABPL::CustomAllocator<int>>::template rebind_alloc<int>;
-
-    std::vector<int, buckets_allocator> testVector(n);*/
-
-    std::cout << "Cycles: " << static_cast<double>(*Counters::getInstance().readSharedEventSet() - cycles) << std::endl;
-
-}
-
 int main() {
 
     groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
-                                            {GroupBy::Adaptive},
-                                            1, "TESTSortOnlyAdaptive");
-
-//    tessilRobinMapPartialPopulationTest<int,int>("CustomContainerRandom");
-
-/*    long_long cycles;
-    cycles = *Counters::getInstance().readSharedEventSet();
-
-    MABPL_tsl::robin_map<int,int> map(200*1000*1000);
-    typename MABPL_tsl::robin_map<int,int>::iteratorCustom it;
-
-    int n = 10;
-    for (int index = 2; index < n; ++index) {
-        it = map.findCustom(index / 2);
-        if (it != map.endCustom()) {
-            it.value() = 5;
-        } else {
-            map.insert({index,3});
-        }
-    }
-
-    std::cout << "Cycles: " << static_cast<double>(*Counters::getInstance().readSharedEventSet() - cycles) << std::endl;
-
-    MABPL::vectorOfPairs<int,int> result = {map.beginCustom(), map.endCustom()};
-    std::cout << "Result when converted to vectorOfPairs" << std::endl;
-    std::cout << "Result length: " << result.size() << std::endl;
-
-    for (auto& pair : result) {
-        std::cout << pair.first << ", " << pair.second << std::endl;
-    }*/
-
-
-/*
-    MABPL_tsl::robin_map<int,int> map(100);
-
-    typename MABPL_tsl::robin_map<int,int>::iteratorCustom it;
-
-
-    int n = 10;
-    for (int index = 2; index < n; ++index) {
-        it = map.findCustom(index / 2);
-        if (it != map.endCustom()) {
-            it.value() = 5;
-            std::cout << "Updated value" << std::endl;
-        } else {
-            map.insert({index,3});
-            std::cout << "Inserted value" << std::endl;
-        }
-    }
-
-    MABPL::vectorOfPairs<int,int> result = {map.beginCustom(), map.endCustom()};
-    std::cout << "Result when converted to vectorOfPairs" << std::endl;
-    std::cout << "Result length: " << result.size() << std::endl;
-
-    for (auto& pair : result) {
-        std::cout << pair.first << ", " << pair.second << std::endl;
-    }
-*/
-
-/*    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1m,
                                             {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                            5, "1-ClusteringSweep-20mValues");
-
-    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
-                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                            5, "1-NoClustering-200mValues");
-
+                                            1, "LazyInit-1-NoClustering-20mValues");
 
     groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution40mValuesCardinalitySweepFixedMax,
                                             {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                            5, "TEST");
+                                            1, "LazyInit-1-NoClustering-40mValues");
 
-    runImdbGroupByMacroBenchmark_titleIdFromPrincipalsTable_clusteringSweep(5,30);
-    runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(5,30);*/
-
-
-
+    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                            1, "LazyInit-1-NoClustering-200mValues");
 
 
+    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1m,
+                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                            1, "LazyInit-1-ClusteringSweep-20mValues");
+
+    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution40mValuesClusteredSweepFixedCardinality1mMax40m,
+                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                            1, "LazyInit-1-ClusteringSweep-40mValues");
+
+    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesClusteredSweepFixedCardinality10mMax200m,
+                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                            1, "LazyInit-1-ClusteringSweep-200mValues");
 
 
-//    runVectorInitBenchmark();
-
-//    groupByCompareResultsTest<int, int>(DataFiles::uniformIntDistribution250mValuesMax10000, GroupBy::Hash, GroupBy::Sort);
-
-//    tessilRobinMapInitialisationBenchmarkDefaultAllocator<int, int>("CustomAllocatorInitCosts");
-//    tessilRobinMapInitialisationBenchmarkCustomAllocator<int, int>("CustomAllocatorInitCosts");
-
-//    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
-//                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-//                                            5, "CallocAllocator-NoClustering");
+    runImdbGroupByMacroBenchmark_titleIdFromPrincipalsTable_clusteringSweep(1,30);
+    runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(1,30);
 
 
     return 0;
