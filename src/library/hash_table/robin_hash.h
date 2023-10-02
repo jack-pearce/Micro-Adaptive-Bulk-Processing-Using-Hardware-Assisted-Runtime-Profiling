@@ -450,8 +450,8 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
 
 //  using buckets_container_type = std::vector<bucket_entry, buckets_allocator>;
 
-    using buckets_container_type = std::vector<bucket_entry>;
-//  using buckets_container_type = LazyInitializationArray<bucket_entry>;
+//    using buckets_container_type = std::vector<bucket_entry>;
+  using buckets_container_type = LazyInitializationArray<bucket_entry>;
 
  public:
   /**
@@ -756,11 +756,16 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
         }
 
         CustomIterator& operator++() {
-            index++;
-            while ((containerStart + index)->empty() && index < bucket_indexes_populated->size()) {
-                index++;
+            while (true) {
+                if ((*reinterpret_cast<bool*>(containerStart + index)) && (containerStart + index)->last_bucket()) {
+                    ++index;
+                    return *this;
+                }
+                ++index;
+                if ((*reinterpret_cast<bool*>(containerStart + index)) && !((containerStart + index)->empty())) {
+                    return *this;
+                }
             }
-            return *this;
         }
 
         CustomIterator operator++(int) {
