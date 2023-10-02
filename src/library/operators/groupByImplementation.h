@@ -58,11 +58,14 @@ T CountAggregation<T>::operator()(T currentAggregate, T _, bool firstAggregation
 
 template<template<typename> class Aggregator, typename T1, typename T2>
 inline void groupByHashAux(int n, T1 *inputGroupBy, T2 *inputAggregate, MABPL_tsl::robin_map<T1, T2> &map, int &index) {
-    typename MABPL_tsl::robin_map<T1, T2>::iterator it;
+//    typename MABPL_tsl::robin_map<T1, T2>::iterator it;
+    typename MABPL_tsl::robin_map<T1, T2>::iteratorCustom it;
     int startingIndex = index;
     for (; index < startingIndex + n; ++index) {
-        it = map.find(inputGroupBy[index]);
-        if (it != map.end()) {
+//        it = map.find(inputGroupBy[index]);
+        it = map.findCustom(inputGroupBy[index]);
+//        if (it != map.end()) {
+        if (it != map.endCustom()) {
             it.value() = Aggregator<T2>()(it->second, inputAggregate[index], false);
         } else {
             map.insert({inputGroupBy[index], Aggregator<T2>()(0, inputAggregate[index], true)});
@@ -81,7 +84,8 @@ vectorOfPairs<T1, T2> groupByHash(int n, T1 *inputGroupBy, T2 *inputAggregate, i
 
     groupByHashAux<Aggregator>(n, inputGroupBy, inputAggregate, map, index);
 
-    return {map.begin(), map.end()};
+//    return {map.begin(), map.end()};
+    return {map.beginCustom(), map.endCustom()};
 }
 
 template<template<typename> class Aggregator, typename T1, typename T2>
@@ -204,11 +208,14 @@ vectorOfPairs<T1, T2> groupBySort(int n, T1 *inputGroupBy, T2 *inputAggregate) {
 template<template<typename> class Aggregator, typename T1, typename T2>
 inline void groupByAdaptiveAuxHash(int n, T1 *inputGroupBy, T2 *inputAggregate, MABPL_tsl::robin_map<T1, T2> &map,
                                    int &index, T1 &largest) {
-    typename MABPL_tsl::robin_map<T1, T2>::iterator it;
+//    typename MABPL_tsl::robin_map<T1, T2>::iterator it;
+    typename MABPL_tsl::robin_map<T1, T2>::iteratorCustom it;
     int startingIndex = index;
     for (; index < startingIndex + n; ++index) {
-        it = map.find(inputGroupBy[index]);
-        if (it != map.end()) {
+//        it = map.find(inputGroupBy[index]);
+        it = map.findCustom(inputGroupBy[index]);
+//        if (it != map.end()) {
+        if (it != map.endCustom()) {
             it.value() = Aggregator<T2>()(it->second, inputAggregate[index], false);
         } else {
             map.insert({inputGroupBy[index], Aggregator<T2>()(0, inputAggregate[index], true)});
@@ -251,7 +258,8 @@ vectorOfPairs<T1, T2> groupByAdaptiveAuxSort(int n, T1 *inputGroupBy, T2 *inputA
             buckets[(inputGroupBy[i] >> (pass * BITS_PER_GROUPBY_RADIX_PASS)) & mask]++;
         }
     }
-    for (auto it = map.begin(); it != map.end(); ++it) {
+//    for (auto it = map.begin(); it != map.end(); ++it) {
+    for (auto it = map.beginCustom(); it != map.endCustom(); ++it) {
         buckets[(it->first >> (pass * BITS_PER_GROUPBY_RADIX_PASS)) & mask]++;
     }
 
@@ -261,7 +269,8 @@ vectorOfPairs<T1, T2> groupByAdaptiveAuxSort(int n, T1 *inputGroupBy, T2 *inputA
 
     std::vector<int> partitions(buckets.data(), buckets.data() + numBuckets);
 
-    for (auto it = map.begin(); it != map.end(); it++) {
+//    for (auto it = map.begin(); it != map.end(); it++) {
+    for (auto it = map.beginCustom(); it != map.endCustom(); it++) {
         bufferGroupBy[--buckets[(it->first >> (pass * BITS_PER_GROUPBY_RADIX_PASS)) & mask]] = it->first;
         bufferAggregate[buckets[(it->first >> (pass * BITS_PER_GROUPBY_RADIX_PASS)) & mask]] = it->second;
     }
@@ -322,7 +331,6 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
     int initialSize = std::max(static_cast<int>(2.5 * cardinality), 400000);
 
     MABPL_tsl::robin_map<T1, T2> map(initialSize);
-    typename MABPL_tsl::robin_map<T1, T2>::iterator it;
 
     std::vector<std::string> counters = {"PERF_COUNT_HW_CACHE_MISSES"};
     long_long *counterValues = Counters::getInstance().getSharedEventSetEvents(counters);
@@ -361,7 +369,8 @@ vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregat
     }
 
     if (sectionsToBeSorted.empty()) {
-        return {map.begin(), map.end()};
+        return {map.beginCustom(), map.endCustom()};
+//        return {map.begin(), map.end()};
     }
 
     elements += map.size();

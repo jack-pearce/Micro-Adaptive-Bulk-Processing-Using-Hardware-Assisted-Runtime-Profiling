@@ -380,7 +380,7 @@ DataSweep DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepVariable
         "value, so the distribution is dense i.e. there are no gaps."};
 
 DataSweep DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax {
-        3,
+        30,
         20*1000*1000,
         "logUniformIntDistribution20mValuesCardinalitySweepFixedMax",
         "Log distribution of cardinality for 20m ints from 1 to 100m. The max value is fixed at 200m, "

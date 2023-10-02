@@ -389,34 +389,81 @@ void tessilRobinMapInitialisationBenchmarkDefaultAllocator(const std::string &fi
 }
 
 template <typename T1, typename T2>
-void tessilRobinMapInitialisationBenchmarkCustomAllocator(const std::string &fileNamePrefix) {
+void tessilRobinMapPartialPopulationTest(const std::string &fileNamePrefix) {
 
-    int totalPoints = 30;
-    std::vector<float> points;
-    generateLogDistribution(totalPoints, 1, 200*1000*1000, points);
+    int totalPoints = 8;
+    std::vector<float> elementsToInsert;
+    size_t size = 200*1000*1000;
+    generateLinearDistribution(totalPoints, 1, size, elementsToInsert);
+
+    auto elementInsertOrder = new int[size];
+    generateUniformDistributionInMemory(elementInsertOrder, size, size);
 
     long_long cycles;
-    std::vector<std::vector<double>> results(totalPoints,
-                                             std::vector<double>(2, 0));
+    std::vector<std::vector<double>> results(elementsToInsert.size(), std::vector<double>(2, 0));
 
-    for (auto i = 0; i < totalPoints; ++i) {
+    for (auto i = 0; i < elementsToInsert.size(); ++i) {
 
-        results[i][0] = static_cast<int>(points[i]);
+        results[i][0] = static_cast<int>(elementsToInsert[i]);
 
         cycles = *Counters::getInstance().readSharedEventSet();
 
-        int initialSize = std::max(static_cast<int>(2.5 * points[i]), 400000);
+        int initialSize = std::max(static_cast<int>(2.5 * size), 400000);
         MABPL_tsl::robin_map<T1, T2> map(initialSize);
+
+        typename MABPL_tsl::robin_map<T1, T2>::iterator it;
+
+        for (size_t j = 0; j < static_cast<int>(elementsToInsert[i]); j++) {
+            int value = elementInsertOrder[j];
+            it = map.find(value);
+            if (it != map.end()) {
+                it.value() = (it->second) + 1;
+            } else {
+                map.insert({value, 1});
+            }
+        }
+
+
+
+
+/*        typename MABPL_tsl::robin_map<T1, T2>::iteratorCustom it;
+
+        for (size_t j = 0; j < static_cast<int>(elementsToInsert[i]); j++) {
+            int value = elementInsertOrder[j];
+            it = map.findCustom(value);
+            if (it != map.endCustom()) {
+                it.value() = (it->second) + 1;
+            } else {
+//                map.insert({value, 1});
+                map[value] = 1;
+            }
+//            map[elementInsertOrder[j]] = map[elementInsertOrder[j]] + 1;
+        }*/
+
+/*        typename MABPL_tsl::robin_map<T1, T2>::iterator it;
+
+        for (size_t j = 0; j < static_cast<int>(elementsToInsert[i]); j++) {
+//            int value = elementInsertOrder[j];
+//            it = map.find(value);
+//            if (it != map.end()) {
+//                it.value() = (it->second) + 1;
+//            } else {
+//                map.insert({value, 1});
+//            }
+            map[elementInsertOrder[j]] = map[elementInsertOrder[j]] + 1;
+        }*/
 
         results[i][1] = static_cast<double>(*Counters::getInstance().readSharedEventSet() - cycles);
 
     }
 
+    delete []elementInsertOrder;
+
     std::vector<std::string> headers(2);
-    headers [0] = "Cardinality";
+    headers [0] = "Elements inserted";
     headers [1] = "Cycles";
 
-    std::string fileName = fileNamePrefix + "_tsl_robinMap_initialisationCostOnly_";
+    std::string fileName = fileNamePrefix + "_tsl_robinMap_partialPopulationCost_";
     std::string fullFilePath = FilePaths::getInstance().getGroupByCyclesFolderPath() + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }

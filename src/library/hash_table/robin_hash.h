@@ -174,14 +174,16 @@ class bucket_entry : public bucket_entry_hash<StoreHash> {
   using distance_type = std::int16_t;
 
   bucket_entry() noexcept
-      : bucket_hash(),
+      : initialised(true),
+        bucket_hash(),
         m_dist_from_ideal_bucket(EMPTY_MARKER_DIST_FROM_IDEAL_BUCKET),
         m_last_bucket(false) {
     tsl_rh_assert(empty());
   }
 
   bucket_entry(bool last_bucket) noexcept
-      : bucket_hash(),
+      : initialised(true),
+        bucket_hash(),
         m_dist_from_ideal_bucket(EMPTY_MARKER_DIST_FROM_IDEAL_BUCKET),
         m_last_bucket(last_bucket) {
     tsl_rh_assert(empty());
@@ -189,7 +191,8 @@ class bucket_entry : public bucket_entry_hash<StoreHash> {
 
   bucket_entry(const bucket_entry& other) noexcept(
       std::is_nothrow_copy_constructible<value_type>::value)
-      : bucket_hash(other),
+      : initialised(true),
+        bucket_hash(other),
         m_dist_from_ideal_bucket(EMPTY_MARKER_DIST_FROM_IDEAL_BUCKET),
         m_last_bucket(other.m_last_bucket) {
     if (!other.empty()) {
@@ -207,7 +210,8 @@ class bucket_entry : public bucket_entry_hash<StoreHash> {
    */
   bucket_entry(bucket_entry&& other) noexcept(
       std::is_nothrow_move_constructible<value_type>::value)
-      : bucket_hash(std::move(other)),
+      : initialised(true),
+        bucket_hash(std::move(other)),
         m_dist_from_ideal_bucket(EMPTY_MARKER_DIST_FROM_IDEAL_BUCKET),
         m_last_bucket(other.m_last_bucket) {
     if (!other.empty()) {
@@ -332,9 +336,10 @@ class bucket_entry : public bucket_entry_hash<StoreHash> {
                 "std::numeric_limits<distance_type>::max() - 1.");
 
  private:
+  bool initialised;
+  alignas(value_type) unsigned char m_value[sizeof(value_type)];
   distance_type m_dist_from_ideal_bucket;
   bool m_last_bucket;
-  alignas(value_type) unsigned char m_value[sizeof(value_type)];
 };
 
 /**
@@ -445,8 +450,8 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
 
 //  using buckets_container_type = std::vector<bucket_entry, buckets_allocator>;
 
-//    using buckets_container_type = std::vector<bucket_entry>;
-  using buckets_container_type = LazyInitializationArray<bucket_entry>;
+    using buckets_container_type = std::vector<bucket_entry>;
+//  using buckets_container_type = LazyInitializationArray<bucket_entry>;
 
  public:
   /**
@@ -564,15 +569,8 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
         m_bucket_count(bucket_count),
         m_nb_elements(0),
         m_grow_on_next_insert(false),
-        m_try_shrink_on_next_insert(false),
-        bucket_indexes_populated(bucket_count) {
-
-//      std::cout << "Bucket count: " << bucket_count << ", bitset size: " << bucket_indexes_populated.size() << std::endl;
-//
-//      for (int i = 0; i < bucket_count; i++) {
-//          std::cout << bucket_indexes_populated[i];
-//      }
-//      std::cout << std::endl;
+        bucket_indexes_populated(bucket_count),
+        m_try_shrink_on_next_insert(false) {
 
     if (bucket_count > max_bucket_count()) {
       TSL_RH_THROW_OR_TERMINATE(std::length_error,
@@ -759,7 +757,7 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
 
         CustomIterator& operator++() {
             index++;
-            while (!(*bucket_indexes_populated)[index] && index < bucket_indexes_populated->size()) {
+            while ((containerStart + index)->empty() && index < bucket_indexes_populated->size()) {
                 index++;
             }
             return *this;

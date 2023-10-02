@@ -32,7 +32,7 @@ template <typename T1, typename T2>
 void tessilRobinMapInitialisationBenchmarkDefaultAllocator(const std::string &fileNamePrefix);
 
 template <typename T1, typename T2>
-void tessilRobinMapInitialisationBenchmarkCustomAllocator(const std::string &fileNamePrefix);
+void tessilRobinMapPartialPopulationTest(const std::string &fileNamePrefix);
 
 
 #include "groupByCyclesBenchmarkImplementation.h"

@@ -896,18 +896,40 @@ void runVectorInitBenchmark() {
 
 int main() {
 
+    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
+                                            {GroupBy::Adaptive},
+                                            1, "TESTSortOnlyAdaptive");
+
+//    tessilRobinMapPartialPopulationTest<int,int>("CustomContainerRandom");
+
 /*    long_long cycles;
     cycles = *Counters::getInstance().readSharedEventSet();
 
-    MABPL::LazyInitializationVector<std::string> vectorTest (100000000);
+    MABPL_tsl::robin_map<int,int> map(200*1000*1000);
+    typename MABPL_tsl::robin_map<int,int>::iteratorCustom it;
+
+    int n = 10;
+    for (int index = 2; index < n; ++index) {
+        it = map.findCustom(index / 2);
+        if (it != map.endCustom()) {
+            it.value() = 5;
+        } else {
+            map.insert({index,3});
+        }
+    }
 
     std::cout << "Cycles: " << static_cast<double>(*Counters::getInstance().readSharedEventSet() - cycles) << std::endl;
 
-    vectorTest[6] = "Jack";
-    vectorTest[6] = "Gail";
-    std::cout << "Last element: " << vectorTest[6] << std::endl;*/
+    MABPL::vectorOfPairs<int,int> result = {map.beginCustom(), map.endCustom()};
+    std::cout << "Result when converted to vectorOfPairs" << std::endl;
+    std::cout << "Result length: " << result.size() << std::endl;
+
+    for (auto& pair : result) {
+        std::cout << pair.first << ", " << pair.second << std::endl;
+    }*/
 
 
+/*
     MABPL_tsl::robin_map<int,int> map(100);
 
     typename MABPL_tsl::robin_map<int,int>::iteratorCustom it;
@@ -925,28 +947,6 @@ int main() {
         }
     }
 
-//    it = map.begin();
-//    std::cout << it->first << ", " << it->second << std::endl;
-//
-//    it = map.end();
-//    std::cout << it->first << ", " << it->second << std::endl;
-
-/*    it = map.beginCustom();
-    std::cout << it->first << ", " << it->second << std::endl;
-    it++;
-    std::cout << it->first << ", " << it->second << std::endl;
-    it++;
-
-    itEnd = map.endCustom();
-    if(it == itEnd) {
-        std::cout << "Yes end" << std::endl;
-    } else {
-        std::cout << "Not end" << std::endl;
-    }*/
-
-
-//    std::cout << it->first << ", " << it->second << std::endl;
-
     MABPL::vectorOfPairs<int,int> result = {map.beginCustom(), map.endCustom()};
     std::cout << "Result when converted to vectorOfPairs" << std::endl;
     std::cout << "Result length: " << result.size() << std::endl;
@@ -954,12 +954,23 @@ int main() {
     for (auto& pair : result) {
         std::cout << pair.first << ", " << pair.second << std::endl;
     }
+*/
+
+/*    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1m,
+                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                            5, "1-ClusteringSweep-20mValues");
+
+    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
+                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                            5, "1-NoClustering-200mValues");
 
 
-//    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
-//                                            {GroupBy::Hash, GroupBy::Adaptive},
-//                                            1, "TEST");
+    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution40mValuesCardinalitySweepFixedMax,
+                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                            5, "TEST");
 
+    runImdbGroupByMacroBenchmark_titleIdFromPrincipalsTable_clusteringSweep(5,30);
+    runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(5,30);*/
 
 
 
@@ -971,7 +982,7 @@ int main() {
 
 //    groupByCompareResultsTest<int, int>(DataFiles::uniformIntDistribution250mValuesMax10000, GroupBy::Hash, GroupBy::Sort);
 
-//    tessilRobinMapInitialisationBenchmarkDefaultAllocator<int, int>("DefaultAllocatorInitCosts");
+//    tessilRobinMapInitialisationBenchmarkDefaultAllocator<int, int>("CustomAllocatorInitCosts");
 //    tessilRobinMapInitialisationBenchmarkCustomAllocator<int, int>("CustomAllocatorInitCosts");
 
 //    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,

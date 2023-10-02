@@ -6,20 +6,6 @@
 #include <memory>
 
 template <typename T>
-bool memoryIsAllZero(const T& object) {
-    const char* begin = reinterpret_cast<const char*>(&object);
-    const char* end = begin + sizeof(T);
-
-    for (const char* ptr = begin; ptr < end; ++ptr) {
-        if (*ptr != 0) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-template <typename T>
 class LazyInitializationArray {
 public:
     using value_type = T;
@@ -39,10 +25,9 @@ public:
     }
 
     value_type& operator[](size_type index) {
-        if (index >= size_) {
-            throw std::out_of_range("Index out of range.");
-        }
-
+//        if (index >= size_) {
+//            throw std::out_of_range("Index out of range.");
+//        }
         return getElement(index);
     }
 
@@ -77,12 +62,10 @@ public:
 private:
     using pointer = typename std::allocator_traits<std::allocator<T>>::pointer;
 
-    value_type& getElement(size_type index) {
-        if (memoryIsAllZero(data_[index])) {
-//            std::cout << "Object constructed at index " << index << std::endl;
+    inline value_type& getElement(size_type index) {
+        if (!(*reinterpret_cast<bool*>(data_ + index))) {
             new (&data_[index]) value_type();
         }
-
         return data_[index];
     }
 
