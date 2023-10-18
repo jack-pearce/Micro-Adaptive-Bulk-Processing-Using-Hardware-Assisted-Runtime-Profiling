@@ -19,14 +19,21 @@ void writeHeadersAndTableToCSV(std::vector<std::string>& headers,
 int getLengthOfCsv(const std::string &filePath);
 int getLengthOfTsv(const std::string& filePath);
 
-void readImdbTitleIdColumnFromBasicsTable(const std::string& filePath, uint32_t* data);
-void readImdbStartYearColumnFromBasicsTable(const std::string& filePath, int* data);
-void readImdbStartYearColumnFromBasicsTable(const std::string& filePath, uint32_t* data);
 
-void readImdbTitleIdColumnFromPrincipalsTable(const std::string& filePath, uint32_t* data);
-void readImdbPersonIdColumnFromPrincipalsTable(const std::string& filePath, uint32_t* data);
+template <typename T>
+void readImdbTitleIdColumnFromBasicsTable(const std::string& filePath, T* data);
 
-void readImdbTitleIdColumnFromAkasTable(const std::string& filePath, int* data);
+template <typename T>
+void readImdbStartYearColumnFromBasicsTable(const std::string& filePath, T* data);
+
+template <typename T>
+void readImdbTitleIdColumnFromPrincipalsTable(const std::string& filePath, T* data);
+
+template <typename T>
+void readImdbPersonIdColumnFromPrincipalsTable(const std::string& filePath, T* data);
+
+template <typename T>
+void readImdbTitleIdColumnFromAkasTable(const std::string& filePath, T* data);
 
 template <typename T>
 void displayDistribution(const DataFile &dataFile);
