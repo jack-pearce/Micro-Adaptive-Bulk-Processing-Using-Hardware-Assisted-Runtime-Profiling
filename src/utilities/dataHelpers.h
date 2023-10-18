@@ -8,17 +8,13 @@
 #include "../library/mabpl.h"
 
 
+int getLengthOfFile(const std::string& filePath);
+
+
+template <typename T>
 void writeHeadersAndTableToCSV(std::vector<std::string>& headers,
-                               std::vector<std::vector<long_long>>  values,
+                               std::vector<std::vector<T>>  values,
                                std::string& filePath);
-
-void writeHeadersAndTableToCSV(std::vector<std::string>& headers,
-                               std::vector<std::vector<double>>  values,
-                               std::string& filePath);
-
-int getLengthOfCsv(const std::string &filePath);
-int getLengthOfTsv(const std::string& filePath);
-
 
 template <typename T>
 void readImdbTitleIdColumnFromBasicsTable(const std::string& filePath, T* data);

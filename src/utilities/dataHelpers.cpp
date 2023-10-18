@@ -10,69 +10,7 @@
 #include "dataHelpers.h"
 
 
-void writeHeadersAndTableToCSV(std::vector<std::string>& headers,
-                               std::vector<std::vector<long_long>>  values,
-                               std::string& filePath) {
-    assert(headers.size() == values[0].size());
-
-    std::ofstream file(filePath);
-
-    for (size_t i = 0; i < headers.size(); ++i) {
-        file << headers[i];
-        if (i != headers.size() - 1) {
-            file << ",";
-        }
-    }
-    file << "\n";
-
-    if (file.is_open()) {
-        for (const auto& row : values) {
-            for (size_t i = 0; i < row.size(); ++i) {
-                file << row[i];
-                if (i != row.size() - 1) {
-                    file << ",";
-                }
-            }
-            file << "\n";
-        }
-        file.close();
-    } else {
-        std::cerr << "Failed to open file: " << filePath << "\n";
-    }
-}
-
-void writeHeadersAndTableToCSV(std::vector<std::string>& headers,
-                               std::vector<std::vector<double>>  values,
-                               std::string& filePath) {
-    assert(headers.size() == values[0].size());
-
-    std::ofstream file(filePath);
-
-    for (size_t i = 0; i < headers.size(); ++i) {
-        file << headers[i];
-        if (i != headers.size() - 1) {
-            file << ",";
-        }
-    }
-    file << "\n";
-
-    if (file.is_open()) {
-        for (const auto& row : values) {
-            for (size_t i = 0; i < row.size(); ++i) {
-                file << row[i];
-                if (i != row.size() - 1) {
-                    file << ",";
-                }
-            }
-            file << "\n";
-        }
-        file.close();
-    } else {
-        std::cerr << "Failed to open file: " << filePath << "\n";
-    }
-}
-
-int getLengthOfCsv(const std::string &filePath) {
+int getLengthOfFile(const std::string& filePath) {
     std::ifstream file(filePath);
     if (!file.is_open()) {
         std::cerr << "Error opening file: " << filePath << std::endl;
@@ -80,24 +18,6 @@ int getLengthOfCsv(const std::string &filePath) {
     }
 
     int rowCount = 0;
-    std::string line;
-    while (std::getline(file, line)) {
-        rowCount++;
-    }
-
-    file.close();
-    return rowCount - 1; // Assumes that the first row is used for column headers
-}
-
-int getLengthOfTsv(const std::string& filePath) {
-    int rowCount = 0;
-
-    std::ifstream file(filePath);
-    if (!file.is_open()) {
-        std::cerr << "Error opening file: " << filePath << std::endl;
-        exit(1);
-    }
-
     std::string line;
     while (std::getline(file, line)) {
         rowCount++;
