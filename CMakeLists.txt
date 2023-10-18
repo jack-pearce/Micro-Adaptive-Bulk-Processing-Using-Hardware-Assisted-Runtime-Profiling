@@ -27,26 +27,26 @@ pkg_check_modules(JSONCPP REQUIRED jsoncpp)
 include_directories(${JSONCPP_INCLUDE_DIRS})
 
 add_executable(${PROJECT_NAME}
-        src/data_generation/dataFiles.cpp
-        src/data_generation/dataFiles.h
-        src/library/operators/select.cpp
-        src/library/utilities/papi.cpp
-        src/library/utilities/systemInformation.cpp
-        src/main.cpp
-        src/utilities/dataHelpers.cpp
-        src/utilities/papiHelpers.cpp
-        src/cycles_benchmarking/selectCyclesBenchmark.h
-        src/data_generation/dataGenerators.cpp
-        src/data_generation/dataGenerators.h
-        src/library/operators/groupBy.cpp
-        src/cycles_benchmarking/groupByCyclesBenchmark.h
-        src/library/mabpl.h
-        src/library/machine_constants/machineConstants.cpp
-        src/time_benchmarking/timeBenchmarkHelpers.cpp
-        src/time_benchmarking/selectTimeBenchmark.h
-        src/main.h
-        src/library/operators/partition.cpp
-        src/cycles_benchmarking/partitionCyclesBenchmark.h)
+        benchmarks/data_generation/dataFiles.cpp
+        benchmarks/data_generation/dataFiles.h
+        library/src/operators/select.cpp
+        library/src/utilities/papi.cpp
+        library/src/utilities/systemInformation.cpp
+        benchmarks/main.cpp
+        benchmarks/utilities/dataHelpers.cpp
+        benchmarks/utilities/papiHelpers.cpp
+        benchmarks/cycles_benchmarking/selectCyclesBenchmark.h
+        benchmarks/data_generation/dataGenerators.cpp
+        benchmarks/data_generation/dataGenerators.h
+        library/src/operators/groupBy.cpp
+        benchmarks/cycles_benchmarking/groupByCyclesBenchmark.h
+        library/include/mabpl.h
+        library/src/machine_constants/machineConstants.cpp
+        benchmarks/time_benchmarking/timeBenchmarkHelpers.cpp
+        benchmarks/time_benchmarking/selectTimeBenchmark.h
+        benchmarks/main.h
+        library/src/operators/partition.cpp
+        benchmarks/cycles_benchmarking/partitionCyclesBenchmark.h)
 
 target_link_libraries(${PROJECT_NAME} benchmark::benchmark)
 

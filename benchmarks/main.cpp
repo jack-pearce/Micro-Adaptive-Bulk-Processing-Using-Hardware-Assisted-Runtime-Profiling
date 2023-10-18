@@ -4,7 +4,7 @@
 #include "cycles_benchmarking/groupByCyclesBenchmark.h"
 #include "data_generation/dataFiles.h"
 #include "utilities/dataHelpers.h"
-#include "library/mabpl.h"
+#include "../library/include/mabpl.h"
 
 using MABPL::Select;
 using MABPL::GroupBy;
@@ -506,7 +506,7 @@ void runImdbSelectIndexesSweepMacroBenchmark(int startYear, int endYear, int ite
     int numImplementations = static_cast<int>(selectImplementations.size());
 
     std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.basics.tsv";
-    int n = getLengthOfTsv(filePath);
+    int n = getLengthOfFile(filePath);
     auto data = new int[n];
     readImdbStartYearColumnFromBasicsTable(filePath, data);
 
@@ -556,7 +556,7 @@ void runImdbSelectValuesSweepMacroBenchmark(int startYear, int endYear, int iter
     int numImplementations = static_cast<int>(selectImplementations.size());
 
     std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.basics.tsv";
-    int n = getLengthOfTsv(filePath);
+    int n = getLengthOfFile(filePath);
     auto yearData = new int[n];
     readImdbStartYearColumnFromBasicsTable(filePath, yearData);
     auto idData = new uint32_t[n];
@@ -612,7 +612,7 @@ void runImdbPartitionMacroBenchmark_titleIdColumnBasicsTable(int iterations) {
     std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.basics.tsv";
     std::string minMachineConstantName = "Partition_minRadixBits";
     std::string startMachineConstantName = "Partition_startRadixBits";
-    int n = getLengthOfTsv(filePath);
+    int n = getLengthOfFile(filePath);
     auto data = new uint32_t [n];
     readImdbTitleIdColumnFromBasicsTable(filePath, data);
 
@@ -676,7 +676,7 @@ void runImdbPartitionMacroBenchmark_startYearColumnBasicsTable(int iterations) {
     std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.basics.tsv";
     std::string minMachineConstantName = "Partition_minRadixBits";
     std::string startMachineConstantName = "Partition_startRadixBits";
-    int n = getLengthOfTsv(filePath);
+    int n = getLengthOfFile(filePath);
     auto data = new uint32_t [n];
     readImdbStartYearColumnFromBasicsTable(filePath, data);
 
@@ -740,7 +740,7 @@ void runImdbPartitionMacroBenchmark_personIdColumnPrincipalsTable(int iterations
     std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.principals.tsv";
     std::string minMachineConstantName = "Partition_minRadixBits";
     std::string startMachineConstantName = "Partition_startRadixBits";
-    int n = getLengthOfTsv(filePath);
+    int n = getLengthOfFile(filePath);
     auto data = new uint32_t [n];
     readImdbPersonIdColumnFromPrincipalsTable(filePath, data);
 
@@ -802,7 +802,7 @@ void runImdbPartitionMacroBenchmark_personIdColumnPrincipalsTable(int iterations
 
 void runImdbGroupByMacroBenchmark_titleIdFromPrincipalsTable_clusteringSweep(int iterations, int numRuns) {
     std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.principals.tsv";
-    int n = getLengthOfTsv(filePath);
+    int n = getLengthOfFile(filePath);
     auto data = new uint32_t[n];
     readImdbTitleIdColumnFromPrincipalsTable(filePath, data);
 
@@ -875,7 +875,7 @@ void runImdbGroupByMacroBenchmark_titleIdFromPrincipalsTable_clusteringSweep(int
 
 void runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(int iterations, int numRuns) {
     std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.akas.tsv";
-    int n = getLengthOfTsv(filePath);
+    int n = getLengthOfFile(filePath);
     auto data = new int [n];
     readImdbTitleIdColumnFromAkasTable(filePath, data);
 
@@ -966,6 +966,15 @@ void runImdbMacroBenchmarks(int iterations) {
 }
 
 int main() {
+
+    std::vector<float> inputThresholdDistribution;
+    generateLogDistribution(30, 1, 10*1000, inputThresholdDistribution);
+    selectCpuCyclesInputSweepBenchmark<int,int>(DataFiles::uniformIntDistribution250mValuesMax10000,
+                                                {Select::ImplementationIndexesBranch,
+                                                 Select::ImplementationIndexesPredication,
+                                                 Select::ImplementationIndexesAdaptive},
+                                                inputThresholdDistribution,
+                                                1, "1-Indexes");
 
     return 0;
 }

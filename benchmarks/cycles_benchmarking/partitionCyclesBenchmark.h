@@ -1,7 +1,7 @@
 #ifndef MABPL_PARTITIONCYCLESBENCHMARK_H
 #define MABPL_PARTITIONCYCLESBENCHMARK_H
 
-#include "../library/mabpl.h"
+#include "../../library/include/mabpl.h"
 #include "../data_generation/dataFiles.h"
 
 using MABPL::Partition;

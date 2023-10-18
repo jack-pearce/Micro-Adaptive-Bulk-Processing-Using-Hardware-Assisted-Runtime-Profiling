@@ -1,7 +1,7 @@
 #ifndef MABPL_GROUPBYCYCLESBENCHMARK_H
 #define MABPL_GROUPBYCYCLESBENCHMARK_H
 
-#include "../library/mabpl.h"
+#include "../../library/include/mabpl.h"
 #include "../data_generation/dataFiles.h"
 
 using MABPL::GroupBy;

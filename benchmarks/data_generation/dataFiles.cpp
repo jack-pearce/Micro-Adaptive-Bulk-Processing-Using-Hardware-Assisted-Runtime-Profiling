@@ -1,5 +1,4 @@
 #include "dataFiles.h"
-#include "../library/utilities/systemInformation.h"
 
 
 FilePaths& FilePaths::getInstance() {
