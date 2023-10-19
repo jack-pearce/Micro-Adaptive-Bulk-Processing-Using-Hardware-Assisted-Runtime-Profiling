@@ -2,7 +2,7 @@
 #define MABPL_MAIN_H
 
 
-#include "../library/include/mabpl.h"
+#include "mabpl.h"
 #include "data_generation/dataFiles.h"
 
 using MABPL::Select;

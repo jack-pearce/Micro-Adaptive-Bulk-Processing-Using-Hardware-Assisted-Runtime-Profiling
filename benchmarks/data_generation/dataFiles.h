@@ -25,14 +25,14 @@ private:
     ~FilePaths() = default;
 
     std::string projectFilePath;
-    const std::string selectCyclesFolder = "/data/output/select_cycles_benchmark/";
-    const std::string groupByCyclesFolder = "/data/output/groupBy_cycles_benchmark/";
-    const std::string partitionCyclesFolder = "/data/output/partition_cycles_benchmark/";
-    const std::string dataFilesFolder = "/data/output/dataFiles/";
-    const std::string oisstInputFolder = "/data/input/oisst_dataset_csv/";
-    const std::string oisstOnputFolder = "/data/output/oisst_benchmark/";
-    const std::string imdbInputFolder = "/data/input/imdb/";
-    const std::string imdbOutputFolder = "/data/output/imdb/";
+    const std::string selectCyclesFolder = "/benchmarks/data/output/select_cycles_benchmark/";
+    const std::string groupByCyclesFolder = "/benchmarks/data/output/groupBy_cycles_benchmark/";
+    const std::string partitionCyclesFolder = "/benchmarks/data/output/partition_cycles_benchmark/";
+    const std::string dataFilesFolder = "/benchmarks/data/output/dataFiles/";
+    const std::string oisstInputFolder = "/benchmarks/data/input/oisst_dataset_csv/";
+    const std::string oisstOnputFolder = "/benchmarks/data/output/oisst_benchmark/";
+    const std::string imdbInputFolder = "/benchmarks/data/input/imdb/";
+    const std::string imdbOutputFolder = "/benchmarks/data/output/imdb/";
 };
 
 void generateEvenIntLogDistribution(int numPoints, double minValue, double maxValue, std::vector<float> &points);

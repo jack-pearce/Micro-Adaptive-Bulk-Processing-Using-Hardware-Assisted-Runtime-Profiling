@@ -8,8 +8,8 @@
 #include <string>
 #include <cassert>
 
-#include "../utilities/dataHelpers.h"
-#include "../utilities/papiHelpers.h"
+#include "utilities/dataHelpers.h"
+#include "utilities/papiHelpers.h"
 #include "selectCyclesBenchmark.h"
 
 using MABPL::Counters;

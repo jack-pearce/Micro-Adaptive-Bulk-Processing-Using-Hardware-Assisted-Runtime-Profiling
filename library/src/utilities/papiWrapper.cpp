@@ -3,7 +3,7 @@
 #include <pthread.h>
 #include <cassert>
 
-#include "papi.h"
+#include "papiWrapper.h"
 
 
 namespace MABPL {

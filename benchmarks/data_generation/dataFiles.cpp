@@ -11,7 +11,7 @@ FilePaths::FilePaths() {
 }
 
 std::string FilePaths::getSelectCyclesFolderPath() {
-    return projectFilePath +selectCyclesFolder;
+    return projectFilePath + selectCyclesFolder;
 }
 
 std::string FilePaths::getGroupByCyclesFolderPath() {

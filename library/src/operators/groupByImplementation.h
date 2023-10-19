@@ -6,11 +6,11 @@
 #include <limits>
 #include <atomic>
 #include <condition_variable>
-#include "tsl/robin_map.h"
+#include <tsl/robin_map.h>
 
-#include "../utilities/systemInformation.h"
-#include "../utilities/papi.h"
-#include "../machine_constants/machineConstants.h"
+#include "utilities/systemInformation.h"
+#include "utilities/papiWrapper.h"
+#include "machine_constants/machineConstants.h"
 
 
 namespace MABPL {

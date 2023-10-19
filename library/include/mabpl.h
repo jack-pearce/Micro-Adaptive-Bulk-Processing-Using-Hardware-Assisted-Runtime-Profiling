@@ -2,15 +2,15 @@
 #define MABPL_MABPL_H
 
 // API for data processing
-#include "../src/machine_constants/machineConstants.h"
-#include "../src/operators/select.h"
-#include "../src/operators/groupBy.h"
-#include "../src/operators/partition.h"
+#include "machine_constants/machineConstants.h"
+#include "operators/select.h"
+#include "operators/groupBy.h"
+#include "operators/partition.h"
 
-// API for auxiliary functions
-#include "../src/utilities/dataStructures.h"
-#include "../src/utilities/papi.h"
-#include "../src/utilities/systemInformation.h"
-#include "../src/utilities/dataGeneration.h"
+// API for utility functions
+#include "utilities/dataStructures.h"
+#include "utilities/papiWrapper.h"
+#include "utilities/systemInformation.h"
+#include "utilities/dataGeneration.h"
 
 #endif //MABPL_MABPL_H

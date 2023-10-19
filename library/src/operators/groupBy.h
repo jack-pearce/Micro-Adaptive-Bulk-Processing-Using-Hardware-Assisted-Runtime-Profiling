@@ -5,7 +5,7 @@
 #include <vector>
 #include <memory>
 
-#include "../utilities/dataStructures.h"
+#include "utilities/dataStructures.h"
 
 
 namespace MABPL {

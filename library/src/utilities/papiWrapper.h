@@ -1,10 +1,10 @@
-#ifndef MABPL_PAPI_H
-#define MABPL_PAPI_H
+#ifndef MABPL_PAPIWRAPPER_H
+#define MABPL_PAPIWRAPPER_H
 
 #include <vector>
 #include <string>
+#include <papi.h>
 
-#include "../../../libs/papi/src/install/include/papi.h"
 
 namespace MABPL {
 
@@ -34,4 +34,4 @@ void destroyThreadEventSet(int eventSet, long_long *values);
 
 }
 
-#endif //MABPL_PAPI_H
+#endif //MABPL_PAPIWRAPPER_H

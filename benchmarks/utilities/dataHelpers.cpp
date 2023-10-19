@@ -1,10 +1,6 @@
 #include <iostream>
 #include <fstream>
-#include <sstream>
 #include <string>
-#include <vector>
-#include <cassert>
-#include <stdexcept>
 #include <cmath>
 
 #include "dataHelpers.h"

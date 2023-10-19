@@ -7,7 +7,7 @@
 #include <cassert>
 #include <algorithm>
 
-#include "../utilities/dataHelpers.h"
+#include "utilities/dataHelpers.h"
 
 
 template <typename T>

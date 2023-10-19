@@ -1,10 +1,11 @@
 #include <vector>
 
+#include "mabpl.h"
 #include "main.h"
 #include "cycles_benchmarking/groupByCyclesBenchmark.h"
 #include "data_generation/dataFiles.h"
 #include "utilities/dataHelpers.h"
-#include "../library/include/mabpl.h"
+
 
 using MABPL::Select;
 using MABPL::GroupBy;
@@ -967,14 +968,19 @@ void runImdbMacroBenchmarks(int iterations) {
 
 int main() {
 
-    std::vector<float> inputThresholdDistribution;
-    generateLogDistribution(30, 1, 10*1000, inputThresholdDistribution);
-    selectCpuCyclesInputSweepBenchmark<int,int>(DataFiles::uniformIntDistribution250mValuesMax10000,
-                                                {Select::ImplementationIndexesBranch,
-                                                 Select::ImplementationIndexesPredication,
-                                                 Select::ImplementationIndexesAdaptive},
-                                                inputThresholdDistribution,
-                                                1, "1-Indexes");
+//    std::vector<float> inputThresholdDistribution;
+//    generateLogDistribution(30, 1, 10*1000, inputThresholdDistribution);
+//    selectCpuCyclesInputSweepBenchmark<int,int>(DataFiles::uniformIntDistribution250mValuesMax10000,
+//                                                {Select::ImplementationIndexesBranch,
+//                                                 Select::ImplementationIndexesPredication,
+//                                                 Select::ImplementationIndexesAdaptive},
+//                                                inputThresholdDistribution,
+//                                                1, "1-Indexes");
+
+    runImdbSelectIndexesSweepMacroBenchmark(1874, 2023, 1,
+                                            {Select::ImplementationIndexesBranch,
+                                             Select::ImplementationIndexesPredication,
+                                             Select::ImplementationIndexesAdaptive});
 
     return 0;
 }

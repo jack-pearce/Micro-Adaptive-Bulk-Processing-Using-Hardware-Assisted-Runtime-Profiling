@@ -7,9 +7,9 @@
 #include <tsl/robin_map.h>
 
 #include "groupByCyclesBenchmark.h"
-#include "../utilities/dataHelpers.h"
-#include "../utilities/papiHelpers.h"
-#include "../data_generation/dataGenerators.h"
+#include "utilities/dataHelpers.h"
+#include "utilities/papiHelpers.h"
+#include "data_generation/dataGenerators.h"
 
 using MABPL::Counters;
 using MABPL::MaxAggregation;

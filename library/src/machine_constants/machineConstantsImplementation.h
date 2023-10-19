@@ -3,10 +3,10 @@
 
 #include <iostream>
 
-#include "../utilities/dataGeneration.h"
-#include "../utilities/papi.h"
-#include "../operators/select.h"
-#include "../operators/groupBy.h"
+#include "utilities/dataGeneration.h"
+#include "utilities/papiWrapper.h"
+#include "operators/select.h"
+#include "operators/groupBy.h"
 
 namespace MABPL {
 

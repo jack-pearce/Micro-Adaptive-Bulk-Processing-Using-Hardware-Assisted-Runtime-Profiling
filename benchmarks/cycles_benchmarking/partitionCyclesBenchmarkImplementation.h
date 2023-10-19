@@ -3,8 +3,8 @@
 
 #include <limits>
 
-#include "../utilities/dataHelpers.h"
-#include "../utilities/papiHelpers.h"
+#include "utilities/dataHelpers.h"
+#include "utilities/papiHelpers.h"
 #include "partitionCyclesBenchmark.h"
 
 

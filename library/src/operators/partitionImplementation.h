@@ -7,9 +7,9 @@
 #include <iostream>
 #include <limits>
 
-#include "../utilities/systemInformation.h"
-#include "../utilities/papi.h"
-#include "../machine_constants/machineConstants.h"
+#include "utilities/systemInformation.h"
+#include "utilities/papiWrapper.h"
+#include "machine_constants/machineConstants.h"
 
 
 namespace MABPL {

@@ -3,10 +3,10 @@
 
 #include <vector>
 #include <memory>
+#include <benchmark/benchmark.h>
 
 #include "selectTimeBenchmark.h"
-#include "../utilities/dataHelpers.h"
-#include "../../libs/benchmark/include/benchmark/benchmark.h"
+#include "utilities/dataHelpers.h"
 
 LoadedData<int>* loadedDataFile;
 

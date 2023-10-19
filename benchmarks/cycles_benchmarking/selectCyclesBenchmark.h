@@ -3,8 +3,8 @@
 
 #include <vector>
 
-#include "../../library/include/mabpl.h"
-#include "../data_generation/dataFiles.h"
+#include "mabpl.h"
+#include "data_generation/dataFiles.h"
 
 using MABPL::Select;
 

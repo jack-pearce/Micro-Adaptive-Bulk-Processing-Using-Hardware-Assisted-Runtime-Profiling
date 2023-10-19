@@ -3,6 +3,7 @@
 
 #include <immintrin.h>
 
+
 namespace MABPL {
 
 template <typename T>
@@ -25,5 +26,6 @@ void printIntelTlbSpecifications();
 int l2TlbEntriesFor4KbytePages();
 
 }
+
 
 #endif //MABPL_SYSTEMINFORMATION_H

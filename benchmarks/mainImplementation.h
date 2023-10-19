@@ -13,7 +13,7 @@
 #include "cycles_benchmarking/groupByCyclesBenchmark.h"
 #include "cycles_benchmarking/partitionCyclesBenchmark.h"
 #include "data_generation/dataFiles.h"
-#include "../library/include/mabpl.h"
+#include "mabpl.h"
 
 using MABPL::Select;
 using MABPL::GroupBy;

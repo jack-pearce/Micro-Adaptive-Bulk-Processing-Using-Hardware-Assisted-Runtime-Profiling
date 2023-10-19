@@ -2,10 +2,10 @@
 #define MICRO_ADAPTIVE_BULK_PROCESSING_LIBRARY_DATAHELPERS_H
 
 #include <algorithm>
+#include <papi.h>
 
-#include "../../libs/papi/src/install/include/papi.h"
-#include "../data_generation/dataFiles.h"
-#include "../../library/include/mabpl.h"
+#include "mabpl.h"
+#include "data_generation/dataFiles.h"
 
 
 int getLengthOfFile(const std::string& filePath);
