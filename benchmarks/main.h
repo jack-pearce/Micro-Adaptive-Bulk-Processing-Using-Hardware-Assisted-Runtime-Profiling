@@ -1,13 +1,13 @@
-#ifndef MABPL_MAIN_H
-#define MABPL_MAIN_H
+#ifndef HAQP_MAIN_H
+#define HAQP_MAIN_H
 
 
-#include "mabpl.h"
+#include "haqp.h"
 #include "data_generation/dataFiles.h"
 
-using MABPL::Select;
-using MABPL::GroupBy;
-using MABPL::Partition;
+using HAQP::Select;
+using HAQP::GroupBy;
+using HAQP::Partition;
 
 
 template <typename T>
@@ -75,4 +75,4 @@ void partitionSweepBenchmarkWithExtraCountersConfigurations(DataSweep &dataSweep
 #include "mainImplementation.h"
 
 
-#endif //MABPL_MAIN_H
+#endif //HAQP_MAIN_H

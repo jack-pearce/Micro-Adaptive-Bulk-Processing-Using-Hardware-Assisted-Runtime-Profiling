@@ -1,5 +1,5 @@
-#ifndef MABPL_DATAFILES_H
-#define MABPL_DATAFILES_H
+#ifndef HAQP_DATAFILES_H
+#define HAQP_DATAFILES_H
 
 #include <string>
 #include <vector>
@@ -181,4 +181,4 @@ public:
 
 #include "dataFilesImplementation.h"
 
-#endif //MABPL_DATAFILES_H
+#endif //HAQP_DATAFILES_H

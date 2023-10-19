@@ -1,10 +1,10 @@
-#ifndef MABPL_GROUPBYCYCLESBENCHMARK_H
-#define MABPL_GROUPBYCYCLESBENCHMARK_H
+#ifndef HAQP_GROUPBYCYCLESBENCHMARK_H
+#define HAQP_GROUPBYCYCLESBENCHMARK_H
 
-#include "mabpl.h"
+#include "haqp.h"
 #include "data_generation/dataFiles.h"
 
-using MABPL::GroupBy;
+using HAQP::GroupBy;
 
 
 template <typename T1, typename T2>
@@ -35,4 +35,4 @@ void tessilRobinMapInitialisationBenchmark(const std::string &fileNamePrefix);
 #include "groupByCyclesBenchmarkImplementation.h"
 
 
-#endif //MABPL_GROUPBYCYCLESBENCHMARK_H
+#endif //HAQP_GROUPBYCYCLESBENCHMARK_H

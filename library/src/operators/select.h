@@ -6,7 +6,7 @@
 #include <vector>
 
 
-namespace MABPL {
+namespace HAQP {
 
 enum SelectIndexesChoice {
     IndexesBranch,

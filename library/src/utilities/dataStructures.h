@@ -1,9 +1,9 @@
-#ifndef MABPL_DATASTRUCTURES_H
-#define MABPL_DATASTRUCTURES_H
+#ifndef HAQP_DATASTRUCTURES_H
+#define HAQP_DATASTRUCTURES_H
 
 #include <vector>
 
-namespace MABPL {
+namespace HAQP {
 
 template<typename T1, typename T2>
 using vectorOfPairs = std::vector<std::pair<T1, T2>>;
@@ -16,4 +16,4 @@ void sortVectorOfPairs(vectorOfPairs<T1, T2> *&inputVectorOfPairs);
 #include "dataStructuresImplementation.h"
 
 
-#endif //MABPL_DATASTRUCTURES_H
+#endif //HAQP_DATASTRUCTURES_H

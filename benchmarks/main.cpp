@@ -1,20 +1,20 @@
 #include <vector>
 
-#include "mabpl.h"
+#include "haqp.h"
 #include "main.h"
 #include "cycles_benchmarking/groupByCyclesBenchmark.h"
 #include "data_generation/dataFiles.h"
 #include "utilities/dataHelpers.h"
 
 
-using MABPL::Select;
-using MABPL::GroupBy;
-using MABPL::Partition;
+using HAQP::Select;
+using HAQP::GroupBy;
+using HAQP::Partition;
 
-using MABPL::MinAggregation;
-using MABPL::MaxAggregation;
-using MABPL::SumAggregation;
-using MABPL::CountAggregation;
+using HAQP::MinAggregation;
+using HAQP::MaxAggregation;
+using HAQP::SumAggregation;
+using HAQP::CountAggregation;
 
 
 void allSelectIndexesSingleThreadedTests(int iterations) {
@@ -467,8 +467,8 @@ void allPartitionTests(int iterations) {
     std::string startMachineConstantName = "Partition_startRadixBits";
     std::string minMachineConstantName = "Partition_minRadixBits";
 
-    int startMachineConstant = MABPL::MachineConstants::getInstance().getMachineConstant(startMachineConstantName);
-    int minMachineConstant = MABPL::MachineConstants::getInstance().getMachineConstant(minMachineConstantName);
+    int startMachineConstant = HAQP::MachineConstants::getInstance().getMachineConstant(startMachineConstantName);
+    int minMachineConstant = HAQP::MachineConstants::getInstance().getMachineConstant(minMachineConstantName);
 
     std::string nameOne = "Int64_ClusterednessSweep_" + std::to_string(startMachineConstant);
     std::string nameTwo = "Int64_ClusterednessSweep_" + std::to_string(minMachineConstant);
@@ -528,7 +528,7 @@ void runImdbSelectIndexesSweepMacroBenchmark(int startYear, int endYear, int ite
 
                 cycles = *Counters::getInstance().readSharedEventSet();
 
-                MABPL::runSelectFunction(selectImplementations[j],
+                HAQP::runSelectFunction(selectImplementations[j],
                                          n, inputFilter, inputFilter, selectedIndexes,year);
 
                 results[year - startYear][1 + (i * numImplementations) + j] = *Counters::getInstance().readSharedEventSet() - cycles;
@@ -584,7 +584,7 @@ void runImdbSelectValuesSweepMacroBenchmark(int startYear, int endYear, int iter
 
                 cycles = *Counters::getInstance().readSharedEventSet();
 
-                MABPL::runSelectFunction(selectImplementations[j],
+                HAQP::runSelectFunction(selectImplementations[j],
                                          n, inputData, inputFilter, selectedValues, year);
 
                 results[year - startYear][1 + (i * numImplementations) + j] = *Counters::getInstance().readSharedEventSet() - cycles;
@@ -633,18 +633,18 @@ void runImdbPartitionMacroBenchmark_titleIdColumnBasicsTable(int iterations) {
 
             if (j == 0) {
                 cycles = *Counters::getInstance().readSharedEventSet();
-                auto partitions = MABPL::partitionAdaptive(n, keys);
+                auto partitions = HAQP::partitionAdaptive(n, keys);
                 cycles = *Counters::getInstance().readSharedEventSet() - cycles;
             } else if (j == 1) {
                 cycles = *Counters::getInstance().readSharedEventSet();
-                auto partitions = MABPL::partitionFixed(n, keys,
-                                                        static_cast<int>(MABPL::MachineConstants::getInstance().getMachineConstant(
+                auto partitions = HAQP::partitionFixed(n, keys,
+                                                        static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(
                                                                 minMachineConstantName)));
                 cycles = *Counters::getInstance().readSharedEventSet() - cycles;
             } else if (j == 2) {
                 cycles = *Counters::getInstance().readSharedEventSet();
-                auto partitions = MABPL::partitionFixed(n, keys,
-                                                        static_cast<int>(MABPL::MachineConstants::getInstance().getMachineConstant(
+                auto partitions = HAQP::partitionFixed(n, keys,
+                                                        static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(
                                                                 startMachineConstantName)));
                 cycles = *Counters::getInstance().readSharedEventSet() - cycles;
             }
@@ -658,9 +658,9 @@ void runImdbPartitionMacroBenchmark_titleIdColumnBasicsTable(int iterations) {
 
     std::vector<std::string> headers(3 * iterations);
     std::string functionNames[] = {"RadixPartition_Adaptive", "RadixPartition_Static_", "RadixPartition_Static_"};
-    functionNames[1].append(std::to_string(static_cast<int>(MABPL::MachineConstants::getInstance().getMachineConstant(minMachineConstantName))));
+    functionNames[1].append(std::to_string(static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(minMachineConstantName))));
     functionNames[1].append("bits");
-    functionNames[2].append(std::to_string(static_cast<int>(MABPL::MachineConstants::getInstance().getMachineConstant(startMachineConstantName))));
+    functionNames[2].append(std::to_string(static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(startMachineConstantName))));
     functionNames[2].append("bits");
     for (auto i = 0; i < (3 * iterations); ++i) {
         headers[i] = functionNames[i % 3];
@@ -697,18 +697,18 @@ void runImdbPartitionMacroBenchmark_startYearColumnBasicsTable(int iterations) {
 
             if (j == 0) {
                 cycles = *Counters::getInstance().readSharedEventSet();
-                auto partitions = MABPL::partitionAdaptive(n, keys);
+                auto partitions = HAQP::partitionAdaptive(n, keys);
                 cycles = *Counters::getInstance().readSharedEventSet() - cycles;
             } else if (j == 1) {
                 cycles = *Counters::getInstance().readSharedEventSet();
-                auto partitions = MABPL::partitionFixed(n, keys,
-                                                        static_cast<int>(MABPL::MachineConstants::getInstance().getMachineConstant(
+                auto partitions = HAQP::partitionFixed(n, keys,
+                                                        static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(
                                                                 minMachineConstantName)));
                 cycles = *Counters::getInstance().readSharedEventSet() - cycles;
             } else if (j == 2) {
                 cycles = *Counters::getInstance().readSharedEventSet();
-                auto partitions = MABPL::partitionFixed(n, keys,
-                                                        static_cast<int>(MABPL::MachineConstants::getInstance().getMachineConstant(
+                auto partitions = HAQP::partitionFixed(n, keys,
+                                                        static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(
                                                                 startMachineConstantName)));
                 cycles = *Counters::getInstance().readSharedEventSet() - cycles;
             }
@@ -722,9 +722,9 @@ void runImdbPartitionMacroBenchmark_startYearColumnBasicsTable(int iterations) {
 
     std::vector<std::string> headers(3 * iterations);
     std::string functionNames[] = {"RadixPartition_Adaptive", "RadixPartition_Static_", "RadixPartition_Static_"};
-    functionNames[1].append(std::to_string(static_cast<int>(MABPL::MachineConstants::getInstance().getMachineConstant(minMachineConstantName))));
+    functionNames[1].append(std::to_string(static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(minMachineConstantName))));
     functionNames[1].append("bits");
-    functionNames[2].append(std::to_string(static_cast<int>(MABPL::MachineConstants::getInstance().getMachineConstant(startMachineConstantName))));
+    functionNames[2].append(std::to_string(static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(startMachineConstantName))));
     functionNames[2].append("bits");
     for (auto i = 0; i < (3 * iterations); ++i) {
         headers[i] = functionNames[i % 3];
@@ -761,18 +761,18 @@ void runImdbPartitionMacroBenchmark_personIdColumnPrincipalsTable(int iterations
 
             if (j == 0) {
                 cycles = *Counters::getInstance().readSharedEventSet();
-                auto partitions = MABPL::partitionAdaptive(n, keys);
+                auto partitions = HAQP::partitionAdaptive(n, keys);
                 cycles = *Counters::getInstance().readSharedEventSet() - cycles;
             } else if (j == 1) {
                 cycles = *Counters::getInstance().readSharedEventSet();
-                auto partitions = MABPL::partitionFixed(n, keys,
-                                                        static_cast<int>(MABPL::MachineConstants::getInstance().getMachineConstant(
+                auto partitions = HAQP::partitionFixed(n, keys,
+                                                        static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(
                                                                 minMachineConstantName)));
                 cycles = *Counters::getInstance().readSharedEventSet() - cycles;
             } else if (j == 2) {
                 cycles = *Counters::getInstance().readSharedEventSet();
-                auto partitions = MABPL::partitionFixed(n, keys,
-                                                        static_cast<int>(MABPL::MachineConstants::getInstance().getMachineConstant(
+                auto partitions = HAQP::partitionFixed(n, keys,
+                                                        static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(
                                                                 startMachineConstantName)));
                 cycles = *Counters::getInstance().readSharedEventSet() - cycles;
             }
@@ -786,9 +786,9 @@ void runImdbPartitionMacroBenchmark_personIdColumnPrincipalsTable(int iterations
 
     std::vector<std::string> headers(3 * iterations);
     std::string functionNames[] = {"RadixPartition_Adaptive", "RadixPartition_Static_", "RadixPartition_Static_"};
-    functionNames[1].append(std::to_string(static_cast<int>(MABPL::MachineConstants::getInstance().getMachineConstant(minMachineConstantName))));
+    functionNames[1].append(std::to_string(static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(minMachineConstantName))));
     functionNames[1].append("bits");
-    functionNames[2].append(std::to_string(static_cast<int>(MABPL::MachineConstants::getInstance().getMachineConstant(startMachineConstantName))));
+    functionNames[2].append(std::to_string(static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(startMachineConstantName))));
     functionNames[2].append("bits");
     for (auto i = 0; i < (3 * iterations); ++i) {
         headers[i] = functionNames[i % 3];
@@ -835,17 +835,17 @@ void runImdbGroupByMacroBenchmark_titleIdFromPrincipalsTable_clusteringSweep(int
 
                 if (j == 0) {
                     cycles = *Counters::getInstance().readSharedEventSet();
-                    auto result = MABPL::groupByAdaptive<CountAggregation>(n, inputGroupBy,
+                    auto result = HAQP::groupByAdaptive<CountAggregation>(n, inputGroupBy,
                                                                            inputAggregate, cardinality);
                     cycles = *Counters::getInstance().readSharedEventSet() - cycles;
                 } else if (j == 1) {
                     cycles = *Counters::getInstance().readSharedEventSet();
-                    auto result = MABPL::groupByHash<CountAggregation>(n, inputGroupBy,
+                    auto result = HAQP::groupByHash<CountAggregation>(n, inputGroupBy,
                                                                        inputAggregate, cardinality);
                     cycles = *Counters::getInstance().readSharedEventSet() - cycles;
                 } else if (j == 2) {
                     cycles = *Counters::getInstance().readSharedEventSet();
-                    auto result = MABPL::groupBySort<CountAggregation>(n, inputGroupBy, inputAggregate);
+                    auto result = HAQP::groupBySort<CountAggregation>(n, inputGroupBy, inputAggregate);
                     cycles = *Counters::getInstance().readSharedEventSet() - cycles;
                 }
 
@@ -908,17 +908,17 @@ void runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(int itera
 
                 if (j == 0) {
                     cycles = *Counters::getInstance().readSharedEventSet();
-                    auto result = MABPL::groupByAdaptive<CountAggregation>(n, inputGroupBy,
+                    auto result = HAQP::groupByAdaptive<CountAggregation>(n, inputGroupBy,
                                                                            inputAggregate, cardinality);
                     cycles = *Counters::getInstance().readSharedEventSet() - cycles;
                 } else if (j == 1) {
                     cycles = *Counters::getInstance().readSharedEventSet();
-                    auto result = MABPL::groupByHash<CountAggregation>(n, inputGroupBy,
+                    auto result = HAQP::groupByHash<CountAggregation>(n, inputGroupBy,
                                                                        inputAggregate, cardinality);
                     cycles = *Counters::getInstance().readSharedEventSet() - cycles;
                 } else if (j == 2) {
                     cycles = *Counters::getInstance().readSharedEventSet();
-                    auto result = MABPL::groupBySort<CountAggregation>(n, inputGroupBy, inputAggregate);
+                    auto result = HAQP::groupBySort<CountAggregation>(n, inputGroupBy, inputAggregate);
                     cycles = *Counters::getInstance().readSharedEventSet() - cycles;
                 }
 

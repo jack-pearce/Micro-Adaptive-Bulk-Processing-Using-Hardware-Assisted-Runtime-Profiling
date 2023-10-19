@@ -1,5 +1,5 @@
-#ifndef MABPL_GROUPBYCYCLESBENCHMARKIMPLEMENTATION_H
-#define MABPL_GROUPBYCYCLESBENCHMARKIMPLEMENTATION_H
+#ifndef HAQP_GROUPBYCYCLESBENCHMARKIMPLEMENTATION_H
+#define HAQP_GROUPBYCYCLESBENCHMARKIMPLEMENTATION_H
 
 #include <cassert>
 #include <iostream>
@@ -11,11 +11,11 @@
 #include "utilities/papiHelpers.h"
 #include "data_generation/dataGenerators.h"
 
-using MABPL::Counters;
-using MABPL::MaxAggregation;
-using MABPL::MaxAggregation;
-using MABPL::SumAggregation;
-using MABPL::CountAggregation;
+using HAQP::Counters;
+using HAQP::MaxAggregation;
+using HAQP::MaxAggregation;
+using HAQP::SumAggregation;
+using HAQP::CountAggregation;
 
 
 template <typename T1, typename T2>
@@ -54,7 +54,7 @@ void groupByCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<Grou
 
                 cycles = *Counters::getInstance().readSharedEventSet();
 
-                auto result = MABPL::runGroupByFunction<MaxAggregation>(groupByImplementations[j],
+                auto result = HAQP::runGroupByFunction<MaxAggregation>(groupByImplementations[j],
                                                                         dataSweep.getNumElements(), inputGroupBy,
                                                                         inputAggregate, cardinality);
 
@@ -117,7 +117,7 @@ void groupByWallTimeSweepBenchmark(DataSweep &dataSweep, const std::vector<Group
 
                 wallTime = PAPI_get_real_usec();
 
-                auto result = MABPL::runGroupByFunction<MaxAggregation>(groupByImplementations[j],
+                auto result = HAQP::runGroupByFunction<MaxAggregation>(groupByImplementations[j],
                                                                         dataSweep.getNumElements(), inputGroupBy,
                                                                         inputAggregate, cardinality);
 
@@ -178,7 +178,7 @@ void groupByWallTimeDopSweepBenchmark(DataSweep &dataSweep, int iterations, cons
 
                 wallTime = PAPI_get_real_usec();
 
-                auto result = MABPL::runGroupByFunction<MaxAggregation>(GroupBy::AdaptiveParallel,
+                auto result = HAQP::runGroupByFunction<MaxAggregation>(GroupBy::AdaptiveParallel,
                                                                         dataSweep.getNumElements(), inputGroupBy,
                                                                         inputAggregate, cardinality, dop[j]);
 
@@ -245,7 +245,7 @@ void groupByBenchmarkWithExtraCounters(DataSweep &dataSweep, GroupBy groupByImpl
             if (PAPI_reset(benchmarkEventSet) != PAPI_OK)
                 exit(1);
 
-            MABPL::runGroupByFunction<MaxAggregation>(groupByImplementation, numElements, inputGroupBy, inputAggregate,
+            HAQP::runGroupByFunction<MaxAggregation>(groupByImplementation, numElements, inputGroupBy, inputAggregate,
                                                       cardinality);
 
             if (PAPI_read(benchmarkEventSet, benchmarkCounterValues) != PAPI_OK)
@@ -387,4 +387,4 @@ void tessilRobinMapInitialisationBenchmark(const std::string &fileNamePrefix) {
 }
 
 
-#endif //MABPL_GROUPBYCYCLESBENCHMARKIMPLEMENTATION_H
+#endif //HAQP_GROUPBYCYCLESBENCHMARKIMPLEMENTATION_H

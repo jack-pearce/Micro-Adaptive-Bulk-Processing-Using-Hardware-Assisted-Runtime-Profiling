@@ -6,7 +6,7 @@
 #include "systemInformation.h"
 
 
-namespace MABPL {
+namespace HAQP {
 
 long l3cacheSize() {
     return sysconf(_SC_LEVEL3_CACHE_SIZE);

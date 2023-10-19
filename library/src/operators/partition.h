@@ -1,11 +1,11 @@
-#ifndef MABPL_PARTITION_H
-#define MABPL_PARTITION_H
+#ifndef HAQP_PARTITION_H
+#define HAQP_PARTITION_H
 
 #include <string>
 #include <vector>
 
 
-namespace MABPL {
+namespace HAQP {
 
 enum Partition {
     RadixBitsFixed,
@@ -27,4 +27,4 @@ std::vector<int> runPartitionFunction(Partition partitionImplementation, int n, 
 
 #include "partitionImplementation.h"
 
-#endif //MABPL_PARTITION_H
+#endif //HAQP_PARTITION_H

@@ -1,5 +1,5 @@
-#ifndef MABPL_SELECTCYCLESBENCHMARKIMPLEMENTATION_H
-#define MABPL_SELECTCYCLESBENCHMARKIMPLEMENTATION_H
+#ifndef HAQP_SELECTCYCLESBENCHMARKIMPLEMENTATION_H
+#define HAQP_SELECTCYCLESBENCHMARKIMPLEMENTATION_H
 
 
 #include <iostream>
@@ -12,7 +12,7 @@
 #include "utilities/papiHelpers.h"
 #include "selectCyclesBenchmark.h"
 
-using MABPL::Counters;
+using HAQP::Counters;
 
 template<typename T1, typename T2>
 void selectSingleRunNoCounters(const DataFile &dataFile, Select selectImplementation, T1 threshold,
@@ -26,7 +26,7 @@ void selectSingleRunNoCounters(const DataFile &dataFile, Select selectImplementa
 
         std::cout << "Running threshold " << threshold << ", iteration " << j + 1 << "... ";
 
-        MABPL::runSelectFunction(selectImplementation,
+        HAQP::runSelectFunction(selectImplementation,
                                  dataFile.getNumElements(), inputData, inputFilter, selection, threshold);
 
         delete[] inputData;
@@ -59,7 +59,7 @@ void selectCpuCyclesSingleInputBenchmark(const DataFile &dataFile,
 
             cycles = *Counters::getInstance().readSharedEventSet();
 
-            MABPL::runSelectFunction(selectImplementations[j],
+            HAQP::runSelectFunction(selectImplementations[j],
                                      dataFile.getNumElements(), inputData, inputFilter, selection, threshold);
 
             results[i][1 + j] = *Counters::getInstance().readSharedEventSet() - cycles;
@@ -116,7 +116,7 @@ void selectCpuCyclesMultipleInputBenchmark(const DataFile &dataFile,
 
                 cycles = *Counters::getInstance().readSharedEventSet();
 
-                MABPL::runSelectFunction(selectImplementations[j],
+                HAQP::runSelectFunction(selectImplementations[j],
                                          dataFile.getNumElements(), inputData, inputFilter, selection, j);
 
                 results[count][1 + (i * iterations) + k] = *Counters::getInstance().readSharedEventSet() - cycles;
@@ -180,7 +180,7 @@ void selectBenchmarkWithExtraCounters(const DataFile &dataFile, Select selectImp
             if (PAPI_reset(benchmarkEventSet) != PAPI_OK)
                 exit(1);
 
-            MABPL::runSelectFunction(selectImplementation,
+            HAQP::runSelectFunction(selectImplementation,
                                      dataFile.getNumElements(), inputData, inputFilter, selection,
                                      static_cast<T1>(thresholds[i]));
 
@@ -250,7 +250,7 @@ void selectCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<Selec
 
                 cycles = *Counters::getInstance().readSharedEventSet();
 
-                MABPL::runSelectFunction(selectImplementations[j],
+                HAQP::runSelectFunction(selectImplementations[j],
                                          dataSweep.getNumElements(), inputData, inputFilter, selection, threshold);
 
                 results[k][1 + (i * selectImplementations.size()) + j] =
@@ -308,7 +308,7 @@ void selectWallTimeSweepBenchmark(DataSweep &dataSweep, const std::vector<Select
 
                 wallTime = PAPI_get_real_usec();
 
-                MABPL::runSelectFunction(selectImplementations[j],
+                HAQP::runSelectFunction(selectImplementations[j],
                                          dataSweep.getNumElements(), inputData, inputFilter, selection, threshold);
 
                 results[k][1 + (i * selectImplementations.size()) + j] =
@@ -367,7 +367,7 @@ void selectWallTimeDopSweepBenchmark(DataSweep &dataSweep, Select selectImplemen
 
                 wallTime = PAPI_get_real_usec();
 
-                MABPL::runSelectFunction(selectImplementation,dataSweep.getNumElements(), inputData, inputFilter,
+                HAQP::runSelectFunction(selectImplementation,dataSweep.getNumElements(), inputData, inputFilter,
                                          selection, threshold, dop[j]);
 
                 results[k][1 + (i * dop.size()) + j] =
@@ -431,7 +431,7 @@ void selectCpuCyclesInputSweepBenchmark(const DataFile &dataFile,
 
                 cycles = *Counters::getInstance().readSharedEventSet();
 
-                MABPL::runSelectFunction(selectImplementations[j],
+                HAQP::runSelectFunction(selectImplementations[j],
                                          dataFile.getNumElements(), inputData, inputFilter,
                                          selection, static_cast<T1>(thresholds[k]));
 
@@ -485,7 +485,7 @@ void selectWallTimeInputSweepBenchmark(const DataFile &dataFile,
 
                 wallTime = PAPI_get_real_usec();
 
-                MABPL::runSelectFunction(selectImplementations[j],
+                HAQP::runSelectFunction(selectImplementations[j],
                                          dataFile.getNumElements(), inputData, inputFilter,
                                          selection, static_cast<T1>(thresholds[k]));
 
@@ -540,7 +540,7 @@ void selectWallTimeDopAndInputSweepBenchmark(const DataFile &dataFile,
 
                 wallTime = PAPI_get_real_usec();
 
-                MABPL::runSelectFunction(selectImplementation,
+                HAQP::runSelectFunction(selectImplementation,
                                          dataFile.getNumElements(), inputData, inputFilter,
                                          selection, static_cast<T1>(thresholds[k]), dop[j]);
 
@@ -568,4 +568,4 @@ void selectWallTimeDopAndInputSweepBenchmark(const DataFile &dataFile,
 }
 
 
-#endif //MABPL_SELECTCYCLESBENCHMARKIMPLEMENTATION_H
+#endif //HAQP_SELECTCYCLESBENCHMARKIMPLEMENTATION_H

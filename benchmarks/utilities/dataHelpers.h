@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <papi.h>
 
-#include "mabpl.h"
+#include "haqp.h"
 #include "data_generation/dataFiles.h"
 
 
@@ -38,7 +38,7 @@ template <typename T>
 void writeDataFileToCSV(const DataFile &dataFile);
 
 template <typename T1, typename T2>
-void sortVectorOfPairs(MABPL::vectorOfPairs<T1, T2> &vectorOfPairs);
+void sortVectorOfPairs(HAQP::vectorOfPairs<T1, T2> &vectorOfPairs);
 
 template <typename T>
 void copyArray(T* source, T* destination, int size);

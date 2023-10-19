@@ -1,5 +1,5 @@
-#ifndef MABPL_GROUPBYIMPLEMENTATION_H
-#define MABPL_GROUPBYIMPLEMENTATION_H
+#ifndef HAQP_GROUPBYIMPLEMENTATION_H
+#define HAQP_GROUPBYIMPLEMENTATION_H
 
 
 #include <iostream>
@@ -13,7 +13,7 @@
 #include "machine_constants/machineConstants.h"
 
 
-namespace MABPL {
+namespace HAQP {
 
 #ifdef __AVX512F__
     constexpr int BITS_PER_GROUPBY_RADIX_PASS = 10;
@@ -653,4 +653,4 @@ vectorOfPairs<T1, T2> runGroupByFunction(GroupBy groupByImplementation, int n, T
 
 }
 
-#endif //MABPL_GROUPBYIMPLEMENTATION_H
+#endif //HAQP_GROUPBYIMPLEMENTATION_H

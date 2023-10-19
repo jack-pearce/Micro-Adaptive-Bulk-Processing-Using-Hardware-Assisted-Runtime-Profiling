@@ -14,7 +14,7 @@ add_library(hazard_adaptive_library
         src/operators/groupBy.cpp
         src/machine_constants/machineConstants.cpp
         src/operators/partition.cpp
-        include/mabpl.h
+        include/haqp.h
 )
 
 target_include_directories(hazard_adaptive_library

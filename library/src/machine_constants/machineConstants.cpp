@@ -6,7 +6,7 @@
 #include "machineConstants.h"
 
 
-namespace MABPL {
+namespace HAQP {
 
 
 void calculateMissingMachineConstants() {

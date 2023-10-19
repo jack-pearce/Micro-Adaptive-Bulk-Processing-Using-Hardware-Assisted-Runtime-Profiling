@@ -1,5 +1,5 @@
-#ifndef MABPL_DATAHELPERSIMPLEMENTATION_H
-#define MABPL_DATAHELPERSIMPLEMENTATION_H
+#ifndef HAQP_DATAHELPERSIMPLEMENTATION_H
+#define HAQP_DATAHELPERSIMPLEMENTATION_H
 
 #include <fstream>
 #include <string>
@@ -235,7 +235,7 @@ void writeDataFileToCSV(const DataFile &dataFile) {
 }
 
 template <typename T1, typename T2>
-void sortVectorOfPairs(MABPL::vectorOfPairs<T1, T2> &vectorOfPairs) {;
+void sortVectorOfPairs(HAQP::vectorOfPairs<T1, T2> &vectorOfPairs) {;
     std::sort(vectorOfPairs.begin(), vectorOfPairs.end(), [](const auto& pair1, const auto& pair2) {
         return pair1.first < pair2.first;
     });
@@ -263,4 +263,4 @@ void randomiseArray(T* data, int n) {
 }
 
 
-#endif //MABPL_DATAHELPERSIMPLEMENTATION_H
+#endif //HAQP_DATAHELPERSIMPLEMENTATION_H

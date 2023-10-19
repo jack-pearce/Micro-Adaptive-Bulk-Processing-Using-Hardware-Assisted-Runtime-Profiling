@@ -2,7 +2,7 @@
 
 #include "partition.h"
 
-namespace MABPL {
+namespace HAQP {
 
 
 std::string getPartitionName(Partition partitionImplementation) {

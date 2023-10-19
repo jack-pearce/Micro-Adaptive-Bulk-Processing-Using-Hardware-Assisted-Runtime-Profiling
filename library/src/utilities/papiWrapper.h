@@ -1,12 +1,12 @@
-#ifndef MABPL_PAPIWRAPPER_H
-#define MABPL_PAPIWRAPPER_H
+#ifndef HAQP_PAPIWRAPPER_H
+#define HAQP_PAPIWRAPPER_H
 
 #include <vector>
 #include <string>
 #include <papi.h>
 
 
-namespace MABPL {
+namespace HAQP {
 
 class Counters {
 public:
@@ -34,4 +34,4 @@ void destroyThreadEventSet(int eventSet, long_long *values);
 
 }
 
-#endif //MABPL_PAPIWRAPPER_H
+#endif //HAQP_PAPIWRAPPER_H

@@ -6,7 +6,7 @@
 #include "papiWrapper.h"
 
 
-namespace MABPL {
+namespace HAQP {
 
 Counters& Counters::getInstance() {
     static Counters instance;

@@ -1,10 +1,10 @@
-#ifndef MABPL_PARTITIONCYCLESBENCHMARK_H
-#define MABPL_PARTITIONCYCLESBENCHMARK_H
+#ifndef HAQP_PARTITIONCYCLESBENCHMARK_H
+#define HAQP_PARTITIONCYCLESBENCHMARK_H
 
-#include "mabpl.h"
+#include "haqp.h"
 #include "data_generation/dataFiles.h"
 
-using MABPL::Partition;
+using HAQP::Partition;
 
 
 template<typename T>
@@ -37,4 +37,4 @@ void partitionSweepBenchmark(DataSweep &dataSweep, const std::vector<Partition> 
 
 #include "partitionCyclesBenchmarkImplementation.h"
 
-#endif //MABPL_PARTITIONCYCLESBENCHMARK_H
+#endif //HAQP_PARTITIONCYCLESBENCHMARK_H

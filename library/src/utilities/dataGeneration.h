@@ -1,7 +1,7 @@
-#ifndef MABPL_DATAGENERATION_H
-#define MABPL_DATAGENERATION_H
+#ifndef HAQP_DATAGENERATION_H
+#define HAQP_DATAGENERATION_H
 
-namespace MABPL {
+namespace HAQP {
 
 template <typename T>
 void copyArray(const T *source, T *destination, int size);
@@ -25,4 +25,4 @@ void generatePartiallySortedInMemory(T *data, int n, int numRepeats, float perce
 
 #include "dataGenerationImplementation.h"
 
-#endif //MABPL_DATAGENERATION_H
+#endif //HAQP_DATAGENERATION_H

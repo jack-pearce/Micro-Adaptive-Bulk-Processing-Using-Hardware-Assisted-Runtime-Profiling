@@ -3,7 +3,7 @@
 #include "groupBy.h"
 
 
-namespace MABPL {
+namespace HAQP {
 
 std::string getGroupByName(GroupBy groupByImplementation) {
     switch (groupByImplementation) {

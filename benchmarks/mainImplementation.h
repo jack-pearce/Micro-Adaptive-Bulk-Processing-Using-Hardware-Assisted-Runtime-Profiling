@@ -1,5 +1,5 @@
-#ifndef MABPL_MAINIMPLEMENTATION_H
-#define MABPL_MAINIMPLEMENTATION_H
+#ifndef HAQP_MAINIMPLEMENTATION_H
+#define HAQP_MAINIMPLEMENTATION_H
 
 #include <string>
 #include <vector>
@@ -13,15 +13,15 @@
 #include "cycles_benchmarking/groupByCyclesBenchmark.h"
 #include "cycles_benchmarking/partitionCyclesBenchmark.h"
 #include "data_generation/dataFiles.h"
-#include "mabpl.h"
+#include "haqp.h"
 
-using MABPL::Select;
-using MABPL::GroupBy;
+using HAQP::Select;
+using HAQP::GroupBy;
 
-using MABPL::MinAggregation;
-using MABPL::MaxAggregation;
-using MABPL::SumAggregation;
-using MABPL::CountAggregation;
+using HAQP::MinAggregation;
+using HAQP::MaxAggregation;
+using HAQP::SumAggregation;
+using HAQP::CountAggregation;
 
 
 template <typename T>
@@ -41,7 +41,7 @@ void selectFunctionalityTest(const DataFile& dataFile, Select selectImplementati
         copyArray<T2>(LoadedData<T2>::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
         copyArray<T1>(LoadedData<T1>::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
 
-        auto selected = MABPL::runSelectFunction(selectImplementation,
+        auto selected = HAQP::runSelectFunction(selectImplementation,
                                                  dataFile.getNumElements(), inputData, inputFilter, selection, i);
         std::cout << i << "%: " << static_cast<float>(selected) / static_cast<float>(dataFile.getNumElements()) << std::endl;
 
@@ -110,7 +110,7 @@ void selectIndexesCompareResultsTest(const DataFile& dataFile, Select selectImpO
 
     std::cout << "Running " << getSelectName(selectImpOne) << "..." << std::endl;
 
-    int resultOne = MABPL::runSelectFunction(selectImpOne, dataFile.getNumElements(),
+    int resultOne = HAQP::runSelectFunction(selectImpOne, dataFile.getNumElements(),
                                              inputData, inputFilter, selectionOne, threshold);
     std::sort(selectionOne, selectionOne + resultOne);
 
@@ -118,7 +118,7 @@ void selectIndexesCompareResultsTest(const DataFile& dataFile, Select selectImpO
 
     std::cout << std::endl << "Running " << getSelectName(selectImpTwo) << "..." << std::endl;
 
-    int resultTwo = MABPL::runSelectFunction(selectImpTwo, dataFile.getNumElements(),
+    int resultTwo = HAQP::runSelectFunction(selectImpTwo, dataFile.getNumElements(),
                                              inputData, inputFilter, selectionTwo, threshold);
     std::sort(selectionTwo, selectionTwo + resultTwo);
 
@@ -165,7 +165,7 @@ void selectValuesCompareResultsTest(const DataFile& dataFile, Select selectImpOn
 
     std::cout << "Running " << getSelectName(selectImpOne) << "..." << std::endl;
 
-    int resultOne = MABPL::runSelectFunction(selectImpOne, dataFile.getNumElements(),
+    int resultOne = HAQP::runSelectFunction(selectImpOne, dataFile.getNumElements(),
                                              inputData, inputFilter, selectionOne, threshold);
     std::sort(selectionOne, selectionOne + resultOne);
 
@@ -173,7 +173,7 @@ void selectValuesCompareResultsTest(const DataFile& dataFile, Select selectImpOn
 
     std::cout << std::endl << "Running " << getSelectName(selectImpTwo) << "..." << std::endl;
 
-    int resultTwo = MABPL::runSelectFunction(selectImpTwo, dataFile.getNumElements(),
+    int resultTwo = HAQP::runSelectFunction(selectImpTwo, dataFile.getNumElements(),
                                              inputData, inputFilter, selectionTwo, threshold);
     std::sort(selectionTwo, selectionTwo + resultTwo);
 
@@ -215,7 +215,7 @@ void selectWallTimeDopSweepBenchmarkCalcDopRange(DataSweep &dataSweep, Select se
                                                  const std::string &fileNamePrefix) {
     int dop = 2;
     std::vector<int> dopValues;
-    while (dop <= MABPL::logicalCoresCount()) {
+    while (dop <= HAQP::logicalCoresCount()) {
         dopValues.push_back(dop);
         dop *= 2;
     }
@@ -230,7 +230,7 @@ void selectWallTimeDopAndInputSweepBenchmarkCalcDopRange(const DataFile &dataFil
                                                          const std::string &fileNamePrefix) {
     int dop = 2;
     std::vector<int> dopValues;
-    while (dop <= MABPL::logicalCoresCount()) {
+    while (dop <= HAQP::logicalCoresCount()) {
         dopValues.push_back(dop);
         dop *= 2;
     }
@@ -246,12 +246,12 @@ void groupByCompareResultsTest(const DataFile& dataFile, GroupBy groupByImpOne, 
     copyArray<T1>(LoadedData<T1>::getInstance(dataFile).getData(), inputGroupBy, dataFile.getNumElements());
     generateUniformDistributionInMemory<T2>(inputAggregate, dataFile.getNumElements(), 10);
 
-    auto resultOne = MABPL::runGroupByFunction<MaxAggregation>(groupByImpOne,
+    auto resultOne = HAQP::runGroupByFunction<MaxAggregation>(groupByImpOne,
                                                                dataFile.getNumElements(), inputGroupBy, inputAggregate,
                                                                10000000);
     sortVectorOfPairs(resultOne);
 
-    auto resultTwo = MABPL::runGroupByFunction<MaxAggregation>(groupByImpTwo,
+    auto resultTwo = HAQP::runGroupByFunction<MaxAggregation>(groupByImpTwo,
                                                                dataFile.getNumElements(), inputGroupBy, inputAggregate,
                                                                10000000);
     sortVectorOfPairs(resultTwo);
@@ -310,7 +310,7 @@ void groupByWallTimeDopSweepBenchmarkCalcDopRange(DataSweep &dataSweep, int iter
                                                   const std::string &fileNamePrefix) {
     int dop = 2;
     std::vector<int> dopValues;
-    while (dop <= MABPL::logicalCoresCount()) {
+    while (dop <= HAQP::logicalCoresCount()) {
         dopValues.push_back(dop);
         dop *= 2;
     }
@@ -405,4 +405,4 @@ void partitionSweepBenchmarkWithExtraCountersConfigurations(DataSweep &dataSweep
 
 
 
-#endif //MABPL_MAINIMPLEMENTATION_H
+#endif //HAQP_MAINIMPLEMENTATION_H

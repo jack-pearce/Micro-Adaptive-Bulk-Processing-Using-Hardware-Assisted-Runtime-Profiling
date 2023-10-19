@@ -1,5 +1,5 @@
-#ifndef MABPL_PARTITIONIMPLEMENTATION_H
-#define MABPL_PARTITIONIMPLEMENTATION_H
+#ifndef HAQP_PARTITIONIMPLEMENTATION_H
+#define HAQP_PARTITIONIMPLEMENTATION_H
 
 
 #include <vector>
@@ -12,7 +12,7 @@
 #include "machine_constants/machineConstants.h"
 
 
-namespace MABPL {
+namespace HAQP {
 
 template<typename T>
 inline void partitionFixedAux(int n, T *keys, T *buffer, std::vector<int> &buckets, int msbToPartition,
@@ -271,4 +271,4 @@ std::vector<int> runPartitionFunction(Partition partitionImplementation, int n, 
 
 }
 
-#endif //MABPL_PARTITIONIMPLEMENTATION_H
+#endif //HAQP_PARTITIONIMPLEMENTATION_H

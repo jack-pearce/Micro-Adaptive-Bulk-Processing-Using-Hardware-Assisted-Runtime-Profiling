@@ -1,5 +1,5 @@
-#ifndef MABPL_PARTITIONCYCLESBENCHMARKIMPLEMENTATION_H
-#define MABPL_PARTITIONCYCLESBENCHMARKIMPLEMENTATION_H
+#ifndef HAQP_PARTITIONCYCLESBENCHMARKIMPLEMENTATION_H
+#define HAQP_PARTITIONCYCLESBENCHMARKIMPLEMENTATION_H
 
 #include <limits>
 
@@ -15,7 +15,7 @@ void testSort(const DataFile &dataFile, Partition partitionImplementation, int r
 
     std::cout << "Running test... ";
 
-    MABPL::runPartitionFunction(partitionImplementation, dataFile.getNumElements(), keys, radixBits);
+    HAQP::runPartitionFunction(partitionImplementation, dataFile.getNumElements(), keys, radixBits);
 
     for (int i = 1; i < dataFile.getNumElements(); i++) {
         if (keys[i] < keys[i - 1]) {
@@ -36,7 +36,7 @@ void testPartition(const DataFile &dataFile, Partition partitionImplementation, 
 
     std::cout << "Running test... ";
 
-    std::vector<int> partitions = MABPL::runPartitionFunction(partitionImplementation, dataFile.getNumElements(),
+    std::vector<int> partitions = HAQP::runPartitionFunction(partitionImplementation, dataFile.getNumElements(),
                                                               keys, radixBits);
 
     int previous = 0;
@@ -97,7 +97,7 @@ void partitionBitsSweepBenchmarkWithExtraCounters(const DataFile &dataFile,
             if (PAPI_reset(benchmarkEventSet) != PAPI_OK)
                 exit(1);
 
-            MABPL::runPartitionFunction(partitionImplementation, dataFile.getNumElements(), keys, radixBits);
+            HAQP::runPartitionFunction(partitionImplementation, dataFile.getNumElements(), keys, radixBits);
 
             if (PAPI_read(benchmarkEventSet, benchmarkCounterValues) != PAPI_OK)
                 exit(1);
@@ -162,7 +162,7 @@ void partitionSweepBenchmarkWithExtraCounters(DataSweep &dataSweep,
             if (PAPI_reset(benchmarkEventSet) != PAPI_OK)
                 exit(1);
 
-            MABPL::runPartitionFunction(partitionImplementation, n, keys, radixBits);
+            HAQP::runPartitionFunction(partitionImplementation, n, keys, radixBits);
 
             if (PAPI_read(benchmarkEventSet, benchmarkCounterValues) != PAPI_OK)
                 exit(1);
@@ -223,7 +223,7 @@ void partitionBitsSweepBenchmark(const DataFile &dataFile, const std::vector<Par
 
                 cycles = *Counters::getInstance().readSharedEventSet();
 
-                MABPL::runPartitionFunction(partitionImplementations[j],
+                HAQP::runPartitionFunction(partitionImplementations[j],
                                             dataFile.getNumElements(), keys, radixBits);
 
                 results[radixBits - startBits][1 + (iteration * partitionImplementations.size()) + j] =
@@ -279,7 +279,7 @@ void partitionSweepBenchmark(DataSweep &dataSweep, const std::vector<Partition> 
 
                 cycles = *Counters::getInstance().readSharedEventSet();
 
-                MABPL::runPartitionFunction(partitionImplementations[j], n, keys, radixBits);
+                HAQP::runPartitionFunction(partitionImplementations[j], n, keys, radixBits);
 
                 results[runNum][1 + (iteration * partitionImplementations.size()) + j] =
                         static_cast<double>(*Counters::getInstance().readSharedEventSet() - cycles);
@@ -311,4 +311,4 @@ void partitionSweepBenchmark(DataSweep &dataSweep, const std::vector<Partition> 
 
 
 
-#endif //MABPL_PARTITIONCYCLESBENCHMARKIMPLEMENTATION_H
+#endif //HAQP_PARTITIONCYCLESBENCHMARKIMPLEMENTATION_H

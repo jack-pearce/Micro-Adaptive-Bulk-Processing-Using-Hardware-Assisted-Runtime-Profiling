@@ -1,10 +1,10 @@
-#ifndef MABPL_SYSTEMINFORMATION_H
-#define MABPL_SYSTEMINFORMATION_H
+#ifndef HAQP_SYSTEMINFORMATION_H
+#define HAQP_SYSTEMINFORMATION_H
 
 #include <immintrin.h>
 
 
-namespace MABPL {
+namespace HAQP {
 
 template <typename T>
 bool arrayIsSimd128Aligned(const T *array) {
@@ -28,4 +28,4 @@ int l2TlbEntriesFor4KbytePages();
 }
 
 
-#endif //MABPL_SYSTEMINFORMATION_H
+#endif //HAQP_SYSTEMINFORMATION_H

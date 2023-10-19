@@ -1,11 +1,11 @@
-#ifndef MABPL_MACHINECONSTANTS_H
-#define MABPL_MACHINECONSTANTS_H
+#ifndef HAQP_MACHINECONSTANTS_H
+#define HAQP_MACHINECONSTANTS_H
 
 #include <string>
 #include <map>
 
 
-namespace MABPL {
+namespace HAQP {
 
 void printMachineConstants();
 void calculateMissingMachineConstants();
@@ -37,4 +37,4 @@ private:
 
 #include "machineConstantsImplementation.h"
 
-#endif //MABPL_MACHINECONSTANTS_H
+#endif //HAQP_MACHINECONSTANTS_H

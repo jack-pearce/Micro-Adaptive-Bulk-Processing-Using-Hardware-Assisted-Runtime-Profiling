@@ -1,5 +1,5 @@
-#ifndef MABPL_GROUPBY_H
-#define MABPL_GROUPBY_H
+#ifndef HAQP_GROUPBY_H
+#define HAQP_GROUPBY_H
 
 #include <string>
 #include <vector>
@@ -8,7 +8,7 @@
 #include "utilities/dataStructures.h"
 
 
-namespace MABPL {
+namespace HAQP {
 
 enum GroupBy {
     Hash,
@@ -61,4 +61,4 @@ vectorOfPairs<T1, T2> runGroupByFunction(GroupBy groupByImplementation, int n, T
 
 #include "groupByImplementation.h"
 
-#endif //MABPL_GROUPBY_H
+#endif //HAQP_GROUPBY_H

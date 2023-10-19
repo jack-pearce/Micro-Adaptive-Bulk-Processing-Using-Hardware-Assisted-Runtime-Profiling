@@ -1,5 +1,5 @@
-#ifndef MABPL_MACHINECONSTANTSIMPLEMENTATION_H
-#define MABPL_MACHINECONSTANTSIMPLEMENTATION_H
+#ifndef HAQP_MACHINECONSTANTSIMPLEMENTATION_H
+#define HAQP_MACHINECONSTANTSIMPLEMENTATION_H
 
 #include <iostream>
 
@@ -8,7 +8,7 @@
 #include "operators/select.h"
 #include "operators/groupBy.h"
 
-namespace MABPL {
+namespace HAQP {
 
 constexpr int NUMBER_OF_TESTS = 9;
 constexpr int SELECT_ITERATIONS = 12;
@@ -648,4 +648,4 @@ void calculateGroupByMachineConstants(int dop) {
 }
 
 
-#endif //MABPL_MACHINECONSTANTSIMPLEMENTATION_H
+#endif //HAQP_MACHINECONSTANTSIMPLEMENTATION_H

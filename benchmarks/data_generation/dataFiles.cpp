@@ -7,7 +7,7 @@ FilePaths& FilePaths::getInstance() {
 }
 
 FilePaths::FilePaths() {
-    projectFilePath = MABPL::getCurrentWorkingDirectory();
+    projectFilePath = HAQP::getCurrentWorkingDirectory();
 }
 
 std::string FilePaths::getSelectCyclesFolderPath() {

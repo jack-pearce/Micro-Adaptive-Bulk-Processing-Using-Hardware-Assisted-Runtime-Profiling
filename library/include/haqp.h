@@ -1,5 +1,5 @@
-#ifndef MABPL_MABPL_H
-#define MABPL_MABPL_H
+#ifndef HAQP_HAQP_H
+#define HAQP_HAQP_H
 
 // API for data processing
 #include "machine_constants/machineConstants.h"
@@ -13,4 +13,4 @@
 #include "utilities/systemInformation.h"
 #include "utilities/dataGeneration.h"
 
-#endif //MABPL_MABPL_H
+#endif //HAQP_HAQP_H

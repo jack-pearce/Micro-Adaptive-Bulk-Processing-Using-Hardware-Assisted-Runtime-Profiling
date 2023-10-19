@@ -1,5 +1,5 @@
-#ifndef MABPL_SELECT_IMPLEMENTATION_H
-#define MABPL_SELECT_IMPLEMENTATION_H
+#ifndef HAQP_SELECT_IMPLEMENTATION_H
+#define HAQP_SELECT_IMPLEMENTATION_H
 
 #include <immintrin.h>
 #include <functional>
@@ -13,7 +13,7 @@
 #include "machine_constants/machineConstants.h"
 
 
-namespace MABPL {
+namespace HAQP {
 
 template<typename T>
 int selectIndexesBranch(int endIndex, const T *inputFilter, int *selection, T threshold, int startIndex) {
@@ -1145,4 +1145,4 @@ int runSelectFunction(Select selectImplementation,
 
 }
 
-#endif //MABPL_SELECT_IMPLEMENTATION_H
+#endif //HAQP_SELECT_IMPLEMENTATION_H

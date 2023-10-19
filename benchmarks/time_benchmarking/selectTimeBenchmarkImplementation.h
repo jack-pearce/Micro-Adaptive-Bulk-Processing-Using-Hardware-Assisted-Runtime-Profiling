@@ -1,5 +1,5 @@
-#ifndef MABPL_SELECTTIMEBENCHMARKIMPLEMENTATION_H
-#define MABPL_SELECTTIMEBENCHMARKIMPLEMENTATION_H
+#ifndef HAQP_SELECTTIMEBENCHMARKIMPLEMENTATION_H
+#define HAQP_SELECTTIMEBENCHMARKIMPLEMENTATION_H
 
 #include <vector>
 #include <memory>
@@ -20,7 +20,7 @@ static void selectTimeBenchmarker(benchmark::State& state) {
     auto selection = std::make_unique<int[]>(numElements);
 
     for (auto _: state) {
-        MABPL::runSelectFunction<int>(selectImplementation, numElements, inputData,
+        HAQP::runSelectFunction<int>(selectImplementation, numElements, inputData,
                                       inputFilter, selection.get(), selectivity);
     }
 }
@@ -48,4 +48,4 @@ void selectTimeBenchmarkSetIterations(const DataFile &dataFile, Select selectImp
 }
 
 
-#endif //MABPL_SELECTTIMEBENCHMARKIMPLEMENTATION_H
+#endif //HAQP_SELECTTIMEBENCHMARKIMPLEMENTATION_H

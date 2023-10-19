@@ -1,10 +1,10 @@
 #ifndef MICRO_ADAPTIVE_BULK_PROCESSING_LIBRARY_TIMEBENCHMARKSELECT_H
 #define MICRO_ADAPTIVE_BULK_PROCESSING_LIBRARY_TIMEBENCHMARKSELECT_H
 
-#include "mabpl.h"
+#include "haqp.h"
 #include "data_generation/dataFiles.h"
 
-using MABPL::Select;
+using HAQP::Select;
 
 
 template <typename T>

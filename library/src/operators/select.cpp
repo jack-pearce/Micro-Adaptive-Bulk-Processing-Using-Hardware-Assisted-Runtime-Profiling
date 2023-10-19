@@ -2,7 +2,7 @@
 
 #include "select.h"
 
-namespace MABPL {
+namespace HAQP {
 
 std::string getSelectName(Select selectImplementation) {
     switch (selectImplementation) {
