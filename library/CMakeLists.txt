@@ -1,3 +1,5 @@
+set(LIB_NAME "hazard_adaptive_library")
+
 link_directories("${CMAKE_SOURCE_DIR}/libs/papi/src/install/lib")
 
 find_package(PkgConfig REQUIRED)
@@ -7,7 +9,7 @@ include_directories(${JSONCPP_INCLUDE_DIRS})
 set(RobinMap_BINARY_DIR ${CMAKE_BINARY_DIR}/libs/robin-map-build)
 add_subdirectory(${CMAKE_SOURCE_DIR}/libs/robin-map ${RobinMap_BINARY_DIR})
 
-add_library(hazard_adaptive_library
+add_library(${LIB_NAME}
         src/operators/select.cpp
         src/utilities/papiWrapper.cpp
         src/utilities/systemInformation.cpp
@@ -17,7 +19,7 @@ add_library(hazard_adaptive_library
         include/haqp.h
 )
 
-target_include_directories(hazard_adaptive_library
+target_include_directories(${LIB_NAME}
         PUBLIC
             ${CMAKE_CURRENT_SOURCE_DIR}/src
             ${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -25,6 +27,6 @@ target_include_directories(hazard_adaptive_library
             ${CMAKE_SOURCE_DIR}/libs/papi/src/install/include
 )
 
-target_link_libraries(hazard_adaptive_library PUBLIC tsl::robin_map)
-target_link_libraries(hazard_adaptive_library PRIVATE papi)
-target_link_libraries(hazard_adaptive_library PRIVATE ${JSONCPP_LIBRARIES})
+target_link_libraries(${LIB_NAME} PUBLIC tsl::robin_map)
+target_link_libraries(${LIB_NAME} PRIVATE papi)
+target_link_libraries(${LIB_NAME} PRIVATE ${JSONCPP_LIBRARIES})
