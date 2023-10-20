@@ -16,8 +16,6 @@ add_executable(${EXE_NAME}
         data_generation/dataGenerators.cpp
         data_generation/dataGenerators.h
         cycles_benchmarking/groupByCyclesBenchmark.h
-        time_benchmarking/timeBenchmarkHelpers.cpp
-        time_benchmarking/selectTimeBenchmark.h
         main.h
         cycles_benchmarking/partitionCyclesBenchmark.h
 )

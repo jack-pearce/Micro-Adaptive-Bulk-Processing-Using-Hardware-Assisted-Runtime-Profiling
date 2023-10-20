@@ -16,12 +16,6 @@ void dataDistributionTest(const DataFile& dataFile);
 template <typename T1, typename T2>
 void selectFunctionalityTest(const DataFile& dataFile, Select selectImplementation);
 
-template <typename T>
-void runSelectTimeBenchmark(const DataFile& dataFile, Select selectImplementation, int selectivityStride);
-
-template <typename T>
-void runSelectTimeBenchmarkSetIterations(const DataFile& dataFile, Select selectImplementation, int selectivityStride, int iterations);
-
 template <typename T1, typename T2>
 void selectBenchmarkWithExtraCountersConfigurations(const DataFile &dataFile, Select selectImplementation, int iterations);
 

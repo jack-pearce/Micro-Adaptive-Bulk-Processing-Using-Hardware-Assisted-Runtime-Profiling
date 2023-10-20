@@ -5,8 +5,6 @@
 #include <vector>
 #include <iostream>
 
-#include "time_benchmarking/selectTimeBenchmark.h"
-#include "time_benchmarking/timeBenchmarkHelpers.h"
 #include "data_generation/dataGenerators.h"
 #include "utilities/dataHelpers.h"
 #include "cycles_benchmarking/selectCyclesBenchmark.h"
@@ -50,18 +48,6 @@ void selectFunctionalityTest(const DataFile& dataFile, Select selectImplementati
         delete[] selection;
 
     }
-}
-
-template <typename T>
-void runSelectTimeBenchmark(const DataFile& dataFile, Select selectImplementation, int selectivityStride) {
-    selectTimeBenchmark<T>(dataFile, selectImplementation, selectivityStride);
-    runTimeBenchmark(0, nullptr);
-}
-
-template <typename T>
-void runSelectTimeBenchmarkSetIterations(const DataFile& dataFile, Select selectImplementation, int selectivityStride, int iterations) {
-    selectTimeBenchmarkSetIterations<T>(dataFile, selectImplementation, selectivityStride, iterations);
-    runTimeBenchmark(0, nullptr);
 }
 
 template <typename T1, typename T2>
