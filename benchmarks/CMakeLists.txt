@@ -12,12 +12,11 @@ add_executable(${EXE_NAME}
         main.cpp
         utilities/dataHelpers.cpp
         utilities/papiHelpers.cpp
-        cycles_benchmarking/selectCyclesBenchmark.h
+        select_benchmarks/selectCyclesBenchmark.h
         data_generation/dataGenerators.cpp
         data_generation/dataGenerators.h
-        cycles_benchmarking/groupByCyclesBenchmark.h
-        main.h
-        cycles_benchmarking/partitionCyclesBenchmark.h
+        groupBy_benchmarks/groupByCyclesBenchmark.h
+        partition_benchmarks/partitionCyclesBenchmark.h
 )
 
 target_include_directories(${EXE_NAME} PUBLIC

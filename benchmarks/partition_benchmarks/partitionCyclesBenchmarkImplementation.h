@@ -6,6 +6,7 @@
 #include "utilities/dataHelpers.h"
 #include "utilities/papiHelpers.h"
 #include "partitionCyclesBenchmark.h"
+#include "data_generation/dataFiles.h"
 
 
 template<typename T>
@@ -196,6 +197,91 @@ void partitionSweepBenchmarkWithExtraCounters(DataSweep &dataSweep,
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 
     shutdownPAPI(benchmarkEventSet, benchmarkCounterValues);
+}
+
+template<typename T>
+void partitionBitsSweepBenchmarkWithExtraCountersConfigurations(const DataFile &dataFile,
+                                                                Partition partitionImplementation,
+                                                                int startBits, int endBits,
+                                                                const std::string &fileNamePrefix,
+                                                                int iterations) {
+    {
+        std::vector<std::string> benchmarkCounters = {"PERF_COUNT_HW_CPU_CYCLES",
+                                                      "INSTRUCTION_RETIRED",
+                                                      "DTLB-STORE-MISSES",
+                                                      "DTLB-STORES",
+                                                      "DTLB-LOAD-MISSES",
+                                                      "PERF_COUNT_HW_CACHE_L1D",
+                                                      "PERF_COUNT_HW_CACHE_REFERENCES",
+                                                      "PERF_COUNT_HW_CACHE_MISSES"};
+
+        partitionBitsSweepBenchmarkWithExtraCounters<T>(dataFile, partitionImplementation, startBits, endBits,
+                                                        benchmarkCounters, fileNamePrefix, iterations);
+    }
+
+/*    {
+        std::vector<std::string> benchmarkCounters = {"PERF_COUNT_HW_CPU_CYCLES",
+                                                      "DTLB-STORES",
+                                                      "DTLB-STORE-MISSES",
+                                                      "DTLB-LOADS",
+                                                      "DTLB-LOAD-MISSES"};
+
+        partitionBitsSweepBenchmarkWithExtraCounters<T>(dataFile, partitionImplementation, startBits, endBits,
+                                                            benchmarkCounters, fileNamePrefix + "1_", iterations);
+    }*/
+
+/*    {
+        std::vector<std::string> benchmarkCounters = {"PERF_COUNT_HW_CPU_CYCLES",
+                                                      "INSTRUCTION_RETIRED",
+                                                      "PERF_COUNT_HW_CACHE_L1D",
+                                                      "PERF_COUNT_HW_CACHE_REFERENCES",
+                                                      "PERF_COUNT_HW_CACHE_MISSES"};
+
+        partitionBitsSweepBenchmarkWithExtraCounters<T>(dataFile, partitionImplementation, startBits, endBits,
+                                                            benchmarkCounters, fileNamePrefix + "2_", iterations);
+    }*/
+}
+
+template<typename T>
+void partitionSweepBenchmarkWithExtraCountersConfigurations(DataSweep &dataSweep,
+                                                            Partition partitionImplementation,
+                                                            int radixBits, const std::string &fileNamePrefix,
+                                                            int iterations) {
+    {
+        std::vector<std::string> benchmarkCounters = {"PERF_COUNT_HW_CPU_CYCLES",
+                                                      "INSTRUCTION_RETIRED",
+                                                      "DTLB-STORE-MISSES",
+                                                      "DTLB-STORES",
+                                                      "DTLB-LOAD-MISSES",
+                                                      "PERF_COUNT_HW_CACHE_L1D",
+                                                      "PERF_COUNT_HW_CACHE_REFERENCES",
+                                                      "PERF_COUNT_HW_CACHE_MISSES"};
+
+        partitionSweepBenchmarkWithExtraCounters<T>(dataSweep, partitionImplementation, radixBits,
+                                                    benchmarkCounters, fileNamePrefix, iterations);
+    }
+
+/*    {
+        std::vector<std::string> benchmarkCounters = {"PERF_COUNT_HW_CPU_CYCLES",
+                                                      "DTLB-STORES",
+                                                      "DTLB-STORE-MISSES",
+                                                      "DTLB-LOADS",
+                                                      "DTLB-LOAD-MISSES"};
+
+        partitionSweepBenchmarkWithExtraCounters<T>(dataSweep, partitionImplementation, radixBits,
+                                                        benchmarkCounters, fileNamePrefix + "1_", iterations);
+    }
+
+    {
+        std::vector<std::string> benchmarkCounters = {"PERF_COUNT_HW_CPU_CYCLES",
+                                                      "INSTRUCTION_RETIRED",
+                                                      "PERF_COUNT_HW_CACHE_L1D",
+                                                      "PERF_COUNT_HW_CACHE_REFERENCES",
+                                                      "PERF_COUNT_HW_CACHE_MISSES"};
+
+        partitionSweepBenchmarkWithExtraCounters<T>(dataSweep, partitionImplementation, radixBits,
+                                                        benchmarkCounters, fileNamePrefix + "2_", iterations);
+    }*/
 }
 
 template<typename T>

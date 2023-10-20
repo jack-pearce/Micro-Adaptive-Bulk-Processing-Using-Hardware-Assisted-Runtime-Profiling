@@ -1,8 +1,9 @@
 #include <vector>
 
 #include "haqp.h"
-#include "main.h"
-#include "cycles_benchmarking/groupByCyclesBenchmark.h"
+#include "select_benchmarks/selectCyclesBenchmark.h"
+#include "groupBy_benchmarks/groupByCyclesBenchmark.h"
+#include "partition_benchmarks/partitionCyclesBenchmark.h"
 #include "data_generation/dataFiles.h"
 #include "utilities/dataHelpers.h"
 
@@ -968,14 +969,34 @@ void runImdbMacroBenchmarks(int iterations) {
 
 int main() {
 
-//    std::vector<float> inputThresholdDistribution;
-//    generateLogDistribution(30, 1, 10*1000, inputThresholdDistribution);
-//    selectCpuCyclesInputSweepBenchmark<int,int>(DataFiles::uniformIntDistribution250mValuesMax10000,
-//                                                {Select::ImplementationIndexesBranch,
-//                                                 Select::ImplementationIndexesPredication,
-//                                                 Select::ImplementationIndexesAdaptive},
-//                                                inputThresholdDistribution,
-//                                                1, "1-Indexes");
+    std::vector<float> inputThresholdDistribution;
+    generateLogDistribution(30, 1, 10*1000, inputThresholdDistribution);
+    selectCpuCyclesInputSweepBenchmark<int,int>(DataFiles::uniformIntDistribution250mValuesMax10000,
+                                                {Select::ImplementationIndexesBranch,
+                                                 Select::ImplementationIndexesPredication,
+                                                 Select::ImplementationIndexesAdaptive},
+                                                inputThresholdDistribution,
+                                                1, "1-Indexes");
+
+    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
+                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                            1, "1-NoClustering");
+
+    std::string startMachineConstantName = "Partition_startRadixBits";
+    std::string minMachineConstantName = "Partition_minRadixBits";
+
+    int startMachineConstant = HAQP::MachineConstants::getInstance().getMachineConstant(startMachineConstantName);
+    int minMachineConstant = HAQP::MachineConstants::getInstance().getMachineConstant(minMachineConstantName);
+
+    std::string nameOne = "Int64_ClusterednessSweep_" + std::to_string(startMachineConstant);
+    std::string nameTwo = "Int64_ClusterednessSweep_" + std::to_string(minMachineConstant);
+
+    partitionSweepBenchmark<uint64_t>(DataSweeps::logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1m,
+                                      {Partition::RadixBitsFixed, Partition::RadixBitsAdaptive},
+                                      startMachineConstant, nameOne, 1);
+    partitionSweepBenchmark<uint64_t>(DataSweeps::logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1m,
+                                      {Partition::RadixBitsFixed},
+                                      minMachineConstant, nameTwo, 1);
 
     runImdbSelectIndexesSweepMacroBenchmark(1874, 2023, 1,
                                             {Select::ImplementationIndexesBranch,

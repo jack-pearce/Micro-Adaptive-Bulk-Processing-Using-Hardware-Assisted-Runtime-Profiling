@@ -11,8 +11,141 @@
 #include "utilities/dataHelpers.h"
 #include "utilities/papiHelpers.h"
 #include "selectCyclesBenchmark.h"
+#include "data_generation/dataFiles.h"
 
 using HAQP::Counters;
+
+
+template <typename T1, typename T2>
+void selectFunctionalityTest(const DataFile& dataFile, Select selectImplementation) {
+
+    for (T1 i = 0; i <= 100; i += 10) {
+        auto inputData = new T2[dataFile.getNumElements()];
+        auto inputFilter = new T1[dataFile.getNumElements()];
+        auto selection = new T2[dataFile.getNumElements()];
+        copyArray<T2>(LoadedData<T2>::getInstance(dataFile).getData(), inputData, dataFile.getNumElements());
+        copyArray<T1>(LoadedData<T1>::getInstance(dataFile).getData(), inputFilter, dataFile.getNumElements());
+
+        auto selected = HAQP::runSelectFunction(selectImplementation,
+                                                dataFile.getNumElements(), inputData, inputFilter, selection, i);
+        std::cout << i << "%: " << static_cast<float>(selected) / static_cast<float>(dataFile.getNumElements()) << std::endl;
+
+        delete[] inputData;
+        delete[] inputFilter;
+        delete[] selection;
+
+    }
+}
+
+template <typename T>
+void selectIndexesCompareResultsTest(const DataFile& dataFile, Select selectImpOne, Select selectImpTwo) {
+    int threshold = 3;
+    auto inputFilter = new T[dataFile.getNumElements()];
+    auto selectionOne = new int[dataFile.getNumElements()];
+    int *inputData;
+    copyArray<T>(LoadedData<T>::getInstance(dataFile).getData(), inputFilter,
+                 dataFile.getNumElements());
+
+    std::cout << "Running " << getSelectName(selectImpOne) << "..." << std::endl;
+
+    int resultOne = HAQP::runSelectFunction(selectImpOne, dataFile.getNumElements(),
+                                            inputData, inputFilter, selectionOne, threshold);
+    std::sort(selectionOne, selectionOne + resultOne);
+
+    auto selectionTwo = new int[dataFile.getNumElements()];
+
+    std::cout << std::endl << "Running " << getSelectName(selectImpTwo) << "..." << std::endl;
+
+    int resultTwo = HAQP::runSelectFunction(selectImpTwo, dataFile.getNumElements(),
+                                            inputData, inputFilter, selectionTwo, threshold);
+    std::sort(selectionTwo, selectionTwo + resultTwo);
+
+    if (resultOne != resultTwo) {
+        std::cout << "Size of results are different" << std::endl;
+    }
+
+/*    for (auto i = 0; i < 400; i++) {
+        std::cout << inputFilter[i] << std::endl;
+    }
+    std::cout << std::endl;
+
+    for (auto i = 0; i < resultOne; i++) {
+        std::cout << selectionOne[i] << std::endl;
+    }
+    std::cout << std::endl;
+
+    for (auto i = 0; i < resultTwo; i++) {
+        std::cout << selectionTwo[i] << std::endl;
+    }
+    std::cout << std::endl;*/
+
+    for (auto i = 0; i < resultOne; ++i) {
+        if (selectionOne[i] != selectionTwo[i]) {
+            std::cout << "Different index found" << std::endl;
+        }
+    }
+
+    delete[] inputFilter;
+    delete[] selectionOne;
+    delete[] selectionTwo;
+}
+
+template <typename T1, typename T2>
+void selectValuesCompareResultsTest(const DataFile& dataFile, Select selectImpOne, Select selectImpTwo) {
+    T1 threshold = 3;
+    auto inputFilter = new T1[dataFile.getNumElements()];
+    auto inputData = new T2[dataFile.getNumElements()];
+    auto selectionOne = new T2[dataFile.getNumElements()];
+    copyArray<T1>(LoadedData<T1>::getInstance(dataFile).getData(), inputFilter,
+                  dataFile.getNumElements());
+    copyArray<T2>(LoadedData<T2>::getInstance(dataFile).getData(), inputData,
+                  dataFile.getNumElements());
+
+    std::cout << "Running " << getSelectName(selectImpOne) << "..." << std::endl;
+
+    int resultOne = HAQP::runSelectFunction(selectImpOne, dataFile.getNumElements(),
+                                            inputData, inputFilter, selectionOne, threshold);
+    std::sort(selectionOne, selectionOne + resultOne);
+
+    auto selectionTwo = new T2[dataFile.getNumElements()];
+
+    std::cout << std::endl << "Running " << getSelectName(selectImpTwo) << "..." << std::endl;
+
+    int resultTwo = HAQP::runSelectFunction(selectImpTwo, dataFile.getNumElements(),
+                                            inputData, inputFilter, selectionTwo, threshold);
+    std::sort(selectionTwo, selectionTwo + resultTwo);
+
+    if (resultOne != resultTwo) {
+        std::cout << "Size of results are different" << std::endl;
+        std::cout << "Result one size: " << resultOne << ", Result two size: " << resultTwo << std::endl;
+    }
+
+/*    for (auto i = 0; i < 400; i++) {
+        std::cout << inputFilter[i] << std::endl;
+    }
+    std::cout << std::endl;
+
+    for (auto i = 0; i < resultOne; i++) {
+        std::cout << selectionOne[i] << std::endl;
+    }
+    std::cout << std::endl;
+
+    for (auto i = 0; i < resultTwo; i++) {
+        std::cout << selectionTwo[i] << std::endl;
+    }
+    std::cout << std::endl;*/
+
+    for (auto i = 0; i < resultOne; ++i) {
+        if (selectionOne[i] != selectionTwo[i]) {
+            std::cout << "Different index found" << std::endl;
+        }
+    }
+
+    delete[] inputFilter;
+    delete[] inputData;
+    delete[] selectionOne;
+    delete[] selectionTwo;
+}
 
 template<typename T1, typename T2>
 void selectSingleRunNoCounters(const DataFile &dataFile, Select selectImplementation, T1 threshold,
@@ -218,6 +351,41 @@ void selectBenchmarkWithExtraCounters(const DataFile &dataFile, Select selectImp
     shutdownPAPI(benchmarkEventSet, benchmarkCounterValues);
 }
 
+template <typename T1, typename T2>
+void selectBenchmarkWithExtraCountersConfigurations(const DataFile &dataFile, Select selectImplementation, int iterations) {
+    // HPC set 1
+    std::vector<std::string> benchmarkCounters = {"PERF_COUNT_HW_CPU_CYCLES",
+                                                  "INSTRUCTION_RETIRED",
+                                                  "LLC_REFERENCES",
+                                                  "LLC_MISSES",
+                                                  "MISPREDICTED_BRANCH_RETIRED",
+                                                  "PERF_COUNT_HW_CACHE_REFERENCES",
+                                                  "PERF_COUNT_HW_CACHE_MISSES",
+                                                  "PERF_COUNT_HW_BRANCH_MISSES",
+                                                  "PERF_COUNT_HW_CACHE_L1D"};
+//    // HPC set 2
+//    std::vector<std::string> benchmarkCounters = {"PERF_COUNT_HW_CPU_CYCLES",
+//                                                  "INSTRUCTION_RETIRED",
+//                                                  "PERF_COUNT_HW_CACHE_L1D",
+//                                                  "L1-DCACHE-LOADS",
+//                                                  "L1-DCACHE-LOAD-MISSES",
+//                                                  "L1-DCACHE-STORES"};
+
+    std::vector<float> inputThresholdDistribution;
+    generateLinearDistribution(2, 0., 1, inputThresholdDistribution);
+
+    // Update min & max to match dataFile
+//    generateLinearDistribution(10, 0, 100, inputThresholdDistribution);
+    // Update min & max to match dataFile
+//    generateLogDistribution(30, 1, 10*1000, inputThresholdDistribution);
+
+    selectBenchmarkWithExtraCounters<T1,T2>(dataFile,
+                                            selectImplementation,
+                                            inputThresholdDistribution,
+                                            iterations,
+                                            benchmarkCounters, "");
+}
+
 template<typename T1, typename T2>
 void selectCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<Select> &selectImplementations,
                                    T1 threshold, int iterations, const std::string &fileNamePrefix) {
@@ -400,6 +568,21 @@ void selectWallTimeDopSweepBenchmark(DataSweep &dataSweep, Select selectImplemen
 }
 
 template <typename T1, typename T2>
+void selectWallTimeDopSweepBenchmarkCalcDopRange(DataSweep &dataSweep, Select selectImplementation,
+                                                 int threshold, int iterations,
+                                                 const std::string &fileNamePrefix) {
+    int dop = 2;
+    std::vector<int> dopValues;
+    while (dop <= HAQP::logicalCoresCount()) {
+        dopValues.push_back(dop);
+        dop *= 2;
+    }
+
+    selectWallTimeDopSweepBenchmark<T1,T2>(dataSweep, selectImplementation, threshold, iterations,
+                                           fileNamePrefix, dopValues);
+}
+
+template <typename T1, typename T2>
 void selectCpuCyclesInputSweepBenchmark(const DataFile &dataFile,
                                         const std::vector<Select> &selectImplementations,
                                         std::vector<float> &thresholds, int iterations,
@@ -565,6 +748,21 @@ void selectWallTimeDopAndInputSweepBenchmark(const DataFile &dataFile,
     std::string fileName = fileNamePrefix + "DopAndInputSweepWallTimeBM_" + dataFile.getFileName();
     std::string fullFilePath = FilePaths::getInstance().getSelectCyclesFolderPath() + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
+}
+
+template <typename T1, typename T2>
+void selectWallTimeDopAndInputSweepBenchmarkCalcDopRange(const DataFile &dataFile, Select selectImplementation,
+                                                         std::vector<float> &thresholds, int iterations,
+                                                         const std::string &fileNamePrefix) {
+    int dop = 2;
+    std::vector<int> dopValues;
+    while (dop <= HAQP::logicalCoresCount()) {
+        dopValues.push_back(dop);
+        dop *= 2;
+    }
+
+    selectWallTimeDopAndInputSweepBenchmark<T1,T2>(dataFile, selectImplementation, thresholds, iterations,
+                                                   fileNamePrefix, dopValues);
 }
 
 

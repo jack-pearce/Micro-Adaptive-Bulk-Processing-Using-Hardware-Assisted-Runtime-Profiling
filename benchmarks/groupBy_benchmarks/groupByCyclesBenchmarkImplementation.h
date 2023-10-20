@@ -4,12 +4,13 @@
 #include <cassert>
 #include <iostream>
 #include <cmath>
-#include <tsl/robin_map.h>
+#include "tsl/robin_map.h"
 
 #include "groupByCyclesBenchmark.h"
 #include "utilities/dataHelpers.h"
 #include "utilities/papiHelpers.h"
 #include "data_generation/dataGenerators.h"
+#include "data_generation/dataFiles.h"
 
 using HAQP::Counters;
 using HAQP::MaxAggregation;
@@ -17,6 +18,37 @@ using HAQP::MaxAggregation;
 using HAQP::SumAggregation;
 using HAQP::CountAggregation;
 
+
+template <typename T1, typename T2>
+void groupByCompareResultsTest(const DataFile& dataFile, GroupBy groupByImpOne, GroupBy groupByImpTwo) {
+    auto inputGroupBy = new T1[dataFile.getNumElements()];
+    auto inputAggregate = new T2[dataFile.getNumElements()];
+    copyArray<T1>(LoadedData<T1>::getInstance(dataFile).getData(), inputGroupBy, dataFile.getNumElements());
+    generateUniformDistributionInMemory<T2>(inputAggregate, dataFile.getNumElements(), 10);
+
+    auto resultOne = HAQP::runGroupByFunction<MaxAggregation>(groupByImpOne,
+                                                              dataFile.getNumElements(), inputGroupBy, inputAggregate,
+                                                              10000000);
+    sortVectorOfPairs(resultOne);
+
+    auto resultTwo = HAQP::runGroupByFunction<MaxAggregation>(groupByImpTwo,
+                                                              dataFile.getNumElements(), inputGroupBy, inputAggregate,
+                                                              10000000);
+    sortVectorOfPairs(resultTwo);
+
+    if (resultOne.size() != resultTwo.size()) {
+        std::cout << "Size of results are different" << std::endl;
+    }
+
+    for (auto i = 0; i < static_cast<int>(resultOne.size()); ++i) {
+        if ((resultOne[i].first != resultTwo[i].first) || (resultOne[i].second != resultTwo[i].second)) {
+            std::cout << "Different row found" << std::endl;
+        }
+    }
+
+    delete []inputGroupBy;
+    delete []inputAggregate;
+}
 
 template <typename T1, typename T2>
 void groupByCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<GroupBy> &groupByImplementations,
@@ -208,6 +240,19 @@ void groupByWallTimeDopSweepBenchmark(DataSweep &dataSweep, int iterations, cons
 }
 
 template <typename T1, typename T2>
+void groupByWallTimeDopSweepBenchmarkCalcDopRange(DataSweep &dataSweep, int iterations,
+                                                  const std::string &fileNamePrefix) {
+    int dop = 2;
+    std::vector<int> dopValues;
+    while (dop <= HAQP::logicalCoresCount()) {
+        dopValues.push_back(dop);
+        dop *= 2;
+    }
+
+    groupByWallTimeDopSweepBenchmark<T1,T2>(dataSweep, iterations, fileNamePrefix, dopValues);
+}
+
+template <typename T1, typename T2>
 void groupByBenchmarkWithExtraCounters(DataSweep &dataSweep, GroupBy groupByImplementation, int iterations,
                                        std::vector<std::string> &benchmarkCounters, const std::string &fileNamePrefix) {
     if (groupByImplementation == GroupBy::Adaptive) {
@@ -281,6 +326,24 @@ void groupByBenchmarkWithExtraCounters(DataSweep &dataSweep, GroupBy groupByImpl
 }
 
 template <typename T1, typename T2>
+void groupByBenchmarkWithExtraCountersConfigurations(DataSweep &dataSweep,
+                                                     GroupBy groupByImplementation,
+                                                     int iterations,
+                                                     const std::string &fileNamePrefix) {
+    std::vector<std::string> benchmarkCounters = {"PERF_COUNT_HW_CPU_CYCLES",
+                                                  "INSTRUCTION_RETIRED",
+                                                  "LLC_REFERENCES",
+                                                  "PERF_COUNT_HW_CACHE_REFERENCES",
+                                                  "PERF_COUNT_HW_CACHE_MISSES",
+                                                  "PERF_COUNT_HW_CACHE_L1D",
+                                                  "L1-DCACHE-LOADS",
+                                                  "L1-DCACHE-LOAD-MISSES",
+                                                  "L1-DCACHE-STORES"};
+
+    groupByBenchmarkWithExtraCounters<T1,T2>(dataSweep, groupByImplementation, iterations, benchmarkCounters, fileNamePrefix);
+}
+
+template <typename T1, typename T2>
 void groupByBenchmarkWithExtraCountersDuringRun(const DataFile &dataFile,
                                                 std::vector<std::string> &benchmarkCounters,
                                                 const std::string &fileNamePrefix) {
@@ -351,6 +414,23 @@ void groupByBenchmarkWithExtraCountersDuringRun(const DataFile &dataFile,
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 
     shutdownPAPI(benchmarkEventSet, benchmarkCounterValues);
+}
+
+template <typename T1, typename T2>
+void groupByBenchmarkWithExtraCountersDuringRunConfigurations(const DataFile &dataFile,
+                                                              const std::string &fileNamePrefix) {
+    // HPC set 1
+    std::vector<std::string> benchmarkCounters = {"PERF_COUNT_HW_CPU_CYCLES",
+                                                  "INSTRUCTION_RETIRED",
+                                                  "LLC_REFERENCES",
+                                                  "PERF_COUNT_HW_CACHE_REFERENCES",
+                                                  "PERF_COUNT_HW_CACHE_MISSES",
+                                                  "PERF_COUNT_HW_CACHE_L1D",
+                                                  "L1-DCACHE-LOADS",
+                                                  "L1-DCACHE-LOAD-MISSES",
+                                                  "L1-DCACHE-STORES"};
+
+    groupByBenchmarkWithExtraCountersDuringRun<T1,T2>(dataFile, benchmarkCounters, fileNamePrefix);
 }
 
 template <typename T1, typename T2>

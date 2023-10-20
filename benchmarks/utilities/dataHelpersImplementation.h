@@ -262,5 +262,12 @@ void randomiseArray(T* data, int n) {
     std::shuffle(data, data + n, gen);
 }
 
+template <typename T>
+void dataDistributionTest(const DataFile& dataFile) {
+    LoadedData<T>::getInstance(dataFile);
+    std::cout << dataFile.getNumElements() << " elements" << std::endl;
+    displayDistribution<T>(dataFile);
+}
+
 
 #endif //HAQP_DATAHELPERSIMPLEMENTATION_H

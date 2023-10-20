@@ -49,6 +49,9 @@ void projectIndexesOnToArray(const int* indexes, int n, T* source, T* destinatio
 template <typename T>
 void randomiseArray(T* data, int n);
 
+template <typename T>
+void dataDistributionTest(const DataFile& dataFile);
+
 #include "dataHelpersImplementation.h"
 
 
