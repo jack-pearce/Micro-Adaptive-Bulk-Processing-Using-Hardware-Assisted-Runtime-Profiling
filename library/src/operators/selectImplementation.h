@@ -120,7 +120,7 @@ public:
     void checkHazards(int n, int selected) {
         float selectivity = static_cast<float>(selected) / static_cast<float>(n);
 
-        if (__builtin_expect((static_cast<float>(branchMispredictions[0]) / static_cast<float>(n)) >
+        if (__builtin_expect((static_cast<float>(*branchMispredictions) / static_cast<float>(n)) >
                               (((selectivity - lowerCrossoverSelectivity) * m) + lowerCrossoverSelectivity), false)) {
             selectOperator->adjustRobustness(1);
         }
@@ -997,7 +997,7 @@ public:
     void checkHazards(int n, int selected) {
         float selectivity = static_cast<float>(selected) / static_cast<float>(n);
 
-        if (__builtin_expect(((static_cast<float>(branchMispredictions[0]) / static_cast<float>(n)) >
+        if (__builtin_expect(((static_cast<float>(*branchMispredictions) / static_cast<float>(n)) >
                             branchCrossoverSelectivity) || (selectivity > vectorizationCrossoverSelectivity), false)) {
             selectOperator->adjustRobustness(1);
         }
@@ -1172,7 +1172,7 @@ public:
     void checkHazards(int n, int selected) {
         float selectivity = static_cast<float>(selected) / static_cast<float>(n);
 
-        if (__builtin_expect(((static_cast<float>(branchMispredictions[0]) / static_cast<float>(n)) >
+        if (__builtin_expect(((static_cast<float>(*branchMispredictions) / static_cast<float>(n)) >
                               branchCrossoverSelectivity) || (selectivity > vectorizationCrossoverSelectivity), false)) {
             selectOperator->adjustRobustness(1);
         }
@@ -1469,7 +1469,6 @@ int runSelectFunction(Select selectImplementation,
                       int n, const T2 *inputData, const T1 *inputFilter, T2 *selection, T1 threshold, int dop) {
     return runSelectFunctionStruct<T1,T2>::run(selectImplementation, n, inputData, inputFilter, selection, threshold, dop);
 }
-
 
 }
 

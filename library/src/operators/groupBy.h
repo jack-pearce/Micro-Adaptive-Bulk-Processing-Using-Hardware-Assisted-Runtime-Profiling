@@ -40,19 +40,6 @@ struct CountAggregation {
     T operator()(T currentAggregate, T _, bool firstAggregation) const;
 };
 
-
-template<template<typename> class Aggregator, typename T1, typename T2>
-vectorOfPairs<T1, T2>  groupByHash(int n, T1 *inputGroupBy, T2 *inputAggregate, int cardinality);
-
-template<template<typename> class Aggregator, typename T1, typename T2>
-vectorOfPairs<T1, T2> groupBySort(int n, T1 *inputGroupBy, T2 *inputAggregate);
-
-template<template<typename> class Aggregator, typename T1, typename T2>
-vectorOfPairs<T1, T2> groupByAdaptive(int n, T1 *inputGroupBy, T2 *inputAggregate, int cardinality);
-
-template<template<typename> class Aggregator, typename T1, typename T2>
-vectorOfPairs<T1, T2> groupByAdaptiveParallel(int n, T1 *inputGroupBy, T2 *inputAggregate, int cardinality, int dop);
-
 template<template<typename> class Aggregator, typename T1, typename T2>
 vectorOfPairs<T1, T2> runGroupByFunction(GroupBy groupByImplementation, int n, T1 *inputGroupBy, T2 *inputAggregate,
                                          int cardinality, int dop = 2);

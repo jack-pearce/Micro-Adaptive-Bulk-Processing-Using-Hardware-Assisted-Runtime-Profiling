@@ -805,7 +805,9 @@ void runImdbPartitionMacroBenchmark_personIdColumnPrincipalsTable(int iterations
 void runImdbGroupByMacroBenchmark_titleIdFromPrincipalsTable_clusteringSweep(int iterations, int numRuns) {
     std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.principals.tsv";
     int n = getLengthOfFile(filePath);
-    auto data = new uint32_t[n];
+    using T = uint32_t;
+
+    auto data = new T[n];
     readImdbTitleIdColumnFromPrincipalsTable(filePath, data);
 
     int cardinality = 9135620;
@@ -818,7 +820,7 @@ void runImdbGroupByMacroBenchmark_titleIdFromPrincipalsTable_clusteringSweep(int
     for (int numRun = 0; numRun < numRuns; numRun++) {
         results[numRun][0] = static_cast<int>(spreadInCluster[numRun]);
 
-        auto clusteredData = new uint32_t [n];
+        auto clusteredData = new T[n];
         copyArray(data, clusteredData, n);
         runClusteringOnData(clusteredData, n, static_cast<int>(spreadInCluster[numRun]));
 
@@ -826,8 +828,8 @@ void runImdbGroupByMacroBenchmark_titleIdFromPrincipalsTable_clusteringSweep(int
 
             for (int j = 0; j < 3; j++) {
 
-                auto inputGroupBy = new uint32_t[n];
-                auto inputAggregate = new uint32_t[n];
+                auto inputGroupBy = new T[n];
+                auto inputAggregate = new T[n];
                 copyArray(clusteredData, inputGroupBy, n);
                 copyArray(clusteredData, inputAggregate, n);
 
@@ -836,17 +838,20 @@ void runImdbGroupByMacroBenchmark_titleIdFromPrincipalsTable_clusteringSweep(int
 
                 if (j == 0) {
                     cycles = *Counters::getInstance().readSharedEventSet();
-                    auto result = HAQP::groupByAdaptive<CountAggregation>(n, inputGroupBy,
-                                                                           inputAggregate, cardinality);
+                    HAQP::GroupByAdaptive<CountAggregation,T,T> groupByOperator(n, inputGroupBy, inputAggregate, cardinality);
+                    auto result = groupByOperator.processInput();
                     cycles = *Counters::getInstance().readSharedEventSet() - cycles;
                 } else if (j == 1) {
                     cycles = *Counters::getInstance().readSharedEventSet();
-                    auto result = HAQP::groupByHash<CountAggregation>(n, inputGroupBy,
-                                                                       inputAggregate, cardinality);
+                    HAQP::GroupByHash<CountAggregation,T,T> groupByOperator(inputGroupBy, inputAggregate, cardinality);
+                    groupByOperator.processMicroBatch(n);
+                    auto result = groupByOperator.getOutput();
                     cycles = *Counters::getInstance().readSharedEventSet() - cycles;
                 } else if (j == 2) {
                     cycles = *Counters::getInstance().readSharedEventSet();
-                    auto result = HAQP::groupBySort<CountAggregation>(n, inputGroupBy, inputAggregate);
+                    HAQP::GroupBySort<CountAggregation,T,T> groupByOperator(inputGroupBy, inputAggregate);
+                    groupByOperator.processMicroBatch(n);
+                    auto result = groupByOperator.getOutput();
                     cycles = *Counters::getInstance().readSharedEventSet() - cycles;
                 }
 
@@ -878,7 +883,9 @@ void runImdbGroupByMacroBenchmark_titleIdFromPrincipalsTable_clusteringSweep(int
 void runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(int iterations, int numRuns) {
     std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.akas.tsv";
     int n = getLengthOfFile(filePath);
-    auto data = new int [n];
+    using T = int;
+
+    auto data = new T[n];
     readImdbTitleIdColumnFromAkasTable(filePath, data);
 
     int cardinality = 7247075;
@@ -891,7 +898,7 @@ void runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(int itera
     for (int numRun = 0; numRun < numRuns; numRun++) {
         results[numRun][0] = static_cast<int>(spreadInCluster[numRun]);
 
-        auto clusteredData = new int [n];
+        auto clusteredData = new T[n];
         copyArray(data, clusteredData, n);
         runClusteringOnData(clusteredData, n, static_cast<int>(spreadInCluster[numRun]));
 
@@ -899,8 +906,8 @@ void runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(int itera
 
             for (int j = 0; j < 3; j++) {
 
-                auto inputGroupBy = new int[n];
-                auto inputAggregate = new int[n];
+                auto inputGroupBy = new T[n];
+                auto inputAggregate = new T[n];
                 copyArray(clusteredData, inputGroupBy, n);
                 copyArray(clusteredData, inputAggregate, n);
 
@@ -909,17 +916,20 @@ void runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(int itera
 
                 if (j == 0) {
                     cycles = *Counters::getInstance().readSharedEventSet();
-                    auto result = HAQP::groupByAdaptive<CountAggregation>(n, inputGroupBy,
-                                                                           inputAggregate, cardinality);
+                    HAQP::GroupByAdaptive<CountAggregation,T,T> groupByOperator(n, inputGroupBy, inputAggregate, cardinality);
+                    auto result = groupByOperator.processInput();
                     cycles = *Counters::getInstance().readSharedEventSet() - cycles;
                 } else if (j == 1) {
                     cycles = *Counters::getInstance().readSharedEventSet();
-                    auto result = HAQP::groupByHash<CountAggregation>(n, inputGroupBy,
-                                                                       inputAggregate, cardinality);
+                    HAQP::GroupByHash<CountAggregation,T,T> groupByOperator(inputGroupBy, inputAggregate, cardinality);
+                    groupByOperator.processMicroBatch(n);
+                    auto result = groupByOperator.getOutput();
                     cycles = *Counters::getInstance().readSharedEventSet() - cycles;
                 } else if (j == 2) {
                     cycles = *Counters::getInstance().readSharedEventSet();
-                    auto result = HAQP::groupBySort<CountAggregation>(n, inputGroupBy, inputAggregate);
+                    HAQP::GroupBySort<CountAggregation,T,T> groupByOperator(inputGroupBy, inputAggregate);
+                    groupByOperator.processMicroBatch(n);
+                    auto result = groupByOperator.getOutput();
                     cycles = *Counters::getInstance().readSharedEventSet() - cycles;
                 }
 
@@ -969,39 +979,10 @@ void runImdbMacroBenchmarks(int iterations) {
 
 int main() {
 
-    std::vector<float> inputThresholdDistribution;
-    generateLogDistribution(30, 1, 10*1000, inputThresholdDistribution);
-    selectCpuCyclesInputSweepBenchmark<int,int>(DataFiles::uniformIntDistribution250mValuesMax10000,
-                                                {Select::ImplementationIndexesBranch,
-                                                 Select::ImplementationIndexesPredication,
-                                                 Select::ImplementationIndexesAdaptive},
-                                                inputThresholdDistribution,
-                                                1, "1-Indexes");
+    int iterations = 1;
 
-    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
-                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                            1, "1-NoClustering");
-
-    std::string startMachineConstantName = "Partition_startRadixBits";
-    std::string minMachineConstantName = "Partition_minRadixBits";
-
-    int startMachineConstant = HAQP::MachineConstants::getInstance().getMachineConstant(startMachineConstantName);
-    int minMachineConstant = HAQP::MachineConstants::getInstance().getMachineConstant(minMachineConstantName);
-
-    std::string nameOne = "Int64_ClusterednessSweep_" + std::to_string(startMachineConstant);
-    std::string nameTwo = "Int64_ClusterednessSweep_" + std::to_string(minMachineConstant);
-
-    partitionSweepBenchmark<uint64_t>(DataSweeps::logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1m,
-                                      {Partition::RadixBitsFixed, Partition::RadixBitsAdaptive},
-                                      startMachineConstant, nameOne, 1);
-    partitionSweepBenchmark<uint64_t>(DataSweeps::logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1m,
-                                      {Partition::RadixBitsFixed},
-                                      minMachineConstant, nameTwo, 1);
-
-    runImdbSelectIndexesSweepMacroBenchmark(1874, 2023, 1,
-                                            {Select::ImplementationIndexesBranch,
-                                             Select::ImplementationIndexesPredication,
-                                             Select::ImplementationIndexesAdaptive});
+    runImdbGroupByMacroBenchmark_titleIdFromPrincipalsTable_clusteringSweep(iterations,30);
+    runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(iterations,30);
 
     return 0;
 }
