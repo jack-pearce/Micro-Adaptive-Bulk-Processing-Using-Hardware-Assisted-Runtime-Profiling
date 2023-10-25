@@ -8,12 +8,12 @@
 
 namespace HAQP {
 
-enum SelectIndexesOperators {
+enum SelectIndexes {
     IndexesBranch,
     IndexesPredication
 };
 
-enum SelectValuesOperators {
+enum SelectValues {
     ValuesBranch,
     ValuesPredication,
     ValuesVectorized

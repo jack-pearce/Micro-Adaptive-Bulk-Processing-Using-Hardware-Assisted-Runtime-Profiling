@@ -10,7 +10,7 @@
 
 
 template<typename T>
-void testSort(const DataFile &dataFile, Partition partitionImplementation, int radixBits) {
+void testSort(const DataFile &dataFile, PartitionOperators partitionImplementation, int radixBits) {
     auto keys = new T[dataFile.getNumElements()];
     copyArray<T>(LoadedData<T>::getInstance(dataFile).getData(), keys, dataFile.getNumElements());
 
@@ -31,7 +31,7 @@ void testSort(const DataFile &dataFile, Partition partitionImplementation, int r
 }
 
 template<typename T>
-void testPartition(const DataFile &dataFile, Partition partitionImplementation, int radixBits) {
+void testPartition(const DataFile &dataFile, PartitionOperators partitionImplementation, int radixBits) {
     auto keys = new T[dataFile.getNumElements()];
     copyArray<T>(LoadedData<T>::getInstance(dataFile).getData(), keys, dataFile.getNumElements());
 
@@ -69,11 +69,11 @@ void testPartition(const DataFile &dataFile, Partition partitionImplementation, 
 
 template<typename T>
 void partitionBitsSweepBenchmarkWithExtraCounters(const DataFile &dataFile,
-                                                  Partition partitionImplementation,
+                                                  PartitionOperators partitionImplementation,
                                                   int startBits, int endBits,
                                                   std::vector<std::string> &benchmarkCounters,
                                                   const std::string &fileNamePrefix, int iterations) {
-    if (partitionImplementation == Partition::RadixBitsAdaptive) {
+    if (partitionImplementation == PartitionOperators::RadixBitsAdaptive) {
         std::cout
                 << "Cannot benchmark adaptive partition using counters as algorithm is already using these counters"
                 << std::endl;
@@ -93,7 +93,7 @@ void partitionBitsSweepBenchmarkWithExtraCounters(const DataFile &dataFile,
             auto keys = new T[dataFile.getNumElements()];
             copyArray<T>(LoadedData<T>::getInstance(dataFile).getData(), keys, dataFile.getNumElements());
 
-            std::cout << "Running radixBits = " << radixBits << ", iteration = " << i + 1 << "... ";
+            std::cout << "Running radixBitsOperator = " << radixBits << ", iteration = " << i + 1 << "... ";
 
             if (PAPI_reset(benchmarkEventSet) != PAPI_OK)
                 exit(1);
@@ -131,10 +131,10 @@ void partitionBitsSweepBenchmarkWithExtraCounters(const DataFile &dataFile,
 
 template<typename T>
 void partitionSweepBenchmarkWithExtraCounters(DataSweep &dataSweep,
-                                              Partition partitionImplementation, int radixBits,
+                                              PartitionOperators partitionImplementation, int radixBits,
                                               std::vector<std::string> &benchmarkCounters,
                                               const std::string &fileNamePrefix, int iterations) {
-    if (partitionImplementation == Partition::RadixBitsAdaptive) {
+    if (partitionImplementation == PartitionOperators::RadixBitsAdaptive) {
         std::cout
                 << "Cannot benchmark adaptive partition using counters as algorithm is already using these counters"
                 << std::endl;
@@ -201,7 +201,7 @@ void partitionSweepBenchmarkWithExtraCounters(DataSweep &dataSweep,
 
 template<typename T>
 void partitionBitsSweepBenchmarkWithExtraCountersConfigurations(const DataFile &dataFile,
-                                                                Partition partitionImplementation,
+                                                                PartitionOperators partitionImplementation,
                                                                 int startBits, int endBits,
                                                                 const std::string &fileNamePrefix,
                                                                 int iterations) {
@@ -244,7 +244,7 @@ void partitionBitsSweepBenchmarkWithExtraCountersConfigurations(const DataFile &
 
 template<typename T>
 void partitionSweepBenchmarkWithExtraCountersConfigurations(DataSweep &dataSweep,
-                                                            Partition partitionImplementation,
+                                                            PartitionOperators partitionImplementation,
                                                             int radixBits, const std::string &fileNamePrefix,
                                                             int iterations) {
     {
@@ -268,7 +268,7 @@ void partitionSweepBenchmarkWithExtraCountersConfigurations(DataSweep &dataSweep
                                                       "DTLB-LOADS",
                                                       "DTLB-LOAD-MISSES"};
 
-        partitionSweepBenchmarkWithExtraCounters<T>(dataSweep, partitionImplementation, radixBits,
+        partitionSweepBenchmarkWithExtraCounters<T>(dataSweep, partitionImplementation, radixBitsOperator,
                                                         benchmarkCounters, fileNamePrefix + "1_", iterations);
     }
 
@@ -279,13 +279,13 @@ void partitionSweepBenchmarkWithExtraCountersConfigurations(DataSweep &dataSweep
                                                       "PERF_COUNT_HW_CACHE_REFERENCES",
                                                       "PERF_COUNT_HW_CACHE_MISSES"};
 
-        partitionSweepBenchmarkWithExtraCounters<T>(dataSweep, partitionImplementation, radixBits,
+        partitionSweepBenchmarkWithExtraCounters<T>(dataSweep, partitionImplementation, radixBitsOperator,
                                                         benchmarkCounters, fileNamePrefix + "2_", iterations);
     }*/
 }
 
 template<typename T>
-void partitionBitsSweepBenchmark(const DataFile &dataFile, const std::vector<Partition> &partitionImplementations,
+void partitionBitsSweepBenchmark(const DataFile &dataFile, const std::vector<PartitionOperators> &partitionImplementations,
                                  int startBits, int endBits, const std::string &fileNamePrefix, int iterations) {
 
     int dataCols = iterations * static_cast<int>(partitionImplementations.size());
@@ -303,7 +303,7 @@ void partitionBitsSweepBenchmark(const DataFile &dataFile, const std::vector<Par
                 copyArray<T>(LoadedData<T>::getInstance(dataFile).getData(), keys,
                              dataFile.getNumElements());
 
-                std::cout << "Running radixBits = " << radixBits << ", iteration = " << iteration + 1;
+                std::cout << "Running radixBitsOperator = " << radixBits << ", iteration = " << iteration + 1;
                 std::cout << ", implementation = ";
                 std::cout << getPartitionName(partitionImplementations[j]) << "... ";
 
@@ -337,7 +337,7 @@ void partitionBitsSweepBenchmark(const DataFile &dataFile, const std::vector<Par
 }
 
 template<typename T>
-void partitionSweepBenchmark(DataSweep &dataSweep, const std::vector<Partition> &partitionImplementations,
+void partitionSweepBenchmark(DataSweep &dataSweep, const std::vector<PartitionOperators> &partitionImplementations,
                              int radixBits, const std::string &fileNamePrefix, int iterations) {
 
     int dataCols = iterations * static_cast<int>(partitionImplementations.size());

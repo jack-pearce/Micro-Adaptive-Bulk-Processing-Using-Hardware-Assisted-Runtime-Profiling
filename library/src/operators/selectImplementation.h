@@ -90,7 +90,7 @@ private:
     int microBatchStartIndex;
     int totalSelected;
     int consecutivePredications;
-    SelectIndexesOperators activeOperator;
+    SelectIndexes activeOperator;
 
     MonitorSelectIndexes<T> monitor;
     SelectIndexesBranch<T> branchOperator;
@@ -151,7 +151,7 @@ SelectIndexesAdaptive<T>::SelectIndexesAdaptive(int n_, const T *inputFilter_, i
     microBatchStartIndex(0),
     totalSelected(0),
     consecutivePredications(0),
-    activeOperator(SelectIndexesOperators::IndexesPredication),
+    activeOperator(SelectIndexes::IndexesPredication),
     monitor(MonitorSelectIndexes<T>(this)),
     branchOperator(SelectIndexesBranch<T>()),
     predicationOperator(SelectIndexesPredication<T>()) {}
@@ -159,13 +159,13 @@ SelectIndexesAdaptive<T>::SelectIndexesAdaptive(int n_, const T *inputFilter_, i
 template<typename T>
 void SelectIndexesAdaptive<T>::adjustRobustness(int adjustment) {
     if (__builtin_expect((adjustment > 0) &&
-                         activeOperator == SelectIndexesOperators::IndexesBranch, false)) {
+                         activeOperator == SelectIndexes::IndexesBranch, false)) {
 //            std::cout << "Switched to select predication" << std::endl;
-        activeOperator = SelectIndexesOperators::IndexesPredication;
+        activeOperator = SelectIndexes::IndexesPredication;
     } else if (__builtin_expect((adjustment < 0) &&
-                                activeOperator == SelectIndexesOperators::IndexesPredication, false)) {
+                                activeOperator == SelectIndexes::IndexesPredication, false)) {
 //            std::cout << "Switched to select branch" << std::endl;
-        activeOperator = SelectIndexesOperators::IndexesBranch;
+        activeOperator = SelectIndexes::IndexesBranch;
         consecutivePredications = 0;
     }
 }
@@ -175,7 +175,7 @@ int SelectIndexesAdaptive<T>::processInput() {
     while (remainingTuples > 0) {
         if (__builtin_expect(consecutivePredications == maxConsecutivePredications, false)) {
 //            std::cout << "Running branch burst" << std::endl;
-            activeOperator = SelectIndexesOperators::IndexesBranch;
+            activeOperator = SelectIndexes::IndexesBranch;
             consecutivePredications = 0;
             microBatchSize = std::min(remainingTuples, tuplesInBranchBurst);
         } else {
@@ -191,7 +191,7 @@ int SelectIndexesAdaptive<T>::processInput() {
 template<typename T>
 inline void SelectIndexesAdaptive<T>::processMicroBatch() {
     microBatchSelected = 0;
-    if (activeOperator == SelectIndexesOperators::IndexesBranch) {
+    if (activeOperator == SelectIndexes::IndexesBranch) {
         Counters::getInstance().readSharedEventSet();
         microBatchSelected = branchOperator.processMicroBatch(microBatchStartIndex + microBatchSize, inputFilter,
                                                               selection, threshold, microBatchStartIndex);
@@ -248,7 +248,7 @@ private:
     int maxConsecutivePredications;
     int tuplesInBranchBurst;
 
-    SelectIndexesOperators activeOperator;
+    SelectIndexes activeOperator;
 
     SelectIndexesBranch<T> branchOperator;
     SelectIndexesPredication<T> predicationOperator;
@@ -318,7 +318,7 @@ SelectIndexesAdaptiveParallelAux<T>::SelectIndexesAdaptiveParallelAux(SelectInde
         tuplesPerHazardCheck(50000),
         maxConsecutivePredications(10),
         tuplesInBranchBurst(1000),
-        activeOperator(SelectIndexesOperators::IndexesPredication),
+        activeOperator(SelectIndexes::IndexesPredication),
         branchOperator(SelectIndexesBranch<T>()),
         predicationOperator(SelectIndexesPredication<T>()) {
 
@@ -347,13 +347,13 @@ SelectIndexesAdaptiveParallelAux<T>::SelectIndexesAdaptiveParallelAux(SelectInde
 template<typename T>
 void SelectIndexesAdaptiveParallelAux<T>::adjustRobustness(int adjustment) {
     if (__builtin_expect((adjustment > 0) &&
-                         activeOperator == SelectIndexesOperators::IndexesBranch, false)) {
+                         activeOperator == SelectIndexes::IndexesBranch, false)) {
 //            std::cout << "Switched to select predication" << std::endl;
-        activeOperator = SelectIndexesOperators::IndexesPredication;
+        activeOperator = SelectIndexes::IndexesPredication;
     } else if (__builtin_expect((adjustment < 0) &&
-                                activeOperator == SelectIndexesOperators::IndexesPredication, false)) {
+                                activeOperator == SelectIndexes::IndexesPredication, false)) {
 //            std::cout << "Switched to select branch" << std::endl;
-        activeOperator = SelectIndexesOperators::IndexesBranch;
+        activeOperator = SelectIndexes::IndexesBranch;
         consecutivePredications = 0;
     }
 }
@@ -368,11 +368,11 @@ int SelectIndexesAdaptiveParallelAux<T>::processInput() {
         taskTuplesRemaining = (*taskIndexes)[nextTaskNumber].second;
         taskSelected = 0;
         consecutivePredications = 0;
-        activeOperator = SelectIndexesOperators::IndexesPredication;
+        activeOperator = SelectIndexes::IndexesPredication;
 
         while (taskTuplesRemaining > 0) {
             if (__builtin_expect(consecutivePredications == maxConsecutivePredications, false)) {
-                activeOperator = SelectIndexesOperators::IndexesBranch;
+                activeOperator = SelectIndexes::IndexesBranch;
                 consecutivePredications = 0;
                 microBatchSize = std::min(taskTuplesRemaining, tuplesInBranchBurst);
 
@@ -394,7 +394,7 @@ int SelectIndexesAdaptiveParallelAux<T>::processInput() {
 template<typename T>
 inline void SelectIndexesAdaptiveParallelAux<T>::processMicroBatch() {
     microBatchSelected = 0;
-    if (activeOperator == SelectIndexesOperators::IndexesBranch) {
+    if (activeOperator == SelectIndexes::IndexesBranch) {
         readThreadEventSet(eventSet, 1, branchMispredictions);
         microBatchSelected = branchOperator.processMicroBatch(microBatchStartIndex + microBatchSize, inputFilter,
                                                               threadSelection, threshold, microBatchStartIndex);
@@ -967,7 +967,7 @@ private:
     int microBatchStartIndex;
     int totalSelected;
     int consecutiveVectorized;
-    SelectValuesOperators activeOperator;
+    SelectValues activeOperator;
 
     MonitorSelectValues<T1,T2> monitor;
     SelectValuesBranch<T1,T2> branchOperator;
@@ -1028,7 +1028,7 @@ SelectValuesAdaptive<T1,T2>::SelectValuesAdaptive(int n_, const T2 *inputData_, 
         microBatchStartIndex(0),
         totalSelected(0),
         consecutiveVectorized(0),
-        activeOperator(SelectValuesOperators::ValuesBranch),
+        activeOperator(SelectValues::ValuesBranch),
         monitor(MonitorSelectValues<T1,T2>(this)),
         branchOperator(SelectValuesBranch<T1,T2>()),
         vectorizedOperator(SelectValuesVectorized<T1,T2>()) {}
@@ -1036,13 +1036,13 @@ SelectValuesAdaptive<T1,T2>::SelectValuesAdaptive(int n_, const T2 *inputData_, 
 template<typename T1, typename T2>
 void SelectValuesAdaptive<T1,T2>::adjustRobustness(int adjustment) {
     if (__builtin_expect((adjustment > 0) &&
-                         activeOperator == SelectValuesOperators::ValuesBranch, false)) {
+                         activeOperator == SelectValues::ValuesBranch, false)) {
 //            std::cout << "Switched to select vectorized" << std::endl;
-        activeOperator = SelectValuesOperators::ValuesVectorized;
+        activeOperator = SelectValues::ValuesVectorized;
     } else if (__builtin_expect((adjustment < 0) &&
-                                activeOperator == SelectValuesOperators::ValuesVectorized, false)) {
+                                activeOperator == SelectValues::ValuesVectorized, false)) {
 //            std::cout << "Switched to select branch" << std::endl;
-        activeOperator = SelectValuesOperators::ValuesBranch;
+        activeOperator = SelectValues::ValuesBranch;
         consecutiveVectorized = 0;
     }
 }
@@ -1052,7 +1052,7 @@ int SelectValuesAdaptive<T1,T2>::processInput() {
     while (remainingTuples > 0) {
         if (__builtin_expect(consecutiveVectorized == maxConsecutiveVectorized, false)) {
 //            std::cout << "Running branch burst" << std::endl;
-            activeOperator = SelectValuesOperators::ValuesBranch;
+            activeOperator = SelectValues::ValuesBranch;
             consecutiveVectorized = 0;
             microBatchSize = std::min(remainingTuples, tuplesInBranchBurst);
         } else {
@@ -1068,7 +1068,7 @@ int SelectValuesAdaptive<T1,T2>::processInput() {
 template<typename T1, typename T2>
 inline void SelectValuesAdaptive<T1,T2>::processMicroBatch() {
     microBatchSelected = 0;
-    if (activeOperator == SelectValuesOperators::ValuesBranch) {
+    if (activeOperator == SelectValues::ValuesBranch) {
         Counters::getInstance().readSharedEventSet();
         microBatchSelected = branchOperator.processMicroBatch(microBatchStartIndex + microBatchSize, inputData,
                                                               inputFilter, selection, threshold, microBatchStartIndex);
@@ -1128,7 +1128,7 @@ private:
     int maxConsecutiveVectorized;
     int tuplesInBranchBurst;
 
-    SelectValuesOperators activeOperator;
+    SelectValues activeOperator;
 
     SelectValuesBranch<T1,T2> branchOperator;
     SelectValuesVectorized<T1,T2> vectorizedOperator;
@@ -1194,7 +1194,7 @@ SelectValuesAdaptiveParallelAux<T1,T2>::SelectValuesAdaptiveParallelAux(SelectVa
         tuplesPerHazardCheck(50000),
         maxConsecutiveVectorized(10),
         tuplesInBranchBurst(1000),
-        activeOperator(SelectValuesOperators::ValuesBranch),
+        activeOperator(SelectValues::ValuesBranch),
         branchOperator(SelectValuesBranch<T1,T2>()),
         vectorizedOperator(SelectValuesVectorized<T1,T2>()) {
 
@@ -1224,13 +1224,13 @@ SelectValuesAdaptiveParallelAux<T1,T2>::SelectValuesAdaptiveParallelAux(SelectVa
 template<typename T1, typename T2>
 void SelectValuesAdaptiveParallelAux<T1,T2>::adjustRobustness(int adjustment) {
     if (__builtin_expect((adjustment > 0) &&
-                         activeOperator == SelectValuesOperators::ValuesBranch, false)) {
+                         activeOperator == SelectValues::ValuesBranch, false)) {
 //            std::cout << "Switched to select predication" << std::endl;
-        activeOperator = SelectValuesOperators::ValuesVectorized;
+        activeOperator = SelectValues::ValuesVectorized;
     } else if (__builtin_expect((adjustment < 0) &&
-                                activeOperator == SelectValuesOperators::ValuesVectorized, false)) {
+                                activeOperator == SelectValues::ValuesVectorized, false)) {
 //            std::cout << "Switched to select branch" << std::endl;
-        activeOperator = SelectValuesOperators::ValuesBranch;
+        activeOperator = SelectValues::ValuesBranch;
         consecutiveVectorized = 0;
     }
 }
@@ -1245,11 +1245,11 @@ int SelectValuesAdaptiveParallelAux<T1,T2>::processInput() {
         taskTuplesRemaining = (*taskIndexes)[nextTaskNumber].second;
         taskSelected = 0;
         consecutiveVectorized = 0;
-        activeOperator = SelectValuesOperators::ValuesBranch;
+        activeOperator = SelectValues::ValuesBranch;
 
         while (taskTuplesRemaining > 0) {
             if (__builtin_expect(consecutiveVectorized == maxConsecutiveVectorized, false)) {
-                activeOperator = SelectValuesOperators::ValuesBranch;
+                activeOperator = SelectValues::ValuesBranch;
                 consecutiveVectorized = 0;
                 microBatchSize = std::min(taskTuplesRemaining, tuplesInBranchBurst);
 
@@ -1271,7 +1271,7 @@ int SelectValuesAdaptiveParallelAux<T1,T2>::processInput() {
 template<typename T1, typename T2>
 inline void SelectValuesAdaptiveParallelAux<T1,T2>::processMicroBatch() {
     microBatchSelected = 0;
-    if (activeOperator == SelectValuesOperators::ValuesBranch) {
+    if (activeOperator == SelectValues::ValuesBranch) {
         readThreadEventSet(eventSet, 1, branchMispredictions);
         microBatchSelected = branchOperator.processMicroBatch(microBatchStartIndex + microBatchSize, inputData,
                                                               inputFilter, threadSelection, threshold,

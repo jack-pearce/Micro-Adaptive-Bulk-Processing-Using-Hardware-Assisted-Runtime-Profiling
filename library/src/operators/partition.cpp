@@ -5,11 +5,11 @@
 namespace HAQP {
 
 
-std::string getPartitionName(Partition partitionImplementation) {
+std::string getPartitionName(PartitionOperators partitionImplementation) {
     switch (partitionImplementation) {
-        case Partition::RadixBitsFixed:
+        case PartitionOperators::RadixBitsFixed:
             return "RadixPartition_Static";
-        case Partition::RadixBitsAdaptive:
+        case PartitionOperators::RadixBitsAdaptive:
             return "RadixPartition_Adaptive";
         default:
             std::cout << "Invalid selection of 'Partition' implementation!" << std::endl;

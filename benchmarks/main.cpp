@@ -7,10 +7,9 @@
 #include "data_generation/dataFiles.h"
 #include "utilities/dataHelpers.h"
 
-
 using HAQP::Select;
 using HAQP::GroupBy;
-using HAQP::Partition;
+using HAQP::PartitionOperators;
 
 using HAQP::MinAggregation;
 using HAQP::MaxAggregation;
@@ -468,37 +467,39 @@ void allPartitionTests(int iterations) {
     std::string startMachineConstantName = "Partition_startRadixBits";
     std::string minMachineConstantName = "Partition_minRadixBits";
 
-    int startMachineConstant = HAQP::MachineConstants::getInstance().getMachineConstant(startMachineConstantName);
-    int minMachineConstant = HAQP::MachineConstants::getInstance().getMachineConstant(minMachineConstantName);
+    int startMachineConstant = static_cast<int>(HAQP::MachineConstants::getInstance().
+            getMachineConstant(startMachineConstantName));
+    int minMachineConstant = static_cast<int>(HAQP::MachineConstants::getInstance().
+            getMachineConstant(minMachineConstantName));
 
     std::string nameOne = "Int64_ClusterednessSweep_" + std::to_string(startMachineConstant);
     std::string nameTwo = "Int64_ClusterednessSweep_" + std::to_string(minMachineConstant);
 
     partitionSweepBenchmark<uint64_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
-                                      {Partition::RadixBitsFixed, Partition::RadixBitsAdaptive},
+                                      {PartitionOperators::RadixBitsFixed, PartitionOperators::RadixBitsAdaptive},
                                       startMachineConstant, nameOne, iterations);
     partitionSweepBenchmark<uint64_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
-                                      {Partition::RadixBitsFixed},
+                                      {PartitionOperators::RadixBitsFixed},
                                       minMachineConstant, nameTwo, iterations);
 
     for (int radixBits = minMachineConstant + 1; radixBits < startMachineConstant; radixBits++) {
         std::string name = "Int64_ClusterednessSweep_" + std::to_string(radixBits);
         partitionSweepBenchmark<uint64_t>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
-                                          {Partition::RadixBitsFixed},
+                                          {PartitionOperators::RadixBitsFixed},
                                           radixBits, name, iterations);
     }
 
     partitionSweepBenchmark<uint64_t>(DataSweeps::logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1m,
-                                      {Partition::RadixBitsFixed, Partition::RadixBitsAdaptive},
+                                      {PartitionOperators::RadixBitsFixed, PartitionOperators::RadixBitsAdaptive},
                                       startMachineConstant, nameOne, iterations);
     partitionSweepBenchmark<uint64_t>(DataSweeps::logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1m,
-                                      {Partition::RadixBitsFixed},
+                                      {PartitionOperators::RadixBitsFixed},
                                       minMachineConstant, nameTwo, iterations);
 
     for (int radixBits = minMachineConstant + 1; radixBits < startMachineConstant; radixBits++) {
         std::string name = "Int64_ClusterednessSweep_" + std::to_string(radixBits);
         partitionSweepBenchmark<uint64_t>(DataSweeps::logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1m,
-                                          {Partition::RadixBitsFixed},
+                                          {PartitionOperators::RadixBitsFixed},
                                           radixBits, name, iterations);
     }
 }
@@ -612,10 +613,11 @@ void runImdbSelectValuesSweepMacroBenchmark(int startYear, int endYear, int iter
 
 void runImdbPartitionMacroBenchmark_titleIdColumnBasicsTable(int iterations) {
     std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.basics.tsv";
-    std::string minMachineConstantName = "Partition_minRadixBits";
-    std::string startMachineConstantName = "Partition_startRadixBits";
+    std::string minRadixBits = "Partition_minRadixBits";
+    std::string startRadixBits = "Partition_startRadixBits";
     int n = getLengthOfFile(filePath);
-    auto data = new uint32_t [n];
+    using T = uint32_t;
+    auto data = new T[n];
     readImdbTitleIdColumnFromBasicsTable(filePath, data);
 
     std::cout << n << std::endl;
@@ -627,26 +629,29 @@ void runImdbPartitionMacroBenchmark_titleIdColumnBasicsTable(int iterations) {
 
         for (int j = 0; j < 3; j++) {
 
-            auto keys = new uint32_t[n];
+            auto keys = new T[n];
             copyArray(data, keys, n);
 
             std::cout << "Running iteration " << i + 1 << "... ";
 
             if (j == 0) {
                 cycles = *Counters::getInstance().readSharedEventSet();
-                auto partitions = HAQP::partitionAdaptive(n, keys);
+                HAQP::PartitionAdaptive<T> partitionOperator(n, keys);
+                auto partitions =  partitionOperator.processInput();
                 cycles = *Counters::getInstance().readSharedEventSet() - cycles;
             } else if (j == 1) {
                 cycles = *Counters::getInstance().readSharedEventSet();
-                auto partitions = HAQP::partitionFixed(n, keys,
-                                                        static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(
-                                                                minMachineConstantName)));
+                HAQP::Partition<T> partitionOperator(n, keys,
+                    static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(minRadixBits)));
+                partitionOperator.processInput();
+                auto partitions = partitionOperator.getOutput();
                 cycles = *Counters::getInstance().readSharedEventSet() - cycles;
             } else if (j == 2) {
                 cycles = *Counters::getInstance().readSharedEventSet();
-                auto partitions = HAQP::partitionFixed(n, keys,
-                                                        static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(
-                                                                startMachineConstantName)));
+                HAQP::Partition<T> partitionOperator(n, keys,
+                    static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(startRadixBits)));
+                partitionOperator.processInput();
+                auto partitions = partitionOperator.getOutput();
                 cycles = *Counters::getInstance().readSharedEventSet() - cycles;
             }
 
@@ -659,9 +664,9 @@ void runImdbPartitionMacroBenchmark_titleIdColumnBasicsTable(int iterations) {
 
     std::vector<std::string> headers(3 * iterations);
     std::string functionNames[] = {"RadixPartition_Adaptive", "RadixPartition_Static_", "RadixPartition_Static_"};
-    functionNames[1].append(std::to_string(static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(minMachineConstantName))));
+    functionNames[1].append(std::to_string(static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(minRadixBits))));
     functionNames[1].append("bits");
-    functionNames[2].append(std::to_string(static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(startMachineConstantName))));
+    functionNames[2].append(std::to_string(static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(startRadixBits))));
     functionNames[2].append("bits");
     for (auto i = 0; i < (3 * iterations); ++i) {
         headers[i] = functionNames[i % 3];
@@ -676,10 +681,11 @@ void runImdbPartitionMacroBenchmark_titleIdColumnBasicsTable(int iterations) {
 
 void runImdbPartitionMacroBenchmark_startYearColumnBasicsTable(int iterations) {
     std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.basics.tsv";
-    std::string minMachineConstantName = "Partition_minRadixBits";
-    std::string startMachineConstantName = "Partition_startRadixBits";
+    std::string minRadixBits = "Partition_minRadixBits";
+    std::string startRadixBits = "Partition_startRadixBits";
     int n = getLengthOfFile(filePath);
-    auto data = new uint32_t [n];
+    using T = uint32_t;
+    auto data = new T[n];
     readImdbStartYearColumnFromBasicsTable(filePath, data);
 
     std::cout << n << std::endl;
@@ -691,26 +697,29 @@ void runImdbPartitionMacroBenchmark_startYearColumnBasicsTable(int iterations) {
 
         for (int j = 0; j < 3; j++) {
 
-            auto keys = new uint32_t[n];
+            auto keys = new T[n];
             copyArray(data, keys, n);
 
             std::cout << "Running iteration " << i + 1 << "... ";
 
             if (j == 0) {
                 cycles = *Counters::getInstance().readSharedEventSet();
-                auto partitions = HAQP::partitionAdaptive(n, keys);
+                HAQP::PartitionAdaptive<T> partitionOperator(n, keys);
+                auto partitions =  partitionOperator.processInput();
                 cycles = *Counters::getInstance().readSharedEventSet() - cycles;
             } else if (j == 1) {
                 cycles = *Counters::getInstance().readSharedEventSet();
-                auto partitions = HAQP::partitionFixed(n, keys,
-                                                        static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(
-                                                                minMachineConstantName)));
+                HAQP::Partition<T> partitionOperator(n, keys,
+                    static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(minRadixBits)));
+                partitionOperator.processInput();
+                auto partitions = partitionOperator.getOutput();
                 cycles = *Counters::getInstance().readSharedEventSet() - cycles;
             } else if (j == 2) {
                 cycles = *Counters::getInstance().readSharedEventSet();
-                auto partitions = HAQP::partitionFixed(n, keys,
-                                                        static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(
-                                                                startMachineConstantName)));
+                HAQP::Partition<T> partitionOperator(n, keys,
+                    static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(startRadixBits)));
+                partitionOperator.processInput();
+                auto partitions = partitionOperator.getOutput();
                 cycles = *Counters::getInstance().readSharedEventSet() - cycles;
             }
 
@@ -723,9 +732,9 @@ void runImdbPartitionMacroBenchmark_startYearColumnBasicsTable(int iterations) {
 
     std::vector<std::string> headers(3 * iterations);
     std::string functionNames[] = {"RadixPartition_Adaptive", "RadixPartition_Static_", "RadixPartition_Static_"};
-    functionNames[1].append(std::to_string(static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(minMachineConstantName))));
+    functionNames[1].append(std::to_string(static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(minRadixBits))));
     functionNames[1].append("bits");
-    functionNames[2].append(std::to_string(static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(startMachineConstantName))));
+    functionNames[2].append(std::to_string(static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(startRadixBits))));
     functionNames[2].append("bits");
     for (auto i = 0; i < (3 * iterations); ++i) {
         headers[i] = functionNames[i % 3];
@@ -740,10 +749,11 @@ void runImdbPartitionMacroBenchmark_startYearColumnBasicsTable(int iterations) {
 
 void runImdbPartitionMacroBenchmark_personIdColumnPrincipalsTable(int iterations) {
     std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.principals.tsv";
-    std::string minMachineConstantName = "Partition_minRadixBits";
-    std::string startMachineConstantName = "Partition_startRadixBits";
+    std::string minRadixBits = "Partition_minRadixBits";
+    std::string startRadixBits = "Partition_startRadixBits";
     int n = getLengthOfFile(filePath);
-    auto data = new uint32_t [n];
+    using T = uint32_t;
+    auto data = new T[n];
     readImdbPersonIdColumnFromPrincipalsTable(filePath, data);
 
     std::cout << n << std::endl;
@@ -755,26 +765,29 @@ void runImdbPartitionMacroBenchmark_personIdColumnPrincipalsTable(int iterations
 
         for (int j = 0; j < 3; j++) {
 
-            auto keys = new uint32_t[n];
+            auto keys = new T[n];
             copyArray(data, keys, n);
 
             std::cout << "Running iteration " << i + 1 << "... ";
 
             if (j == 0) {
                 cycles = *Counters::getInstance().readSharedEventSet();
-                auto partitions = HAQP::partitionAdaptive(n, keys);
+                HAQP::PartitionAdaptive<T> partitionOperator(n, keys);
+                auto partitions =  partitionOperator.processInput();
                 cycles = *Counters::getInstance().readSharedEventSet() - cycles;
             } else if (j == 1) {
                 cycles = *Counters::getInstance().readSharedEventSet();
-                auto partitions = HAQP::partitionFixed(n, keys,
-                                                        static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(
-                                                                minMachineConstantName)));
+                HAQP::Partition<T> partitionOperator(n, keys,
+                    static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(minRadixBits)));
+                partitionOperator.processInput();
+                auto partitions = partitionOperator.getOutput();
                 cycles = *Counters::getInstance().readSharedEventSet() - cycles;
             } else if (j == 2) {
                 cycles = *Counters::getInstance().readSharedEventSet();
-                auto partitions = HAQP::partitionFixed(n, keys,
-                                                        static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(
-                                                                startMachineConstantName)));
+                HAQP::Partition<T> partitionOperator(n, keys,
+                    static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(startRadixBits)));
+                partitionOperator.processInput();
+                auto partitions = partitionOperator.getOutput();
                 cycles = *Counters::getInstance().readSharedEventSet() - cycles;
             }
 
@@ -787,9 +800,9 @@ void runImdbPartitionMacroBenchmark_personIdColumnPrincipalsTable(int iterations
 
     std::vector<std::string> headers(3 * iterations);
     std::string functionNames[] = {"RadixPartition_Adaptive", "RadixPartition_Static_", "RadixPartition_Static_"};
-    functionNames[1].append(std::to_string(static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(minMachineConstantName))));
+    functionNames[1].append(std::to_string(static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(minRadixBits))));
     functionNames[1].append("bits");
-    functionNames[2].append(std::to_string(static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(startMachineConstantName))));
+    functionNames[2].append(std::to_string(static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(startRadixBits))));
     functionNames[2].append("bits");
     for (auto i = 0; i < (3 * iterations); ++i) {
         headers[i] = functionNames[i % 3];
@@ -979,10 +992,12 @@ void runImdbMacroBenchmarks(int iterations) {
 
 int main() {
 
-    int iterations = 1;
+    int iterations = 5;
+    runImdbPartitionMacroBenchmark_titleIdColumnBasicsTable(iterations);
+    runImdbPartitionMacroBenchmark_startYearColumnBasicsTable(iterations);
+    runImdbPartitionMacroBenchmark_personIdColumnPrincipalsTable(iterations);
 
-    runImdbGroupByMacroBenchmark_titleIdFromPrincipalsTable_clusteringSweep(iterations,30);
-    runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(iterations,30);
+    allPartitionTests(1);
 
     return 0;
 }

@@ -7,21 +7,15 @@
 
 namespace HAQP {
 
-enum Partition {
+enum PartitionOperators {
     RadixBitsFixed,
     RadixBitsAdaptive
 };
 
-std::string getPartitionName(Partition partitionImplementation);
+std::string getPartitionName(PartitionOperators partitionImplementation);
 
 template<typename T>
-std::vector<int> partitionFixed(int n, T *keys, int radixBits = 10);
-
-template<typename T>
-std::vector<int> partitionAdaptive(int n, T *keys);
-
-template<typename T>
-std::vector<int> runPartitionFunction(Partition partitionImplementation, int n, T *keys, int radixBits = 10);
+std::vector<int> runPartitionFunction(PartitionOperators partitionImplementation, int n, T *keys, int radixBits = 10);
 
 }
 
