@@ -150,8 +150,9 @@ public:
         static_assert(std::is_arithmetic<T2>::value, "Payload column must be an numeric type");
     }
 
-    void addMap(GroupByHash<Aggregator,T1,T2> && map_, T1 mapLargest) noexcept {
-        map = std::move(map_.getState());
+    void addMap(tsl::robin_map<T1, T2> && map_, T1 mapLargest) noexcept {
+        std::cout << "Map added" << std::endl;
+        map = map_;
         largest = std::max(largest, mapLargest);
         totalTuplesToProcess += map.size();
     }
@@ -433,7 +434,7 @@ vectorOfPairs<T1, T2> GroupByAdaptive<Aggregator, T1, T2>::processInput() {
         return hashOperator.getOutput();
     }
 
-    sortOperator.addMap(std::move(hashOperator), mapLargest);
+    sortOperator.addMap(hashOperator.getState(), mapLargest);
     return sortOperator.getOutput();
 }
 
@@ -590,7 +591,7 @@ void GroupByAdaptiveParallelAux<Aggregator, T1, T2>::processInput() {
         return;
     }
 
-    sortOperator->addMap(std::move(*hashOperator), mapLargest);
+    sortOperator->addMap(hashOperator->getState(), mapLargest);
     sortOperator->getOutput(*(args->output));
 }
 
