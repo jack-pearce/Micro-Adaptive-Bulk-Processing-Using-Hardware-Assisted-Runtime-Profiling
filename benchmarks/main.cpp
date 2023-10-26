@@ -35,7 +35,7 @@ void allSelectIndexesSingleThreadedTests(int iterations) {
                                    Select::ImplementationIndexesAdaptive},
                                    50, iterations, "2-Indexes");
 
-    // Graph 2.5: Selectivity on fully sorted data
+    // Graph 3: Selectivity on fully sorted data
     std::vector<float> inputThresholdDistribution2;
     generateLogDistribution(30, 1, 100, inputThresholdDistribution2);
     selectCpuCyclesInputSweepBenchmark<int,int>(DataFiles::fullySortedIntDistribution250mValues,
@@ -43,16 +43,9 @@ void allSelectIndexesSingleThreadedTests(int iterations) {
                                         Select::ImplementationIndexesPredication,
                                         Select::ImplementationIndexesAdaptive},
                                        inputThresholdDistribution2,
-                                       iterations, "2-5-Indexes");
+                                       iterations, "3-Indexes");
 
-    // Graph 3: Period range on linearly varying selectivity
-/*    selectCpuCyclesSweepBenchmark<int,int>(DataSweeps::varyingIntDistribution250mValuesSweep,
-                                  {Select::ImplementationIndexesBranch,
-                                   Select::ImplementationIndexesPredication,
-                                   Select::ImplementationIndexesAdaptive},
-                                   50, iterations, "Indexes");*/
-
-    // Graph 4: Period range on step varying selectivity
+    // Graph 4: Varying section length on step varying selectivity
     selectCpuCyclesSweepBenchmark<int,int>(DataSweeps::lowerStep50IntDistribution250mValuesSweepSectionLength_1,
                                            {Select::ImplementationIndexesBranch,
                                             Select::ImplementationIndexesPredication,
@@ -71,27 +64,19 @@ void allSelectIndexesSingleThreadedTests(int iterations) {
                                             Select::ImplementationIndexesAdaptive},
                                            50, iterations, "4_3-Indexes");
 
+    selectCpuCyclesSingleInputBenchmark<int,int>(DataFiles::worstCaseIndexesTunedUpperStep50IntDistribution250mValues,
+                                             {Select::ImplementationIndexesBranch,
+                                              Select::ImplementationIndexesPredication,
+                                              Select::ImplementationIndexesAdaptive},
+                                             50,
+                                             iterations, "4_4-Indexes");
 
-    // Graph 5: Best case - tuned unequal step varying selectivity
+    // Graph 5: Varying relative section length on step varying selectivity
     selectCpuCyclesSweepBenchmark<int,int>(DataSweeps::lowerStep50IntDistribution250mValuesPercentageStepSweep,
                                   {Select::ImplementationIndexesBranch,
                                    Select::ImplementationIndexesPredication,
                                    Select::ImplementationIndexesAdaptive},
                                   50, iterations, "5-Indexes");
-/*    selectCpuCyclesSingleInputBenchmark(DataFiles::bestCaseIndexesTunedUnequalLowerStep50IntDistribution250mValues,
-                                        {Select::ImplementationIndexesBranch,
-                                         Select::ImplementationIndexesPredication,
-                                         Select::ImplementationIndexesAdaptive},
-                                        50,
-                                        iterations, "Indexes");*/
-
-    // Graph 6: Worst case - tuned period range on step varying selectivity
-    selectCpuCyclesSingleInputBenchmark<int,int>(DataFiles::worstCaseIndexesTunedUpperStep50IntDistribution250mValues,
-                                        {Select::ImplementationIndexesBranch,
-                                         Select::ImplementationIndexesPredication,
-                                         Select::ImplementationIndexesAdaptive},
-                                        50,
-                                        iterations, "6-Indexes");
 }
 
 void allSelectValuesSingleThreadedTests(int iterations) {
@@ -113,7 +98,7 @@ void allSelectValuesSingleThreadedTests(int iterations) {
                                    Select::ImplementationValuesAdaptive},
                                    50, iterations, "2-Values");
 
-    // Graph 2.5: Selectivity on fully sorted data
+    // Graph 3: Selectivity on fully sorted data
     std::vector<float> inputThresholdDistribution2;
     generateLogDistribution(30, 1, 100, inputThresholdDistribution2);
     selectCpuCyclesInputSweepBenchmark<int,int>(DataFiles::fullySortedIntDistribution250mValues,
@@ -121,44 +106,28 @@ void allSelectValuesSingleThreadedTests(int iterations) {
                                         Select::ImplementationValuesVectorized,
                                         Select::ImplementationValuesAdaptive},
                                        inputThresholdDistribution2,
-                                       iterations, "2-5-Values");
+                                       iterations, "3-Values");
 
-
-    // Graph 3: Period range on linearly varying selectivity
-/*    selectCpuCyclesSweepBenchmark<int,int>(DataSweeps::varyingIntDistribution250mValuesSweep,
-                                  {Select::ImplementationValuesBranch,
-                                   Select::ImplementationValuesVectorized,
-                                   Select::ImplementationValuesAdaptive},
-                                   50, iterations, "Values");*/
-
-    // Graph 4: Period range on step varying selectivity
+    // Graph 4: Varying section length on step varying selectivity
     selectCpuCyclesSweepBenchmark<int,int>(DataSweeps::lowerStep50IntDistribution250mValuesSweep,
                                   {Select::ImplementationValuesBranch,
                                    Select::ImplementationValuesVectorized,
                                    Select::ImplementationValuesAdaptive},
-                                   50, iterations, "4-Values");
+                                   50, iterations, "4_1-Values");
 
-    // Graph 5: Best case - tuned unequal step varying selectivity
+    selectCpuCyclesSingleInputBenchmark<int,int>(DataFiles::worstCaseValuesTunedLowerStep50IntDistribution250mValues,
+                                 {Select::ImplementationValuesBranch,
+                                  Select::ImplementationValuesVectorized,
+                                  Select::ImplementationValuesAdaptive},
+                                 50,
+                                 iterations, "4_2-Values");
+
+    // Graph 5: Varying relative section length on step varying selectivity
     selectCpuCyclesSweepBenchmark<int,int>(DataSweeps::lowerStep50IntDistribution250mValuesPercentageStepSweep,
                                   {Select::ImplementationValuesBranch,
                                    Select::ImplementationValuesVectorized,
                                    Select::ImplementationValuesAdaptive},
                                   50, iterations, "5-Values");
-/*    selectCpuCyclesSingleInputBenchmark(DataFiles::bestCaseValuesTunedUnequalLowerStep50IntDistribution250mValues,
-                                        {Select::ImplementationValuesBranch,
-                                         Select::ImplementationValuesVectorized,
-                                         Select::ImplementationValuesAdaptive},
-                                        50,
-                                        iterations, "Values");*/
-
-    // Graph 6: Worst case - tuned period range on step varying selectivity
-    selectCpuCyclesSingleInputBenchmark<int,int>(DataFiles::worstCaseValuesTunedLowerStep50IntDistribution250mValues,
-                                        {Select::ImplementationValuesBranch,
-                                         Select::ImplementationValuesVectorized,
-                                         Select::ImplementationValuesAdaptive},
-                                        50,
-                                        iterations, "6-Values");
-
 }
 
 void allSelectIndexesParallelTests(int iterations) {
@@ -222,60 +191,29 @@ void allSelectValuesParallelTests(int iterations) {
 }
 
 void allGroupBySingleThreadedTests(int iterations) {
-    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
-                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                   iterations, "1-NoClustering");
-
-    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered10,
-                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                   iterations, "1-Clustered10");
-
-    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered1k,
-                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                   iterations, "1-Clustered1k");
-
-    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMaxClustered100k,
-                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                   iterations, "1-Clustered100k");
-
-    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepVariableMax,
-                                   {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                   iterations, "1-NoClustering-VariableUpperBound");
-
-    groupByCpuCyclesSweepBenchmark<int64_t,int64_t>(DataSweeps::logUniformIntDistribution20mValuesCardinalitySweepFixedMax,
-                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                            iterations, "1-NoClustering-64bitInts");
-
-    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution40mValuesCardinalitySweepFixedMax,
-                                     {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                     iterations, "1-NoClustering-40mValues");
-
     groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution200mValuesCardinalitySweepFixedMax,
                                      {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
                                      iterations, "1-NoClustering-200mValues");
 
+    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution250mValuesClusteredSweepFixedCardinality10mMax250m,
+                                    {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
+                                    iterations, "2-ClusteringSweep-250mValues");
+
     groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::linearUniformIntDistribution20mValuesCardinalitySections_100_3m_Max20m,
                                      {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                     iterations, "2-TwoSection_100_3m");
+                                     iterations, "3-TwoSection_100_3m");
 
     groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::linearUniformIntDistribution20mValuesCardinalitySections_3m_100_Max20m,
                                    {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                   iterations, "2-TwoSection_3m_100");
+                                   iterations, "3-TwoSection_3m_100");
 
     groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::linearUniformIntDistribution200mValuesMultipleCardinalitySections_100_10m_Max100m,
                                    {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                   iterations, "3-MultipleSection_100_10m");
+                                   iterations, "4-MultipleSection_100_10m");
 
     groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::linearUniformIntDistribution200mValuesMultipleCardinalitySections_10m_100_Max100m,
                                    {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                   iterations, "3-MultipleSection_10m_100");
-
-    tessilRobinMapInitialisationBenchmark<int,int>("4-MapOverheadCosts");
-
-    groupByCpuCyclesSweepBenchmark<int,int>(DataSweeps::logUniformIntDistribution20mValuesClusteredSweepFixedCardinality1m,
-                                            {GroupBy::Hash, GroupBy::Sort, GroupBy::Adaptive},
-                                            iterations, "1-ClusteringSweep-20mValues");
-
+                                   iterations, "4-MultipleSection_10m_100");
 }
 
 void allGroupByParallelTests(int iterations) {
@@ -301,7 +239,7 @@ void allGroupByParallelTests(int iterations) {
                                                           iterations, "5-DOP-2-MultipleCardinalitySectionsBwdParallel");
 }
 
-void allSingleThreadedDataSizeTests(int iterations) {
+void allSelectAndGroupBySingleThreadedDataSizeTests(int iterations) {
     std::vector<float> inputThresholdDistribution;
     generateLogDistribution(30, 1, 10*1000, inputThresholdDistribution);
     selectCpuCyclesInputSweepBenchmark<int,int>(DataFiles::uniformIntDistribution250mValuesMax10000,
@@ -369,7 +307,7 @@ void allSingleThreadedDataSizeTests(int iterations) {
                                                     iterations, "1-GroupBy-64-64");
 }
 
-void allParallelDataSizeTests(int iterations) {
+void allSelectAndGroupByParallelDataSizeTests(int iterations) {
     std::vector<float> inputThresholdDistribution;
     generateLogDistribution(30, 1, 10*1000, inputThresholdDistribution);
     selectWallTimeInputSweepBenchmark<int,int>(DataFiles::uniformIntDistribution250mValuesMax10000,
@@ -504,8 +442,8 @@ void allPartitionTests(int iterations) {
     }
 }
 
-void runImdbSelectIndexesSweepMacroBenchmark(int startYear, int endYear, int iterations,
-                                             const std::vector<Select> &selectImplementations) {
+void imdbSelectIndexesSweepMacroBenchmark(int startYear, int endYear, int iterations,
+                                          const std::vector<Select> &selectImplementations) {
     int numImplementations = static_cast<int>(selectImplementations.size());
 
     std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.basics.tsv";
@@ -554,268 +492,7 @@ void runImdbSelectIndexesSweepMacroBenchmark(int startYear, int endYear, int ite
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 }
 
-void runImdbSelectValuesSweepMacroBenchmark(int startYear, int endYear, int iterations,
-                                             const std::vector<Select> &selectImplementations) {
-    int numImplementations = static_cast<int>(selectImplementations.size());
-
-    std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.basics.tsv";
-    int n = getLengthOfFile(filePath);
-    auto yearData = new int[n];
-    readImdbStartYearColumnFromBasicsTable(filePath, yearData);
-    auto idData = new uint32_t[n];
-    readImdbTitleIdColumnFromBasicsTable(filePath, idData);
-
-    long_long cycles;
-    std::vector<std::vector<long_long>> results(endYear - startYear + 1,
-                                                std::vector<long_long>((numImplementations * iterations) + 1, 0));
-
-    for (auto year = startYear; year <= endYear; ++year) {
-        results[year - startYear][0] = year;
-
-        for (auto i = 0; i < iterations; ++i) {
-            for (auto j = 0; j < numImplementations; ++j) {
-                auto inputFilter = new int[n];
-                copyArray<int>(yearData, inputFilter, n);
-
-                auto inputData = new uint32_t[n];
-                copyArray<uint32_t>(idData, inputData, n);
-
-                auto selectedValues = new uint32_t[n];
-
-                std::cout << "Running year " << year << ", iteration " << i + 1 << "... ";
-
-                cycles = *Counters::getInstance().readSharedEventSet();
-
-                HAQP::runSelectFunction(selectImplementations[j],
-                                         n, inputData, inputFilter, selectedValues, year);
-
-                results[year - startYear][1 + (i * numImplementations) + j] = *Counters::getInstance().readSharedEventSet() - cycles;
-
-                delete[] inputFilter;
-                delete[] inputData;
-                delete[] selectedValues;
-
-                std::cout << "Completed" << std::endl;
-            }
-        }
-    }
-
-    std::vector<std::string> headers((numImplementations * iterations) + 1);
-    headers [0] = "Year";
-    for (auto i = 0; i < (numImplementations * iterations); ++i) {
-        headers[1 + i] = getSelectName(selectImplementations[i % numImplementations]);
-    }
-
-    std::string fileName = "IMDB_selectValues_year_sweep";
-    std::string fullFilePath = FilePaths::getInstance().getImdbOutputFolderPath() + fileName + ".csv";
-    writeHeadersAndTableToCSV(headers, results, fullFilePath);
-}
-
-void runImdbPartitionMacroBenchmark_titleIdColumnBasicsTable(int iterations) {
-    std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.basics.tsv";
-    std::string minRadixBits = "Partition_minRadixBits";
-    std::string startRadixBits = "Partition_startRadixBits";
-    int n = getLengthOfFile(filePath);
-    using T = uint32_t;
-    auto data = new T[n];
-    readImdbTitleIdColumnFromBasicsTable(filePath, data);
-
-    std::cout << n << std::endl;
-
-    long_long cycles;
-    std::vector<std::vector<long_long>> results(1, std::vector<long_long>((3 * iterations), 0));
-
-    for (int i = 0; i < iterations; i++) {
-
-        for (int j = 0; j < 3; j++) {
-
-            auto keys = new T[n];
-            copyArray(data, keys, n);
-
-            std::cout << "Running iteration " << i + 1 << "... ";
-
-            if (j == 0) {
-                cycles = *Counters::getInstance().readSharedEventSet();
-                HAQP::PartitionAdaptive<T> partitionOperator(n, keys);
-                auto partitions =  partitionOperator.processInput();
-                cycles = *Counters::getInstance().readSharedEventSet() - cycles;
-            } else if (j == 1) {
-                cycles = *Counters::getInstance().readSharedEventSet();
-                HAQP::Partition<T> partitionOperator(n, keys,
-                    static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(minRadixBits)));
-                partitionOperator.processInput();
-                auto partitions = partitionOperator.getOutput();
-                cycles = *Counters::getInstance().readSharedEventSet() - cycles;
-            } else if (j == 2) {
-                cycles = *Counters::getInstance().readSharedEventSet();
-                HAQP::Partition<T> partitionOperator(n, keys,
-                    static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(startRadixBits)));
-                partitionOperator.processInput();
-                auto partitions = partitionOperator.getOutput();
-                cycles = *Counters::getInstance().readSharedEventSet() - cycles;
-            }
-
-            results[0][(i * 3) + j] = cycles;
-
-            delete[] keys;
-            std::cout << "Completed" << std::endl;
-        }
-    }
-
-    std::vector<std::string> headers(3 * iterations);
-    std::string functionNames[] = {"RadixPartition_Adaptive", "RadixPartition_Static_", "RadixPartition_Static_"};
-    functionNames[1].append(std::to_string(static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(minRadixBits))));
-    functionNames[1].append("bits");
-    functionNames[2].append(std::to_string(static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(startRadixBits))));
-    functionNames[2].append("bits");
-    for (auto i = 0; i < (3 * iterations); ++i) {
-        headers[i] = functionNames[i % 3];
-    }
-
-    std::string fileName = "IMDB_partition_titleIdColumn_BasicsTable";
-    std::string fullFilePath = FilePaths::getInstance().getImdbOutputFolderPath() + fileName + ".csv";
-    writeHeadersAndTableToCSV(headers, results, fullFilePath);
-
-    delete[] data;
-}
-
-void runImdbPartitionMacroBenchmark_startYearColumnBasicsTable(int iterations) {
-    std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.basics.tsv";
-    std::string minRadixBits = "Partition_minRadixBits";
-    std::string startRadixBits = "Partition_startRadixBits";
-    int n = getLengthOfFile(filePath);
-    using T = uint32_t;
-    auto data = new T[n];
-    readImdbStartYearColumnFromBasicsTable(filePath, data);
-
-    std::cout << n << std::endl;
-
-    long_long cycles;
-    std::vector<std::vector<long_long>> results(1, std::vector<long_long>((3 * iterations), 0));
-
-    for (int i = 0; i < iterations; i++) {
-
-        for (int j = 0; j < 3; j++) {
-
-            auto keys = new T[n];
-            copyArray(data, keys, n);
-
-            std::cout << "Running iteration " << i + 1 << "... ";
-
-            if (j == 0) {
-                cycles = *Counters::getInstance().readSharedEventSet();
-                HAQP::PartitionAdaptive<T> partitionOperator(n, keys);
-                auto partitions =  partitionOperator.processInput();
-                cycles = *Counters::getInstance().readSharedEventSet() - cycles;
-            } else if (j == 1) {
-                cycles = *Counters::getInstance().readSharedEventSet();
-                HAQP::Partition<T> partitionOperator(n, keys,
-                    static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(minRadixBits)));
-                partitionOperator.processInput();
-                auto partitions = partitionOperator.getOutput();
-                cycles = *Counters::getInstance().readSharedEventSet() - cycles;
-            } else if (j == 2) {
-                cycles = *Counters::getInstance().readSharedEventSet();
-                HAQP::Partition<T> partitionOperator(n, keys,
-                    static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(startRadixBits)));
-                partitionOperator.processInput();
-                auto partitions = partitionOperator.getOutput();
-                cycles = *Counters::getInstance().readSharedEventSet() - cycles;
-            }
-
-            results[0][(i * 3) + j] = cycles;
-
-            delete[] keys;
-            std::cout << "Completed" << std::endl;
-        }
-    }
-
-    std::vector<std::string> headers(3 * iterations);
-    std::string functionNames[] = {"RadixPartition_Adaptive", "RadixPartition_Static_", "RadixPartition_Static_"};
-    functionNames[1].append(std::to_string(static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(minRadixBits))));
-    functionNames[1].append("bits");
-    functionNames[2].append(std::to_string(static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(startRadixBits))));
-    functionNames[2].append("bits");
-    for (auto i = 0; i < (3 * iterations); ++i) {
-        headers[i] = functionNames[i % 3];
-    }
-
-    std::string fileName = "IMDB_partition_startYearColumn_BasicsTable";
-    std::string fullFilePath = FilePaths::getInstance().getImdbOutputFolderPath() + fileName + ".csv";
-    writeHeadersAndTableToCSV(headers, results, fullFilePath);
-
-    delete[] data;
-}
-
-void runImdbPartitionMacroBenchmark_personIdColumnPrincipalsTable(int iterations) {
-    std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.principals.tsv";
-    std::string minRadixBits = "Partition_minRadixBits";
-    std::string startRadixBits = "Partition_startRadixBits";
-    int n = getLengthOfFile(filePath);
-    using T = uint32_t;
-    auto data = new T[n];
-    readImdbPersonIdColumnFromPrincipalsTable(filePath, data);
-
-    std::cout << n << std::endl;
-
-    long_long cycles;
-    std::vector<std::vector<long_long>> results(1, std::vector<long_long>((3 * iterations), 0));
-
-    for (int i = 0; i < iterations; i++) {
-
-        for (int j = 0; j < 3; j++) {
-
-            auto keys = new T[n];
-            copyArray(data, keys, n);
-
-            std::cout << "Running iteration " << i + 1 << "... ";
-
-            if (j == 0) {
-                cycles = *Counters::getInstance().readSharedEventSet();
-                HAQP::PartitionAdaptive<T> partitionOperator(n, keys);
-                auto partitions =  partitionOperator.processInput();
-                cycles = *Counters::getInstance().readSharedEventSet() - cycles;
-            } else if (j == 1) {
-                cycles = *Counters::getInstance().readSharedEventSet();
-                HAQP::Partition<T> partitionOperator(n, keys,
-                    static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(minRadixBits)));
-                partitionOperator.processInput();
-                auto partitions = partitionOperator.getOutput();
-                cycles = *Counters::getInstance().readSharedEventSet() - cycles;
-            } else if (j == 2) {
-                cycles = *Counters::getInstance().readSharedEventSet();
-                HAQP::Partition<T> partitionOperator(n, keys,
-                    static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(startRadixBits)));
-                partitionOperator.processInput();
-                auto partitions = partitionOperator.getOutput();
-                cycles = *Counters::getInstance().readSharedEventSet() - cycles;
-            }
-
-            results[0][(i * 3) + j] = cycles;
-
-            delete[] keys;
-            std::cout << "Completed" << std::endl;
-        }
-    }
-
-    std::vector<std::string> headers(3 * iterations);
-    std::string functionNames[] = {"RadixPartition_Adaptive", "RadixPartition_Static_", "RadixPartition_Static_"};
-    functionNames[1].append(std::to_string(static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(minRadixBits))));
-    functionNames[1].append("bits");
-    functionNames[2].append(std::to_string(static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(startRadixBits))));
-    functionNames[2].append("bits");
-    for (auto i = 0; i < (3 * iterations); ++i) {
-        headers[i] = functionNames[i % 3];
-    }
-
-    std::string fileName = "IMDB_partition_personIdColumn_PrincipalsTable";
-    std::string fullFilePath = FilePaths::getInstance().getImdbOutputFolderPath() + fileName + ".csv";
-    writeHeadersAndTableToCSV(headers, results, fullFilePath);
-
-    delete[] data;
-}
-
-void runImdbGroupByMacroBenchmark_titleIdFromPrincipalsTable_clusteringSweep(int iterations, int numRuns) {
+void imdbGroupByMacroBenchmark_titleIdFromPrincipalsTable_clusteringSweep(int iterations, int numRuns) {
     std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.principals.tsv";
     int n = getLengthOfFile(filePath);
     using T = uint32_t;
@@ -893,113 +570,224 @@ void runImdbGroupByMacroBenchmark_titleIdFromPrincipalsTable_clusteringSweep(int
     delete[] data;
 }
 
-void runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(int iterations, int numRuns) {
-    std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.akas.tsv";
+void imdbPartitionMacroBenchmark_titleIdColumnBasicsTable(int iterations) {
+    std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.basics.tsv";
+    std::string minRadixBits = "Partition_minRadixBits";
+    std::string startRadixBits = "Partition_startRadixBits";
     int n = getLengthOfFile(filePath);
-    using T = int;
-
+    using T = uint32_t;
     auto data = new T[n];
-    readImdbTitleIdColumnFromAkasTable(filePath, data);
+    readImdbTitleIdColumnFromBasicsTable(filePath, data);
 
-    int cardinality = 7247075;
+    std::cout << n << std::endl;
+
     long_long cycles;
-    std::vector<std::vector<long_long>> results(numRuns, std::vector<long_long>(1 + (3 * iterations), 0));
+    std::vector<std::vector<long_long>> results(1, std::vector<long_long>((3 * iterations), 0));
 
-    std::vector<float> spreadInCluster;
-    generateLogDistribution(numRuns, 1, n, spreadInCluster);
+    for (int i = 0; i < iterations; i++) {
 
-    for (int numRun = 0; numRun < numRuns; numRun++) {
-        results[numRun][0] = static_cast<int>(spreadInCluster[numRun]);
+        for (int j = 0; j < 3; j++) {
 
-        auto clusteredData = new T[n];
-        copyArray(data, clusteredData, n);
-        runClusteringOnData(clusteredData, n, static_cast<int>(spreadInCluster[numRun]));
+            auto keys = new T[n];
+            copyArray(data, keys, n);
 
-        for (int iteration = 0; iteration < iterations; iteration++) {
+            std::cout << "Running iteration " << i + 1 << "... ";
 
-            for (int j = 0; j < 3; j++) {
-
-                auto inputGroupBy = new T[n];
-                auto inputAggregate = new T[n];
-                copyArray(clusteredData, inputGroupBy, n);
-                copyArray(clusteredData, inputAggregate, n);
-
-                std::cout << "Running input " << static_cast<int>(spreadInCluster[numRun]) << ", iteration ";
-                std::cout << iteration + 1 << "... ";
-
-                if (j == 0) {
-                    cycles = *Counters::getInstance().readSharedEventSet();
-                    HAQP::GroupByAdaptive<CountAggregation,T,T> groupByOperator(n, inputGroupBy, inputAggregate, cardinality);
-                    auto result = groupByOperator.processInput();
-                    cycles = *Counters::getInstance().readSharedEventSet() - cycles;
-                } else if (j == 1) {
-                    cycles = *Counters::getInstance().readSharedEventSet();
-                    HAQP::GroupByHash<CountAggregation,T,T> groupByOperator(inputGroupBy, inputAggregate, cardinality);
-                    groupByOperator.processMicroBatch(n);
-                    auto result = groupByOperator.getOutput();
-                    cycles = *Counters::getInstance().readSharedEventSet() - cycles;
-                } else if (j == 2) {
-                    cycles = *Counters::getInstance().readSharedEventSet();
-                    HAQP::GroupBySort<CountAggregation,T,T> groupByOperator(inputGroupBy, inputAggregate);
-                    groupByOperator.processMicroBatch(n);
-                    auto result = groupByOperator.getOutput();
-                    cycles = *Counters::getInstance().readSharedEventSet() - cycles;
-                }
-
-                results[numRun][1 + (iteration * 3) + j] = cycles;
-
-                delete[] inputGroupBy;
-                delete[] inputAggregate;
-                std::cout << "Completed" << std::endl;
+            if (j == 0) {
+                cycles = *Counters::getInstance().readSharedEventSet();
+                HAQP::PartitionAdaptive<T> partitionOperator(n, keys);
+                auto partitions =  partitionOperator.processInput();
+                cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+            } else if (j == 1) {
+                cycles = *Counters::getInstance().readSharedEventSet();
+                HAQP::Partition<T> partitionOperator(n, keys,
+                    static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(minRadixBits)));
+                partitionOperator.processInput();
+                auto partitions = partitionOperator.getOutput();
+                cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+            } else if (j == 2) {
+                cycles = *Counters::getInstance().readSharedEventSet();
+                HAQP::Partition<T> partitionOperator(n, keys,
+                    static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(startRadixBits)));
+                partitionOperator.processInput();
+                auto partitions = partitionOperator.getOutput();
+                cycles = *Counters::getInstance().readSharedEventSet() - cycles;
             }
+
+            results[0][(i * 3) + j] = cycles;
+
+            delete[] keys;
+            std::cout << "Completed" << std::endl;
         }
-
-        delete[] clusteredData;
     }
 
-    std::vector<std::string> headers(1 + (3 * iterations));
-    headers[0] = "SpreadInCluster";
-    std::string functionNames[] = {"GroupBy_Adaptive", "GroupBy_Hash", "GroupBy_Sort"};
+    std::vector<std::string> headers(3 * iterations);
+    std::string functionNames[] = {"RadixPartition_Adaptive", "RadixPartition_Static_", "RadixPartition_Static_"};
+    functionNames[1].append(std::to_string(static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(minRadixBits))));
+    functionNames[1].append("bits");
+    functionNames[2].append(std::to_string(static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(startRadixBits))));
+    functionNames[2].append("bits");
     for (auto i = 0; i < (3 * iterations); ++i) {
-        headers[1 + i] = functionNames[i % 3];
+        headers[i] = functionNames[i % 3];
     }
 
-    std::string fileName = "IMDB_groupBy_titleIdColumn_AkasTable";
+    std::string fileName = "IMDB_partition_titleIdColumn_BasicsTable";
     std::string fullFilePath = FilePaths::getInstance().getImdbOutputFolderPath() + fileName + ".csv";
     writeHeadersAndTableToCSV(headers, results, fullFilePath);
 
     delete[] data;
 }
 
-void runImdbMacroBenchmarks(int iterations) {
-    runImdbSelectIndexesSweepMacroBenchmark(1874, 2023, iterations,
-                                            {Select::ImplementationIndexesBranch,
-                                             Select::ImplementationIndexesPredication,
-                                             Select::ImplementationIndexesAdaptive});
+void imdbPartitionMacroBenchmark_startYearColumnBasicsTable(int iterations) {
+    std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.basics.tsv";
+    std::string minRadixBits = "Partition_minRadixBits";
+    std::string startRadixBits = "Partition_startRadixBits";
+    int n = getLengthOfFile(filePath);
+    using T = uint32_t;
+    auto data = new T[n];
+    readImdbStartYearColumnFromBasicsTable(filePath, data);
 
-    runImdbSelectValuesSweepMacroBenchmark(1874, 2023, iterations,
-                                           {Select::ImplementationValuesBranch,
-                                            Select::ImplementationValuesVectorized,
-                                            Select::ImplementationValuesAdaptive});
+    std::cout << n << std::endl;
 
-    runImdbPartitionMacroBenchmark_titleIdColumnBasicsTable(iterations);
-    runImdbPartitionMacroBenchmark_startYearColumnBasicsTable(iterations);
-    runImdbPartitionMacroBenchmark_personIdColumnPrincipalsTable(iterations);
+    long_long cycles;
+    std::vector<std::vector<long_long>> results(1, std::vector<long_long>((3 * iterations), 0));
 
-    runImdbGroupByMacroBenchmark_titleIdFromPrincipalsTable_clusteringSweep(iterations,30);
-    runImdbGroupByMacroBenchmark_titleIdFromAkasTable_clusteringSweep(iterations,30);
+    for (int i = 0; i < iterations; i++) {
+
+        for (int j = 0; j < 3; j++) {
+
+            auto keys = new T[n];
+            copyArray(data, keys, n);
+
+            std::cout << "Running iteration " << i + 1 << "... ";
+
+            if (j == 0) {
+                cycles = *Counters::getInstance().readSharedEventSet();
+                HAQP::PartitionAdaptive<T> partitionOperator(n, keys);
+                auto partitions =  partitionOperator.processInput();
+                cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+            } else if (j == 1) {
+                cycles = *Counters::getInstance().readSharedEventSet();
+                HAQP::Partition<T> partitionOperator(n, keys,
+                    static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(minRadixBits)));
+                partitionOperator.processInput();
+                auto partitions = partitionOperator.getOutput();
+                cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+            } else if (j == 2) {
+                cycles = *Counters::getInstance().readSharedEventSet();
+                HAQP::Partition<T> partitionOperator(n, keys,
+                    static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(startRadixBits)));
+                partitionOperator.processInput();
+                auto partitions = partitionOperator.getOutput();
+                cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+            }
+
+            results[0][(i * 3) + j] = cycles;
+
+            delete[] keys;
+            std::cout << "Completed" << std::endl;
+        }
+    }
+
+    std::vector<std::string> headers(3 * iterations);
+    std::string functionNames[] = {"RadixPartition_Adaptive", "RadixPartition_Static_", "RadixPartition_Static_"};
+    functionNames[1].append(std::to_string(static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(minRadixBits))));
+    functionNames[1].append("bits");
+    functionNames[2].append(std::to_string(static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(startRadixBits))));
+    functionNames[2].append("bits");
+    for (auto i = 0; i < (3 * iterations); ++i) {
+        headers[i] = functionNames[i % 3];
+    }
+
+    std::string fileName = "IMDB_partition_startYearColumn_BasicsTable";
+    std::string fullFilePath = FilePaths::getInstance().getImdbOutputFolderPath() + fileName + ".csv";
+    writeHeadersAndTableToCSV(headers, results, fullFilePath);
+
+    delete[] data;
+}
+
+void imdbPartitionMacroBenchmark_personIdColumnPrincipalsTable(int iterations) {
+    std::string filePath = FilePaths::getInstance().getImdbInputFolderPath() + "title.principals.tsv";
+    std::string minRadixBits = "Partition_minRadixBits";
+    std::string startRadixBits = "Partition_startRadixBits";
+    int n = getLengthOfFile(filePath);
+    using T = uint32_t;
+    auto data = new T[n];
+    readImdbPersonIdColumnFromPrincipalsTable(filePath, data);
+
+    std::cout << n << std::endl;
+
+    long_long cycles;
+    std::vector<std::vector<long_long>> results(1, std::vector<long_long>((3 * iterations), 0));
+
+    for (int i = 0; i < iterations; i++) {
+
+        for (int j = 0; j < 3; j++) {
+
+            auto keys = new T[n];
+            copyArray(data, keys, n);
+
+            std::cout << "Running iteration " << i + 1 << "... ";
+
+            if (j == 0) {
+                cycles = *Counters::getInstance().readSharedEventSet();
+                HAQP::PartitionAdaptive<T> partitionOperator(n, keys);
+                auto partitions =  partitionOperator.processInput();
+                cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+            } else if (j == 1) {
+                cycles = *Counters::getInstance().readSharedEventSet();
+                HAQP::Partition<T> partitionOperator(n, keys,
+                    static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(minRadixBits)));
+                partitionOperator.processInput();
+                auto partitions = partitionOperator.getOutput();
+                cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+            } else if (j == 2) {
+                cycles = *Counters::getInstance().readSharedEventSet();
+                HAQP::Partition<T> partitionOperator(n, keys,
+                    static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(startRadixBits)));
+                partitionOperator.processInput();
+                auto partitions = partitionOperator.getOutput();
+                cycles = *Counters::getInstance().readSharedEventSet() - cycles;
+            }
+
+            results[0][(i * 3) + j] = cycles;
+
+            delete[] keys;
+            std::cout << "Completed" << std::endl;
+        }
+    }
+
+    std::vector<std::string> headers(3 * iterations);
+    std::string functionNames[] = {"RadixPartition_Adaptive", "RadixPartition_Static_", "RadixPartition_Static_"};
+    functionNames[1].append(std::to_string(static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(minRadixBits))));
+    functionNames[1].append("bits");
+    functionNames[2].append(std::to_string(static_cast<int>(HAQP::MachineConstants::getInstance().getMachineConstant(startRadixBits))));
+    functionNames[2].append("bits");
+    for (auto i = 0; i < (3 * iterations); ++i) {
+        headers[i] = functionNames[i % 3];
+    }
+
+    std::string fileName = "IMDB_partition_personIdColumn_PrincipalsTable";
+    std::string fullFilePath = FilePaths::getInstance().getImdbOutputFolderPath() + fileName + ".csv";
+    writeHeadersAndTableToCSV(headers, results, fullFilePath);
+
+    delete[] data;
+}
+
+void allImdbMacroBenchmarks(int iterations) {
+    imdbSelectIndexesSweepMacroBenchmark(1874, 2023, iterations,
+                                         {Select::ImplementationIndexesBranch,
+                                          Select::ImplementationIndexesPredication,
+                                          Select::ImplementationIndexesAdaptive});
+
+    imdbGroupByMacroBenchmark_titleIdFromPrincipalsTable_clusteringSweep(iterations, 30);
+
+    imdbPartitionMacroBenchmark_titleIdColumnBasicsTable(iterations);
+    imdbPartitionMacroBenchmark_startYearColumnBasicsTable(iterations);
+    imdbPartitionMacroBenchmark_personIdColumnPrincipalsTable(iterations);
 }
 
 int main() {
-
-    std::vector<float> inputThresholdDistribution;
-    generateLogDistribution(30, 1, 10*1000, inputThresholdDistribution);
-    selectCpuCyclesInputSweepBenchmark<int,int>(DataFiles::uniformIntDistribution250mValuesMax10000,
-                                                {Select::ImplementationIndexesBranch,
-                                                 Select::ImplementationIndexesPredication,
-                                                 Select::ImplementationIndexesAdaptive},
-                                                inputThresholdDistribution,
-                                                1, "OOP_TEST_1-Indexes");
 
     return 0;
 }

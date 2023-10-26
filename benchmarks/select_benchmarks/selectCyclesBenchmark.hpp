@@ -9,36 +9,10 @@
 using HAQP::Select;
 
 
-template <typename T1, typename T2>
-void selectFunctionalityTest(const DataFile& dataFile, Select selectImplementation);
-
-template <typename T>
-void selectIndexesCompareResultsTest(const DataFile& dataFile, Select selectImpOne, Select selectImpTwo);
-
-template <typename T1, typename T2>
-void selectValuesCompareResultsTest(const DataFile& dataFile, Select selectImpOne, Select selectImpTwo);
-
-template<typename T1, typename T2>
-void selectSingleRunNoCounters(const DataFile &dataFile, Select selectImplementation, T1 threshold,
-                               int iterations);
-
 template<typename T1, typename T2>
 void selectCpuCyclesSingleInputBenchmark(const DataFile &dataFile,
                                          const std::vector<Select> &selectImplementations, T1 threshold,
                                          int iterations, const std::string &fileNamePrefix);
-
-template<typename T1, typename T2>
-void selectCpuCyclesMultipleInputBenchmark(const DataFile &dataFile,
-                                           const std::vector<Select> &selectImplementations,
-                                           int selectivityStride, int iterations, const std::string &fileNamePrefix);
-
-template<typename T1, typename T2>
-void selectBenchmarkWithExtraCounters(const DataFile &dataFile, Select selectImplementation,
-                                      std::vector<float> &thresholds, int iterations,
-                                      std::vector<std::string> &benchmarkCounters, const std::string &fileNamePrefix);
-
-template <typename T1, typename T2>
-void selectBenchmarkWithExtraCountersConfigurations(const DataFile &dataFile, Select selectImplementation, int iterations);
 
 template<typename T1, typename T2>
 void selectCpuCyclesSweepBenchmark(DataSweep &dataSweep, const std::vector<Select> &selectImplementations,

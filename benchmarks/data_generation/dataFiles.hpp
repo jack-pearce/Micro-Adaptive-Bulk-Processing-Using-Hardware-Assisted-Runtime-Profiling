@@ -14,9 +14,6 @@ public:
     std::string getSelectCyclesFolderPath();
     std::string getGroupByCyclesFolderPath();
     std::string getPartitionCyclesFolderPath();
-    std::string getDataFilesFolderPath();
-    std::string getOisstInputFolderPath();
-    std::string getOisstOutputFolderPath();
     std::string getImdbInputFolderPath();
     std::string getImdbOutputFolderPath();
 
@@ -28,9 +25,6 @@ private:
     const std::string selectCyclesFolder = "/benchmarks/data/output/select_cycles_benchmark/";
     const std::string groupByCyclesFolder = "/benchmarks/data/output/groupBy_cycles_benchmark/";
     const std::string partitionCyclesFolder = "/benchmarks/data/output/partition_cycles_benchmark/";
-    const std::string dataFilesFolder = "/benchmarks/data/output/dataFiles/";
-    const std::string oisstInputFolder = "/benchmarks/data/input/oisst_dataset_csv/";
-    const std::string oisstOnputFolder = "/benchmarks/data/output/oisst_benchmark/";
     const std::string imdbInputFolder = "/benchmarks/data/input/imdb/";
     const std::string imdbOutputFolder = "/benchmarks/data/output/imdb/";
 };

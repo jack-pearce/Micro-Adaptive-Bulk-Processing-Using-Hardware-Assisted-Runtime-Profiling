@@ -22,18 +22,6 @@ std::string FilePaths::getPartitionCyclesFolderPath() {
     return projectFilePath + partitionCyclesFolder;
 }
 
-std::string FilePaths::getDataFilesFolderPath() {
-    return projectFilePath + dataFilesFolder;
-}
-
-std::string FilePaths::getOisstInputFolderPath() {
-    return projectFilePath + oisstInputFolder;
-}
-
-std::string FilePaths::getOisstOutputFolderPath() {
-    return projectFilePath + oisstOnputFolder;
-}
-
 std::string FilePaths::getImdbInputFolderPath() {
     return projectFilePath + imdbInputFolder;
 }

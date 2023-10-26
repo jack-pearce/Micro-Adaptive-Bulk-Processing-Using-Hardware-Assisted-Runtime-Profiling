@@ -29,28 +29,8 @@ template <typename T>
 void readImdbPersonIdColumnFromPrincipalsTable(const std::string& filePath, T* data);
 
 template <typename T>
-void readImdbTitleIdColumnFromAkasTable(const std::string& filePath, T* data);
-
-template <typename T>
-void displayDistribution(const DataFile &dataFile);
-
-template <typename T>
-void writeDataFileToCSV(const DataFile &dataFile);
-
-template <typename T1, typename T2>
-void sortVectorOfPairs(HAQP::vectorOfPairs<T1, T2> &vectorOfPairs);
-
-template <typename T>
 void copyArray(T* source, T* destination, int size);
 
-template <typename T>
-void projectIndexesOnToArray(const int* indexes, int n, T* source, T* destination);
-
-template <typename T>
-void randomiseArray(T* data, int n);
-
-template <typename T>
-void dataDistributionTest(const DataFile& dataFile);
 
 #include "dataHelpersImplementation.hpp"
 
