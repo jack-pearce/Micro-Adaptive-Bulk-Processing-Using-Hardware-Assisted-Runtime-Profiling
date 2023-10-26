@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "groupBy.h"
+#include "groupBy.hpp"
 
 
 namespace HAQP {

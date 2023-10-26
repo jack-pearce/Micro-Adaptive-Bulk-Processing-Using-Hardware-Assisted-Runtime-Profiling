@@ -1,5 +1,5 @@
-#ifndef HAQP_PARTITION_H
-#define HAQP_PARTITION_H
+#ifndef HAQP_PARTITION_HPP
+#define HAQP_PARTITION_HPP
 
 #include <string>
 #include <vector>
@@ -19,6 +19,6 @@ std::vector<int> runPartitionFunction(PartitionOperators partitionImplementation
 
 }
 
-#include "partitionImplementation.h"
+#include "partitionImplementation.hpp"
 
-#endif //HAQP_PARTITION_H
+#endif //HAQP_PARTITION_HPP

@@ -3,8 +3,8 @@
 
 #include <vector>
 
-#include "haqp.h"
-#include "data_generation/dataFiles.h"
+#include "haqp.hpp"
+#include "data_generation/dataFiles.hpp"
 
 using HAQP::Select;
 
@@ -81,7 +81,7 @@ void selectWallTimeDopAndInputSweepBenchmarkCalcDopRange(const DataFile &dataFil
                                                          const std::string &fileNamePrefix);
 
 
-#include "selectCyclesBenchmarkImplementation.h"
+#include "selectCyclesBenchmarkImplementation.hpp"
 
 
 #endif //MICRO_ADAPTIVE_BULK_PROCESSING_COUNTERBENCHMARK_H

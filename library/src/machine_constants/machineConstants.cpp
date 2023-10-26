@@ -3,7 +3,7 @@
 #include <json/json.h>
 #include <cmath>
 
-#include "machineConstants.h"
+#include "machineConstants.hpp"
 
 
 namespace HAQP {

@@ -1,5 +1,5 @@
-#ifndef HAQP_SYSTEMINFORMATION_H
-#define HAQP_SYSTEMINFORMATION_H
+#ifndef HAQP_SYSTEMINFORMATION_HPP
+#define HAQP_SYSTEMINFORMATION_HPP
 
 #include <immintrin.h>
 
@@ -28,4 +28,4 @@ int l2TlbEntriesFor4KbytePages();
 }
 
 
-#endif //HAQP_SYSTEMINFORMATION_H
+#endif //HAQP_SYSTEMINFORMATION_HPP

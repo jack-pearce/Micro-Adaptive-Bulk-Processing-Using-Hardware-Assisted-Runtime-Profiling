@@ -1,5 +1,5 @@
-#ifndef HAQP_PAPIWRAPPER_H
-#define HAQP_PAPIWRAPPER_H
+#ifndef HAQP_PAPIWRAPPER_HPP
+#define HAQP_PAPIWRAPPER_HPP
 
 #include <vector>
 #include <string>
@@ -34,4 +34,4 @@ void destroyThreadEventSet(int eventSet, long_long *values);
 
 }
 
-#endif //HAQP_PAPIWRAPPER_H
+#endif //HAQP_PAPIWRAPPER_HPP

@@ -8,15 +8,15 @@ link_directories("${CMAKE_SOURCE_DIR}/libs/papi/src/install/lib")
 
 add_executable(${EXE_NAME}
         data_generation/dataFiles.cpp
-        data_generation/dataFiles.h
+        data_generation/dataFiles.hpp
         main.cpp
         utilities/dataHelpers.cpp
         utilities/papiHelpers.cpp
-        select_benchmarks/selectCyclesBenchmark.h
+        select_benchmarks/selectCyclesBenchmark.hpp
         data_generation/dataGenerators.cpp
-        data_generation/dataGenerators.h
-        groupBy_benchmarks/groupByCyclesBenchmark.h
-        partition_benchmarks/partitionCyclesBenchmark.h
+        data_generation/dataGenerators.hpp
+        groupBy_benchmarks/groupByCyclesBenchmark.hpp
+        partition_benchmarks/partitionCyclesBenchmark.hpp
 )
 
 target_include_directories(${EXE_NAME} PUBLIC

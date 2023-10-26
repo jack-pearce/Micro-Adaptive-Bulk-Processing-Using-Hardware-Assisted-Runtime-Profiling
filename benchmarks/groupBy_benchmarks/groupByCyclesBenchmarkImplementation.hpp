@@ -1,16 +1,16 @@
-#ifndef HAQP_GROUPBYCYCLESBENCHMARKIMPLEMENTATION_H
-#define HAQP_GROUPBYCYCLESBENCHMARKIMPLEMENTATION_H
+#ifndef HAQP_GROUPBYCYCLESBENCHMARKIMPLEMENTATION_HPP
+#define HAQP_GROUPBYCYCLESBENCHMARKIMPLEMENTATION_HPP
 
 #include <cassert>
 #include <iostream>
 #include <cmath>
 #include "tsl/robin_map.h"
 
-#include "groupByCyclesBenchmark.h"
-#include "utilities/dataHelpers.h"
-#include "utilities/papiHelpers.h"
-#include "data_generation/dataGenerators.h"
-#include "data_generation/dataFiles.h"
+#include "groupByCyclesBenchmark.hpp"
+#include "utilities/dataHelpers.hpp"
+#include "utilities/papiHelpers.hpp"
+#include "data_generation/dataGenerators.hpp"
+#include "data_generation/dataFiles.hpp"
 
 using HAQP::Counters;
 using HAQP::MaxAggregation;
@@ -467,4 +467,4 @@ void tessilRobinMapInitialisationBenchmark(const std::string &fileNamePrefix) {
 }
 
 
-#endif //HAQP_GROUPBYCYCLESBENCHMARKIMPLEMENTATION_H
+#endif //HAQP_GROUPBYCYCLESBENCHMARKIMPLEMENTATION_HPP

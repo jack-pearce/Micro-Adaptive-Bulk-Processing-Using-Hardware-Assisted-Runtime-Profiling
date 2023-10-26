@@ -1,5 +1,5 @@
-#ifndef HAQP_DATAGENERATIONIMPLEMENTATION_H
-#define HAQP_DATAGENERATIONIMPLEMENTATION_H
+#ifndef HAQP_DATAGENERATIONIMPLEMENTATION_HPP
+#define HAQP_DATAGENERATIONIMPLEMENTATION_HPP
 
 #include <iostream>
 #include <random>
@@ -146,4 +146,4 @@ void generatePartiallySortedInMemory(T *data, int n, int numRepeats, float perce
 
 }
 
-#endif //HAQP_DATAGENERATIONIMPLEMENTATION_H
+#endif //HAQP_DATAGENERATIONIMPLEMENTATION_HPP

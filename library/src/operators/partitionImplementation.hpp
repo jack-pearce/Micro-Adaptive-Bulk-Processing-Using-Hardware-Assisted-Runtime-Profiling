@@ -1,5 +1,5 @@
-#ifndef HAQP_PARTITIONIMPLEMENTATION_H
-#define HAQP_PARTITIONIMPLEMENTATION_H
+#ifndef HAQP_PARTITIONIMPLEMENTATION_HPP
+#define HAQP_PARTITIONIMPLEMENTATION_HPP
 
 
 #include <vector>
@@ -7,9 +7,9 @@
 #include <iostream>
 #include <limits>
 
-#include "utilities/systemInformation.h"
-#include "utilities/papiWrapper.h"
-#include "machine_constants/machineConstants.h"
+#include "utilities/systemInformation.hpp"
+#include "utilities/papiWrapper.hpp"
+#include "machine_constants/machineConstants.hpp"
 
 
 namespace HAQP {
@@ -308,4 +308,4 @@ std::vector<int> runPartitionFunction(PartitionOperators partitionImplementation
 
 }
 
-#endif //HAQP_PARTITIONIMPLEMENTATION_H
+#endif //HAQP_PARTITIONIMPLEMENTATION_HPP

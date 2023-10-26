@@ -1,12 +1,12 @@
-#ifndef HAQP_MACHINECONSTANTSIMPLEMENTATION_H
-#define HAQP_MACHINECONSTANTSIMPLEMENTATION_H
+#ifndef HAQP_MACHINECONSTANTSIMPLEMENTATION_HPP
+#define HAQP_MACHINECONSTANTSIMPLEMENTATION_HPP
 
 #include <iostream>
 
-#include "utilities/dataGeneration.h"
-#include "utilities/papiWrapper.h"
-#include "operators/select.h"
-#include "operators/groupBy.h"
+#include "utilities/dataGeneration.hpp"
+#include "utilities/papiWrapper.hpp"
+#include "operators/select.hpp"
+#include "operators/groupBy.hpp"
 
 namespace HAQP {
 
@@ -648,4 +648,4 @@ void calculateGroupByMachineConstants(int dop) {
 }
 
 
-#endif //HAQP_MACHINECONSTANTSIMPLEMENTATION_H
+#endif //HAQP_MACHINECONSTANTSIMPLEMENTATION_HPP

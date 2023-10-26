@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "partition.h"
+#include "partition.hpp"
 
 namespace HAQP {
 

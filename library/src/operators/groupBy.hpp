@@ -1,11 +1,11 @@
-#ifndef HAQP_GROUPBY_H
-#define HAQP_GROUPBY_H
+#ifndef HAQP_GROUPBY_HPP
+#define HAQP_GROUPBY_HPP
 
 #include <string>
 #include <vector>
 #include <memory>
 
-#include "utilities/dataStructures.h"
+#include "utilities/dataStructures.hpp"
 
 
 namespace HAQP {
@@ -46,6 +46,6 @@ vectorOfPairs<T1, T2> runGroupByFunction(GroupBy groupByImplementation, int n, T
 
 }
 
-#include "groupByImplementation.h"
+#include "groupByImplementation.hpp"
 
-#endif //HAQP_GROUPBY_H
+#endif //HAQP_GROUPBY_HPP

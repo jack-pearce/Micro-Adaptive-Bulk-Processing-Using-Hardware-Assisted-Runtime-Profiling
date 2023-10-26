@@ -1,4 +1,4 @@
-#include "dataFiles.h"
+#include "dataFiles.hpp"
 
 
 FilePaths& FilePaths::getInstance() {

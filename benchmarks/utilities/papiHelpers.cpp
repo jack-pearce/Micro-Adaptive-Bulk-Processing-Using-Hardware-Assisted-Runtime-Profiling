@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 
-#include "papiHelpers.h"
+#include "papiHelpers.hpp"
 
 int initialisePAPIandCreateEventSet(std::vector<std::string>& counters) {
     int returnValue, eventCode, eventSet=PAPI_NULL;

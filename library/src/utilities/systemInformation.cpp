@@ -3,7 +3,7 @@
 #include <thread>
 #include <bitset>
 
-#include "systemInformation.h"
+#include "systemInformation.hpp"
 
 
 namespace HAQP {

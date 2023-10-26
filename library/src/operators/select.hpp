@@ -40,6 +40,6 @@ int runSelectFunction(Select selectImplementation,
 
 }
 
-#include "selectImplementation.h"
+#include "selectImplementation.hpp"
 
 #endif //MICRO_ADAPTIVE_BULK_PROCESSING_LIBRARY_SELECT_H

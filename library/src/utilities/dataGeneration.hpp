@@ -1,5 +1,5 @@
-#ifndef HAQP_DATAGENERATION_H
-#define HAQP_DATAGENERATION_H
+#ifndef HAQP_DATAGENERATION_HPP
+#define HAQP_DATAGENERATION_HPP
 
 namespace HAQP {
 
@@ -23,6 +23,6 @@ void generatePartiallySortedInMemory(T *data, int n, int numRepeats, float perce
 
 }
 
-#include "dataGenerationImplementation.h"
+#include "dataGenerationImplementation.hpp"
 
-#endif //HAQP_DATAGENERATION_H
+#endif //HAQP_DATAGENERATION_HPP

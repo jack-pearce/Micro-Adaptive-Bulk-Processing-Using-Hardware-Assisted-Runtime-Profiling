@@ -1,5 +1,5 @@
-#ifndef HAQP_SELECTCYCLESBENCHMARKIMPLEMENTATION_H
-#define HAQP_SELECTCYCLESBENCHMARKIMPLEMENTATION_H
+#ifndef HAQP_SELECTCYCLESBENCHMARKIMPLEMENTATION_HPP
+#define HAQP_SELECTCYCLESBENCHMARKIMPLEMENTATION_HPP
 
 
 #include <iostream>
@@ -8,10 +8,10 @@
 #include <string>
 #include <cassert>
 
-#include "utilities/dataHelpers.h"
-#include "utilities/papiHelpers.h"
-#include "selectCyclesBenchmark.h"
-#include "data_generation/dataFiles.h"
+#include "utilities/dataHelpers.hpp"
+#include "utilities/papiHelpers.hpp"
+#include "selectCyclesBenchmark.hpp"
+#include "data_generation/dataFiles.hpp"
 
 using HAQP::Counters;
 
@@ -766,4 +766,4 @@ void selectWallTimeDopAndInputSweepBenchmarkCalcDopRange(const DataFile &dataFil
 }
 
 
-#endif //HAQP_SELECTCYCLESBENCHMARKIMPLEMENTATION_H
+#endif //HAQP_SELECTCYCLESBENCHMARKIMPLEMENTATION_HPP

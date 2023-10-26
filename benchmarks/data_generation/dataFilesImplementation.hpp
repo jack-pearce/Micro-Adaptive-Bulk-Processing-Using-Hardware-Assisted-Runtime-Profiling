@@ -1,10 +1,10 @@
-#ifndef HAQP_DATAFILESIMPLEMENTATION_H
-#define HAQP_DATAFILESIMPLEMENTATION_H
+#ifndef HAQP_DATAFILESIMPLEMENTATION_HPP
+#define HAQP_DATAFILESIMPLEMENTATION_HPP
 
 #include <utility>
 
-#include "dataGenerators.h"
-#include "dataFiles.h"
+#include "dataGenerators.hpp"
+#include "dataFiles.hpp"
 
 
 template <typename T>
@@ -198,4 +198,4 @@ bool DataSweep::loadNextDataSetIntoMemory(T *data) {
 }
 
 
-#endif //HAQP_DATAFILESIMPLEMENTATION_H
+#endif //HAQP_DATAFILESIMPLEMENTATION_HPP

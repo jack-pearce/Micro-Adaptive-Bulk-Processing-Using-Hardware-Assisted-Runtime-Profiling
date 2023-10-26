@@ -4,8 +4,8 @@
 #include <algorithm>
 #include <papi.h>
 
-#include "haqp.h"
-#include "data_generation/dataFiles.h"
+#include "haqp.hpp"
+#include "data_generation/dataFiles.hpp"
 
 
 int getLengthOfFile(const std::string& filePath);
@@ -52,7 +52,7 @@ void randomiseArray(T* data, int n);
 template <typename T>
 void dataDistributionTest(const DataFile& dataFile);
 
-#include "dataHelpersImplementation.h"
+#include "dataHelpersImplementation.hpp"
 
 
 #endif //MICRO_ADAPTIVE_BULK_PROCESSING_LIBRARY_DATAHELPERS_H

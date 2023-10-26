@@ -2,7 +2,7 @@
 #include <random>
 #include <algorithm>
 
-#include "dataGenerators.h"
+#include "dataGenerators.hpp"
 
 
 std::vector<int> generateClusteringOrder(int n, int spreadInCluster) {

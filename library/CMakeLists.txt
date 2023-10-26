@@ -16,7 +16,7 @@ add_library(${LIB_NAME}
         src/operators/groupBy.cpp
         src/machine_constants/machineConstants.cpp
         src/operators/partition.cpp
-        include/haqp.h
+        include/haqp.hpp
 )
 
 target_include_directories(${LIB_NAME}

@@ -1,5 +1,5 @@
-#ifndef HAQP_GROUPBYIMPLEMENTATION_H
-#define HAQP_GROUPBYIMPLEMENTATION_H
+#ifndef HAQP_GROUPBYIMPLEMENTATION_HPP
+#define HAQP_GROUPBYIMPLEMENTATION_HPP
 
 
 #include <iostream>
@@ -8,9 +8,9 @@
 #include <condition_variable>
 #include <tsl/robin_map.h>
 
-#include "utilities/systemInformation.h"
-#include "utilities/papiWrapper.h"
-#include "machine_constants/machineConstants.h"
+#include "utilities/systemInformation.hpp"
+#include "utilities/papiWrapper.hpp"
+#include "machine_constants/machineConstants.hpp"
 
 
 namespace HAQP {
@@ -850,4 +850,4 @@ vectorOfPairs<T1, T2> runGroupByFunction(GroupBy groupByImplementation, int n, T
 
 }
 
-#endif //HAQP_GROUPBYIMPLEMENTATION_H
+#endif //HAQP_GROUPBYIMPLEMENTATION_HPP

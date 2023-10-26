@@ -1,5 +1,5 @@
-#ifndef HAQP_DATASTRUCTURES_H
-#define HAQP_DATASTRUCTURES_H
+#ifndef HAQP_DATASTRUCTURES_HPP
+#define HAQP_DATASTRUCTURES_HPP
 
 #include <vector>
 
@@ -13,7 +13,7 @@ void sortVectorOfPairs(vectorOfPairs<T1, T2> *&inputVectorOfPairs);
 
 }
 
-#include "dataStructuresImplementation.h"
+#include "dataStructuresImplementation.hpp"
 
 
-#endif //HAQP_DATASTRUCTURES_H
+#endif //HAQP_DATASTRUCTURES_HPP

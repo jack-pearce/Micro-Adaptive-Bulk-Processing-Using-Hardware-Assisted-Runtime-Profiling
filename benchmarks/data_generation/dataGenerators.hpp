@@ -1,7 +1,7 @@
 #ifndef MICRO_ADAPTIVE_BULK_PROCESSING_LIBRARY_DATA_GENERATOR_H
 #define MICRO_ADAPTIVE_BULK_PROCESSING_LIBRARY_DATA_GENERATOR_H
 
-#include "dataFiles.h"
+#include "dataFiles.hpp"
 
 std::vector<int> generateClusteringOrder(int n, int spreadInCluster);
 
@@ -84,6 +84,6 @@ template <typename T>
 void runClusteringOnData(T *data, int n, int spreadInCluster);
 
 
-#include "dataGeneratorsImplementation.h"
+#include "dataGeneratorsImplementation.hpp"
 
 #endif //MICRO_ADAPTIVE_BULK_PROCESSING_LIBRARY_DATA_GENERATOR_H

@@ -1,5 +1,5 @@
-#ifndef HAQP_DATAFILES_H
-#define HAQP_DATAFILES_H
+#ifndef HAQP_DATAFILES_HPP
+#define HAQP_DATAFILES_HPP
 
 #include <string>
 #include <vector>
@@ -179,6 +179,6 @@ public:
 
 };
 
-#include "dataFilesImplementation.h"
+#include "dataFilesImplementation.hpp"
 
-#endif //HAQP_DATAFILES_H
+#endif //HAQP_DATAFILES_HPP

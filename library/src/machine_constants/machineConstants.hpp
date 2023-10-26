@@ -1,5 +1,5 @@
-#ifndef HAQP_MACHINECONSTANTS_H
-#define HAQP_MACHINECONSTANTS_H
+#ifndef HAQP_MACHINECONSTANTS_HPP
+#define HAQP_MACHINECONSTANTS_HPP
 
 #include <string>
 #include <map>
@@ -35,6 +35,6 @@ private:
 
 }
 
-#include "machineConstantsImplementation.h"
+#include "machineConstantsImplementation.hpp"
 
-#endif //HAQP_MACHINECONSTANTS_H
+#endif //HAQP_MACHINECONSTANTS_HPP

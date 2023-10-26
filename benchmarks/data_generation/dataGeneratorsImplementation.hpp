@@ -1,5 +1,5 @@
-#ifndef HAQP_DATAGENERATORSIMPLEMENTATION_H
-#define HAQP_DATAGENERATORSIMPLEMENTATION_H
+#ifndef HAQP_DATAGENERATORSIMPLEMENTATION_HPP
+#define HAQP_DATAGENERATORSIMPLEMENTATION_HPP
 
 #include <iostream>
 #include <random>
@@ -7,7 +7,7 @@
 #include <cassert>
 #include <algorithm>
 
-#include "utilities/dataHelpers.h"
+#include "utilities/dataHelpers.hpp"
 
 
 template <typename T>
@@ -593,4 +593,4 @@ void runClusteringOnData(T *data, int n, int spreadInCluster) {
 }
 
 
-#endif //HAQP_DATAGENERATORSIMPLEMENTATION_H
+#endif //HAQP_DATAGENERATORSIMPLEMENTATION_HPP

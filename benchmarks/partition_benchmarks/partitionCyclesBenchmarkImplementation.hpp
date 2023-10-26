@@ -1,12 +1,12 @@
-#ifndef HAQP_PARTITIONCYCLESBENCHMARKIMPLEMENTATION_H
-#define HAQP_PARTITIONCYCLESBENCHMARKIMPLEMENTATION_H
+#ifndef HAQP_PARTITIONCYCLESBENCHMARKIMPLEMENTATION_HPP
+#define HAQP_PARTITIONCYCLESBENCHMARKIMPLEMENTATION_HPP
 
 #include <limits>
 
-#include "utilities/dataHelpers.h"
-#include "utilities/papiHelpers.h"
-#include "partitionCyclesBenchmark.h"
-#include "data_generation/dataFiles.h"
+#include "utilities/dataHelpers.hpp"
+#include "utilities/papiHelpers.hpp"
+#include "partitionCyclesBenchmark.hpp"
+#include "data_generation/dataFiles.hpp"
 
 
 template<typename T>
@@ -397,4 +397,4 @@ void partitionSweepBenchmark(DataSweep &dataSweep, const std::vector<PartitionOp
 
 
 
-#endif //HAQP_PARTITIONCYCLESBENCHMARKIMPLEMENTATION_H
+#endif //HAQP_PARTITIONCYCLESBENCHMARKIMPLEMENTATION_HPP

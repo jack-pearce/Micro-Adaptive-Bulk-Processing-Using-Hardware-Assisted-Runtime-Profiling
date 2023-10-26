@@ -3,7 +3,7 @@
 #include <pthread.h>
 #include <cassert>
 
-#include "papiWrapper.h"
+#include "papiWrapper.hpp"
 
 
 namespace HAQP {

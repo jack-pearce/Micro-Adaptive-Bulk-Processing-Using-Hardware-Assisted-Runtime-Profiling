@@ -3,7 +3,7 @@
 #include <string>
 #include <cmath>
 
-#include "dataHelpers.h"
+#include "dataHelpers.hpp"
 
 
 int getLengthOfFile(const std::string& filePath) {

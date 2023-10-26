@@ -7,10 +7,10 @@
 #include <atomic>
 #include <cstring>
 
-#include "utilities/papiWrapper.h"
-#include "utilities/systemInformation.h"
-#include "utilities/dataStructures.h"
-#include "machine_constants/machineConstants.h"
+#include "utilities/papiWrapper.hpp"
+#include "utilities/systemInformation.hpp"
+#include "utilities/dataStructures.hpp"
+#include "machine_constants/machineConstants.hpp"
 
 
 namespace HAQP {

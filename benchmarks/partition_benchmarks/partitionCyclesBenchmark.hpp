@@ -1,8 +1,8 @@
-#ifndef HAQP_PARTITIONCYCLESBENCHMARK_H
-#define HAQP_PARTITIONCYCLESBENCHMARK_H
+#ifndef HAQP_PARTITIONCYCLESBENCHMARK_HPP
+#define HAQP_PARTITIONCYCLESBENCHMARK_HPP
 
-#include "haqp.h"
-#include "data_generation/dataFiles.h"
+#include "haqp.hpp"
+#include "data_generation/dataFiles.hpp"
 
 using HAQP::PartitionOperators;
 
@@ -48,6 +48,6 @@ void partitionSweepBenchmark(DataSweep &dataSweep, const std::vector<PartitionOp
                              int radixBits, const std::string &fileNamePrefix, int iterations);
 
 
-#include "partitionCyclesBenchmarkImplementation.h"
+#include "partitionCyclesBenchmarkImplementation.hpp"
 
-#endif //HAQP_PARTITIONCYCLESBENCHMARK_H
+#endif //HAQP_PARTITIONCYCLESBENCHMARK_HPP

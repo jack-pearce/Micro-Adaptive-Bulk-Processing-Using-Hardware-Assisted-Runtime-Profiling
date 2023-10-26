@@ -1,11 +1,11 @@
 #include <vector>
 
-#include "haqp.h"
-#include "select_benchmarks/selectCyclesBenchmark.h"
-#include "groupBy_benchmarks/groupByCyclesBenchmark.h"
-#include "partition_benchmarks/partitionCyclesBenchmark.h"
-#include "data_generation/dataFiles.h"
-#include "utilities/dataHelpers.h"
+#include "haqp.hpp"
+#include "select_benchmarks/selectCyclesBenchmark.hpp"
+#include "groupBy_benchmarks/groupByCyclesBenchmark.hpp"
+#include "partition_benchmarks/partitionCyclesBenchmark.hpp"
+#include "data_generation/dataFiles.hpp"
+#include "utilities/dataHelpers.hpp"
 
 using HAQP::Select;
 using HAQP::GroupBy;
@@ -992,12 +992,14 @@ void runImdbMacroBenchmarks(int iterations) {
 
 int main() {
 
-    int iterations = 5;
-    runImdbPartitionMacroBenchmark_titleIdColumnBasicsTable(iterations);
-    runImdbPartitionMacroBenchmark_startYearColumnBasicsTable(iterations);
-    runImdbPartitionMacroBenchmark_personIdColumnPrincipalsTable(iterations);
-
-    allPartitionTests(1);
+    std::vector<float> inputThresholdDistribution;
+    generateLogDistribution(30, 1, 10*1000, inputThresholdDistribution);
+    selectCpuCyclesInputSweepBenchmark<int,int>(DataFiles::uniformIntDistribution250mValuesMax10000,
+                                                {Select::ImplementationIndexesBranch,
+                                                 Select::ImplementationIndexesPredication,
+                                                 Select::ImplementationIndexesAdaptive},
+                                                inputThresholdDistribution,
+                                                1, "OOP_TEST_1-Indexes");
 
     return 0;
 }
